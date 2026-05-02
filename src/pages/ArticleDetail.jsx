@@ -97,6 +97,7 @@ export default function ArticleDetail() {
   const [cText, setCText] = useState("");
   const [videoIdx, setVideoIdx] = useState(0);
   const [cardIdx, setCardIdx] = useState(0);
+  const [showAuthorMore, setShowAuthorMore] = useState(false);
 
   const onLike = () => { setLiked(p => !p); setLikeCount(p => liked ? p - 1 : p + 1); };
   const onBookmark = () => setBookmarked(p => !p);
@@ -236,30 +237,42 @@ export default function ArticleDetail() {
             {a.tags.map(tag => (<a key={tag} href="#" style={{ fontSize:"11px", color:"#1c4f8a", border:"1px solid #1c4f8a", padding:"4px 12px", textDecoration:"none" }}>#{tag}</a>))}
           </div>
 
-          {/* 기자란 */}
-          <div style={{ border:"1px solid #e0e0e0", padding:"24px", margin:"32px 0", background:"#f7f8fa" }}>
+          {/* 기자란 - 더보기 버튼 */}
+
+          <div style={{ border:"1px solid #e0e0e0", padding:"20px", margin:"32px 0", background:"#f7f8fa" }}>
             <div style={{ fontSize:"11px", color:"#9a9a9a", letterSpacing:"1px", fontWeight:"700", marginBottom:"14px" }}>이 기사를 쓴 기자</div>
-            <div style={{ display:"flex", gap:"16px", alignItems:"flex-start" }}>
-              <div style={{ width:"56px", height:"56px", borderRadius:"50%", background:color, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:"22px", fontWeight:"700", flexShrink:0 }}>정</div>
+            <div style={{ display:"flex", gap:"14px", alignItems:"flex-start" }}>
+              <div style={{ width:"52px", height:"52px", borderRadius:"50%", background:color, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:"20px", fontWeight:"700", flexShrink:0 }}>정</div>
               <div style={{ flex:1 }}>
-                <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", marginBottom:"4px" }}>{a.author_name}</div>
-                <div style={{ fontSize:"12px", color:"#9a9a9a", marginBottom:"10px" }}>{a.author_bio}</div>
-                <div style={{ fontSize:"13px", color:"#3a3a3a", lineHeight:"1.7", marginBottom:"16px" }}>{a.author_intro}</div>
-                {/* 이 기자의 다른 기사 */}
-                <div style={{ paddingTop:"16px", borderTop:"1px solid #e0e0e0" }}>
-                  <div style={{ fontSize:"11px", color:"#9a9a9a", fontWeight:"700", letterSpacing:"1px", marginBottom:"12px" }}>이 기자의 다른 기사</div>
-                  <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
-                    {AUTHOR_ARTICLES.map(art => (
-                      <Link key={art.id} to={"/이음매거진/" + art.id} style={{ display:"flex", alignItems:"center", gap:"10px", textDecoration:"none" }}>
-                        <div style={{ width:"60px", height:"44px", background:"#eef3fa", borderRadius:"3px", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.2rem" }}>📰</div>
-                        <div>
-                          <div style={{ fontSize:"12px", color:"#1a1a1a", fontWeight:"600", lineHeight:"1.4" }}>{art.title}</div>
-                          <div style={{ fontSize:"10px", color:"#9a9a9a", marginTop:"2px" }}>{art.date}</div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"4px" }}>
+                  <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52" }}>{a.author_name}</div>
+                  <button onClick={() => setShowAuthorMore(p => !p)}
+                    style={{ fontSize:"11px", color:"#1c4f8a", background:"none", border:"1px solid #1c4f8a", padding:"3px 10px", cursor:"pointer", borderRadius:"20px", fontFamily:"inherit" }}>
+                    {showAuthorMore ? "접기 ▲" : "더보기 ▼"}
+                  </button>
                 </div>
+                <div style={{ fontSize:"12px", color:"#9a9a9a", marginBottom: showAuthorMore ? "10px" : "0" }}>{a.author_bio}</div>
+
+                {/* 더보기 펼쳐지는 영역 */}
+                {showAuthorMore && (
+                  <div>
+                    <div style={{ fontSize:"13px", color:"#3a3a3a", lineHeight:"1.7", marginBottom:"16px" }}>{a.author_intro}</div>
+                    <div style={{ paddingTop:"14px", borderTop:"1px solid #e0e0e0" }}>
+                      <div style={{ fontSize:"11px", color:"#9a9a9a", fontWeight:"700", letterSpacing:"1px", marginBottom:"10px" }}>이 기자의 다른 기사</div>
+                      <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
+                        {AUTHOR_ARTICLES.map(art => (
+                          <Link key={art.id} to={"/이음매거진/" + art.id} style={{ display:"flex", alignItems:"center", gap:"10px", textDecoration:"none" }}>
+                            <div style={{ width:"56px", height:"42px", background:"#eef3fa", borderRadius:"3px", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.1rem" }}>📰</div>
+                            <div>
+                              <div style={{ fontSize:"12px", color:"#1a1a1a", fontWeight:"600", lineHeight:"1.4" }}>{art.title}</div>
+                              <div style={{ fontSize:"10px", color:"#9a9a9a", marginTop:"2px" }}>{art.date}</div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
