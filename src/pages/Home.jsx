@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 
 const CC = {
@@ -386,37 +386,7 @@ export default function ArticleDetail() {
         </aside>
       </div>
 
-      {/* 푸터 */}
-      <footer style={{background:"#0d2d52",color:"rgba(255,255,255,0.65)",padding:"40px 24px",textAlign:"center",fontSize:"13px",borderTop:"3px solid #1c4f8a"}}>
-        <div style={{maxWidth:"800px",margin:"0 auto"}}>
-          <div style={{display:"flex",flexDirection:"column",alignItems:"center",marginBottom:"20px"}}>
-            <div style={{display:"flex",alignItems:"center",gap:"12px",marginBottom:"4px"}}>
-              <img src="/logo.png" alt="이음미디어 로고" style={{height:"52px",width:"auto",objectFit:"contain"}}/>
-              <div style={{textAlign:"left"}}>
-                <div style={{fontFamily:"'Noto Serif KR',serif",fontSize:"24px",fontWeight:"900",color:"white",letterSpacing:"-1px"}}>이<span style={{color:"#f0a882"}}>음</span>미디어</div>
-                <div style={{fontSize:"10px",color:"rgba(255,255,255,0.5)",fontFamily:"monospace",letterSpacing:"0.12em"}}>E-EUM MEDIA</div>
-              </div>
-            </div>
-            <div style={{fontSize:"12px",color:"rgba(255,255,255,0.5)",marginTop:"10px"}}>세상을 잇고, 사람을 잇는다 · 당신의 성공이 우리의 뉴스다</div>
-          </div>
-          <div style={{fontSize:"11px",color:"rgba(255,255,255,0.4)",lineHeight:"1.9",marginBottom:"16px"}}>
-            등록번호: 경기 아XXXXX | 발행인: 성창운 | 편집인: 정세연<br/>
-            청소년보호책임자: 정세연 | press@eummedia.kr<br/>
-            주소: 경기도 고양시 일산 | 발행일: 매주
-          </div>
-          <div style={{paddingTop:"16px",borderTop:"1px solid rgba(255,255,255,0.1)",display:"flex",flexWrap:"wrap",justifyContent:"center",gap:"12px",fontSize:"11px",marginBottom:"12px"}}>
-            {[
-              {href:"/privacy",label:"개인정보처리방침"},
-              {href:"/terms",label:"이용약관"},
-              {href:"/youth",label:"청소년보호정책"},
-              {href:"/about#editorial",label:"편집방침"},
-              {href:"/ad",label:"광고문의"},
-              {href:"/about",label:"이음미디어 소개"},
-            ].map(l=>(<a key={l.href} href={l.href} style={{color:"rgba(255,255,255,0.5)",textDecoration:"none"}}>{l.label}</a>))}
-          </div>
-          <div style={{fontSize:11,color:"rgba(255,255,255,0.3)"}}>© 2026 이음미디어. All rights reserved.</div>
-        </div>
-      </footer>
+ 
 
     </div>
   );

@@ -116,7 +116,7 @@ export default function ArticleDetail() {
     <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#fff", color:"#1a1a1a", minHeight:"100vh" }}>
 
       {/* 플로팅 바 */}
-      <div style={{ position:"fixed", right:"20px", top:"50%", transform:"translateY(-50%)", display:"flex", flexDirection:"column", alignItems:"center", gap:"8px", zIndex:999 }}>
+      <div style={{ position:"fixed", right:"20px", bottom:"30%", top:"auto", display:"flex", flexDirection:"column", alignItems:"center", gap:"8px", zIndex:999 }}>
         <FloatBtn onClick={onLike}>
           <span style={{ fontSize:"15px" }}>{liked ? "❤️" : "🤍"}</span>
           <span style={{ fontSize:"8px", color:"#9a9a9a", fontWeight:"700" }}>{likeCount}</span>
