@@ -2,13 +2,13 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const channels = [
-  { name: "정치", path: "/channel/politics" },
-  { name: "경제", path: "/channel/economy" },
-  { name: "사회", path: "/channel/society" },
-  { name: "문화", path: "/channel/culture" },
-  { name: "건강", path: "/channel/health" },
-  { name: "라이프", path: "/channel/life" },
-  { name: "오피니언", path: "/channel/opinion" },
+  { name: "이음매거진", path: "/channel/politics" },
+  { name: "이음로컬", path: "/channel/economy" },
+  { name: "이음에듀", path: "/channel/society" },
+  { name: "이음피플", path: "/channel/culture" },
+  { name: "이음트렌드", path: "/channel/health" },
+  { name: "이음보이스", path: "/channel/life" },
+  { name: "이음뷰", path: "/channel/opinion" },
 ];
 
 export default function Header() {

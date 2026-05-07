@@ -65,23 +65,70 @@ const POPULAR = [
   { id:"p5", title:"바이올리니스트 박진영 독주회", channel:"이음피플", views:516, thumb:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=80&q=80" },
 ];
 
-function FloatBtn({ onClick, children, bg, fg }) {
-  const [h, setH] = useState(false);
-  return (
-    <button onClick={onClick} onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
-      style={{ width:"40px", height:"40px", borderRadius:"50%", background: bg || (h ? "#f0f4f8" : "#fff"), border:"1px solid " + (h ? "#0d2d52" : "#e0e0e0"), boxShadow: h ? "0 4px 12px rgba(0,0,0,0.15)" : "0 2px 8px rgba(0,0,0,0.08)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.2s", gap:"1px", color: fg || (h ? "#0d2d52" : "#555") }}>
-      {children}
-    </button>
-  );
-}
-
 function ArrowBtn({ onClick, dir }) {
   const [h, setH] = useState(false);
   return (
     <button onClick={onClick} onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
       style={{ width:"32px", height:"32px", borderRadius:"50%", background: h ? "#0d2d52" : "#fff", border:"2px solid " + (h ? "#0d2d52" : "#ddd"), color: h ? "#fff" : "#0d2d52", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:"18px", fontWeight:"900", transition:"all 0.2s", lineHeight:1 }}>
-      {dir === "prev" ? "\u2039" : "\u203a"}
+      {dir === "prev" ? "‹" : "›"}
     </button>
+  );
+}
+
+function StickyBtn({ onClick, title, bg, fg, active, activeColor, children }) {
+  const [h, setH] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      onMouseEnter={() => setH(true)}
+      onMouseLeave={() => setH(false)}
+      style={{
+        width: "48px",
+        height: "48px",
+        borderRadius: "50%",
+        background: bg || (active ? "#fff5f5" : h ? "#f0f4f8" : "#fff"),
+        border: "1px solid " + (active ? (activeColor || "#e74c3c") : h ? "#0d2d52" : "#e0e0e0"),
+        boxShadow: h ? "0 4px 14px rgba(0,0,0,0.15)" : "0 2px 8px rgba(0,0,0,0.08)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        transition: "all 0.2s",
+        gap: "2px",
+        color: fg || (active ? activeColor : h ? "#0d2d52" : "#555"),
+        padding: 0,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function StickyReactionBar({ liked, likeCount, onLike, bookmarked, onBookmark, onCopy, copied, onKakao, onFb, commentCount }) {
+  const buttons = [
+    { icon: liked ? "❤️" : "🤍", label: likeCount, onClick: onLike, title: "좋아요", active: liked, activeColor: "#e74c3c" },
+    { icon: "💬", label: commentCount, onClick: () => document.getElementById("comment-section")?.scrollIntoView({ behavior: "smooth" }), title: "댓글" },
+    { icon: bookmarked ? "🔖" : "📌", label: bookmarked ? "저장됨" : "저장", onClick: onBookmark, title: "저장", active: bookmarked, activeColor: "#c9a84c" },
+    { type: "divider" },
+    { icon: "K", label: "카톡", onClick: onKakao, title: "카카오 공유", bg: "#FEE500", fg: "#3C1E1E", iconStyle: { fontSize: "13px", fontWeight: "900" } },
+    { icon: "f", label: "FB", onClick: onFb, title: "페이스북 공유", bg: "#1877F2", fg: "white", iconStyle: { fontSize: "13px", fontWeight: "900" } },
+    { icon: copied ? "✅" : "🔗", label: copied ? "복사됨" : "링크", onClick: onCopy, title: "링크 복사" },
+  ];
+
+  return (
+    <div style={{ position: "sticky", top: "120px", display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", width: "52px", alignSelf: "flex-start" }}>
+      {buttons.map((btn, i) => {
+        if (btn.type === "divider") return <div key={i} style={{ width: "1px", height: "14px", background: "#e0e0e0", margin: "2px 0" }} />;
+        return (
+          <StickyBtn key={i} onClick={btn.onClick} title={btn.title} bg={btn.bg} fg={btn.fg} active={btn.active} activeColor={btn.activeColor}>
+            <span style={btn.iconStyle || { fontSize: "16px" }}>{btn.icon}</span>
+            <span style={{ fontSize: "9px", color: btn.fg || (btn.active ? btn.activeColor : "#9a9a9a"), fontWeight: "700", lineHeight: 1 }}>{btn.label}</span>
+          </StickyBtn>
+        );
+      })}
+    </div>
   );
 }
 
@@ -114,31 +161,6 @@ export default function ArticleDetail() {
 
   return (
     <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#fff", color:"#1a1a1a", minHeight:"100vh" }}>
-
-      {/* 플로팅 바 */}
-      <div style={{ position:"fixed", right:"20px", bottom:"30%", top:"auto", display:"flex", flexDirection:"column", alignItems:"center", gap:"8px", zIndex:999 }}>
-        <FloatBtn onClick={onLike}>
-          <span style={{ fontSize:"15px" }}>{liked ? "❤️" : "🤍"}</span>
-          <span style={{ fontSize:"8px", color:"#9a9a9a", fontWeight:"700" }}>{likeCount}</span>
-        </FloatBtn>
-        <FloatBtn>
-          <span style={{ fontSize:"15px" }}>💬</span>
-          <span style={{ fontSize:"8px", color:"#9a9a9a", fontWeight:"700" }}>{comments.length}</span>
-        </FloatBtn>
-        <FloatBtn onClick={onBookmark}>
-          <span style={{ fontSize:"15px" }}>{bookmarked ? "🔖" : "📌"}</span>
-        </FloatBtn>
-        <div style={{ width:"1px", height:"12px", background:"#e0e0e0" }} />
-        <FloatBtn onClick={onKakao} bg="#FEE500" fg="#3C1E1E">
-          <span style={{ fontSize:"13px", fontWeight:"900" }}>K</span>
-        </FloatBtn>
-        <FloatBtn onClick={onFb} bg="#1877F2" fg="white">
-          <span style={{ fontSize:"13px", fontWeight:"900" }}>f</span>
-        </FloatBtn>
-        <FloatBtn onClick={onCopy}>
-          <span style={{ fontSize:"15px" }}>{copied ? "✅" : "🔗"}</span>
-        </FloatBtn>
-      </div>
 
       {/* 상단바 */}
       <div style={{ background:"#0d2d52", padding:"6px 0", fontSize:"11px" }}>
@@ -193,8 +215,19 @@ export default function ArticleDetail() {
         </div>
       </div>
 
-      {/* 본문 레이아웃 */}
-      <div style={{ maxWidth:"1200px", margin:"0 auto", padding:"48px 32px", display:"grid", gridTemplateColumns:"1fr 300px", gap:"56px", alignItems:"start" }}>
+      {/* 본문 레이아웃: 플로팅바 | 기사 | 사이드바 */}
+      <div style={{ maxWidth:"1280px", margin:"0 auto", padding:"48px 32px", display:"grid", gridTemplateColumns:"60px 1fr 300px", gap:"32px", alignItems:"start" }}>
+
+        {/* ★ 왼쪽 sticky 반응 바 */}
+        <StickyReactionBar
+          liked={liked} likeCount={likeCount} onLike={onLike}
+          bookmarked={bookmarked} onBookmark={onBookmark}
+          onCopy={onCopy} copied={copied}
+          onKakao={onKakao} onFb={onFb}
+          commentCount={comments.length}
+        />
+
+        {/* 기사 본문 */}
         <main>
           <div style={{ fontSize:"10px", color:color, fontWeight:"700", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"14px", display:"flex", alignItems:"center", gap:"8px" }}>
             <span style={{ width:"24px", height:"1px", background:color, display:"inline-block" }} />{a.channel}
@@ -237,8 +270,7 @@ export default function ArticleDetail() {
             {a.tags.map(tag => (<a key={tag} href="#" style={{ fontSize:"11px", color:"#1c4f8a", border:"1px solid #1c4f8a", padding:"4px 12px", textDecoration:"none" }}>#{tag}</a>))}
           </div>
 
-          {/* 기자란 - 더보기 버튼 */}
-
+          {/* 기자란 */}
           <div style={{ border:"1px solid #e0e0e0", padding:"20px", margin:"32px 0", background:"#f7f8fa" }}>
             <div style={{ fontSize:"11px", color:"#9a9a9a", letterSpacing:"1px", fontWeight:"700", marginBottom:"14px" }}>이 기사를 쓴 기자</div>
             <div style={{ display:"flex", gap:"14px", alignItems:"flex-start" }}>
@@ -252,8 +284,6 @@ export default function ArticleDetail() {
                   </button>
                 </div>
                 <div style={{ fontSize:"12px", color:"#9a9a9a", marginBottom: showAuthorMore ? "10px" : "0" }}>{a.author_bio}</div>
-
-                {/* 더보기 펼쳐지는 영역 */}
                 {showAuthorMore && (
                   <div>
                     <div style={{ fontSize:"13px", color:"#3a3a3a", lineHeight:"1.7", marginBottom:"16px" }}>{a.author_intro}</div>
@@ -315,7 +345,7 @@ export default function ArticleDetail() {
           </div>
 
           {/* 댓글 */}
-          <div style={{ margin:"32px 0" }}>
+          <div id="comment-section" style={{ margin:"32px 0" }}>
             <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", borderBottom:"2px solid #0d2d52", paddingBottom:"10px", marginBottom:"20px" }}>댓글 {comments.length}개</div>
             <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px", marginBottom:"20px" }}>
               <input value={cName} onChange={e => setCName(e.target.value)} placeholder="이름" style={{ width:"100%", border:"1px solid #d0d0d0", padding:"8px 12px", fontSize:"12px", fontFamily:"inherit", marginBottom:"8px", outline:"none", boxSizing:"border-box" }} />
@@ -428,9 +458,9 @@ export default function ArticleDetail() {
             <div style={{ fontSize:"12px", color:"rgba(255,255,255,0.5)", marginTop:"10px" }}>세상을 잇고, 사람을 잇는다 · 당신의 성공이 우리의 뉴스다</div>
           </div>
           <div style={{ fontSize:"11px", color:"rgba(255,255,255,0.4)", lineHeight:"1.9", marginBottom:"16px" }}>
-            등록번호: 경기 아XXXXX | 발행인: 성창운 | 편집인: 정세연<br />
+            등록번호: 서울, 이56526 | 발행인: 성창운 | 편집국장: 정세연<br />
             청소년보호책임자: 정세연 | press@eummedia.kr<br />
-            주소: 서울 관악구 남부순환로 1699 2층 | 발행일: 매주
+            주소: 경기도 고양시 일산 | 발행일: 매주
           </div>
           <div style={{ paddingTop:"16px", borderTop:"1px solid rgba(255,255,255,0.1)", display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", fontSize:"11px", marginBottom:"12px" }}>
             {[
