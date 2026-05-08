@@ -162,48 +162,6 @@ export default function ArticleDetail() {
   return (
     <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#fff", color:"#1a1a1a", minHeight:"100vh" }}>
 
-      {/* 상단바 */}
-      <div style={{ background:"#0d2d52", padding:"6px 0", fontSize:"11px" }}>
-        <div style={{ maxWidth:"1200px", margin:"0 auto", padding:"0 32px", display:"flex", justifyContent:"space-between", color:"rgba(255,255,255,0.6)" }}>
-          <span style={{ color:"rgba(255,255,255,0.8)", fontWeight:"500" }}>2026년 5월 1일 목요일 · 경기도 고양</span>
-          <div style={{ display:"flex", gap:"16px" }}>
-            {["시민기자 지원","광고문의","로그인"].map(t => (
-              <a key={t} href="#" style={{ color:"rgba(255,255,255,0.55)", textDecoration:"none" }}>{t}</a>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* 헤더 */}
-      <header style={{ background:"#fff", borderBottom:"1px solid #e0e0e0" }}>
-        <div style={{ maxWidth:"1200px", margin:"0 auto", padding:"0 32px" }}>
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 0 14px", borderBottom:"3px solid #0d2d52" }}>
-            <Link to="/" style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:"12px" }}>
-              <img src="/logo.png" alt="이음미디어" style={{ height:"52px", width:"auto", objectFit:"contain" }} />
-              <div>
-                <div style={{ fontFamily:"serif", fontSize:"26px", fontWeight:"900", color:"#0d2d52", letterSpacing:"-1px", lineHeight:1 }}>
-                  이<span style={{ color:"#e8432d" }}>음</span>미디어
-                </div>
-                <div style={{ fontSize:"10px", color:"#9a9a9a", letterSpacing:"3px", marginTop:"3px" }}>E-EUM MEDIA</div>
-              </div>
-            </Link>
-            <div style={{ display:"flex", gap:"8px" }}>
-              <button style={{ background:"#1c4f8a", color:"white", border:"none", padding:"8px 18px", fontSize:"12px", fontWeight:"700", cursor:"pointer", fontFamily:"inherit" }}>구독하기</button>
-              <button style={{ background:"transparent", border:"1px solid #c0c0c0", padding:"7px 16px", fontSize:"12px", cursor:"pointer", fontFamily:"inherit" }}>로그인</button>
-            </div>
-          </div>
-          <nav>
-            <ul style={{ display:"flex", listStyle:"none", margin:0, padding:0 }}>
-              {["전체","이음매거진","이음로컬","이음에듀","이음피플","이음트렌드","이음보이스","이음뷰"].map(ch => (
-                <li key={ch}>
-                  <Link to={ch === "전체" ? "/" : "/" + ch} style={{ display:"block", padding:"11px 16px", fontSize:"12.5px", fontWeight: ch === a.channel ? "700" : "500", color: ch === a.channel ? "#1c4f8a" : "#3a3a3a", textDecoration:"none", borderBottom: ch === a.channel ? "2px solid #1c4f8a" : "2px solid transparent" }}>{ch}</Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-      </header>
-
       {/* 브레드크럼 */}
       <div style={{ background:"#f7f8fa", borderBottom:"1px solid #e8e8e8", padding:"10px 0", fontSize:"11px", color:"#9a9a9a" }}>
         <div style={{ maxWidth:"1200px", margin:"0 auto", padding:"0 32px", display:"flex", gap:"6px", alignItems:"center" }}>
@@ -443,38 +401,6 @@ export default function ArticleDetail() {
           </div>
         </aside>
       </div>
-
-      {/* 푸터 */}
-      <footer style={{ background:"#0d2d52", color:"rgba(255,255,255,0.65)", padding:"40px 24px", textAlign:"center", borderTop:"3px solid #1c4f8a" }}>
-        <div style={{ maxWidth:"800px", margin:"0 auto" }}>
-          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", marginBottom:"20px" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:"12px", marginBottom:"4px" }}>
-              <img src="/logo.png" alt="이음미디어 로고" style={{ height:"52px", width:"auto", objectFit:"contain" }} />
-              <div style={{ textAlign:"left" }}>
-                <div style={{ fontFamily:"serif", fontSize:"24px", fontWeight:"900", color:"white", letterSpacing:"-1px" }}>이<span style={{ color:"#f0a882" }}>음</span>미디어</div>
-                <div style={{ fontSize:"10px", color:"rgba(255,255,255,0.5)", fontFamily:"monospace", letterSpacing:"0.12em" }}>E-EUM MEDIA</div>
-              </div>
-            </div>
-            <div style={{ fontSize:"12px", color:"rgba(255,255,255,0.5)", marginTop:"10px" }}>세상을 잇고, 사람을 잇는다 · 당신의 성공이 우리의 뉴스다</div>
-          </div>
-          <div style={{ fontSize:"11px", color:"rgba(255,255,255,0.4)", lineHeight:"1.9", marginBottom:"16px" }}>
-            등록번호: 서울, 이56526 | 발행인: 성창운 | 편집국장: 정세연<br />
-            청소년보호책임자: 정세연 | press@eummedia.kr<br />
-            주소: 경기도 고양시 일산 | 발행일: 매주
-          </div>
-          <div style={{ paddingTop:"16px", borderTop:"1px solid rgba(255,255,255,0.1)", display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"12px", fontSize:"11px", marginBottom:"12px" }}>
-            {[
-              { href:"/privacy", label:"개인정보처리방침" },
-              { href:"/terms", label:"이용약관" },
-              { href:"/youth", label:"청소년보호정책" },
-              { href:"/about", label:"편집방침" },
-              { href:"/ad", label:"광고문의" },
-              { href:"/about", label:"이음미디어 소개" },
-            ].map(l => (<a key={l.label} href={l.href} style={{ color:"rgba(255,255,255,0.5)", textDecoration:"none" }}>{l.label}</a>))}
-          </div>
-          <div style={{ fontSize:"11px", color:"rgba(255,255,255,0.3)" }}>© 2026 이음미디어. All rights reserved.</div>
-        </div>
-      </footer>
 
     </div>
   );

@@ -31,11 +31,6 @@ export default function Signup() {
 
   return (
     <div style={s.page}>
-      <header style={s.header}>
-        <Link to="/" style={s.logo}>이음미디어</Link>
-        <p style={s.slogan}>세상과 당신을 잇는 주간인터넷신문</p>
-      </header>
-
       <main style={s.main}>
         <div style={s.card}>
           <h1 style={s.title}>회원가입</h1>
@@ -83,31 +78,12 @@ export default function Signup() {
           </div>
         </div>
       </main>
-
-      <footer style={s.footer}>
-        <div style={s.footerTop}/>
-        <div style={s.footerInner}>
-          <div style={s.footerLogo}>이음미디어</div>
-          <p style={s.footerSlogan}>세상과 당신을 잇는 주간인터넷신문</p>
-          <div style={s.footerLegal}>
-            <span>등록번호: 서울, 이56526</span><span>|</span>
-            <span>발행인: 성창운</span><span>|</span>
-            <span>편집국장: 정세연</span><span>|</span>
-            <span>청소년보호책임자: 정세연</span>
-          </div>
-          <p style={s.footerAddr}>발행소: 서울시 관악구 남부순환로 1699, 2층 | (주)봉숭아학당문화혁신학교</p>
-          <p style={s.footerCopy}>© 2026 이음미디어. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   );
 }
 
 const s = {
   page:       { minHeight:"100vh", background:"#f5f7fa", fontFamily:"'Noto Sans KR',sans-serif", display:"flex", flexDirection:"column" },
-  header:     { background:"#0a1628", padding:"20px 24px", textAlign:"center", borderBottom:"4px solid #c9a84c" },
-  logo:       { fontFamily:"'Noto Serif KR',serif", fontSize:"1.8rem", fontWeight:900, color:"#fff", textDecoration:"none", display:"block" },
-  slogan:     { color:"#c9a84c", fontSize:"0.82rem", margin:"6px 0 0", letterSpacing:"0.5px" },
   main:       { flex:1, display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 24px" },
   card:       { background:"#fff", borderRadius:16, padding:"40px 36px", width:"100%", maxWidth:420, boxShadow:"0 4px 24px rgba(0,0,0,0.08)" },
   title:      { fontFamily:"'Noto Serif KR',serif", fontSize:"1.6rem", fontWeight:700, color:"#0d2d52", margin:"0 0 8px", textAlign:"center" },
@@ -123,12 +99,4 @@ const s = {
   submitBtn:  { background:"#0d2d52", color:"#fff", border:"none", borderRadius:10, padding:"13px", fontSize:"1rem", fontWeight:700, cursor:"pointer", fontFamily:"'Noto Sans KR',sans-serif", marginTop:4 },
   loginLink:  { textAlign:"center", marginTop:20, fontSize:"0.85rem", color:"#888" },
   link:       { color:"#4a6fa5", fontWeight:600, textDecoration:"none" },
-  footer:     { background:"#0a1628", fontFamily:"'Noto Sans KR',sans-serif" },
-  footerTop:  { height:4, background:"linear-gradient(90deg,#c9a84c,#e8c96d,#c9a84c)" },
-  footerInner:{ maxWidth:1200, margin:"0 auto", padding:"28px 24px", textAlign:"center" },
-  footerLogo: { fontFamily:"'Noto Serif KR',serif", fontSize:"1.4rem", fontWeight:900, color:"#fff" },
-  footerSlogan:{ color:"#c9a84c", fontSize:"0.82rem", margin:"6px 0 16px" },
-  footerLegal:{ display:"flex", flexWrap:"wrap", justifyContent:"center", gap:"6px 12px", fontSize:"0.78rem", color:"#a0aec0", marginBottom:6 },
-  footerAddr: { fontSize:"0.75rem", color:"#718096", margin:"4px 0" },
-  footerCopy: { fontSize:"0.72rem", color:"#4a5568", marginTop:12 },
 };

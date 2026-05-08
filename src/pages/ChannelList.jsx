@@ -73,21 +73,6 @@ export default function ChannelList() {
 
   return (
     <div style={s.page}>
-      <header style={s.header}>
-        <div style={s.headerInner}>
-          <Link to="/" style={s.logo}>이음미디어</Link>
-          <nav style={s.gnb}>
-            {CHANNELS.filter(c=>c!=="전체").map(ch=>(
-              <button key={ch} onClick={()=>switchChannel(ch)}
-                style={{...s.gnbItem,...(activeChannel===ch?s.gnbActive:{})}}>
-                {CHANNEL_META[ch].icon} {ch}
-              </button>
-            ))}
-          </nav>
-          <Link to="/login" style={s.loginBtn}>로그인</Link>
-        </div>
-      </header>
-
       <div style={{...s.banner,background:`linear-gradient(135deg,${meta.color} 0%,${meta.color}dd 100%)`}}>
         <div style={s.bannerInner}>
           <span style={s.bannerIcon}>{meta.icon}</span>
@@ -162,22 +147,6 @@ export default function ChannelList() {
         )}
       </main>
 
-      <footer style={s.footer}>
-        <div style={s.footerTop}/>
-        <div style={s.footerInner}>
-          <div style={s.footerLogo}>이음미디어</div>
-          <p style={s.footerSlogan}>사람과 사람을 잇는 인터넷 주간신문</p>
-          <div style={s.footerLegal}>
-            <span>등록번호: 서울, 이56526</span><span>|</span>
-            <span>등록일: 2026.04.27</span><span>|</span>
-            <span>발행인: 성창운</span><span>|</span>
-            <span>편집국장: 정세연</span><span>|</span>
-            <span>청소년보호책임자: 정세연</span>
-          </div>
-          <p style={s.footerAddr}>발행소: 서울시 관악구 남부순환로 1699, 2층 | (주)봉숭아학당문화혁신학교</p>
-          <p style={s.footerCopy}>© 2026 이음미디어. All rights reserved.</p>
-        </div>
-      </footer>
       <style>{`@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}.ecard:hover{transform:translateY(-4px)!important;box-shadow:0 12px 32px rgba(0,0,0,0.13)!important}.ecard:hover img{transform:scale(1.05)!important}`}</style>
     </div>
   );
@@ -212,13 +181,6 @@ function ArticleCard({article}) {
 
 const s = {
   page:{minHeight:"100vh",background:"#f5f7fa",fontFamily:"'Noto Sans KR',sans-serif"},
-  header:{background:"#0a1628",position:"sticky",top:0,zIndex:100,boxShadow:"0 2px 12px rgba(0,0,0,0.3)"},
-  headerInner:{maxWidth:1200,margin:"0 auto",padding:"0 24px",height:60,display:"flex",alignItems:"center",gap:16},
-  logo:{fontFamily:"'Noto Serif KR',serif",fontSize:"1.3rem",fontWeight:900,color:"#fff",textDecoration:"none",whiteSpace:"nowrap"},
-  gnb:{display:"flex",gap:2,flex:1,overflowX:"auto"},
-  gnbItem:{background:"none",border:"none",color:"#a0aec0",cursor:"pointer",padding:"5px 10px",borderRadius:20,fontSize:"0.8rem",fontFamily:"'Noto Sans KR',sans-serif",transition:"all 0.2s",whiteSpace:"nowrap"},
-  gnbActive:{background:"rgba(201,168,76,0.15)",color:"#c9a84c"},
-  loginBtn:{background:"#c9a84c",color:"#0a1628",padding:"7px 16px",borderRadius:20,fontSize:"0.82rem",fontWeight:700,textDecoration:"none",whiteSpace:"nowrap"},
   banner:{padding:"28px 0",position:"relative",overflow:"hidden"},
   bannerInner:{maxWidth:1200,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",gap:16},
   bannerIcon:{fontSize:"2.2rem"},
@@ -265,12 +227,4 @@ const s = {
   badge:{display:"inline-block",color:"#fff",fontSize:"0.72rem",padding:"3px 9px",borderRadius:10,fontWeight:600},
   metaText:{fontSize:"0.78rem",color:"#aaa"},
   loadMore:{display:"block",margin:"32px auto 0",background:"#fff",border:"2px solid #0d2d52",color:"#0d2d52",padding:"11px 36px",borderRadius:28,cursor:"pointer",fontSize:"0.9rem",fontWeight:600,fontFamily:"'Noto Sans KR',sans-serif"},
-  footer:{background:"#0a1628",marginTop:64,fontFamily:"'Noto Sans KR',sans-serif"},
-  footerTop:{height:4,background:"linear-gradient(90deg,#c9a84c,#e8c96d,#c9a84c)"},
-  footerInner:{maxWidth:1200,margin:"0 auto",padding:"36px 24px 28px",textAlign:"center"},
-  footerLogo:{fontFamily:"'Noto Serif KR',serif",fontSize:"1.5rem",fontWeight:900,color:"#fff"},
-  footerSlogan:{color:"#c9a84c",fontSize:"0.82rem",margin:"6px 0 20px"},
-  footerLegal:{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:"6px 12px",fontSize:"0.8rem",color:"#a0aec0",marginBottom:8},
-  footerAddr:{fontSize:"0.78rem",color:"#718096",margin:"4px 0"},
-  footerCopy:{fontSize:"0.75rem",color:"#4a5568",marginTop:16},
 };
