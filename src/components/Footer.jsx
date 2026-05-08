@@ -1,100 +1,84 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom'
 
 export default function Footer() {
   return (
     <footer style={{
-      backgroundColor: "#0d2d52",
-      color: "rgba(255,255,255,0.65)",
-      fontFamily: "'Noto Sans KR', sans-serif",
-      borderTop: "3px solid #c9a84c",
-      marginTop: 60
+      background: '#0d2d52',
+      color: '#ccc',
+      padding: '48px 0 24px',
+      marginTop: '80px',
+      fontFamily: "'Noto Sans KR', sans-serif"
     }}>
-      <div style={{
-        maxWidth: 800,
-        margin: "0 auto",
-        padding: "40px 24px",
-        textAlign: "center"
-      }}>
-        {/* 로고 */}
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+
+        {/* 상단 3열 */}
         <div style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          marginBottom: 20
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '40px',
+          marginBottom: '40px'
         }}>
-          <img src="/logo.png" alt="이음미디어 로고" style={{ height: 52, width: "auto", objectFit: "contain", marginBottom: 10 }} />
-          <div style={{
-            fontFamily: "'Noto Serif KR', serif",
-            fontSize: 24,
-            fontWeight: 900,
-            color: "white",
-            letterSpacing: "-1px"
-          }}>
-            이음<span style={{ color: "#c9a84c" }}>미디어</span>
+
+          {/* 로고 + 슬로건 */}
+          <div>
+            <div style={{
+              color: '#c9a84c',
+              fontSize: '22px',
+              fontWeight: '700',
+              fontFamily: "'Noto Serif KR', serif",
+              marginBottom: '10px'
+            }}>
+              이음미디어
+            </div>
+            <p style={{ fontSize: '13px', lineHeight: '1.8', color: '#aaa' }}>
+              세상과 당신을 잇는<br />주간인터넷신문
+            </p>
           </div>
-          <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)", fontFamily: "monospace", letterSpacing: "0.12em" }}>E-EUM MEDIA</div>
+
+          {/* 바로가기 */}
+          <div>
+            <h4 style={{ color: '#c9a84c', fontSize: '14px', marginBottom: '14px' }}>바로가기</h4>
+            {[
+              { to: '/about', label: '이음미디어 소개' },
+              { to: '/advertise', label: '광고문의' },
+              { to: '/citizen-reporter', label: '시민기자지원' },
+              { to: '/report', label: '제보하기' },
+              { to: '/subscribe', label: '구독신청' },
+            ].map(item => (
+              <div key={item.to} style={{ marginBottom: '8px' }}>
+                <Link to={item.to} style={{ color: '#bbb', fontSize: '13px', textDecoration: 'none' }}>
+                  {item.label}
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          {/* 연락처 */}
+          <div>
+            <h4 style={{ color: '#c9a84c', fontSize: '14px', marginBottom: '14px' }}>연락처</h4>
+            <p style={{ fontSize: '13px', lineHeight: '2', color: '#aaa' }}>
+              이메일: press@eummedia.kr<br />
+              서울특별시 관악구<br />
+              남부순환로 1699 2층
+            </p>
+          </div>
         </div>
 
-        {/* 슬로건 강조 */}
+        {/* 하단 법적 정보 */}
         <div style={{
-          fontSize: 15,
-          fontWeight: 700,
-          color: "#c9a84c",
-          marginTop: 12,
-          marginBottom: 6,
-          fontFamily: "'Noto Serif KR', serif",
-          letterSpacing: "-0.5px"
+          borderTop: '1px solid #1e4a7a',
+          paddingTop: '20px',
+          fontSize: '12px',
+          color: '#888',
+          lineHeight: '2'
         }}>
-          세상을 잇고, 사람을 잇는다
-        </div>
-        <div style={{
-          fontSize: 13,
-          fontWeight: 500,
-          color: "rgba(255,255,255,0.7)",
-          marginBottom: 20,
-          letterSpacing: "0.5px"
-        }}>
-          당신의 성공이 우리의 뉴스다
-        </div>
-
-        {/* 등록정보 */}
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", lineHeight: 1.9, marginBottom: 16 }}>
-          등록번호: 서울, 이56526 | 발행인: 성창운 | 편집인: 정세연<br />
-          청소년보호책임자: 정세연 | press@eummedia.kr<br />
-          주소: 경기도 고양시 일산 | 발행일: 매주
-        </div>
-
-        {/* 링크 */}
-        <div style={{
-          paddingTop: 16,
-          borderTop: "1px solid rgba(255,255,255,0.1)",
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          gap: 12,
-          fontSize: 11,
-          marginBottom: 12
-        }}>
-          {[
-            { href: "/privacy", label: "개인정보처리방침" },
-            { href: "/terms", label: "이용약관" },
-            { href: "/youth", label: "청소년보호정책" },
-            { href: "/about#editorial", label: "편집방침" },
-            { href: "/ad", label: "광고문의" },
-            { href: "/about", label: "이음미디어 소개" },
-          ].map(l => (
-            <a key={l.href} href={l.href} style={{ color: "rgba(255,255,255,0.5)", textDecoration: "none" }}
-              onMouseEnter={e => e.currentTarget.style.color = "#c9a84c"}
-              onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.5)"}
-            >{l.label}</a>
-          ))}
-        </div>
-
-        {/* 카피라이트 */}
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>
-          © 2026 이음미디어. All rights reserved.
+          <p>등록번호: 서울, 이56526 | 발행인: 성창운 | 편집국장: 정세연</p>
+          <p>주소: 서울특별시 관악구 남부순환로 1699 2층</p>
+          <p style={{ marginTop: '8px' }}>
+            © 2026 이음미디어. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
-  );
+  )
 }
