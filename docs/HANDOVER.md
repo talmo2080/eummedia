@@ -4,7 +4,7 @@
 > 세션 시작 시: 이 문서를 가장 먼저 읽으세요.
 > 세션 종료 전: 반드시 이 문서를 업데이트하고 commit & push 하세요.
 >
-> **마지막 작업: 2026-05-09** — Phase 3 사전작업 A-2 완료 (7개 채널 등록)
+> **마지막 작업: 2026-05-09** — Phase 3 사전작업 A 전체 100% 완료 (A-1 봇 계정 + A-2 7채널 + A-3 service_role key 위치)
 
 ## 🎯 프로젝트 개요
 
@@ -62,7 +62,8 @@
 - [x] **Phase 3 설계**: RSS 구조 조사 + 매핑/변환/Edge Function 의사코드 (2026-05-09)
 - [x] **Phase 3 사전작업 A-1**: 봇 계정(이음매거진) 생성 + public.users 등록 (2026-05-09)
 - [x] **Phase 3 사전작업 A-2**: 7개 채널 INSERT 완료 (2026-05-09)
-- [ ] **Phase 3 사전작업 A-3 + 구현**: service_role key 확인 + Edge Function + React 연결 ← **다음**
+- [x] **Phase 3 사전작업 A-3**: service_role key 위치 확인 (2026-05-09) — **사전작업 A 100% 완료** ✅
+- [ ] **Phase 3 구현**: Edge Function (B) + React 연결 (C) ← **다음**
 - [ ] **Phase 3 보강(2차)**: 본문 크롤링 추가
 - [ ] **Phase 4**: 시민기자 시스템 (TipTap 에디터, 승인 워크플로우)
 - [ ] **Phase 5**: 카카오 알림 자동화 + Vercel 배포
@@ -117,20 +118,22 @@
 > ℹ️ Phase 3 설계 문서 4종(매핑표 / 변환 규칙 / Edge Function 의사코드 / 본 HANDOVER 갱신 초안)은 **정세연님 외부 메모에 보관**됨. 다음 세션 시작 시 그 문서 재참조.
 > RSS 조사 결과 요약: `https://eummagazine.com/rss` 글로벌 피드 1개에 41 item, boardId(15~21)는 link URL의 `/(\d{2})/\?idx=` 정규식으로 추출, shop_view 2건은 skip 대상.
 
-1. **A-3: service_role key 위치 확인** (다음 세션, 5분)
-   - Supabase 대시보드 → Settings → API → "service_role" 영역에서 확인만
-   - 절대 채팅·코드·git에 노출 금지. Edge Function 환경변수에만 보관
-2. **B: Edge Function 구현** (다음 세션 이후)
+1. **B: Edge Function 구현** (다음 세션)
    - 위치: `supabase/functions/import-magazine/index.ts` (Deno)
-   - 환경변수 4개: `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` / `AUTHOR_UUID=fd1adda6-d3ed-42d5-b0ed-540dde82776b` / `RSS_URL=https://eummagazine.com/rss`
+   - 환경변수 4개:
+     - `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` / `AUTHOR_UUID=fd1adda6-d3ed-42d5-b0ed-540dde82776b` / `RSS_URL=https://eummagazine.com/rss`
+   - **service_role key 처리 절차**:
+     1. 대시보드 → ⚙️ Project Settings → API Keys → "Legacy" 탭 → service_role 옆 `Reveal` → 복사
+     2. 대시보드의 Edge Functions → Secrets에 `SUPABASE_SERVICE_ROLE_KEY` 이름으로 저장 (또는 `supabase secrets set` CLI)
+     3. 절대 `.env` / git / 채팅에 노출 금지
    - 의사코드는 외부 메모의 산출물 3 참조
    - 로컬 테스트(`supabase functions serve`) → 배포(`supabase functions deploy`) → 수동 1회 실행 → 기대값: fetched=41, upserted=39, skipped=2(shop_view)
-3. **C: React mock → Supabase 교체** (B 이후)
+2. **C: React mock → Supabase 교체** (B 이후)
    - `src/pages/Home.jsx` / `ChannelList.jsx` / `ArticleDetail.jsx` 의 mock 데이터를 `supabase.from('articles').select(...)`로 교체
    - ArticleDetail에서 외부 URL 재구성: `https://eummagazine.com/${channel.slug.split('-').pop()}/?idx=${article.slug}&bmode=view`
    - 카드/본문에 "[원문 보기]" 새 탭 링크 노출
 
-> ✅ **A-1, A-2 완료 — 사전 작업 95% 끝.** 다음 세션은 A-3(5분)부터 시작 후 B 진입.
+> ✅ **사전작업 A (A-1/A-2/A-3) 100% 완료.** 다음 세션은 바로 B 진입.
 
 ## 📝 결정된 사항
 
@@ -145,6 +148,8 @@
 - **slug 규약 1차 확정** (2026-05-09): `articles.slug = idx 숫자` / `channels.slug = 'name-boardId'` (예: `magazine-21`). 외부 URL은 React에서 재구성. board_id 컬럼 추가는 2차 작업
 - **content NOT NULL 회피** (2026-05-09): placeholder Markdown + 원문 링크 저장 (시니어 친화 톤). 2차에서 본문 크롤링으로 채움
 - **Edge Function 인증** (2026-05-09): service_role key 필요 (anon은 RLS에 막힘). 1차 트리거는 수동 HTTP POST
+- **service_role key 위치** (2026-05-09): Supabase 대시보드 → ⚙️ Project Settings → API Keys → "Legacy anon, service_role API keys" 탭 → service_role 옆 `Reveal` 버튼. URL: `/dashboard/project/avbsniuthpcejjcdeiyw/settings/api-keys`
+- **service_role key 노출 정책** (2026-05-09): 채팅·코드·git에 절대 노출 금지. Edge Function의 환경변수(`SUPABASE_SERVICE_ROLE_KEY`)에만 보관 (`supabase secrets set` 또는 대시보드의 Edge Functions → Secrets)
 
 ## 🚨 알려진 이슈
 
@@ -167,6 +172,12 @@
 8. ~~**A-2(7채널 INSERT) 진행 시 트리거/FK 의존성 점검 필요**~~ — ✅ **해결됨 (2026-05-09)**:
    - 7채널 INSERT가 트리거/FK 의존성 문제 없이 1회에 깔끔히 성공 (`count(*)=7` 확인)
    - A-1의 `auth_trigger` 사례와는 달리 `channels` INSERT는 자동 트리거 의존성이 없음 (참고 기록)
+9. **Supabase 키 시스템 세대 교체 진행 중** (2026-05-09 신규):
+   - Legacy: `anon` + `service_role` ← 본 프로젝트 현재 사용
+   - 신 시스템: `Publishable` + `Secret`
+   - 대시보드 화면 하단에 "Disable legacy API keys" 권장 알림 존재 (즉시 강제 아님)
+   - **Phase 3 (현재)**: Legacy 그대로 사용. 변경 비용 0
+   - **Phase 5 (Vercel 배포 시)**: 신 시스템 마이그레이션 검토 — 그 시점 Supabase 권장 정책 재확인
 
 ## 🛠️ 사용자 환경 주의사항
 
