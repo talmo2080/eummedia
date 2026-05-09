@@ -4,7 +4,7 @@
 > 세션 시작 시: 이 문서를 가장 먼저 읽으세요.
 > 세션 종료 전: 반드시 이 문서를 업데이트하고 commit & push 하세요.
 >
-> **마지막 작업: 2026-05-09** — .env 보안 정리 + Supabase 연결 검증 + Migration 적용 발견
+> **마지막 작업: 2026-05-09** — Phase 3 사전작업 A-2 완료 (7개 채널 등록)
 
 ## 🎯 프로젝트 개요
 
@@ -59,7 +59,11 @@
 - [x] **Phase 1**: React 사이트 통일성 정리 + GitHub 첫 푸시 (2026-05-08)
 - [x] **Phase 2-A**: .env 보안 정리 + Supabase 연결 검증 (2026-05-09)
 - [ ] **Phase 2-B**: 나머지 6개 테이블 점검 + Edge Function 설계 (필요 시)
-- [ ] **Phase 3**: 매거진 30여 개 기사 마이그레이션 ← **다음**
+- [x] **Phase 3 설계**: RSS 구조 조사 + 매핑/변환/Edge Function 의사코드 (2026-05-09)
+- [x] **Phase 3 사전작업 A-1**: 봇 계정(이음매거진) 생성 + public.users 등록 (2026-05-09)
+- [x] **Phase 3 사전작업 A-2**: 7개 채널 INSERT 완료 (2026-05-09)
+- [ ] **Phase 3 사전작업 A-3 + 구현**: service_role key 확인 + Edge Function + React 연결 ← **다음**
+- [ ] **Phase 3 보강(2차)**: 본문 크롤링 추가
 - [ ] **Phase 4**: 시민기자 시스템 (TipTap 에디터, 승인 워크플로우)
 - [ ] **Phase 5**: 카카오 알림 자동화 + Vercel 배포
 - [ ] **Phase 6**: eummedia.kr 도메인 연결 + SEO/AEO 최적화
@@ -108,18 +112,25 @@
 - ❓ 나머지 6개 테이블(users/channels/comments/subscriptions/advertisements/reports) 적용 여부 미확인
 - ❓ Personal Access Token(PAT) 미발급 → MCP `list_tables`, `get_advisors` 등 관리자 도구 사용 불가
 
-### 다음 즉시 할 일 → Phase 3 시작
+### 다음 즉시 할 일 → Phase 3 사전작업 이어가기 + 구현
 
-1. **매거진 RSS 전략 확정**
-   - eummagazine.com 의 RSS URL 확인 (전체 / 카테고리별)
-   - Edge Function 트리거 방식 (cron / 수동 / Webhook)
-2. **articles 스키마 ↔ 매거진 데이터 매핑 정리**
-   - `supabase/migrations/20260430000003_create_articles.sql` 컬럼 ↔ RSS 필드
-3. **첫 Edge Function 구현 + 배포**
+> ℹ️ Phase 3 설계 문서 4종(매핑표 / 변환 규칙 / Edge Function 의사코드 / 본 HANDOVER 갱신 초안)은 **정세연님 외부 메모에 보관**됨. 다음 세션 시작 시 그 문서 재참조.
+> RSS 조사 결과 요약: `https://eummagazine.com/rss` 글로벌 피드 1개에 41 item, boardId(15~21)는 link URL의 `/(\d{2})/\?idx=` 정규식으로 추출, shop_view 2건은 skip 대상.
+
+1. **A-3: service_role key 위치 확인** (다음 세션, 5분)
+   - Supabase 대시보드 → Settings → API → "service_role" 영역에서 확인만
+   - 절대 채팅·코드·git에 노출 금지. Edge Function 환경변수에만 보관
+2. **B: Edge Function 구현** (다음 세션 이후)
    - 위치: `supabase/functions/import-magazine/index.ts` (Deno)
-   - 역할: 매거진 RSS 읽어 `articles` 테이블에 upsert
-4. **React 측 articles 표시 연결**
-   - Home / ChannelList / ArticleDetail 의 mock 데이터를 supabase 호출로 교체
+   - 환경변수 4개: `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` / `AUTHOR_UUID=fd1adda6-d3ed-42d5-b0ed-540dde82776b` / `RSS_URL=https://eummagazine.com/rss`
+   - 의사코드는 외부 메모의 산출물 3 참조
+   - 로컬 테스트(`supabase functions serve`) → 배포(`supabase functions deploy`) → 수동 1회 실행 → 기대값: fetched=41, upserted=39, skipped=2(shop_view)
+3. **C: React mock → Supabase 교체** (B 이후)
+   - `src/pages/Home.jsx` / `ChannelList.jsx` / `ArticleDetail.jsx` 의 mock 데이터를 `supabase.from('articles').select(...)`로 교체
+   - ArticleDetail에서 외부 URL 재구성: `https://eummagazine.com/${channel.slug.split('-').pop()}/?idx=${article.slug}&bmode=view`
+   - 카드/본문에 "[원문 보기]" 새 탭 링크 노출
+
+> ✅ **A-1, A-2 완료 — 사전 작업 95% 끝.** 다음 세션은 A-3(5분)부터 시작 후 B 진입.
 
 ## 📝 결정된 사항
 
@@ -128,6 +139,12 @@
 - **push 방식**: master 브랜치에 직접 push (PR 사용 안 함)
 - **사용자 확인 절차**: 파일 수정/삭제 시 사용자 OK 받기 (특히 git 작업)
 - **anon key rotate 생략 결정** (2026-05-09): 첫 커밋 노출 내용이 한글 placeholder뿐임을 `git show`로 확인 → rotate 작업 불필요
+- **봇 계정 식별자 확정** (Phase 3 import author, 2026-05-09):
+  - id = `fd1adda6-d3ed-42d5-b0ed-540dde82776b` (Edge Function의 `AUTHOR_UUID`로 사용)
+  - email = `bot@eummedia.kr` / nickname = `이음매거진` / role = `admin` / is_active = true
+- **slug 규약 1차 확정** (2026-05-09): `articles.slug = idx 숫자` / `channels.slug = 'name-boardId'` (예: `magazine-21`). 외부 URL은 React에서 재구성. board_id 컬럼 추가는 2차 작업
+- **content NOT NULL 회피** (2026-05-09): placeholder Markdown + 원문 링크 저장 (시니어 친화 톤). 2차에서 본문 크롤링으로 채움
+- **Edge Function 인증** (2026-05-09): service_role key 필요 (anon은 RLS에 막힘). 1차 트리거는 수동 HTTP POST
 
 ## 🚨 알려진 이슈
 
@@ -142,6 +159,14 @@
    - Supabase MCP의 `list_tables`, `get_advisors` 등 관리자 권한 도구 사용 불가
    - 필요해지면 https://supabase.com/dashboard/account/tokens 에서 발급 안내
 6. **`.env.old` 백업 파일 로컬에 존재** — `.gitignore`로 추적 안 됨. 한글 placeholder만 들어있어 보안 위험 없음. Phase 3 진입 전 삭제 권장.
+7. **auth_trigger 자동 작동 안 한 사례 발견** (2026-05-09 신규):
+   - `bot@eummedia.kr` 봇 계정을 대시보드에서 생성했지만 `public.users` 행이 **자동 생성되지 않음** (total_users=0 직접 SELECT로 확인)
+   - `on_auth_user_created` 트리거 자체는 등록되어 있음을 확인
+   - 추정 원인: 봇 계정 생성이 트리거 등록보다 먼저였거나, 트리거 실행 시 다른 제약/레이스에 걸렸을 가능성. 확정 못 함
+   - 해결: `public.users`에 수동 INSERT (id=`fd1adda6-d3ed-42d5-b0ed-540dde82776b`, nickname=`이음매거진`, role=`admin`, is_active=true) → 1행 정상 생성
+8. ~~**A-2(7채널 INSERT) 진행 시 트리거/FK 의존성 점검 필요**~~ — ✅ **해결됨 (2026-05-09)**:
+   - 7채널 INSERT가 트리거/FK 의존성 문제 없이 1회에 깔끔히 성공 (`count(*)=7` 확인)
+   - A-1의 `auth_trigger` 사례와는 달리 `channels` INSERT는 자동 트리거 의존성이 없음 (참고 기록)
 
 ## 🛠️ 사용자 환경 주의사항
 
