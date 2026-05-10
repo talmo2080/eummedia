@@ -18,15 +18,6 @@ const CHANNELS = [
   { slug:"이음뷰",     icon:"👁️" },
 ];
 
-const ARTICLES = [
-  { id:"2", title:"27년째 골목을 지키는 손", channel:"이음피플", views:892, date:"2026.04.30", thumb:"https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&q=80" },
-  { id:"3", title:"바이올리니스트 박진영, 금호아트홀 독주회", channel:"이음피플", views:516, date:"2026.04.29", thumb:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&q=80" },
-  { id:"4", title:"우울증을 이겨낸 13만 유튜버, 태리TV", channel:"이음피플", views:724, date:"2026.04.28", thumb:"https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80" },
-  { id:"5", title:"넷플릭스의 '문화 식민지'로 살 것인가", channel:"이음매거진", views:886, date:"2026.04.27", thumb:"https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&q=80" },
-  { id:"6", title:"AI 시대, 우리 아이 교육은 어디로", channel:"이음뷰", views:1102, date:"2026.04.26", thumb:"https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=80" },
-  { id:"7", title:"열 번째 봄, 이천도자기축제 현장", channel:"이음매거진", views:1284, date:"2026.04.25", thumb:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400&q=80" },
-];
-
 const POPULAR = [
   { id:"7", title:"열 번째 봄, 이천도자기축제 현장", channel:"이음매거진", views:1284, thumb:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=80&q=80" },
   { id:"6", title:"AI 시대, 우리 아이 교육은 어디로", channel:"이음뷰", views:1102, thumb:"https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=80&q=80" },
@@ -69,6 +60,11 @@ const STOCKS = {
     { name:"TIGER 차이나전기차", code:"371460", price:"9,870", change:"-120", pct:"-1.20%", up:false },
   ],
 };
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+}
 
 function StockWidget() {
   const tabs = ["전체","코스피","코스닥","ETF"];
@@ -136,6 +132,7 @@ function StockWidget() {
 
 export default function Home() {
   const [heroArticle, setHeroArticle] = useState(null);
+  const [articles, setArticles] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -145,10 +142,11 @@ export default function Home() {
         .select('slug, title, summary, thumbnail_url, published_at, channels(name)')
         .eq('status', 'published')
         .order('published_at', { ascending: false })
-        .limit(1);
+        .limit(7);
       if (cancelled) return;
-      if (error) { console.error('[HERO] supabase error:', error); return; }
+      if (error) { console.error('[HERO+ARTICLES] supabase error:', error); return; }
       setHeroArticle(data?.[0] ?? null);
+      setArticles(data?.slice(1) ?? []);
     })();
     return () => { cancelled = true; };
   }, []);
@@ -190,16 +188,15 @@ export default function Home() {
 
           {/* 기사 그리드 */}
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"20px" }}>
-            {ARTICLES.map(a => (
-              <Link key={a.id} to={"/article/" + a.id}
+            {articles.map(a => (
+              <Link key={a.slug} to={"/article/" + a.slug}
                 style={{ textDecoration:"none", background:"#fff", border:"1px solid #e8e8e8", display:"block" }}>
-                <img src={a.thumb} alt={a.title} style={{ width:"100%", height:"170px", objectFit:"cover", display:"block" }} />
+                <img src={a.thumbnail_url} alt={a.title} style={{ width:"100%", height:"170px", objectFit:"cover", display:"block" }} />
                 <div style={{ padding:"14px" }}>
-                  <div style={{ fontSize:"10px", color: CC[a.channel]||"#0d2d52", fontWeight:"700", marginBottom:"6px" }}>{a.channel}</div>
-                  <div style={{ fontSize:"14px", fontWeight:"600", color:"#1a1a1a", lineHeight:"1.5", marginBottom:"8px" }}>{a.title}</div>
+                  <div style={{ fontSize:"10px", color: CC[a.channels?.name] || "#0d2d52", fontWeight:"700", marginBottom:"6px" }}>{a.channels?.name}</div>
+                  <div style={{ fontSize:"14px", fontWeight:"600", color:"#1a1a1a", lineHeight:"1.5", marginBottom:"8px", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{a.title}</div>
                   <div style={{ display:"flex", justifyContent:"space-between", fontSize:"10px", color:"#9a9a9a" }}>
-                    <span>{a.date}</span>
-                    <span>👁 {a.views.toLocaleString()}</span>
+                    <span>{formatDate(a.published_at)}</span>
                   </div>
                 </div>
               </Link>
