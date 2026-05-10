@@ -68,11 +68,12 @@ export default function Footer() {
         <div style={{
           borderTop: '1px solid #1e4a7a',
           paddingTop: '20px',
-          fontSize: '12px',
+          fontSize: '14px',
           color: '#888',
           lineHeight: '2'
         }}>
-          <p>등록번호: 서울, 이56526 | 발행인: 성창운 | 편집국장: 정세연</p>
+          <p>등록번호: 서울,아56526 | 이음미디어</p>
+          <p>발행인 성창운 | 편집인 정세연 | 대표 최일례</p>
           <p>주소: 서울특별시 관악구 남부순환로 1699 2층</p>
           <p style={{ marginTop: '8px' }}>
             © 2026 이음미디어. All rights reserved.
