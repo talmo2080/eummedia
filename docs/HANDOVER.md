@@ -4,7 +4,7 @@
 > 세션 시작 시: 이 문서를 가장 먼저 읽으세요.
 > 세션 종료 전: 반드시 이 문서를 업데이트하고 commit & push 하세요.
 >
-> **마지막 작업: 2026-05-09** — Phase 3-B 완료 (Edge Function 배포 + 39건 import 성공, 12.4초)
+> **마지막 작업: 2026-05-09** — Phase 3-B 종료 (39건 import 성공) + `channels.english_slug` 마이그레이션 완료. **다음 시작점: C-1 Home.jsx**
 
 ## 🎯 프로젝트 개요
 
@@ -64,7 +64,8 @@
 - [x] **Phase 3 사전작업 A-2**: 7개 채널 INSERT 완료 (2026-05-09)
 - [x] **Phase 3 사전작업 A-3**: service_role key 위치 확인 (2026-05-09) — **사전작업 A 100% 완료** ✅
 - [x] **Phase 3 구현 B**: Edge Function `import-magazine` 배포 + 1회 호출 → **39건 import 성공** (12.4초) (2026-05-09) ✅
-- [ ] **Phase 3 구현 C**: React mock → Supabase 교체 (Home → ChannelList → ArticleDetail) ← **다음**
+- [x] **URL slug 영문 마이그레이션**: `channels.english_slug` 컬럼 추가 + 7행 매핑 + NOT NULL/UNIQUE 적용 (2026-05-09) ✅
+- [ ] **Phase 3 구현 C**: React mock → Supabase 교체 (Home → ChannelList → ArticleDetail) ← **다음 (C-1 Home.jsx부터)**
 - [ ] **Phase 3 구현 D**: AdminDashboard "지금 import" 버튼 (자동 동기화 대신 수동 트리거)
 - [ ] **Phase 3 보강(스테이지 2)**: HTML 본문 + 이미지 Supabase Storage 백업 (매거진 폐쇄 6개월 전)
 - [ ] **Phase 4**: 시민기자 시스템 (TipTap 에디터, 승인 워크플로우)
@@ -115,29 +116,49 @@
 - ❓ 나머지 6개 테이블(users/channels/comments/subscriptions/advertisements/reports) 적용 여부 미확인
 - ❓ Personal Access Token(PAT) 미발급 → MCP `list_tables`, `get_advisors` 등 관리자 도구 사용 불가
 
-### 다음 즉시 할 일 → Phase 3-C/D 진행
+### 다음 즉시 할 일 → Phase 3-C 시작 (C-1 Home.jsx부터)
 
-1. **URL slug 영문 마이그레이션** (Option A — 새 컬럼 추가, Edge Function 무영향)
-   - `channels` 테이블에 `english_slug text NOT NULL UNIQUE` 컬럼 추가
-   - 7행 매핑: `magazine-21→magazine` / `local-16→local` / `edu-17→edu` / `people-15→people` / `trend-18→trend` / `voice-19→voice` / `view-20→view`
-   - 검증: `slug` 컬럼 7행 정규식 `^[a-z]+-\d{2}$` 매칭 = 7
-2. **C-1: `src/pages/Home.jsx` mock → Supabase 교체**
-   - `supabase.from('articles').select(...).eq('status','published').order('published_at',desc).limit(N)`
-   - 추천 기사 / 최신 N건 카드 노출
-3. **C-2: `src/pages/ChannelList.jsx` mock → Supabase + Header.jsx 정정**
-   - URL 파라미터: `/channel/:englishSlug` (예: `/channel/magazine`)
-   - channels 테이블에서 `english_slug` 룩업 → `articles.eq('channel_id', channelId)`
-   - Header.jsx의 죽은 path들 (`/channel/politics`, `/channel/economy` 등 7개) → 영문 slug로 일괄 정정
-4. **C-3: `src/pages/ArticleDetail.jsx` mock → Supabase**
-   - `articles.eq('slug', idx).single()` + channel join
+> 🟢 **사전 준비 100% 끝.** Edge Function 배포됨, articles 39건 import됨, channels.english_slug 마이그레이션됨, Edge Function 소스 git에 보관됨.
+> 다음 세션은 곧바로 C-1 들어갈 수 있음.
+
+1. **C-1: `src/pages/Home.jsx` mock → Supabase 교체** ← **다음 세션 시작점**
+   - 현재 상태: mock 데이터 사용 중 (Header 채널 메뉴는 `politics/economy` 등 죽은 path)
+   - 작업:
+     - `import { supabase } from '../lib/supabase'`
+     - `supabase.from('articles').select('id, title, summary, thumbnail_url, slug, published_at, channels(name, english_slug)').eq('status','published').order('published_at',{ascending:false}).limit(N)`
+     - 카드 클릭 시 `/article/${article.slug}` 또는 `/channel/${channel.english_slug}/${article.slug}` 패턴
+   - 채널 색상은 ChannelList.jsx의 `CHANNEL_META`(채널명 → 색/아이콘) 그대로 활용 가능 — articles의 `channels.name`을 키로 사용
+2. **C-2: `src/pages/ChannelList.jsx` + `Header.jsx` 동시 정정**
+   - URL 파라미터를 한글 → `english_slug` 로 변경 (`/channel/magazine` 등)
+   - ChannelList: `useParams().englishSlug`로 `channels.english_slug` 룩업 → channel_id 얻기 → `articles.eq('channel_id', id)`
+   - Header.jsx 7개 path를 영문 slug로 일괄 정정:
+     - `politics → magazine` / `economy → local` / `society → edu` / `culture → people` / `health → trend` / `life → voice` / `opinion → view`
+3. **C-3: `src/pages/ArticleDetail.jsx` mock → Supabase**
+   - `supabase.from('articles').select('*, channels(name, slug, english_slug)').eq('slug', slug).single()`
    - 외부 URL 재구성: `https://eummagazine.com/${channel.slug.split('-').pop()}/?idx=${article.slug}&bmode=view`
-   - "[원문 보기]" 새 탭 링크 (단계 1 정책 — 단계 2에서 본문 직접 표시로 교체 예정)
-5. **D: AdminDashboard "지금 import" 버튼**
-   - 함수: `fetch('/functions/v1/import-magazine', { method:'POST', headers:{ Authorization:'Bearer ANON' } })`
+   - "[원문 보기]" 새 탭 링크 (스테이지 1 정책 — 스테이지 2에서 본문 직접 표시로 교체)
+4. **D: AdminDashboard "지금 import" 버튼**
+   - 위치: `src/pages/AdminDashboard.jsx`
+   - 함수 호출: `await fetch('https://avbsniuthpcejjcdeiyw.supabase.co/functions/v1/import-magazine', { method:'POST', headers:{ Authorization:`Bearer ${anon키}` }})`
    - 응답 JSON에서 `upserted/skipped/durationMs` 표시
    - 매거진 신규 발행 시 편집국장이 클릭 1회 → 동기화
 
-> ✅ **Phase 3-B 완료 (2026-05-09).** 다음 세션은 위 1번(slug 마이그레이션)부터 시작.
+### 🗂 다음 세션이 알면 좋은 것 (C-1 시작용 빠른 참조)
+
+| 항목 | 값 |
+|---|---|
+| articles 행 수 | **39** (`status='published'` 모두) |
+| 가장 최근 기사 published_at | `2026-05-08T23:15:40+00:00` (UTC) |
+| content 평균 길이 | 약 2,355자 (og:description 풍부) |
+| summary 평균 길이 | 약 150자 (NULL 0건) |
+| thumbnail_url | 모든 행 채워짐 (cdn.imweb.me) — 6개월 후 폐쇄 위험 |
+| channels.english_slug | `magazine, local, edu, people, trend, voice, view` |
+| supabase-js | v2.105.1 (`src/lib/supabase.js` 정상) |
+| anon SELECT 정책 | articles `status='published'` 허용 / channels `is_active=true` 허용 (이미 검증됨) |
+
+### 🎯 다음 세션 시작 명령어 (정세연님 메모용)
+
+> "안녕! docs/HANDOVER.md 를 읽고 현재 상태 파악해줘. 다음 즉시 할 일의 1번(C-1 Home.jsx)부터 시작할 준비 됐는지 확인하고, 시작 전에 나에게 OK 받기."
 
 ## 📝 결정된 사항
 
@@ -157,11 +178,18 @@
 - **import-magazine 1차 실행 결과 확정** (2026-05-09): RSS 41건 → upserted 39건 / skipped 2건(shop_view) / errors 0건 / durationMs 12,423ms. 채널별 분포: 이음트렌드 12, 이음보이스 7, 이음뷰 5, 이음로컬 4, 이음매거진 4, 이음피플 4, 이음에듀 3
 - **URL slug 영문 신설 결정** (2026-05-09): React 라우팅용 영문 slug = `magazine / local / edu / people / trend / voice / view`. channels 테이블에 `english_slug text NOT NULL UNIQUE` 컬럼 추가 (기존 `slug='name-boardId'`는 그대로 유지 — Edge Function 호환). 이전 Header.jsx의 politics/economy 같은 죽은 path는 C 단계에서 정정
 - **자동 동기화 정책 결정** (2026-05-09): pg_cron/외부 cron 대신 **AdminDashboard "지금 import" 버튼** (Phase 3-D). 매거진 6개월 후 폐쇄 + 봉숭아학당 "손맛 검증" 철학 부합. 향후 재발행 잦아지면 cron 도입
+- **`channels.english_slug` 마이그레이션 실행 완료** (2026-05-09): 컬럼 추가 + 7행 매핑(`magazine/local/edu/people/trend/voice/view`) + NOT NULL + UNIQUE 적용 검증. 기존 `slug` 컬럼 무손상(`^[a-z]+-\d{2}$` 정규식 검증=7), articles 39건 무영향. **앞으로 React URL 라우팅은 `english_slug`만 사용**, Edge Function은 기존 `slug` 그대로 사용
+- **import 데이터 품질 통계** (2026-05-09): articles 39건, NULL 0건, content 평균 2,355자 (og:description 풍부함 확인). 채널별 분포: 이음트렌드 12, 이음보이스 7, 이음뷰 5, 이음로컬/피플/매거진 각 4, 이음에듀 3
 
 ## 🚨 알려진 이슈
 
 1. ~~**.env 보안 (anon key 노출 우려)**~~ — ✅ **해결됨 (2026-05-09)** — .gitignore 처리, .env.example 생성, 첫 커밋 점검 결과 실제 키 노출 없음 확인.
-2. ~~**Header URL slug 한글**~~ — 🟡 **결정됨 (2026-05-09)**: 영문 신설 (`magazine/local/edu/people/trend/voice/view`)로 통일. 마이그레이션은 위 "다음 즉시 할 일 #1"에 명세. 또한 현 Header.jsx의 path들이 `politics/economy/society/culture/health/life/opinion`(매거진과 무관한 일반 신문 카테고리)로 되어 있어 사실상 죽은 링크 — C-2에서 함께 정정
+2. ~~**Header URL slug 한글 + DB 매핑 부재**~~ — 🟢 **DB 마이그레이션 완료, React 정정만 남음 (2026-05-09)**:
+   - DB: `channels.english_slug` 컬럼 추가됨, 7행 매핑 완료 (`magazine/local/edu/people/trend/voice/view`)
+   - React 잔여 작업 (C-2에서 처리):
+     - `src/components/Header.jsx`의 7개 path를 영문 slug로 정정 (현재 `/channel/politics` 등 죽은 링크)
+     - `src/pages/ChannelList.jsx`의 한글 channelName 사용 → english_slug로 변경
+     - `src/pages/Home.jsx` / `ArticleDetail.jsx`의 채널 링크도 모두 english_slug 패턴으로
 3. **inp/lbl 스타일 객체 중복**: 3개 파일에 반복, 추후 리팩토링
 4. **나머지 6개 테이블 적용 여부 미확인** (2026-05-09 신규):
    - 확인된 것: `articles` 만 (anon SELECT로 검증)
