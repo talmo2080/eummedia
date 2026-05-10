@@ -4,7 +4,7 @@
 > 세션 시작 시: 이 문서를 가장 먼저 읽으세요.
 > 세션 종료 전: 반드시 이 문서를 업데이트하고 commit & push 하세요.
 >
-> **마지막 작업: 2026-05-09 후반부** — Phase 3-C STEP 4-A 완료 (Home.jsx HERO Supabase 연동, 화면 검증 통과). **다음 시작점: STEP 4-B (ARTICLES 6건 교체)**
+> **마지막 작업: 2026-05-10** — Phase 3-C (C-1, P-01) 완성 — Home.jsx mock→Supabase 전체 교체 + 로딩/에러 UI + 푸터 등록번호 정식 표기. **다음 시작점: P-02 (기사 상세, `ArticleDetail.jsx`)** — 자세한 가이드는 `docs/session-handoff-2026-05-10.md`
 
 ## 🎯 프로젝트 개요
 
@@ -65,7 +65,10 @@
 - [x] **Phase 3 사전작업 A-3**: service_role key 위치 확인 (2026-05-09) — **사전작업 A 100% 완료** ✅
 - [x] **Phase 3 구현 B**: Edge Function `import-magazine` 배포 + 1회 호출 → **39건 import 성공** (12.4초) (2026-05-09) ✅
 - [x] **URL slug 영문 마이그레이션**: `channels.english_slug` 컬럼 추가 + 7행 매핑 + NOT NULL/UNIQUE 적용 (2026-05-09) ✅
-- [ ] **Phase 3 구현 C**: React mock → Supabase 교체 (Home → ChannelList → ArticleDetail) ← **다음 (C-1 Home.jsx부터)**
+- [x] **Phase 3 구현 C-1 (P-01)**: Home.jsx mock → Supabase 전체 교체 + 로딩/에러 UI + 푸터 등록번호 (2026-05-10) ✅
+- [ ] **Phase 3 구현 C-3 (P-02)**: ArticleDetail.jsx mock → Supabase ← **다음 시작점** (기사 상세, HERO/카드 클릭 정상화)
+- [ ] **Phase 3 구현 C-2**: ChannelList.jsx + Header.jsx URL slug 영문 정정
+- [ ] **🎯 정식 발행 목표**: **2~3주 내** (P-02 + C-2 + Phase 3-D + 최소 다듬기 후 가비아 도메인 연결)
 - [ ] **Phase 3 구현 D**: AdminDashboard "지금 import" 버튼 (자동 동기화 대신 수동 트리거)
 - [ ] **Phase 3 보강(스테이지 2)**: HTML 본문 + 이미지 Supabase Storage 백업 (매거진 폐쇄 6개월 전)
 - [ ] **Phase 4**: 시민기자 시스템 (TipTap 에디터, 승인 워크플로우)
@@ -109,6 +112,44 @@
   - cancelled 플래그(StrictMode 안전), WebkitLineClamp 2줄(title/summary)
 - **`.gitignore` 정리** (commit `6bcb10d`)
   - `test-*.js` 패턴 추적 제외 (검증용 스크립트 보존)
+
+## ✅ 오늘 완료 (2026-05-10) — C-1 (P-01) 완성
+
+총 4 commit, Home.jsx mock → Supabase 전체 교체 + 로딩/에러 UI + 푸터 등록번호 정식 표기.
+
+| 단계 | commit | 내용 | 결과 |
+|---|---|---|---|
+| STEP 4-B | `a02a932` | ARTICLES 6건 통합 쿼리 (`.limit(7)`) + formatDate helper (YYYY.MM.DD) + views 제거 + WebkitLineClamp 2줄 | ✅ |
+| 푸터 | `e0e9452` | 인터넷신문 등록번호 정식 표기 (서울,아56526) + 책임자 정보 (발행인/편집인/대표) + fontSize 14px (시니어 친화) | ✅ |
+| STEP 4-C | `e6a76c6` | POPULAR 5건 분리 쿼리 (`.range(7, 11)`) + 라벨 "인기 기사" → "추천 기사" (편집인 추천 의미) | ✅ |
+| STEP 4-D | `991588d` | 로딩 placeholder 통합 (HERO + ARTICLES 6 + POPULAR 5) + 통합 `error` state + 에러 배너 (`role="alert"`) + `aria-busy` 접근성 | ✅ |
+
+### 🏆 마일스톤
+- 🎊 **인터넷신문 등록번호 정식 발급**: `서울,아56526` (등록증 발급 완료 — 발행 인프라 확보)
+- 🎯 **C-1 메인 홈페이지 완성**: 실제 매거진 39건 중 12건이 HERO/ARTICLES/POPULAR 3개 영역에 살아남
+- 🌟 **발행인 성창운 회장 기사**가 추천기사 1번 자리에 자동 배치 (편집인 의도 ↔ 시스템 정렬 합치)
+- 📐 **CLS(레이아웃 점프) 0** — 스켈레톤이 실카드와 동일 박스 크기
+
+### 📌 5가지 원칙 (재확인)
+- **분리 쿼리** 패턴 (HERO+ARTICLES 통합 / POPULAR 별도) — 의미적 단일 책임
+- **데이터 길이/null 기반 로딩 판단** — `loading` state 추가 안 함, 4-A 일관성
+- **통합 `error` state + 페이지 상단 배너** — 시니어 친화 메시지
+- **"한 commit = 한 작업"** — 푸터 작업도 4-B와 별도 분리
+- **사용자(정세연) OK 받기 후 적용** — 매 단계 진단→계획→실행
+
+## 🚀 다음 세션 시작점: P-02 (`ArticleDetail.jsx` 기사 상세)
+
+> 자세한 가이드는 `docs/session-handoff-2026-05-10.md` 참고.
+
+요지:
+- C-1에서 HERO/ARTICLES/POPULAR 카드 클릭 시 `/article/${slug}` 라우팅까지는 작동하지만 ArticleDetail이 아직 mock이라 다른 기사가 표시됨
+- P-02 작업: `supabase.from('articles').select('*, channels(name, slug, english_slug)').eq('slug', slug).single()` → 본문 placeholder + "[원문 보기]" 외부 URL 재구성 (HANDOVER 결정사항 참고)
+- 작업 흐름은 P-01과 동일: 작은 단위, 옵스 검증, 사용자 OK 후 commit/push
+
+### 🎯 정식 발행 목표 — 2~3주 내
+- **남은 핵심 작업**: P-02 (ArticleDetail) → C-2 (Header/ChannelList URL slug) → Phase 3-D ("지금 import" 버튼) → 최소 다듬기 → 가비아 도메인 연결
+- C-2 영문 slug 정정과 Phase 3-D 수동 import 버튼은 작업량 가벼움
+- 가장 큰 단위는 P-02 (기사 본문 표시 정책 결정 포함)
 
 ## ⚠️ 알려진 이슈 (의도된 것 — 다음 세션 무시 OK)
 
@@ -184,9 +225,11 @@
 
 > "안녕! docs/HANDOVER.md 를 읽고 현재 상태 파악해줘. 다음 즉시 할 일의 1번(C-1 Home.jsx)부터 시작할 준비 됐는지 확인하고, 시작 전에 나에게 OK 받기."
 
-## 🚀 다음 세션 시작점: STEP 4-B (ARTICLES 6건)
+## ✅ C-1 진행 기록 (STEP 4-A → 4-D, 박제용 참고)
 
-### 결정 필요한 3가지 (다음 세션 시작 시 옵스/정세연 결정)
+> **모두 완료** — STEP 4-B/4-C/4-D 적용 + commit + 화면 검증 통과. 이하 섹션은 진행 시점 설계 기록 (히스토리: commit `a02a932`/`e6a76c6`/`991588d`).
+
+### 결정 필요한 3가지 (다음 세션 시작 시 옵스/정세연 결정) — ✅ 모두 채택됨
 
 1. **쿼리 구조**
    - 옵션 A: 통합 `.limit(7)` — `setHeroArticle(data[0])` + `setArticles(data.slice(1))` (네트워크 1회)
