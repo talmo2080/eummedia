@@ -19,6 +19,9 @@ dist-ssr
 # Supabase local working files
 supabase/.temp/
 
+# Local debug/verification scripts (검증용 임시 — 추적 안 함)
+test-*.js
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
