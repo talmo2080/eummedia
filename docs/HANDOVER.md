@@ -4,7 +4,7 @@
 > 세션 시작 시: 이 문서를 가장 먼저 읽으세요.
 > 세션 종료 전: 반드시 이 문서를 업데이트하고 commit & push 하세요.
 >
-> **마지막 작업: 2026-05-09** — Phase 3-B 종료 (39건 import 성공) + `channels.english_slug` 마이그레이션 완료. **다음 시작점: C-1 Home.jsx**
+> **마지막 작업: 2026-05-09 후반부** — Phase 3-C STEP 4-A 완료 (Home.jsx HERO Supabase 연동, 화면 검증 통과). **다음 시작점: STEP 4-B (ARTICLES 6건 교체)**
 
 ## 🎯 프로젝트 개요
 
@@ -96,6 +96,30 @@
 | 4 | (no commit) | `node test-supabase.js` 실행 → `articles` 테이블 SELECT | ✅ status 200, 1.1초, 0 row |
 | 5 | (이 커밋) | HANDOVER 갱신 — 이번 세션 진전 반영 | ✅ |
 
+## ✅ 오늘 완료 (2026-05-09 후반부)
+
+- **Phase 3-B 검증 SQL 5개 100% 통과**
+  - 39건 정확, 7채널 분포 정확, NULL 0개, content 평균 2,355자
+- **english_slug 마이그레이션 성공**
+  - `magazine, local, edu, people, trend, voice, view`
+- **STEP 4-A HERO 연동 성공** (commit `92fbcb9`)
+  - 화면 검증: "손으로 읽는 예술 — 도자사용전 《만지면 이해되는 것들》" (이음트렌드, 2026.05.09) 정상 표시
+  - DB 검증 [3]번 쿼리 결과와 정확히 일치
+  - mock HERO 상수 제거, useState/useEffect로 Supabase fetch
+  - cancelled 플래그(StrictMode 안전), WebkitLineClamp 2줄(title/summary)
+- **`.gitignore` 정리** (commit `6bcb10d`)
+  - `test-*.js` 패턴 추적 제외 (검증용 스크립트 보존)
+
+## ⚠️ 알려진 이슈 (의도된 것 — 다음 세션 무시 OK)
+
+- **HERO 카드 클릭 → 다른 기사 표시**
+  - 원인: ArticleDetail.jsx가 아직 mock이라 slug `171203804` 못 찾고 mock fallback
+  - HERO 카드 자체와 `/article/${slug}` 라우팅은 정상 작동
+  - C-3에서 ArticleDetail 교체 시 자동 해결
+- **콘솔 `Uncaught (in promise)` 3개**
+  - 출처: 브라우저 확장(Grabbit, Linkify) — `content.js`, `(index):1`
+  - Supabase 호출과 무관, 무시 가능
+
 ### 🆕 중요 발견
 
 - **Migration SQL이 이미 적용된 상태**. 이전 HANDOVER에는 "Migration 적용 또는 Edge Function 구축"이 다음 할 일로 적혀 있었지만, 검증 결과 `articles` 테이블이 이미 존재하고 RLS도 anon read를 허용함. 누군가(이전 세션에서 사용자 직접?) Supabase 대시보드 SQL Editor 또는 CLI로 적용한 것으로 추정됨.
@@ -159,6 +183,97 @@
 ### 🎯 다음 세션 시작 명령어 (정세연님 메모용)
 
 > "안녕! docs/HANDOVER.md 를 읽고 현재 상태 파악해줘. 다음 즉시 할 일의 1번(C-1 Home.jsx)부터 시작할 준비 됐는지 확인하고, 시작 전에 나에게 OK 받기."
+
+## 🚀 다음 세션 시작점: STEP 4-B (ARTICLES 6건)
+
+### 결정 필요한 3가지 (다음 세션 시작 시 옵스/정세연 결정)
+
+1. **쿼리 구조**
+   - 옵션 A: 통합 `.limit(7)` — `setHeroArticle(data[0])` + `setArticles(data.slice(1))` (네트워크 1회)
+   - 옵션 B: 별도 `.range(1, 6)` — 4-A 코드 변경 없이 ARTICLES 쿼리만 추가 (네트워크 +1회)
+   - 클론(이번 세션 Claude) 권장: **옵션 A** (의미적 단일 책임 — "최신 기사 묶음 fetch")
+2. **날짜 포맷**
+   - `formatDate` helper 추가 (YYYY.MM.DD, mock 일관성 — 예: `2026.05.08`)
+   - 또는 `toLocaleDateString('ko-KR')` 그대로 사용 (예: "2026. 5. 8.")
+   - 클론 권장: **helper 추가** (mock 일관성)
+3. **views 라벨 제거**
+   - 카드에서 `👁 1,234` 라벨 완전히 빼기
+   - 컬럼 없음 SQL 결과로 확정 (`SELECT column_name FROM information_schema.columns WHERE table_name='articles'`에 views 없음)
+   - 클론 권장: **제거** (4-D에서 다른 메타 추가 검토)
+
+### 옵션 A 기준 설계 미리보기 (다음 세션 그대로 진행 가능)
+
+```jsx
+// 변경 1: useState 두 개로
+const [heroArticle, setHeroArticle] = useState(null);
+const [articles, setArticles] = useState([]);   // ← 신규
+
+// 변경 2: useEffect의 limit(1) → limit(7) + 분배
+useEffect(() => {
+  let cancelled = false;
+  (async () => {
+    const { data, error } = await supabase
+      .from('articles')
+      .select('slug, title, summary, thumbnail_url, published_at, channels(name)')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+      .limit(7);                                 // ← 1 → 7
+    if (cancelled) return;
+    if (error) { console.error('[HERO+ARTICLES] supabase error:', error); return; }
+    setHeroArticle(data?.[0] ?? null);
+    setArticles(data?.slice(1) ?? []);           // ← 추가
+  })();
+  return () => { cancelled = true; };
+}, []);
+```
+
+**JSX ARTICLES 영역 교체** (현재 `ARTICLES.map` → `articles.map`):
+
+```jsx
+{articles.map(a => (
+  <Link key={a.slug} to={"/article/" + a.slug}
+    style={{ textDecoration:"none", background:"#fff", border:"1px solid #e8e8e8", display:"block" }}>
+    <img src={a.thumbnail_url} alt={a.title} style={{ width:"100%", height:"170px", objectFit:"cover", display:"block" }} />
+    <div style={{ padding:"14px" }}>
+      <div style={{ fontSize:"10px", color: CC[a.channels?.name] || "#0d2d52", fontWeight:"700", marginBottom:"6px" }}>{a.channels?.name}</div>
+      <div style={{ fontSize:"14px", fontWeight:"600", color:"#1a1a1a", lineHeight:"1.5", marginBottom:"8px", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{a.title}</div>
+      <div style={{ display:"flex", justifyContent:"space-between", fontSize:"10px", color:"#9a9a9a" }}>
+        <span>{formatDate(a.published_at)}</span>
+      </div>
+    </div>
+  </Link>
+))}
+```
+
+`formatDate` helper (Home.jsx 상단 또는 컴포넌트 외부):
+```js
+function formatDate(iso) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+}
+```
+
+설계 메모:
+- `key={a.slug}` (slug는 unique, 매거진 idx 숫자 안정 키)
+- 라우팅 `/article/${slug}` 일관성 (4-A와 동일)
+- 채널 색상 `CC[a.channels?.name]` — Home.jsx 상단 mock CC 객체 그대로 활용 (사용자 OK 결정 (2))
+- 클램프 추가 — title에 `WebkitLineClamp:2` (4-A 일관성). summary는 카드에 안 보여주므로 제외
+- views 제거 — 컬럼 없음 확정. 빈자리 디자인은 4-D에서
+
+### 화면 변화 예측 (4-B 적용 후)
+
+| 영역 | 변화 |
+|---|---|
+| HERO | 그대로 (4-A 검증 끝) |
+| ARTICLES 그리드 6건 | 🔴 mock → 실제 매거진 기사 (HERO 다음 6건, 최신순) |
+| 카드 표시 | 채널 색상 / 제목(2줄 클램프) / 날짜(YYYY.MM.DD). 조회수 라벨 사라짐 |
+| 사이드바 POPULAR | 그대로 mock (4-C에서) |
+
+### CC 매핑 검증 결과 (다음 세션 참고)
+
+- 7채널 모두 CC에 있음 ✅
+  - 매거진(#0d2d52), 에듀(#1a6b3c), 피플(#5c2d8a), 트렌드(#c45c0a), 보이스(#1c4f8a), 뷰(#8a6a00), 로컬(#1a6b3c)
+- 잉여 매핑: `이음뉴스` (실제 7채널에 없음) — 무해, 정리는 다음 차수
 
 ## 📝 결정된 사항
 
