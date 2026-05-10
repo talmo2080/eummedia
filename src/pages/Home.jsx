@@ -1,5 +1,6 @@
-﻿import { useState } from "react";
+﻿import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 
 const CC = {
   "이음매거진":"#0d2d52","이음뉴스":"#c0392b","이음에듀":"#1a6b3c",
@@ -16,13 +17,6 @@ const CHANNELS = [
   { slug:"이음보이스", icon:"🎙️" },
   { slug:"이음뷰",     icon:"👁️" },
 ];
-
-const HERO = {
-  id:"1", title:"세상을 잇고, 사람을 잇는다 — 이음미디어 창간호",
-  subtitle:"당신의 성공이 우리의 뉴스입니다. 고양시 일산에서 시작하는 시민기자들의 이야기.",
-  channel:"이음매거진", date:"2026.05.07",
-  thumb:"https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80",
-};
 
 const ARTICLES = [
   { id:"2", title:"27년째 골목을 지키는 손", channel:"이음피플", views:892, date:"2026.04.30", thumb:"https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&q=80" },
@@ -141,6 +135,24 @@ function StockWidget() {
 }
 
 export default function Home() {
+  const [heroArticle, setHeroArticle] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('slug, title, summary, thumbnail_url, published_at, channels(name)')
+        .eq('status', 'published')
+        .order('published_at', { ascending: false })
+        .limit(1);
+      if (cancelled) return;
+      if (error) { console.error('[HERO] supabase error:', error); return; }
+      setHeroArticle(data?.[0] ?? null);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
   return (
     <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f7f8fa", color:"#1a1a1a", minHeight:"100vh" }}>
 
@@ -151,15 +163,19 @@ export default function Home() {
 
         <main>
           {/* 히어로 */}
-          <Link to={"/article/" + HERO.id} style={{ display:"block", textDecoration:"none", marginBottom:"24px", position:"relative", overflow:"hidden" }}>
-            <img src={HERO.thumb} alt={HERO.title} style={{ width:"100%", height:"380px", objectFit:"cover", display:"block" }} />
-            <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 60%)" }} />
-            <div style={{ position:"absolute", bottom:0, left:0, right:0, padding:"28px" }}>
-              <span style={{ fontSize:"10px", color:"#c9a84c", fontWeight:"700", letterSpacing:"2px" }}>{HERO.channel}</span>
-              <h2 style={{ fontFamily:"serif", fontSize:"26px", fontWeight:"700", color:"white", lineHeight:"1.4", margin:"8px 0" }}>{HERO.title}</h2>
-              <p style={{ fontSize:"13px", color:"rgba(255,255,255,0.8)", margin:0 }}>{HERO.subtitle}</p>
-            </div>
-          </Link>
+          {heroArticle ? (
+            <Link to={"/article/" + heroArticle.slug} style={{ display:"block", textDecoration:"none", marginBottom:"24px", position:"relative", overflow:"hidden" }}>
+              <img src={heroArticle.thumbnail_url} alt={heroArticle.title} style={{ width:"100%", height:"380px", objectFit:"cover", display:"block" }} />
+              <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 60%)" }} />
+              <div style={{ position:"absolute", bottom:0, left:0, right:0, padding:"28px" }}>
+                <span style={{ fontSize:"10px", color:"#c9a84c", fontWeight:"700", letterSpacing:"2px" }}>{heroArticle.channels?.name}</span>
+                <h2 style={{ fontFamily:"serif", fontSize:"26px", fontWeight:"700", color:"white", lineHeight:"1.4", margin:"8px 0", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{heroArticle.title}</h2>
+                <p style={{ fontSize:"13px", color:"rgba(255,255,255,0.8)", margin:0, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{heroArticle.summary}</p>
+              </div>
+            </Link>
+          ) : (
+            <div style={{ width:"100%", height:"380px", background:"#e8e8e8", marginBottom:"24px" }} aria-hidden="true" />
+          )}
 
           {/* 채널 아이콘 바 */}
           <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:"8px", marginBottom:"24px" }}>
