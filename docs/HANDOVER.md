@@ -4,7 +4,7 @@
 > 세션 시작 시: 이 문서를 가장 먼저 읽으세요.
 > 세션 종료 전: 반드시 이 문서를 업데이트하고 commit & push 하세요.
 >
-> **마지막 작업: 2026-05-09** — Phase 3 사전작업 A 전체 100% 완료 (A-1 봇 계정 + A-2 7채널 + A-3 service_role key 위치)
+> **마지막 작업: 2026-05-09** — Phase 3-B 완료 (Edge Function 배포 + 39건 import 성공, 12.4초)
 
 ## 🎯 프로젝트 개요
 
@@ -63,8 +63,10 @@
 - [x] **Phase 3 사전작업 A-1**: 봇 계정(이음매거진) 생성 + public.users 등록 (2026-05-09)
 - [x] **Phase 3 사전작업 A-2**: 7개 채널 INSERT 완료 (2026-05-09)
 - [x] **Phase 3 사전작업 A-3**: service_role key 위치 확인 (2026-05-09) — **사전작업 A 100% 완료** ✅
-- [ ] **Phase 3 구현**: Edge Function (B) + React 연결 (C) ← **다음**
-- [ ] **Phase 3 보강(2차)**: 본문 크롤링 추가
+- [x] **Phase 3 구현 B**: Edge Function `import-magazine` 배포 + 1회 호출 → **39건 import 성공** (12.4초) (2026-05-09) ✅
+- [ ] **Phase 3 구현 C**: React mock → Supabase 교체 (Home → ChannelList → ArticleDetail) ← **다음**
+- [ ] **Phase 3 구현 D**: AdminDashboard "지금 import" 버튼 (자동 동기화 대신 수동 트리거)
+- [ ] **Phase 3 보강(스테이지 2)**: HTML 본문 + 이미지 Supabase Storage 백업 (매거진 폐쇄 6개월 전)
 - [ ] **Phase 4**: 시민기자 시스템 (TipTap 에디터, 승인 워크플로우)
 - [ ] **Phase 5**: 카카오 알림 자동화 + Vercel 배포
 - [ ] **Phase 6**: eummedia.kr 도메인 연결 + SEO/AEO 최적화
@@ -113,27 +115,29 @@
 - ❓ 나머지 6개 테이블(users/channels/comments/subscriptions/advertisements/reports) 적용 여부 미확인
 - ❓ Personal Access Token(PAT) 미발급 → MCP `list_tables`, `get_advisors` 등 관리자 도구 사용 불가
 
-### 다음 즉시 할 일 → Phase 3 사전작업 이어가기 + 구현
+### 다음 즉시 할 일 → Phase 3-C/D 진행
 
-> ℹ️ Phase 3 설계 문서 4종(매핑표 / 변환 규칙 / Edge Function 의사코드 / 본 HANDOVER 갱신 초안)은 **정세연님 외부 메모에 보관**됨. 다음 세션 시작 시 그 문서 재참조.
-> RSS 조사 결과 요약: `https://eummagazine.com/rss` 글로벌 피드 1개에 41 item, boardId(15~21)는 link URL의 `/(\d{2})/\?idx=` 정규식으로 추출, shop_view 2건은 skip 대상.
+1. **URL slug 영문 마이그레이션** (Option A — 새 컬럼 추가, Edge Function 무영향)
+   - `channels` 테이블에 `english_slug text NOT NULL UNIQUE` 컬럼 추가
+   - 7행 매핑: `magazine-21→magazine` / `local-16→local` / `edu-17→edu` / `people-15→people` / `trend-18→trend` / `voice-19→voice` / `view-20→view`
+   - 검증: `slug` 컬럼 7행 정규식 `^[a-z]+-\d{2}$` 매칭 = 7
+2. **C-1: `src/pages/Home.jsx` mock → Supabase 교체**
+   - `supabase.from('articles').select(...).eq('status','published').order('published_at',desc).limit(N)`
+   - 추천 기사 / 최신 N건 카드 노출
+3. **C-2: `src/pages/ChannelList.jsx` mock → Supabase + Header.jsx 정정**
+   - URL 파라미터: `/channel/:englishSlug` (예: `/channel/magazine`)
+   - channels 테이블에서 `english_slug` 룩업 → `articles.eq('channel_id', channelId)`
+   - Header.jsx의 죽은 path들 (`/channel/politics`, `/channel/economy` 등 7개) → 영문 slug로 일괄 정정
+4. **C-3: `src/pages/ArticleDetail.jsx` mock → Supabase**
+   - `articles.eq('slug', idx).single()` + channel join
+   - 외부 URL 재구성: `https://eummagazine.com/${channel.slug.split('-').pop()}/?idx=${article.slug}&bmode=view`
+   - "[원문 보기]" 새 탭 링크 (단계 1 정책 — 단계 2에서 본문 직접 표시로 교체 예정)
+5. **D: AdminDashboard "지금 import" 버튼**
+   - 함수: `fetch('/functions/v1/import-magazine', { method:'POST', headers:{ Authorization:'Bearer ANON' } })`
+   - 응답 JSON에서 `upserted/skipped/durationMs` 표시
+   - 매거진 신규 발행 시 편집국장이 클릭 1회 → 동기화
 
-1. **B: Edge Function 구현** (다음 세션)
-   - 위치: `supabase/functions/import-magazine/index.ts` (Deno)
-   - 환경변수 4개:
-     - `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` / `AUTHOR_UUID=fd1adda6-d3ed-42d5-b0ed-540dde82776b` / `RSS_URL=https://eummagazine.com/rss`
-   - **service_role key 처리 절차**:
-     1. 대시보드 → ⚙️ Project Settings → API Keys → "Legacy" 탭 → service_role 옆 `Reveal` → 복사
-     2. 대시보드의 Edge Functions → Secrets에 `SUPABASE_SERVICE_ROLE_KEY` 이름으로 저장 (또는 `supabase secrets set` CLI)
-     3. 절대 `.env` / git / 채팅에 노출 금지
-   - 의사코드는 외부 메모의 산출물 3 참조
-   - 로컬 테스트(`supabase functions serve`) → 배포(`supabase functions deploy`) → 수동 1회 실행 → 기대값: fetched=41, upserted=39, skipped=2(shop_view)
-2. **C: React mock → Supabase 교체** (B 이후)
-   - `src/pages/Home.jsx` / `ChannelList.jsx` / `ArticleDetail.jsx` 의 mock 데이터를 `supabase.from('articles').select(...)`로 교체
-   - ArticleDetail에서 외부 URL 재구성: `https://eummagazine.com/${channel.slug.split('-').pop()}/?idx=${article.slug}&bmode=view`
-   - 카드/본문에 "[원문 보기]" 새 탭 링크 노출
-
-> ✅ **사전작업 A (A-1/A-2/A-3) 100% 완료.** 다음 세션은 바로 B 진입.
+> ✅ **Phase 3-B 완료 (2026-05-09).** 다음 세션은 위 1번(slug 마이그레이션)부터 시작.
 
 ## 📝 결정된 사항
 
@@ -150,11 +154,14 @@
 - **Edge Function 인증** (2026-05-09): service_role key 필요 (anon은 RLS에 막힘). 1차 트리거는 수동 HTTP POST
 - **service_role key 위치** (2026-05-09): Supabase 대시보드 → ⚙️ Project Settings → API Keys → "Legacy anon, service_role API keys" 탭 → service_role 옆 `Reveal` 버튼. URL: `/dashboard/project/avbsniuthpcejjcdeiyw/settings/api-keys`
 - **service_role key 노출 정책** (2026-05-09): 채팅·코드·git에 절대 노출 금지. Edge Function의 환경변수(`SUPABASE_SERVICE_ROLE_KEY`)에만 보관 (`supabase secrets set` 또는 대시보드의 Edge Functions → Secrets)
+- **import-magazine 1차 실행 결과 확정** (2026-05-09): RSS 41건 → upserted 39건 / skipped 2건(shop_view) / errors 0건 / durationMs 12,423ms. 채널별 분포: 이음트렌드 12, 이음보이스 7, 이음뷰 5, 이음로컬 4, 이음매거진 4, 이음피플 4, 이음에듀 3
+- **URL slug 영문 신설 결정** (2026-05-09): React 라우팅용 영문 slug = `magazine / local / edu / people / trend / voice / view`. channels 테이블에 `english_slug text NOT NULL UNIQUE` 컬럼 추가 (기존 `slug='name-boardId'`는 그대로 유지 — Edge Function 호환). 이전 Header.jsx의 politics/economy 같은 죽은 path는 C 단계에서 정정
+- **자동 동기화 정책 결정** (2026-05-09): pg_cron/외부 cron 대신 **AdminDashboard "지금 import" 버튼** (Phase 3-D). 매거진 6개월 후 폐쇄 + 봉숭아학당 "손맛 검증" 철학 부합. 향후 재발행 잦아지면 cron 도입
 
 ## 🚨 알려진 이슈
 
 1. ~~**.env 보안 (anon key 노출 우려)**~~ — ✅ **해결됨 (2026-05-09)** — .gitignore 처리, .env.example 생성, 첫 커밋 점검 결과 실제 키 노출 없음 확인.
-2. **Header URL slug 한글**: `/channel/이음매거진` → 추후 `/channel/magazine` 로 변경 권장 (SEO)
+2. ~~**Header URL slug 한글**~~ — 🟡 **결정됨 (2026-05-09)**: 영문 신설 (`magazine/local/edu/people/trend/voice/view`)로 통일. 마이그레이션은 위 "다음 즉시 할 일 #1"에 명세. 또한 현 Header.jsx의 path들이 `politics/economy/society/culture/health/life/opinion`(매거진과 무관한 일반 신문 카테고리)로 되어 있어 사실상 죽은 링크 — C-2에서 함께 정정
 3. **inp/lbl 스타일 객체 중복**: 3개 파일에 반복, 추후 리팩토링
 4. **나머지 6개 테이블 적용 여부 미확인** (2026-05-09 신규):
    - 확인된 것: `articles` 만 (anon SELECT로 검증)
