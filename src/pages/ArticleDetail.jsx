@@ -43,14 +43,6 @@ const RELATED = [
   { id:"4", title:"우울증을 이겨낸 13만 유튜버", channel:"이음피플", views:724, thumb:"https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=120&q=80" },
 ];
 
-const POPULAR = [
-  { id:"p1", title:"우울증을 이겨낸 13만 유튜버 태리TV", channel:"이음피플", views:1284, thumb:"https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&q=80" },
-  { id:"p2", title:"넷플릭스의 문화 식민지로 살 것인가", channel:"이음매거진", views:886, thumb:"https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=80&q=80" },
-  { id:"p3", title:"27년째 골목을 지키는 손", channel:"이음로컬", views:892, thumb:"https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=80&q=80" },
-  { id:"p4", title:"AI 시대 우리 아이 교육은", channel:"이음뷰", views:1102, thumb:"https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=80&q=80" },
-  { id:"p5", title:"바이올리니스트 박진영 독주회", channel:"이음피플", views:516, thumb:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=80&q=80" },
-];
-
 function ArrowBtn({ onClick, dir }) {
   const [h, setH] = useState(false);
   return (
@@ -122,6 +114,7 @@ export default function ArticleDetail() {
   const { slug } = useParams();
   const [article, setArticle] = useState(null);
   const [error, setError] = useState(null);
+  const [popular, setPopular] = useState([]);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(47);
   const [bookmarked, setBookmarked] = useState(false);
@@ -158,6 +151,23 @@ export default function ArticleDetail() {
       if (cancelled) return;
       if (err) { setError('기사를 불러오지 못했습니다.'); return; }
       setArticle(data);
+    })();
+    return () => { cancelled = true; };
+  }, [slug]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error: err } = await supabase
+        .from('articles')
+        .select('slug, title, thumbnail_url, channels(name)')
+        .eq('status', 'published')
+        .neq('slug', slug)
+        .order('published_at', { ascending: false })
+        .range(7, 12);
+      if (cancelled) return;
+      if (err) { console.error('[ArticleDetail POPULAR] supabase error:', err); return; }
+      setPopular((data ?? []).slice(0, 5));
     })();
     return () => { cancelled = true; };
   }, [slug]);
@@ -434,17 +444,29 @@ export default function ArticleDetail() {
           </div>
 
           <div>
-            <div style={{ fontSize:"12px", fontWeight:"700", color:"#555", borderBottom:"2px solid #0d2d52", paddingBottom:"8px", marginBottom:"12px" }}>이번 주 인기 기사</div>
-            {POPULAR.map((p, i) => (
-              <Link key={p.id} to={"/" + p.channel + "/" + p.id} style={{ display:"flex", gap:"10px", padding:"8px 0", borderBottom:"1px solid #f0f0f0", textDecoration:"none", alignItems:"center" }}>
-                <img src={p.thumb} alt={p.title} style={{ width:"52px", height:"40px", objectFit:"cover", borderRadius:"2px", flexShrink:0 }} />
-                <div>
-                  <div style={{ fontSize:"10px", color: CC[p.channel] || "#0d2d52", fontWeight:"700", marginBottom:"2px" }}>{p.channel}</div>
-                  <div style={{ fontSize:"11px", color:"#1a1a1a", lineHeight:"1.4", fontWeight:"500" }}>{p.title}</div>
-                  <div style={{ fontSize:"10px", color:"#9a9a9a" }}>👁 {p.views.toLocaleString()}</div>
-                </div>
-              </Link>
-            ))}
+            <div style={{ fontSize:"12px", fontWeight:"700", color:"#555", borderBottom:"2px solid #0d2d52", paddingBottom:"8px", marginBottom:"12px" }}>이번 주 추천 기사</div>
+            {popular.length > 0
+              ? popular.map((p, i) => (
+                  <Link key={p.slug} to={"/article/" + p.slug} style={{ display:"flex", gap:"10px", padding:"8px 0", borderBottom:"1px solid #f0f0f0", textDecoration:"none", alignItems:"center" }}>
+                    <span style={{ fontSize:"13px", fontWeight:"700", color:"#c9a84c", width:"16px", flexShrink:0 }}>{i+1}</span>
+                    <img src={p.thumbnail_url} alt={p.title} style={{ width:"52px", height:"40px", objectFit:"cover", borderRadius:"2px", flexShrink:0 }} />
+                    <div>
+                      <div style={{ fontSize:"10px", color: CC[p.channels?.name] || "#0d2d52", fontWeight:"700", marginBottom:"2px" }}>{p.channels?.name}</div>
+                      <div style={{ fontSize:"11px", color:"#1a1a1a", lineHeight:"1.4", fontWeight:"500", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{p.title}</div>
+                    </div>
+                  </Link>
+                ))
+              : Array.from({length: 5}).map((_, i) => (
+                  <div key={"pk-"+i} style={{ display:"flex", gap:"10px", padding:"8px 0", borderBottom:"1px solid #f0f0f0", alignItems:"center" }} aria-busy="true">
+                    <span style={{ fontSize:"13px", fontWeight:"700", color:"#e0e0e0", width:"16px", flexShrink:0 }}>{i+1}</span>
+                    <div style={{ width:"52px", height:"40px", background:"#e8e8e8", flexShrink:0, borderRadius:"2px" }} />
+                    <div style={{ flex:1 }}>
+                      <div style={{ width:"40%", height:"10px", background:"#e8e8e8", marginBottom:"4px" }} />
+                      <div style={{ width:"90%", height:"11px", background:"#e8e8e8" }} />
+                    </div>
+                  </div>
+                ))
+            }
           </div>
         </aside>
       </div>
