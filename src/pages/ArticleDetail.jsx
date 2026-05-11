@@ -37,12 +37,6 @@ const INIT_COMMENTS = [
   { id:3, name:"이순희", date:"2026.04.29", content:"시민기자 이야기가 인상적이었어요.", likes:12 },
 ];
 
-const RELATED = [
-  { id:"2", title:"27년째 골목을 지키는 손", channel:"이음피플", views:892, thumb:"https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&q=80" },
-  { id:"3", title:"바이올리니스트 박진영, 금호아트홀", channel:"이음피플", views:516, thumb:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=120&q=80" },
-  { id:"4", title:"우울증을 이겨낸 13만 유튜버", channel:"이음피플", views:724, thumb:"https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=120&q=80" },
-];
-
 function ArrowBtn({ onClick, dir }) {
   const [h, setH] = useState(false);
   return (
@@ -115,6 +109,7 @@ export default function ArticleDetail() {
   const [article, setArticle] = useState(null);
   const [error, setError] = useState(null);
   const [popular, setPopular] = useState([]);
+  const [related, setRelated] = useState([]);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(47);
   const [bookmarked, setBookmarked] = useState(false);
@@ -171,6 +166,26 @@ export default function ArticleDetail() {
     })();
     return () => { cancelled = true; };
   }, [slug]);
+
+  const channelId = article?.channel_id;
+  useEffect(() => {
+    if (!channelId) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error: err } = await supabase
+        .from('articles')
+        .select('slug, title, thumbnail_url, channels(name)')
+        .eq('status', 'published')
+        .eq('channel_id', channelId)
+        .neq('slug', slug)
+        .order('published_at', { ascending: false })
+        .limit(3);
+      if (cancelled) return;
+      if (err) { console.error('[ArticleDetail RELATED] supabase error:', err); return; }
+      setRelated(data ?? []);
+    })();
+    return () => { cancelled = true; };
+  }, [channelId, slug]);
 
   if (error) {
     return (
@@ -386,19 +401,30 @@ export default function ArticleDetail() {
             ))}
           </div>
 
-          {/* 관련 기사 */}
+          {/* 관련 기사 — 같은 채널 다른 기사 (STEP 5-C) */}
           <div style={{ margin:"32px 0" }}>
             <div style={{ fontSize:"13px", fontWeight:"700", color:"#0d2d52", borderLeft:"3px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>관련 기사</div>
-            {RELATED.map(r => (
-              <Link key={r.id} to={"/" + r.channel + "/" + r.id} style={{ display:"flex", gap:"14px", padding:"14px 0", borderBottom:"1px solid #f0f0f0", textDecoration:"none" }}>
-                <img src={r.thumb} alt={r.title} style={{ width:"90px", height:"68px", objectFit:"cover", borderRadius:"3px", flexShrink:0 }} />
-                <div>
-                  <div style={{ fontSize:"11px", color: CC[r.channel] || "#0d2d52", fontWeight:"700", marginBottom:"5px" }}>{r.channel}</div>
-                  <div style={{ fontSize:"13px", color:"#1a1a1a", fontWeight:"600", lineHeight:"1.5", marginBottom:"5px" }}>{r.title}</div>
-                  <div style={{ fontSize:"11px", color:"#9a9a9a" }}>👁 {r.views.toLocaleString()}</div>
-                </div>
-              </Link>
-            ))}
+            {related.length > 0
+              ? related.map(r => (
+                  <Link key={r.slug} to={"/article/" + r.slug} style={{ display:"flex", gap:"14px", padding:"14px 0", borderBottom:"1px solid #f0f0f0", textDecoration:"none" }}>
+                    <img src={r.thumbnail_url} alt={r.title} style={{ width:"90px", height:"68px", objectFit:"cover", borderRadius:"3px", flexShrink:0 }} />
+                    <div>
+                      <div style={{ fontSize:"11px", color: CC[r.channels?.name] || "#0d2d52", fontWeight:"700", marginBottom:"5px" }}>{r.channels?.name}</div>
+                      <div style={{ fontSize:"13px", color:"#1a1a1a", fontWeight:"600", lineHeight:"1.5", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{r.title}</div>
+                    </div>
+                  </Link>
+                ))
+              : Array.from({length: 3}).map((_, i) => (
+                  <div key={"rk-"+i} style={{ display:"flex", gap:"14px", padding:"14px 0", borderBottom:"1px solid #f0f0f0" }} aria-busy="true">
+                    <div style={{ width:"90px", height:"68px", background:"#e8e8e8", borderRadius:"3px", flexShrink:0 }} />
+                    <div style={{ flex:1 }}>
+                      <div style={{ width:"30%", height:"11px", background:"#e8e8e8", marginBottom:"5px" }} />
+                      <div style={{ width:"90%", height:"13px", background:"#e8e8e8", marginBottom:"4px" }} />
+                      <div style={{ width:"70%", height:"13px", background:"#e8e8e8" }} />
+                    </div>
+                  </div>
+                ))
+            }
           </div>
         </main>
 
@@ -417,16 +443,26 @@ export default function ArticleDetail() {
 
           <div>
             <div style={{ fontSize:"12px", fontWeight:"700", color:"#555", borderBottom:"2px solid #0d2d52", paddingBottom:"8px", marginBottom:"12px" }}>관련 기사</div>
-            {RELATED.map(r => (
-              <Link key={r.id} to={"/" + r.channel + "/" + r.id} style={{ display:"flex", gap:"10px", padding:"10px 0", borderBottom:"1px solid #f0f0f0", textDecoration:"none" }}>
-                <img src={r.thumb} alt={r.title} style={{ width:"80px", height:"60px", objectFit:"cover", borderRadius:"2px", flexShrink:0 }} />
-                <div>
-                  <div style={{ fontSize:"10px", color: CC[r.channel] || "#0d2d52", fontWeight:"700", marginBottom:"3px" }}>{r.channel}</div>
-                  <div style={{ fontSize:"12px", color:"#1a1a1a", lineHeight:"1.4", fontWeight:"500" }}>{r.title}</div>
-                  <div style={{ fontSize:"10px", color:"#9a9a9a", marginTop:"3px" }}>👁 {r.views}</div>
-                </div>
-              </Link>
-            ))}
+            {related.length > 0
+              ? related.map(r => (
+                  <Link key={r.slug} to={"/article/" + r.slug} style={{ display:"flex", gap:"10px", padding:"10px 0", borderBottom:"1px solid #f0f0f0", textDecoration:"none" }}>
+                    <img src={r.thumbnail_url} alt={r.title} style={{ width:"80px", height:"60px", objectFit:"cover", borderRadius:"2px", flexShrink:0 }} />
+                    <div>
+                      <div style={{ fontSize:"10px", color: CC[r.channels?.name] || "#0d2d52", fontWeight:"700", marginBottom:"3px" }}>{r.channels?.name}</div>
+                      <div style={{ fontSize:"12px", color:"#1a1a1a", lineHeight:"1.4", fontWeight:"500", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{r.title}</div>
+                    </div>
+                  </Link>
+                ))
+              : Array.from({length: 3}).map((_, i) => (
+                  <div key={"rsk-"+i} style={{ display:"flex", gap:"10px", padding:"10px 0", borderBottom:"1px solid #f0f0f0" }} aria-busy="true">
+                    <div style={{ width:"80px", height:"60px", background:"#e8e8e8", flexShrink:0, borderRadius:"2px" }} />
+                    <div style={{ flex:1 }}>
+                      <div style={{ width:"35%", height:"10px", background:"#e8e8e8", marginBottom:"3px" }} />
+                      <div style={{ width:"90%", height:"12px", background:"#e8e8e8" }} />
+                    </div>
+                  </div>
+                ))
+            }
           </div>
 
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
