@@ -13,6 +13,8 @@ function formatDate(iso) {
   return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
 }
 
+const socialIconStyle = { fontSize: "24px", textDecoration: "none", lineHeight: 1 };
+
 const AUTHOR_ARTICLES = [
   { id:"a1", title:"닥터리부트, 두피케어의 새로운 기준을 세우다", date:"2026.04.20" },
   { id:"a2", title:"봉숭아학당 26기 수료식, 시민기자의 탄생", date:"2026.04.10" },
@@ -211,7 +213,7 @@ export default function ArticleDetail() {
     published_at: formatDate(article.published_at),
     content: article.content,
     author_name: "정세연 편집국장",
-    author_bio: "닥터리부트 두피관리센터 원장 · 두피전문가 27년 · 이음미디어 편집국장",
+    author_bio: "닥터리부트 두피관리센터(일산) 원장 · 두피전문가 27년 · 이음미디어 편집국장",
     author_intro: "두피 전문가 27년 경력의 정세연 원장이자 이음미디어 편집국장입니다. 세상을 잇고 사람을 잇는 이야기를 발굴합니다.",
     tags: ["이음매거진","문화","전시"],
     views: 1284,
@@ -285,14 +287,28 @@ export default function ArticleDetail() {
             이 글은 이음매거진에 먼저 실린 글입니다. 전체 본문과 이미지는 매거진 사이트에서 보실 수 있습니다.
           </div>
 
-          {/* 협찬 배너 */}
-          <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", borderLeft:"4px solid #1c4f8a", padding:"16px 20px", margin:"32px 0", display:"flex", alignItems:"center", justifyContent:"space-between", gap:"20px" }}>
-            <div>
-              <div style={{ fontSize:"9px", color:"#9a9a9a", marginBottom:"3px" }}>SPONSORED</div>
-              <div style={{ fontSize:"13px", fontWeight:"700", color:"#0d2d52", marginBottom:"3px" }}>닥터리부트 두피관리센터</div>
-              <div style={{ fontSize:"11px", color:"#6b6b6b" }}>고양시 라온 원장 · 두피전문가 27년</div>
+          {/* 광고 박스 — 정세연 본인 광고 (광고 샘플 역할) */}
+          <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", borderLeft:"4px solid #1c4f8a", padding:"24px 24px 16px", margin:"32px 0" }}>
+            <div style={{ fontSize:"10px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
+            <div style={{ fontFamily:"serif", fontSize:"17px", fontWeight:"700", color:"#0d2d52", lineHeight:"1.5", marginBottom:"8px", fontStyle:"italic" }}>
+              "고객의 마지막 희망이 되고픈 두피전문가"
             </div>
-            <button style={{ background:"#0d2d52", color:"white", border:"none", padding:"9px 20px", fontSize:"11px", fontWeight:"700", cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap" }}>예약 · 문의 →</button>
+            <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", marginBottom:"4px" }}>닥터리부트 두피관리센터</div>
+            <div style={{ fontSize:"12px", color:"#6b6b6b", marginBottom:"3px" }}>정세연 원장 · 두피전문가 27년</div>
+            <div style={{ fontSize:"12px", color:"#6b6b6b", marginBottom:"18px" }}>일산 · 브레인트레이너 · SMP디자인전문가</div>
+            <a href="https://naver.me/GWeDuL23" target="_blank" rel="noopener noreferrer"
+               style={{ display:"inline-block", background:"#0d2d52", color:"white", padding:"11px 24px", fontSize:"12px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit", marginBottom:"16px" }}>
+              예약 · 문의 →
+            </a>
+            <div style={{ display:"flex", gap:"18px", paddingTop:"16px", borderTop:"1px solid #e8e8e8" }}>
+              <a href="https://dr-reboot.co.kr" target="_blank" rel="noopener noreferrer" title="홈페이지" style={socialIconStyle}>🏠</a>
+              <a href="https://naver.me/GWeDuL23" target="_blank" rel="noopener noreferrer" title="네이버 지도" style={socialIconStyle}>📍</a>
+              <a href="https://www.youtube.com/channel/UCVdGlBOwnxzPs5rnNGhAZuQ" target="_blank" rel="noopener noreferrer" title="유튜브" style={socialIconStyle}>🎥</a>
+              <a href="https://blog.naver.com/mzk6682" target="_blank" rel="noopener noreferrer" title="네이버 블로그" style={socialIconStyle}>✍️</a>
+            </div>
+            <div style={{ marginTop:"14px", paddingTop:"12px", borderTop:"1px dashed #e0e0e0", fontSize:"11px", color:"#9a9a9a", textAlign:"right" }}>
+              광고 문의: <a href="mailto:press@eummedia.kr" style={{ color:"#1c4f8a", textDecoration:"none" }}>press@eummedia.kr</a>
+            </div>
           </div>
 
           {/* 태그 */}
@@ -466,17 +482,28 @@ export default function ArticleDetail() {
           </div>
 
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
-            <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>AD</div>
+            <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
             <div style={{ width:"100%", height:"120px", background:"linear-gradient(135deg,#0d2d52,#1c4f8a)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:"12px", borderRadius:"2px" }}>
-              <div style={{ textAlign:"center", color:"white" }}>
+              <div style={{ textAlign:"center", color:"white", padding:"0 12px" }}>
                 <div style={{ fontSize:"22px", marginBottom:"6px" }}>💆</div>
-                <div style={{ fontSize:"13px", fontWeight:"700" }}>닥터리부트</div>
-                <div style={{ fontSize:"10px", opacity:0.75, marginTop:"3px" }}>두피케어 전문 27년</div>
+                <div style={{ fontSize:"12px", fontWeight:"700" }}>닥터리부트 두피관리센터</div>
               </div>
             </div>
-            <div style={{ fontSize:"12px", fontWeight:"700", color:"#0d2d52", marginBottom:"4px" }}>두피케어 전문 27년</div>
-            <div style={{ fontSize:"11px", color:"#6b6b6b", lineHeight:"1.7", marginBottom:"12px" }}>고양시 라온 원장 · 탈모 예방 전문</div>
-            <button style={{ width:"100%", background:"#0d2d52", color:"white", border:"none", padding:"9px", fontSize:"11px", fontWeight:"700", cursor:"pointer", fontFamily:"inherit" }}>예약 · 문의 →</button>
+            <div style={{ fontSize:"12px", fontWeight:"700", color:"#0d2d52", marginBottom:"3px", lineHeight:"1.4" }}>고객의 마지막 희망이 되고픈</div>
+            <div style={{ fontSize:"11px", color:"#6b6b6b", lineHeight:"1.6", marginBottom:"12px" }}>
+              정세연 원장 · 두피전문가 27년<br />
+              일산 · 브레인트레이너 · SMP디자인전문가
+            </div>
+            <a href="https://naver.me/GWeDuL23" target="_blank" rel="noopener noreferrer"
+               style={{ display:"block", textAlign:"center", background:"#0d2d52", color:"white", padding:"9px", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit", marginBottom:"10px" }}>
+              예약 · 문의 →
+            </a>
+            <div style={{ display:"flex", justifyContent:"space-around", paddingTop:"10px", borderTop:"1px solid #e8e8e8" }}>
+              <a href="https://dr-reboot.co.kr" target="_blank" rel="noopener noreferrer" title="홈페이지" style={{ ...socialIconStyle, fontSize:"16px" }}>🏠</a>
+              <a href="https://naver.me/GWeDuL23" target="_blank" rel="noopener noreferrer" title="네이버 지도" style={{ ...socialIconStyle, fontSize:"16px" }}>📍</a>
+              <a href="https://www.youtube.com/channel/UCVdGlBOwnxzPs5rnNGhAZuQ" target="_blank" rel="noopener noreferrer" title="유튜브" style={{ ...socialIconStyle, fontSize:"16px" }}>🎥</a>
+              <a href="https://blog.naver.com/mzk6682" target="_blank" rel="noopener noreferrer" title="네이버 블로그" style={{ ...socialIconStyle, fontSize:"16px" }}>✍️</a>
+            </div>
           </div>
 
           <div>
