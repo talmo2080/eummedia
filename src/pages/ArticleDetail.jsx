@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 
 const CC = {
   "이음매거진":"#0d2d52","이음뉴스":"#c0392b","이음에듀":"#1a6b3c",
@@ -7,25 +8,10 @@ const CC = {
   "이음뷰":"#8a6a00","이음로컬":"#1a6b3c",
 };
 
-const ARTICLE = {
-  title: "열 번째 봄, 도자기 위로 난 꽃길을 걷다",
-  subtitle: "경기 이천 세라피아에서 열리는 '2026 이천도자기축제' 현장을 직접 걸었다.",
-  channel: "이음매거진",
-  author_name: "정세연 편집국장",
-  author_bio: "닥터리부트 두피관리센터 원장 · 두피전문가 27년 · 이음미디어 편집국장",
-  author_intro: "두피 전문가 27년 경력의 정세연 원장이자 이음미디어 편집국장입니다. 세상을 잇고 사람을 잇는 이야기를 발굴합니다.",
-  thumbnail: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=900&q=80",
-  tags: ["이천도자기축제","경기문화","도예","봄여행","이음매거진"],
-  views: 1284, published_at: "2026.04.28", read_time: 5,
-  content: `
-    <p style="font-size:19px;font-weight:600;color:#0d2d52;line-height:1.8;margin-bottom:28px;border-left:4px solid #1c4f8a;padding-left:20px;">봄비가 살짝 내린 4월 셋째 주 토요일, 경기도 이천 설봉공원 일대는 도자기와 꽃의 향연으로 가득 찼다.</p>
-    <h3 style="font-size:20px;font-weight:700;color:#0d2d52;margin:36px 0 16px;padding-bottom:8px;border-bottom:1px solid #e0e0e0;">흙으로 빚는 봄의 언어</h3>
-    <p style="margin-bottom:24px;line-height:2;">축제 첫날 오전 10시, 세라피아 야외 도예 체험장에는 이미 긴 줄이 늘어서 있었다. 아이의 손을 잡은 부모, 커플, 노부부까지 세대를 초월한 방문객들이 물레 앞에 앉아 흙을 매만졌다.</p>
-    <div style="background:#f7f8fa;border-left:4px solid #1c4f8a;padding:20px 24px;margin:28px 0;font-style:italic;font-size:16px;color:#3a3a3a;line-height:1.9;">"도자기는 불로 완성되지만, 시작은 언제나 사람의 손입니다."<cite style="display:block;font-size:12px;color:#9a9a9a;margin-top:10px;font-style:normal;font-weight:600;">- 이천 도예 장인 김광수</cite></div>
-    <h3 style="font-size:20px;font-weight:700;color:#0d2d52;margin:36px 0 16px;padding-bottom:8px;border-bottom:1px solid #e0e0e0;">장인의 손, 백 년의 기억</h3>
-    <p style="margin-bottom:24px;line-height:2;">축제의 백미는 단연 장인 시연 코너다. 경기도 무형문화재 김광수 장인은 60년 경력의 손놀림으로 10분 만에 항아리 하나를 빚어냈다.</p>
-  `,
-};
+function formatDate(iso) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+}
 
 const AUTHOR_ARTICLES = [
   { id:"a1", title:"닥터리부트, 두피케어의 새로운 기준을 세우다", date:"2026.04.20" },
@@ -133,8 +119,9 @@ function StickyReactionBar({ liked, likeCount, onLike, bookmarked, onBookmark, o
 }
 
 export default function ArticleDetail() {
-  const a = ARTICLE;
-  const color = CC[a.channel] || "#0d2d52";
+  const { slug } = useParams();
+  const [article, setArticle] = useState(null);
+  const [error, setError] = useState(null);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(47);
   const [bookmarked, setBookmarked] = useState(false);
@@ -158,6 +145,55 @@ export default function ArticleDetail() {
     setComments(p => [...p, { id: Date.now(), name: cName, date: "2026.05.01", content: cText, likes: 0 }]);
     setCName(""); setCText("");
   };
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error: err } = await supabase
+        .from('articles')
+        .select('slug, title, summary, content, thumbnail_url, published_at, channels(name, slug, english_slug)')
+        .eq('slug', slug)
+        .eq('status', 'published')
+        .single();
+      if (cancelled) return;
+      if (err) { setError('기사를 불러오지 못했습니다.'); return; }
+      setArticle(data);
+    })();
+    return () => { cancelled = true; };
+  }, [slug]);
+
+  if (error) {
+    return (
+      <div role="alert" style={{ maxWidth:"800px", margin:"80px auto", padding:"24px", background:"#fff5f5", border:"1px solid #e74c3c", color:"#c0392b", fontSize:"15px", textAlign:"center", fontFamily:"'Noto Sans KR',sans-serif" }}>
+        ⚠️ {error}<br />
+        <Link to="/" style={{ display:"inline-block", marginTop:"12px", color:"#0d2d52", fontSize:"13px" }}>← 홈으로 돌아가기</Link>
+      </div>
+    );
+  }
+  if (!article) {
+    return (
+      <div aria-busy="true" style={{ maxWidth:"800px", margin:"80px auto", padding:"24px", color:"#9a9a9a", fontSize:"14px", textAlign:"center", fontFamily:"'Noto Sans KR',sans-serif" }}>
+        기사를 불러오는 중입니다…
+      </div>
+    );
+  }
+
+  const a = {
+    title: article.title,
+    subtitle: article.summary,
+    channel: article.channels?.name,
+    thumbnail: article.thumbnail_url,
+    published_at: formatDate(article.published_at),
+    content: article.content,
+    author_name: "정세연 편집국장",
+    author_bio: "닥터리부트 두피관리센터 원장 · 두피전문가 27년 · 이음미디어 편집국장",
+    author_intro: "두피 전문가 27년 경력의 정세연 원장이자 이음미디어 편집국장입니다. 세상을 잇고 사람을 잇는 이야기를 발굴합니다.",
+    tags: ["이음매거진","문화","전시"],
+    views: 1284,
+    read_time: 5,
+  };
+  const color = CC[a.channel] || "#0d2d52";
+  const externalUrl = `https://eummagazine.com/${article.channels?.slug?.split('-').pop()}/?idx=${article.slug}&bmode=view`;
 
   return (
     <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#fff", color:"#1a1a1a", minHeight:"100vh" }}>
@@ -208,10 +244,21 @@ export default function ArticleDetail() {
 
           {/* 대표 이미지 */}
           <img src={a.thumbnail} alt={a.title} style={{ width:"100%", height:"380px", objectFit:"cover", borderRadius:"4px", marginBottom:"10px", display:"block" }} />
-          <div style={{ fontSize:"11px", color:"#9a9a9a", textAlign:"center", marginBottom:"32px", fontStyle:"italic" }}>이천 세라피아 야외 도예 체험장 / 이음미디어</div>
+          <div style={{ fontSize:"11px", color:"#9a9a9a", textAlign:"center", marginBottom:"32px", fontStyle:"italic" }}>{a.channel} / 이음미디어</div>
 
-          {/* 본문 */}
-          <div style={{ fontFamily:"serif", fontSize:"17px", lineHeight:"2", color:"#2a2a2a", marginBottom:"28px" }} dangerouslySetInnerHTML={{ __html: a.content }} />
+          {/* 본문 — 미리보기 안내 + 평문 본문 + 원문 보기 (스테이지 1) */}
+          <div style={{ background:"#f5f5f5", borderLeft:"3px solid #0d2d52", padding:"8px 12px", marginBottom:"16px", fontSize:"13px", color:"#9a9a9a", lineHeight:"1.6" }}>
+            📰 이 페이지는 이음매거진 원문의 미리보기입니다.<br />
+            전체 본문은 아래 [원문 보기]에서 확인하세요.
+          </div>
+          <div style={{ whiteSpace:"pre-wrap", fontFamily:"inherit", fontSize:"16px", lineHeight:"1.9", color:"#222", marginBottom:"24px" }}>{a.content}</div>
+          <a href={externalUrl} target="_blank" rel="noopener noreferrer"
+             style={{ display:"inline-block", background:"#0d2d52", color:"white", padding:"14px 28px", fontSize:"15px", fontWeight:"700", textDecoration:"none", margin:"8px 0", fontFamily:"inherit" }}>
+            원문 보기 →
+          </a>
+          <div style={{ fontSize:"12px", color:"#9a9a9a", marginBottom:"24px" }}>
+            이 글은 이음매거진에 먼저 실린 글입니다. 전체 본문과 이미지는 매거진 사이트에서 보실 수 있습니다.
+          </div>
 
           {/* 협찬 배너 */}
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", borderLeft:"4px solid #1c4f8a", padding:"16px 20px", margin:"32px 0", display:"flex", alignItems:"center", justifyContent:"space-between", gap:"20px" }}>
