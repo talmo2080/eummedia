@@ -37,9 +37,9 @@ function timeAgo(dateStr) {
 }
 
 export default function ChannelList() {
-  const { channelName } = useParams();
+  const { englishSlug } = useParams();
   const navigate = useNavigate();
-  const [activeChannel, setActiveChannel] = useState(channelName || "전체");
+  const [activeChannel, setActiveChannel] = useState(englishSlug || "전체");
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("latest");

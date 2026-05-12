@@ -8,13 +8,13 @@ const VALUES = [
 ]
 
 const CHANNELS = [
-  { name: '이음매거진', desc: '시대를 읽는 깊이 있는 기획·인터뷰', path: '/channel/politics' },
-  { name: '이음로컬', desc: '고양·일산을 비롯한 지역 밀착 보도', path: '/channel/economy' },
-  { name: '이음에듀', desc: '학교, 교육 정책, 평생학습 이야기', path: '/channel/society' },
-  { name: '이음피플', desc: '평범한 사람들의 비범한 이야기', path: '/channel/culture' },
-  { name: '이음트렌드', desc: '문화·라이프스타일·소비 트렌드', path: '/channel/health' },
-  { name: '이음보이스', desc: '시민의 목소리, 제보와 인터뷰', path: '/channel/life' },
-  { name: '이음뷰', desc: '편집국과 기고자의 칼럼·논평', path: '/channel/opinion' },
+  { name: '이음매거진', desc: '시대를 읽는 깊이 있는 기획·인터뷰', path: '/channel/magazine' },
+  { name: '이음피플',   desc: '평범한 사람들의 비범한 이야기',     path: '/channel/people' },
+  { name: '이음로컬',   desc: '고양·일산을 비롯한 지역 밀착 보도', path: '/channel/local' },
+  { name: '이음에듀',   desc: '학교, 교육 정책, 평생학습 이야기',  path: '/channel/edu' },
+  { name: '이음뷰',     desc: '편집국과 기고자의 칼럼·논평',       path: '/channel/view' },
+  { name: '이음트렌드', desc: '문화·라이프스타일·소비 트렌드',     path: '/channel/trend' },
+  { name: '이음보이스', desc: '시민의 목소리, 제보와 인터뷰',     path: '/channel/voice' },
 ]
 
 const PRINCIPLES = [
@@ -67,11 +67,11 @@ export default function About() {
             fontFamily: SERIF, fontSize: 44, fontWeight: 700, lineHeight: 1.35,
             letterSpacing: -1, marginBottom: 22,
           }}>
-            세상과 당신을 잇는<br /><span style={{ color: SUB }}>주간인터넷신문</span>
+            세상과 당신을 잇는<br /><span style={{ color: SUB }}>이음미디어</span>
           </h1>
           <p style={{ fontSize: 17, lineHeight: 1.9, opacity: 0.85, fontWeight: 300 }}>
-            이음미디어는 분절된 정보의 시대에 맥락과 사실을 잇습니다.<br />
-            지역의 작은 목소리부터 AI 시대의 큰 흐름까지 — 매주 토요일, 깊이 있게 전합니다.
+            이음미디어는 세상과 당신을 잇고, 당신의 성공이 우리의 뉴스입니다.<br />
+            지역의 작은 목소리부터 AI 시대의 큰 흐름까지 — 매일 새 이야기를 전합니다.
           </p>
         </div>
       </section>
@@ -219,6 +219,28 @@ export default function About() {
             }}>
               편집 5대 원칙
             </h2>
+            {/* 부 슬로건 — 편집 철학이 5대 원칙의 머리 (2026-05-12, 편집인 결정) */}
+            <div style={{
+              maxWidth: 560,
+              margin: '28px auto 0',
+              paddingTop: 22,
+              borderTop: `1px solid ${SUB}`,
+            }}>
+              <p style={{
+                fontFamily: SERIF,
+                fontSize: 18,
+                fontStyle: 'italic',
+                color: NAVY,
+                lineHeight: 1.7,
+                letterSpacing: '-0.3px',
+                margin: 0,
+                textAlign: 'center',
+              }}>
+                <span style={{ color: SUB, fontSize: 24, marginRight: 4, verticalAlign: '-3px' }}>“</span>
+                이음미디어는 정보를 모으지 않고, 정보를 거릅니다.
+                <span style={{ color: SUB, fontSize: 24, marginLeft: 4, verticalAlign: '-3px' }}>”</span>
+              </p>
+            </div>
           </div>
           <div>
             {PRINCIPLES.map(p => (

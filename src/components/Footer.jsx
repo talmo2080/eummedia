@@ -31,7 +31,7 @@ export default function Footer() {
               이음미디어
             </div>
             <p style={{ fontSize: '13px', lineHeight: '1.8', color: '#aaa' }}>
-              세상과 당신을 잇는<br />주간인터넷신문
+              세상과 당신을 잇는<br />인터넷신문
             </p>
           </div>
 

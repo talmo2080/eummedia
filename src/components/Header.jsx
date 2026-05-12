@@ -2,13 +2,13 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const channels = [
-  { name: "이음매거진", path: "/channel/politics" },
-  { name: "이음로컬", path: "/channel/economy" },
-  { name: "이음에듀", path: "/channel/society" },
-  { name: "이음피플", path: "/channel/culture" },
-  { name: "이음트렌드", path: "/channel/health" },
-  { name: "이음보이스", path: "/channel/life" },
-  { name: "이음뷰", path: "/channel/opinion" },
+  { name: "이음매거진", path: "/channel/magazine" },
+  { name: "이음피플",   path: "/channel/people" },
+  { name: "이음로컬",   path: "/channel/local" },
+  { name: "이음에듀",   path: "/channel/edu" },
+  { name: "이음뷰",     path: "/channel/view" },
+  { name: "이음트렌드", path: "/channel/trend" },
+  { name: "이음보이스", path: "/channel/voice" },
 ];
 
 export default function Header() {
@@ -44,7 +44,7 @@ export default function Header() {
               lineHeight: 1.2
             }}>이음미디어</div>
             <div style={{ fontSize: 11, color: "#aac4e0" }}>
-              세상과 당신을 잇는 주간인터넷신문
+              세상과 당신을 잇는 인터넷신문
             </div>
           </div>
         </Link>
