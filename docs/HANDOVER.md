@@ -354,8 +354,8 @@ Claude Code Desktop이 채팅 첨부 이미지를 모델 입력으로만 base64 
 
 ### 📌 다음 세션 작업 큐 (우선순위 순, 5/13 갱신)
 
-1. ✅ **항목 C 단계 1 실행 완료** — 5/14: is_featured 마이그레이션 실행 완료 (39 false / 0 true / 컬럼 OK / Partial Unique Index OK). SQL 박제: `supabase/migrations/20260514000001_add_is_featured.sql` (commit `f1623bc`). 다음 시작점은 단계 2 (ChannelList.jsx 쿼리 교체).
-2. **항목 C 단계 2 적용** — `ChannelList.jsx` 쿼리 교체 (분리 쿼리 패턴) + commit
+1. ✅ **항목 C 단계 1 실행 완료** — 5/14: is_featured 마이그레이션 실행 완료 (39 false / 0 true / 컬럼 OK / Partial Unique Index OK). SQL 박제: `supabase/migrations/20260514000001_add_is_featured.sql` (commit `f1623bc`).
+2. ✅ **항목 C 단계 2 적용 완료** — 5/14: ChannelList Supabase 전환 완료, 7채널 dev 검증 통과 (매거진/피플/로컬 4건, 에듀 3건, 뷰 5건, 보이스 7건, 트렌드 9→12 페이지네이션). 분리 쿼리 3단 + cancelled cleanup + OFFSET 페이지네이션 + 안전 가드 2줄. commit `71d3607`. **부수 발견 박제**: 7채널 모두 배너 설명문이 "이음미디어의 모든 채널 콘텐츠"로 잘못 표시 (CHANNEL_META 한글 키 / activeChannel 영문 slug 불일치) → 단계 3 묶음. 매거진 카피 세연 결정: **"라이프스타일 전문 콘텐츠"**. 나머지 6채널 카피 미정. 다음 시작점은 단계 3 (UI 인터랙션 + CHANNEL_META 영문 키 재구성).
 3. **항목 C 단계 3** — UI 인터랙션 (featured 위치 / `loading` state 제거 / error 배너 / 카드 메타 재설계 / "전체" 탭 처리)
 4. **항목 C 단계 4** — dev 캡처 검증 (7채널 진입 / 픽 분기 / 빈 채널 / 검색 / 페이지네이션)
 5. **등록증 이미지 보관** — 세연님 원본 파일 경로 안내 후 `docs/legal/seoul-a56526-registration-2026-04-27.jpg`로 복사
