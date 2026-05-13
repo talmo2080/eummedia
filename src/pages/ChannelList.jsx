@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
-const CHANNELS = ["전체", "이음매거진", "이음로컬", "이음에듀", "이음피플", "이음트렌드", "이음보이스", "이음뷰"];
+const CHANNELS = ["전체", "이음매거진", "이음피플", "이음로컬", "이음에듀", "이음뷰", "이음트렌드", "이음보이스"];
 
 const CHANNEL_META = {
   전체:      { icon: "📋", desc: "이음미디어의 모든 채널 콘텐츠",      color: "#0d2d52", accent: "#c9a84c" },
@@ -13,6 +13,16 @@ const CHANNEL_META = {
   이음트렌드: { icon: "📈", desc: "시대의 흐름을 읽고 K-컬처의 미래를 선점하는 감각", color: "#7c4a00", accent: "#fb923c" },
   이음보이스: { icon: "🎙️", desc: "당신의 이야기가 이음미디어를 통해 세상의 울림이 되는 광장", color: "#064e3b", accent: "#34d399" },
   이음뷰:    { icon: "🎬", desc: "복잡한 시대의 실타래를 푸는 이음미디어만의 독창적 시선", color: "#1e1b4b", accent: "#818cf8" },
+};
+
+const SLUG_BY_NAME = {
+  "이음매거진": "magazine",
+  "이음로컬":   "local",
+  "이음에듀":   "edu",
+  "이음피플":   "people",
+  "이음트렌드": "trend",
+  "이음보이스": "voice",
+  "이음뷰":    "view",
 };
 
 const PAGE_SIZE = 9;
@@ -40,7 +50,7 @@ export default function ChannelList() {
 
   const switchChannel = useCallback((ch) => {
     setActiveChannel(ch); setPage(1); setSearchQuery(""); setSearchInput("");
-    if (ch === "전체") navigate("/channel"); else navigate(`/channel/${ch}`);
+    if (ch === "전체") navigate("/channel"); else navigate(`/channel/${SLUG_BY_NAME[ch]}`);
   }, [navigate]);
 
   useEffect(() => {
