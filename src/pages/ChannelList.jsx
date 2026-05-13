@@ -43,6 +43,7 @@ export default function ChannelList() {
   const [featured, setFeatured] = useState(null);
   const [latest, setLatest] = useState([]);
   const [error, setError] = useState(null);
+  const [retryCount, setRetryCount] = useState(0);
   const [sortBy, setSortBy] = useState("latest");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
@@ -112,7 +113,7 @@ export default function ChannelList() {
     })();
 
     return () => { cancelled = true; };
-  }, [englishSlug]);
+  }, [englishSlug, retryCount]);
 
   async function handleLoadMore() {
     if (!channel) return;
@@ -136,6 +137,10 @@ export default function ChannelList() {
     setPage(nextPage);
   }
 
+  function handleRetry() {
+    setRetryCount(c => c + 1);
+  }
+
   const hasMore = latest.length === PAGE_SIZE * page;
   const meta = CHANNEL_META[channel?.name] || CHANNEL_META[activeChannel] || CHANNEL_META["전체"];
 
@@ -148,6 +153,13 @@ export default function ChannelList() {
         </div>
         <div style={{...s.bannerLine,background:meta.accent}}/>
       </div>
+
+      {error && (
+        <div role="alert" style={s.errorBanner}>
+          <span>⚠️ {error}</span>
+          <button onClick={handleRetry} style={s.retryButton}>다시 시도</button>
+        </div>
+      )}
 
       <main style={s.main}>
         <div style={s.filterBar}>
@@ -259,6 +271,8 @@ const s = {
   bannerTitle:{fontFamily:"'Noto Serif KR',serif",fontSize:"1.7rem",fontWeight:900,color:"#fff",margin:0},
   bannerDesc:{color:"rgba(255,255,255,0.7)",fontSize:"0.88rem",margin:"4px 0 0"},
   bannerLine:{position:"absolute",bottom:0,left:0,right:0,height:3},
+  errorBanner:{maxWidth:1200,margin:"24px auto 0",padding:"14px 20px",background:"#fff5f5",color:"#c0392b",borderLeft:"4px solid #c0392b",fontSize:"14px",lineHeight:1.6,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12},
+  retryButton:{background:"#c0392b",color:"#fff",border:"none",borderRadius:20,padding:"6px 16px",cursor:"pointer",fontSize:"13px",fontWeight:600,fontFamily:"'Noto Sans KR',sans-serif",whiteSpace:"nowrap"},
   main:{maxWidth:1200,margin:"0 auto",padding:"28px 24px"},
   filterBar:{background:"#fff",borderRadius:12,padding:"0 16px",marginBottom:24,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,boxShadow:"0 2px 8px rgba(0,0,0,0.06)"},
   tabRow:{display:"flex",overflowX:"auto"},
