@@ -6,13 +6,13 @@ const CHANNELS = ["전체", "이음매거진", "이음로컬", "이음에듀", "
 
 const CHANNEL_META = {
   전체:      { icon: "📋", desc: "이음미디어의 모든 채널 콘텐츠",      color: "#0d2d52", accent: "#c9a84c" },
-  이음매거진: { icon: "📖", desc: "두피·미용·라이프스타일 전문 콘텐츠", color: "#0d2d52", accent: "#4a9eff" },
-  이음로컬:   { icon: "📍", desc: "지역 소식과 우리 동네 이야기",       color: "#1a4d2e", accent: "#4caf78" },
-  이음에듀:   { icon: "🎓", desc: "교육·자격·평생학습 정보",            color: "#3d1f6b", accent: "#a78bfa" },
-  이음피플:   { icon: "👤", desc: "사람과 이야기 — 인터뷰 & 칼럼",     color: "#6b1f1f", accent: "#f87171" },
-  이음트렌드: { icon: "📈", desc: "사회·문화 최신 트렌드 분석",         color: "#7c4a00", accent: "#fb923c" },
-  이음보이스: { icon: "🎙️", desc: "독자 칼럼·시민 목소리",             color: "#064e3b", accent: "#34d399" },
-  이음뷰:    { icon: "🎬", desc: "영상·포토·멀티미디어 콘텐츠",        color: "#1e1b4b", accent: "#818cf8" },
+  이음매거진: { icon: "📖", desc: "이음미디어가 엄선한 이번 주의 시선, 그 이상의 깊이", color: "#0d2d52", accent: "#4a9eff" },
+  이음로컬:   { icon: "📍", desc: "가장 가까운 곳의 숨소리에서 세상의 해답을 찾는 현장", color: "#1a4d2e", accent: "#4caf78" },
+  이음에듀:   { icon: "🎓", desc: "기술의 속도에 인간의 가치를 더하는 인문학적 배움의 여정", color: "#3d1f6b", accent: "#a78bfa" },
+  이음피플:   { icon: "👤", desc: "당신의 삶이 뉴스가 되고, 당신의 이름이 브랜드가 되는 공간", color: "#6b1f1f", accent: "#f87171" },
+  이음트렌드: { icon: "📈", desc: "시대의 흐름을 읽고 K-컬처의 미래를 선점하는 감각", color: "#7c4a00", accent: "#fb923c" },
+  이음보이스: { icon: "🎙️", desc: "당신의 이야기가 이음미디어를 통해 세상의 울림이 되는 광장", color: "#064e3b", accent: "#34d399" },
+  이음뷰:    { icon: "🎬", desc: "복잡한 시대의 실타래를 푸는 이음미디어만의 독창적 시선", color: "#1e1b4b", accent: "#818cf8" },
 };
 
 const PAGE_SIZE = 9;
@@ -127,7 +127,7 @@ export default function ChannelList() {
   }
 
   const hasMore = latest.length === PAGE_SIZE * page;
-  const meta = CHANNEL_META[activeChannel] || CHANNEL_META["전체"];
+  const meta = CHANNEL_META[channel?.name] || CHANNEL_META[activeChannel] || CHANNEL_META["전체"];
 
   return (
     <div style={s.page}>
