@@ -354,7 +354,7 @@ Claude Code Desktop이 채팅 첨부 이미지를 모델 입력으로만 base64 
 
 ### 📌 다음 세션 작업 큐 (우선순위 순, 5/13 갱신)
 
-1. **항목 C 단계 1 실행** — `is_featured` 마이그레이션 SQL을 `supabase/migrations/` 박제 + Supabase 대시보드 직접 실행 (세연 OK 받고)
+1. ✅ **항목 C 단계 1 실행 완료** — 5/14: is_featured 마이그레이션 실행 완료 (39 false / 0 true / 컬럼 OK / Partial Unique Index OK). SQL 박제: `supabase/migrations/20260514000001_add_is_featured.sql` (commit `f1623bc`). 다음 시작점은 단계 2 (ChannelList.jsx 쿼리 교체).
 2. **항목 C 단계 2 적용** — `ChannelList.jsx` 쿼리 교체 (분리 쿼리 패턴) + commit
 3. **항목 C 단계 3** — UI 인터랙션 (featured 위치 / `loading` state 제거 / error 배너 / 카드 메타 재설계 / "전체" 탭 처리)
 4. **항목 C 단계 4** — dev 캡처 검증 (7채널 진입 / 픽 분기 / 빈 채널 / 검색 / 페이지네이션)
