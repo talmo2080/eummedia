@@ -361,7 +361,7 @@ Claude Code Desktop이 채팅 첨부 이미지를 모델 입력으로만 base64 
    - **3-2**: 카드 footer 정리 (`✍ ` `👁 ` 빈 아이콘 — 단계 2 안전 가드 후 빈 영역으로 남음)
    - **3-3**: "전체" 탭 처리 (현재 클릭 시 `/channel` → 홈 리다이렉트)
    - ✅ **3-4**: 채널 탭 클릭 정상화 + CHANNELS 순서 5/12 박제 적용 완료 (5/14, commit `163f659`). SLUG_BY_NAME 매핑 dict (7건, DB english_slug와 1:1) + switchChannel navigate 정정 + CHANNELS 배열 5/12 박제 순서(매거진→피플→로컬→에듀→뷰→트렌드→보이스) — 5/10 박제 "잡지 목차 = 본문 색인 일치" 원칙 실현. **P-03 진행도 75% → 80%**.
-   - **3-5**: error 통합 배너 (Home.jsx 패턴 적용, 현재 콘솔에만)
+   - ✅ **3-5**: error 통합 배너 + 다시 시도 버튼 박제 완료 (5/14, commit `c8a37e2`). Home.jsx 5/10 박제 패턴 일관성 + retry 버튼 신규 패턴 (ChannelList부터, P-02 등에 향후 자연 전파). retryCount state + useEffect 재트리거. role="alert" 접근성. 검증: `/channel/nonexistent`로 잘못된 slug 진입 → 배너 → 다시 시도 → 정상 URL 변경 시 자동 사라짐 3단계 통과. **P-03 진행도 80% → 85%**.
    - **3-6**: CHANNEL_META 영문 키 재구성 (3-4 SLUG_BY_NAME dict 활용 경로 가능)
 4. **항목 C 단계 4** — dev 캡처 검증 (7채널 진입 / 픽 분기 / 빈 채널 / 검색 / 페이지네이션)
 5. **등록증 이미지 보관** — 세연님 원본 파일 경로 안내 후 `docs/legal/seoul-a56526-registration-2026-04-27.jpg`로 복사
