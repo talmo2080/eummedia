@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 
 const CHANNELS = ["전체", "이음매거진", "이음로컬", "이음에듀", "이음피플", "이음트렌드", "이음보이스", "이음뷰"];
 
@@ -16,18 +17,6 @@ const CHANNEL_META = {
 
 const PAGE_SIZE = 9;
 
-const DUMMY = [
-  { id:"1", slug:"hair-care-secrets-2026", title:"두피 건강의 비밀, 27년 전문가가 전하는 모발 관리의 모든 것", summary:"두피 건강은 단순히 미적 문제가 아닙니다. 전신 건강과 직결된 신호를 올바르게 읽는 법을 알아봅니다.", thumbnail:"https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80", author:"정세연", channel:"이음매거진", tags:["두피","모발관리","건강"], views:1240, published_at:"2026-05-01T09:00:00Z", is_sponsored:false, is_featured:true },
-  { id:"2", slug:"scalp-spring-care", title:"봄철 두피 트러블, 원인과 해결책 완벽 정리", summary:"환절기마다 반복되는 두피 트러블. 전문가가 알려주는 시즌별 맞춤 케어 방법을 소개합니다.", thumbnail:"https://images.unsplash.com/photo-1559599101-f09722fb4948?w=800&q=80", author:"정세연", channel:"이음매거진", tags:["두피","봄케어"], views:876, published_at:"2026-04-28T10:30:00Z", is_sponsored:false, is_featured:false },
-  { id:"3", slug:"ilsan-local-news", title:"일산 호수공원 봄 축제, 10만 인파 몰려", summary:"경기도 고양시 일산 호수공원에서 열린 봄 축제에 10만 명이 방문했습니다.", thumbnail:"https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&q=80", author:"이음로컬팀", channel:"이음로컬", tags:["일산","고양","축제"], views:2103, published_at:"2026-04-25T08:00:00Z", is_sponsored:false, is_featured:true },
-  { id:"4", slug:"lifelong-edu-trend", title:"평생교육원 설립 열풍, 언론기관 부설의 장점과 절차는?", summary:"언론사 부설 평생교육원 설립이 주목받는 이유와 실제 절차, 비용, 필요 인력을 상세히 정리했습니다.", thumbnail:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&q=80", author:"이음에듀팀", channel:"이음에듀", tags:["평생교육","교육원"], views:654, published_at:"2026-04-20T14:00:00Z", is_sponsored:false, is_featured:false },
-  { id:"5", slug:"interview-scalp-expert", title:"두피 전문가 27년, 닥터리부트 정세연 원장 단독 인터뷰", summary:"일산 두피관리센터를 운영하며 매거진 편집국장까지, 두 가지 꿈을 동시에 실현하는 삶의 이야기.", thumbnail:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80", author:"이음피플팀", channel:"이음피플", tags:["인터뷰","두피전문가"], views:3410, published_at:"2026-04-15T11:00:00Z", is_sponsored:false, is_featured:true },
-  { id:"6", slug:"web-dev-beginner-journey", title:"50대의 웹개발 도전기, Claude AI와 함께하는 코딩 여정", summary:"전문가도 초보자도 아닌 새로운 도전자로서 React와 Supabase를 배워가는 현실적인 이야기.", thumbnail:"https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80", author:"정세연", channel:"이음피플", tags:["웹개발","AI","도전"], views:1892, published_at:"2026-04-10T09:00:00Z", is_sponsored:true, is_featured:false },
-  { id:"7", slug:"kpop-trend-2026", title:"2026 K-콘텐츠 트렌드, 글로벌을 넘어 일상으로", summary:"K-드라마, K-뷰티, K-푸드까지. 한류가 일상이 된 시대의 새로운 트렌드를 분석합니다.", thumbnail:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80", author:"이음트렌드팀", channel:"이음트렌드", tags:["트렌드","한류","K콘텐츠"], views:1560, published_at:"2026-04-08T09:00:00Z", is_sponsored:false, is_featured:false },
-  { id:"8", slug:"citizen-voice-education", title:"우리 동네 교육 현실, 학부모 100인의 목소리", summary:"전국 학부모 100명이 말하는 교육 현장의 진짜 이야기. 변화가 필요한 것들을 솔직하게 담았습니다.", thumbnail:"https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80", author:"시민기자 박민정", channel:"이음보이스", tags:["교육","시민","목소리"], views:789, published_at:"2026-04-01T09:00:00Z", is_sponsored:false, is_featured:false },
-  { id:"9", slug:"spring-fashion-view", title:"봄 패션 화보, 이음뷰가 담은 2026 스프링 룩", summary:"이음미디어 포토팀이 직접 촬영한 2026 봄 패션 화보. 일상에서 완성하는 스프링 스타일링.", thumbnail:"https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&q=80", author:"이음뷰팀", channel:"이음뷰", tags:["패션","화보","뷰티"], views:2210, published_at:"2026-03-28T10:00:00Z", is_sponsored:false, is_featured:false },
-];
-
 function timeAgo(dateStr) {
   const diff = (Date.now() - new Date(dateStr)) / 1000;
   if (diff < 60) return "방금 전";
@@ -40,8 +29,10 @@ export default function ChannelList() {
   const { englishSlug } = useParams();
   const navigate = useNavigate();
   const [activeChannel, setActiveChannel] = useState(englishSlug || "전체");
-  const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [channel, setChannel] = useState(null);
+  const [featured, setFeatured] = useState(null);
+  const [latest, setLatest] = useState([]);
+  const [error, setError] = useState(null);
   const [sortBy, setSortBy] = useState("latest");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
@@ -52,23 +43,90 @@ export default function ChannelList() {
     if (ch === "전체") navigate("/channel"); else navigate(`/channel/${ch}`);
   }, [navigate]);
 
-  useEffect(() => { setPage(1); loadArticles(); }, [activeChannel, sortBy]);
+  useEffect(() => {
+    if (!englishSlug) return;
+    let cancelled = false;
+    setPage(1);
+    setChannel(null);
+    setFeatured(null);
+    setLatest([]);
+    setError(null);
 
-  async function loadArticles() {
-    setLoading(true);
-    await new Promise(r => setTimeout(r, 300));
-    let result = [...DUMMY];
-    if (activeChannel !== "전체") result = result.filter(a => a.channel === activeChannel);
-    if (sortBy === "popular") result.sort((a,b) => b.views - a.views);
-    else result.sort((a,b) => new Date(b.published_at) - new Date(a.published_at));
-    setArticles(result); setLoading(false);
+    (async () => {
+      // [1/3] 채널 룩업
+      const { data: chData, error: chErr } = await supabase
+        .from('channels')
+        .select('id, name, english_slug')
+        .eq('english_slug', englishSlug)
+        .maybeSingle();
+      if (cancelled) return;
+      if (chErr || !chData) {
+        console.error('[CHANNEL] supabase error:', chErr);
+        setError('채널 정보를 불러오지 못했어요. 잠시 후 새로고침 해주세요.');
+        return;
+      }
+      setChannel(chData);
+
+      // [2/3] 편집국장의 픽 (채널당 1건)
+      const { data: fData, error: fErr } = await supabase
+        .from('articles')
+        .select('slug, title, summary, thumbnail_url, published_at, channels(name)')
+        .eq('status', 'published')
+        .eq('channel_id', chData.id)
+        .eq('is_featured', true)
+        .maybeSingle();
+      if (cancelled) return;
+      if (fErr) {
+        console.error('[FEATURED] supabase error:', fErr);
+        setError('편집국장의 픽을 불러오지 못했어요. 잠시 후 새로고침 해주세요.');
+        return;
+      }
+      setFeatured(fData);
+
+      // [3/3] 최신 N건 (픽 제외, OFFSET 0)
+      const { data: lData, error: lErr } = await supabase
+        .from('articles')
+        .select('slug, title, summary, thumbnail_url, published_at, channels(name)')
+        .eq('status', 'published')
+        .eq('channel_id', chData.id)
+        .eq('is_featured', false)
+        .order('published_at', { ascending: false })
+        .range(0, PAGE_SIZE - 1);
+      if (cancelled) return;
+      if (lErr) {
+        console.error('[LATEST] supabase error:', lErr);
+        setError(prev => prev || '최신 기사를 불러오지 못했어요. 잠시 후 새로고침 해주세요.');
+        return;
+      }
+      setLatest(lData ?? []);
+    })();
+
+    return () => { cancelled = true; };
+  }, [englishSlug]);
+
+  async function handleLoadMore() {
+    if (!channel) return;
+    const nextPage = page + 1;
+    const from = page * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    const { data, error: err } = await supabase
+      .from('articles')
+      .select('slug, title, summary, thumbnail_url, published_at, channels(name)')
+      .eq('status', 'published')
+      .eq('channel_id', channel.id)
+      .eq('is_featured', false)
+      .order('published_at', { ascending: false })
+      .range(from, to);
+    if (err) {
+      console.error('[LOAD_MORE] supabase error:', err);
+      setError('더 보기 기사를 불러오지 못했어요. 잠시 후 새로고침 해주세요.');
+      return;
+    }
+    setLatest(prev => [...prev, ...(data ?? [])]);
+    setPage(nextPage);
   }
 
-  const filtered = articles.filter(a => !searchQuery || a.title.includes(searchQuery) || a.summary.includes(searchQuery) || a.tags.some(t => t.includes(searchQuery)));
-  const featured = !searchQuery && activeChannel === "전체" ? filtered.find(a => a.is_featured) : null;
-  const listItems = featured ? filtered.filter(a => a.id !== featured.id) : filtered;
-  const paginated = listItems.slice(0, page * PAGE_SIZE);
-  const hasMore = paginated.length < listItems.length;
+  const hasMore = latest.length === PAGE_SIZE * page;
   const meta = CHANNEL_META[activeChannel] || CHANNEL_META["전체"];
 
   return (
@@ -76,7 +134,7 @@ export default function ChannelList() {
       <div style={{...s.banner,background:`linear-gradient(135deg,${meta.color} 0%,${meta.color}dd 100%)`}}>
         <div style={s.bannerInner}>
           <span style={s.bannerIcon}>{meta.icon}</span>
-          <div><h1 style={s.bannerTitle}>{activeChannel}</h1><p style={s.bannerDesc}>{meta.desc}</p></div>
+          <div><h1 style={s.bannerTitle}>{channel?.name ?? activeChannel}</h1><p style={s.bannerDesc}>{meta.desc}</p></div>
         </div>
         <div style={{...s.bannerLine,background:meta.accent}}/>
       </div>
@@ -112,37 +170,41 @@ export default function ChannelList() {
           </div>
         )}
 
-        {loading&&<div style={s.skeletonGrid}>{[0,1,2].map(i=><div key={i} style={s.skeleton}/>)}</div>}
-
-        {!loading&&filtered.length===0&&(
-          <div style={s.empty}><div style={{fontSize:"3rem"}}>📭</div><p style={{color:"#888",marginTop:12}}>{searchQuery?"검색 결과가 없습니다.":"아직 기사가 없습니다."}</p></div>
+        {!channel && !error && (
+          <div style={s.skeletonGrid}>{[0,1,2].map(i=><div key={i} style={s.skeleton}/>)}</div>
         )}
 
-        {!loading&&featured&&(
+        {channel && !featured && latest.length === 0 && (
+          <div style={s.empty}>
+            <div style={{fontSize:"3rem"}}>📭</div>
+            <p style={{color:"#888",marginTop:12}}>아직 기사가 없습니다.</p>
+          </div>
+        )}
+
+        {featured && (
           <Link to={`/article/${featured.slug}`} style={{textDecoration:"none"}}>
             <article style={s.featured}>
-              <div style={s.featuredImgWrap}><img src={featured.thumbnail} alt={featured.title} style={s.featuredImg}/></div>
+              <div style={s.featuredImgWrap}><img src={featured.thumbnail_url} alt={featured.title} style={s.featuredImg}/></div>
               <div style={s.featuredBody}>
                 <div style={s.featuredMeta}>
-                  <span style={{...s.badge,background:CHANNEL_META[featured.channel]?.color}}>{CHANNEL_META[featured.channel]?.icon} {featured.channel}</span>
-                  <span style={s.featuredLabel}>✦ 추천기사</span>
+                  <span style={{...s.badge,background:meta.color}}>{meta.icon} {channel?.name}</span>
+                  <span style={s.featuredLabel}>✦ 편집국장의 픽</span>
                 </div>
                 <h2 style={s.featuredTitle}>{featured.title}</h2>
                 <p style={s.featuredSummary}>{featured.summary}</p>
-                <div style={s.featuredFooter}>
-                  <span style={s.metaText}>✍ {featured.author}</span>
-                  <span style={s.metaText}>👁 {featured.views.toLocaleString()}</span>
-                  <span style={s.metaText}>{timeAgo(featured.published_at)}</span>
-                </div>
               </div>
             </article>
           </Link>
         )}
 
-        {!loading&&paginated.length>0&&(
+        {latest.length > 0 && (
           <>
-            <div style={s.grid}>{paginated.map(a=><ArticleCard key={a.id} article={a}/>)}</div>
-            {hasMore&&<button style={s.loadMore} onClick={()=>setPage(p=>p+1)}>기사 더 보기 ({listItems.length-paginated.length}개 남음) ↓</button>}
+            <div style={s.grid}>{latest.map(a => <ArticleCard key={a.slug} article={a} channelMeta={meta} channelName={channel?.name}/>)}</div>
+            {hasMore && (
+              <button style={s.loadMore} onClick={handleLoadMore}>
+                기사 더 보기 ↓
+              </button>
+            )}
           </>
         )}
       </main>
@@ -152,24 +214,24 @@ export default function ChannelList() {
   );
 }
 
-function ArticleCard({article}) {
-  const meta = CHANNEL_META[article.channel]||CHANNEL_META["전체"];
+function ArticleCard({article, channelMeta, channelName}) {
+  const meta = channelMeta || CHANNEL_META["전체"];
   return (
     <Link to={`/article/${article.slug}`} style={{textDecoration:"none"}}>
       <article className="ecard" style={s.card}>
         <div style={s.cardImgWrap}>
-          <img src={article.thumbnail} alt={article.title} style={s.cardImg}/>
-          <span style={{...s.badge,position:"absolute",bottom:10,left:10,background:meta.color}}>{meta.icon} {article.channel}</span>
+          <img src={article.thumbnail_url} alt={article.title} style={s.cardImg}/>
+          <span style={{...s.badge,position:"absolute",bottom:10,left:10,background:meta.color}}>{meta.icon} {channelName}</span>
           {article.is_sponsored&&<span style={s.adBadge}>AD</span>}
         </div>
         <div style={s.cardBody}>
           <h3 style={s.cardTitle}>{article.title}</h3>
           <p style={s.cardSummary}>{article.summary}</p>
-          <div style={s.tagRow}>{article.tags.slice(0,3).map(t=><span key={t} style={s.tag}>#{t}</span>)}</div>
+          <div style={s.tagRow}>{(article.tags ?? []).slice(0,3).map(t=><span key={t} style={s.tag}>#{t}</span>)}</div>
           <div style={s.cardFooter}>
             <span style={s.metaText}>✍ {article.author}</span>
             <div style={{display:"flex",gap:8}}>
-              <span style={s.metaText}>👁 {article.views.toLocaleString()}</span>
+              <span style={s.metaText}>👁 {article.views?.toLocaleString() ?? ''}</span>
               <span style={s.metaText}>{timeAgo(article.published_at)}</span>
             </div>
           </div>
