@@ -360,9 +360,9 @@ Claude Code Desktop이 채팅 첨부 이미지를 모델 입력으로만 base64 
    - ✅ **3-1**: 7채널 설명문 정세연 편집국장 카피 적용 완료 (5/14). 룩업 fallback 체인 3단 보완 (commit `d8cc7e5`). 부수 효과: 카드 색상/아이콘 채널별 정상화. CHANNEL_META 한글 키 구조 그대로 유지.
    - **3-2**: 카드 footer 정리 (`✍ ` `👁 ` 빈 아이콘 — 단계 2 안전 가드 후 빈 영역으로 남음)
    - **3-3**: "전체" 탭 처리 (현재 클릭 시 `/channel` → 홈 리다이렉트)
-   - **3-4**: 채널 탭 클릭 깨짐 해소 ([부-1] — switchChannel 한글 → 영문 slug 매핑)
+   - ✅ **3-4**: 채널 탭 클릭 정상화 + CHANNELS 순서 5/12 박제 적용 완료 (5/14, commit `163f659`). SLUG_BY_NAME 매핑 dict (7건, DB english_slug와 1:1) + switchChannel navigate 정정 + CHANNELS 배열 5/12 박제 순서(매거진→피플→로컬→에듀→뷰→트렌드→보이스) — 5/10 박제 "잡지 목차 = 본문 색인 일치" 원칙 실현. **P-03 진행도 75% → 80%**.
    - **3-5**: error 통합 배너 (Home.jsx 패턴 적용, 현재 콘솔에만)
-   - **3-6**: CHANNEL_META 영문 키 재구성 (3-4 작업과 묶음 가능)
+   - **3-6**: CHANNEL_META 영문 키 재구성 (3-4 SLUG_BY_NAME dict 활용 경로 가능)
 4. **항목 C 단계 4** — dev 캡처 검증 (7채널 진입 / 픽 분기 / 빈 채널 / 검색 / 페이지네이션)
 5. **등록증 이미지 보관** — 세연님 원본 파일 경로 안내 후 `docs/legal/seoul-a56526-registration-2026-04-27.jpg`로 복사
 6. **Subscribe 모델 D 카피 일괄 적용** (5/12부터 이연) — `Subscribe.jsx:25, 62` + `About.jsx:325`
