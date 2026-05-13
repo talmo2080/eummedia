@@ -35,6 +35,11 @@ function timeAgo(dateStr) {
   return `${Math.floor(diff/86400)}일 전`;
 }
 
+function formatDate(iso) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+}
+
 export default function ChannelList() {
   const { englishSlug } = useParams();
   const navigate = useNavigate();
@@ -251,11 +256,8 @@ function ArticleCard({article, channelMeta, channelName}) {
           <p style={s.cardSummary}>{article.summary}</p>
           <div style={s.tagRow}>{(article.tags ?? []).slice(0,3).map(t=><span key={t} style={s.tag}>#{t}</span>)}</div>
           <div style={s.cardFooter}>
-            <span style={s.metaText}>✍ {article.author}</span>
-            <div style={{display:"flex",gap:8}}>
-              <span style={s.metaText}>👁 {article.views?.toLocaleString() ?? ''}</span>
-              <span style={s.metaText}>{timeAgo(article.published_at)}</span>
-            </div>
+            <span style={s.metaText}>{channelName}</span>
+            <span style={s.metaText}>{formatDate(article.published_at)}</span>
           </div>
         </div>
       </article>
