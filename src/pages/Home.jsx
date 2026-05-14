@@ -9,13 +9,13 @@ const CC = {
 };
 
 const CHANNELS = [
-  { slug:"이음매거진", icon:"📰" },
-  { slug:"이음로컬",   icon:"📍" },
-  { slug:"이음에듀",   icon:"📚" },
-  { slug:"이음피플",   icon:"👤" },
-  { slug:"이음트렌드", icon:"📈" },
-  { slug:"이음보이스", icon:"🎙️" },
-  { slug:"이음뷰",     icon:"👁️" },
+  { slug:"magazine", name:"이음매거진", icon:"📰" },
+  { slug:"people",   name:"이음피플",   icon:"👤" },
+  { slug:"local",    name:"이음로컬",   icon:"📍" },
+  { slug:"edu",      name:"이음에듀",   icon:"📚" },
+  { slug:"view",     name:"이음뷰",     icon:"👁️" },
+  { slug:"trend",    name:"이음트렌드", icon:"📈" },
+  { slug:"voice",    name:"이음보이스", icon:"🎙️" },
 ];
 
 const STOCKS = {
@@ -215,7 +215,7 @@ export default function Home() {
               <Link key={ch.slug} to={"/channel/" + ch.slug}
                 style={{ textDecoration:"none", textAlign:"center", padding:"12px 4px", background:"#fff", border:"1px solid #e8e8e8" }}>
                 <div style={{ fontSize:"20px", marginBottom:"4px" }}>{ch.icon}</div>
-                <div style={{ fontSize:"10px", fontWeight:"600", color:"#0d2d52" }}>{ch.slug}</div>
+                <div style={{ fontSize:"10px", fontWeight:"600", color:"#0d2d52" }}>{ch.name}</div>
               </Link>
             ))}
           </div>
