@@ -13,6 +13,16 @@ function formatDate(iso) {
   return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
 }
 
+function splitIntoParagraphs(content) {
+  if (!content) return [];
+  const PROTECT = '';
+  let s = content;
+  s = s.replace(/(\d)\.(\d)/g, '$1' + PROTECT + '$2');
+  s = s.replace(/[“”][^“”]*[“”]|"[^"]*"/g, (m) => m.replace(/\./g, PROTECT));
+  const parts = s.split('.').map(p => p.trim()).filter(Boolean);
+  return parts.map(p => p.replace(new RegExp(PROTECT, 'g'), '.') + '.');
+}
+
 const socialIconStyle = { fontSize: "24px", textDecoration: "none", lineHeight: 1 };
 
 const AUTHOR_ARTICLES = [
@@ -278,7 +288,26 @@ export default function ArticleDetail() {
             📰 이 페이지는 이음매거진 원문의 미리보기입니다.<br />
             전체 본문은 아래 [원문 보기]에서 확인하세요.
           </div>
-          <div style={{ whiteSpace:"pre-wrap", fontFamily:"inherit", fontSize:"16px", lineHeight:"1.9", color:"#222", marginBottom:"24px" }}>{a.content}</div>
+          <div style={{ fontFamily:"'Noto Sans KR', sans-serif", fontSize:"17px", lineHeight:"2.0", color:"#222", marginBottom:"24px" }}>
+            {splitIntoParagraphs(a.content).flatMap((para, i, arr) => {
+              const midIdx = Math.floor((arr.length - 1) / 2);
+              const items = [<p key={"p-"+i} style={{ margin:"0 0 1em 0" }}>{para}</p>];
+              if (i === midIdx) {
+                items.push(
+                  <a key={"midad-"+i} href="https://naver.me/GWeDuL23" target="_blank" rel="noopener noreferrer"
+                    style={{ display:"flex", alignItems:"center", gap:"16px", width:"100%", minHeight:"80px", padding:"16px 20px", margin:"32px 0", background:"#f7f8fa", border:"1px solid #e0e0e0", borderLeft:"4px solid #1c4f8a", textDecoration:"none", color:"inherit", fontFamily:"'Noto Sans KR', sans-serif" }}>
+                    <div style={{ fontSize:"10px", color:"#9a9a9a", letterSpacing:"1px", fontWeight:"700", flexShrink:0, paddingRight:"16px", borderRight:"1px solid #e0e0e0" }}>SPONSORED</div>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", marginBottom:"4px" }}>닥터리부트 두피관리센터</div>
+                      <div style={{ fontFamily:"serif", fontSize:"13px", color:"#5a5a5a", fontStyle:"italic", lineHeight:"1.5" }}>"고객의 마지막 희망이 되고픈 두피전문가"</div>
+                    </div>
+                    <div style={{ fontSize:"20px", color:"#0d2d52", flexShrink:0 }}>→</div>
+                  </a>
+                );
+              }
+              return items;
+            })}
+          </div>
           <a href={externalUrl} target="_blank" rel="noopener noreferrer"
              style={{ display:"inline-block", background:"#0d2d52", color:"white", padding:"14px 28px", fontSize:"15px", fontWeight:"700", textDecoration:"none", margin:"8px 0", fontFamily:"inherit" }}>
             원문 보기 →
