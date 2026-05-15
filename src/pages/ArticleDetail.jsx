@@ -141,7 +141,7 @@ export default function ArticleDetail() {
     (async () => {
       const { data, error: err } = await supabase
         .from('articles')
-        .select('slug, title, summary, content, thumbnail_url, published_at, channels(name, slug, english_slug)')
+        .select('slug, title, summary, content, thumbnail_url, published_at, channel_id, channels(name, slug, english_slug)')
         .eq('slug', slug)
         .eq('status', 'published')
         .single();
@@ -417,7 +417,7 @@ export default function ArticleDetail() {
             ))}
           </div>
 
-          {/* 관련 기사 — 같은 채널 다른 기사 (STEP 5-C) */}
+          {/* 관련 기사 — 같은 채널 다른 기사 (STEP 5-C, 5/15 사고 해소로 살아남) */}
           <div style={{ margin:"32px 0" }}>
             <div style={{ fontSize:"13px", fontWeight:"700", color:"#0d2d52", borderLeft:"3px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>관련 기사</div>
             {related.length > 0
@@ -458,23 +458,25 @@ export default function ArticleDetail() {
           </div>
 
           <div>
-            <div style={{ fontSize:"12px", fontWeight:"700", color:"#555", borderBottom:"2px solid #0d2d52", paddingBottom:"8px", marginBottom:"12px" }}>관련 기사</div>
-            {related.length > 0
-              ? related.map(r => (
-                  <Link key={r.slug} to={"/article/" + r.slug} style={{ display:"flex", gap:"10px", padding:"10px 0", borderBottom:"1px solid #f0f0f0", textDecoration:"none" }}>
-                    <img src={r.thumbnail_url} alt={r.title} style={{ width:"80px", height:"60px", objectFit:"cover", borderRadius:"2px", flexShrink:0 }} />
+            <div style={{ fontSize:"12px", fontWeight:"700", color:"#555", borderBottom:"2px solid #0d2d52", paddingBottom:"8px", marginBottom:"12px" }}>이번 주 추천 기사</div>
+            {popular.length > 0
+              ? popular.map((p, i) => (
+                  <Link key={p.slug} to={"/article/" + p.slug} style={{ display:"flex", gap:"10px", padding:"8px 0", borderBottom:"1px solid #f0f0f0", textDecoration:"none", alignItems:"center" }}>
+                    <span style={{ fontSize:"13px", fontWeight:"700", color:"#c9a84c", width:"16px", flexShrink:0 }}>{i+1}</span>
+                    <img src={p.thumbnail_url} alt={p.title} style={{ width:"52px", height:"40px", objectFit:"cover", borderRadius:"2px", flexShrink:0 }} />
                     <div>
-                      <div style={{ fontSize:"10px", color: CC[r.channels?.name] || "#0d2d52", fontWeight:"700", marginBottom:"3px" }}>{r.channels?.name}</div>
-                      <div style={{ fontSize:"12px", color:"#1a1a1a", lineHeight:"1.4", fontWeight:"500", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{r.title}</div>
+                      <div style={{ fontSize:"10px", color: CC[p.channels?.name] || "#0d2d52", fontWeight:"700", marginBottom:"2px" }}>{p.channels?.name}</div>
+                      <div style={{ fontSize:"11px", color:"#1a1a1a", lineHeight:"1.4", fontWeight:"500", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{p.title}</div>
                     </div>
                   </Link>
                 ))
-              : Array.from({length: 3}).map((_, i) => (
-                  <div key={"rsk-"+i} style={{ display:"flex", gap:"10px", padding:"10px 0", borderBottom:"1px solid #f0f0f0" }} aria-busy="true">
-                    <div style={{ width:"80px", height:"60px", background:"#e8e8e8", flexShrink:0, borderRadius:"2px" }} />
+              : Array.from({length: 5}).map((_, i) => (
+                  <div key={"pk-"+i} style={{ display:"flex", gap:"10px", padding:"8px 0", borderBottom:"1px solid #f0f0f0", alignItems:"center" }} aria-busy="true">
+                    <span style={{ fontSize:"13px", fontWeight:"700", color:"#e0e0e0", width:"16px", flexShrink:0 }}>{i+1}</span>
+                    <div style={{ width:"52px", height:"40px", background:"#e8e8e8", flexShrink:0, borderRadius:"2px" }} />
                     <div style={{ flex:1 }}>
-                      <div style={{ width:"35%", height:"10px", background:"#e8e8e8", marginBottom:"3px" }} />
-                      <div style={{ width:"90%", height:"12px", background:"#e8e8e8" }} />
+                      <div style={{ width:"40%", height:"10px", background:"#e8e8e8", marginBottom:"4px" }} />
+                      <div style={{ width:"90%", height:"11px", background:"#e8e8e8" }} />
                     </div>
                   </div>
                 ))
@@ -504,32 +506,6 @@ export default function ArticleDetail() {
               <a href="https://www.youtube.com/channel/UCVdGlBOwnxzPs5rnNGhAZuQ" target="_blank" rel="noopener noreferrer" title="유튜브" style={{ ...socialIconStyle, fontSize:"16px" }}>🎥</a>
               <a href="https://blog.naver.com/mzk6682" target="_blank" rel="noopener noreferrer" title="네이버 블로그" style={{ ...socialIconStyle, fontSize:"16px" }}>✍️</a>
             </div>
-          </div>
-
-          <div>
-            <div style={{ fontSize:"12px", fontWeight:"700", color:"#555", borderBottom:"2px solid #0d2d52", paddingBottom:"8px", marginBottom:"12px" }}>이번 주 추천 기사</div>
-            {popular.length > 0
-              ? popular.map((p, i) => (
-                  <Link key={p.slug} to={"/article/" + p.slug} style={{ display:"flex", gap:"10px", padding:"8px 0", borderBottom:"1px solid #f0f0f0", textDecoration:"none", alignItems:"center" }}>
-                    <span style={{ fontSize:"13px", fontWeight:"700", color:"#c9a84c", width:"16px", flexShrink:0 }}>{i+1}</span>
-                    <img src={p.thumbnail_url} alt={p.title} style={{ width:"52px", height:"40px", objectFit:"cover", borderRadius:"2px", flexShrink:0 }} />
-                    <div>
-                      <div style={{ fontSize:"10px", color: CC[p.channels?.name] || "#0d2d52", fontWeight:"700", marginBottom:"2px" }}>{p.channels?.name}</div>
-                      <div style={{ fontSize:"11px", color:"#1a1a1a", lineHeight:"1.4", fontWeight:"500", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{p.title}</div>
-                    </div>
-                  </Link>
-                ))
-              : Array.from({length: 5}).map((_, i) => (
-                  <div key={"pk-"+i} style={{ display:"flex", gap:"10px", padding:"8px 0", borderBottom:"1px solid #f0f0f0", alignItems:"center" }} aria-busy="true">
-                    <span style={{ fontSize:"13px", fontWeight:"700", color:"#e0e0e0", width:"16px", flexShrink:0 }}>{i+1}</span>
-                    <div style={{ width:"52px", height:"40px", background:"#e8e8e8", flexShrink:0, borderRadius:"2px" }} />
-                    <div style={{ flex:1 }}>
-                      <div style={{ width:"40%", height:"10px", background:"#e8e8e8", marginBottom:"4px" }} />
-                      <div style={{ width:"90%", height:"11px", background:"#e8e8e8" }} />
-                    </div>
-                  </div>
-                ))
-            }
           </div>
         </aside>
       </div>
