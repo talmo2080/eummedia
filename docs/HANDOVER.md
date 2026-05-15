@@ -4,7 +4,7 @@
 > 세션 시작 시: 이 문서를 가장 먼저 읽으세요.
 > 세션 종료 전: 반드시 이 문서를 업데이트하고 commit & push 하세요.
 >
-> **마지막 작업: 2026-05-14** — P-03 항목 C **단계 1·2·3-1·3-4·3-5·3-2 누적 완성** (마이그레이션·ChannelList Supabase 전환·27년 매거진 카피·탭+CHANNELS 순서·error 배너+retry·카드 footer 정리). **P-03 진행도 50% → 90%**. 협업 구조 시스템 작동 검증 (박제 파일 4개 첨부 → 옵스 5분 따라잡음). 메타인지 7번 신규 박제: *"세연님이 '이상해' 하면 옵스 추측 금지 + 정확히 묻기"*. **다음 시작점: 단계 3-3 ("전체" 탭) 또는 3-6 (영문 키 재구성) 또는 4 (전체 검증) 또는 P-02 (기사 상세)** — 자세한 가이드는 `docs/session-handoff-2026-05-14.md` + 설계안 `docs/design-proposals/2026-05-13-channel-list-feature.md`
+> **마지막 작업: 2026-05-15** — P-02 ArticleDetail 레이아웃 정정 + 관련 기사 영구 사고 해소 (channel_id select 누락 → article fetch에 추가, related fetch 살아남). 사이드 광고 ↔ 추천 swap (광고 내용 0 변경). 사이드 관련 기사 영역 통째 삭제. Home.jsx 채널 카드 한글 URL 사고 해소 + CHECKLIST.md v1.0 박제 (협업 메타인지 10종 누적). **P-03 진행도 90% 유지, P-02 진행도 ~50% (레이아웃·핵심 fetch 완성)**. **다음 시작점: 단계 3-3 ("전체" 탭) 또는 3-6 (영문 키 재구성) 또는 단계 4 (전체 검증) 또는 P-02 후속 (본문 표시 정책 / 외부 원문 링크)** — 자세한 가이드는 `docs/session-handoff-2026-05-14.md` + 설계안 `docs/design-proposals/2026-05-13-channel-list-feature.md` + 협업 체크리스트 `docs/CHECKLIST.md`
 
 ## 🎯 프로젝트 개요
 
