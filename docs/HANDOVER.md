@@ -4,7 +4,7 @@
 > 세션 시작 시: 이 문서를 가장 먼저 읽으세요.
 > 세션 종료 전: 반드시 이 문서를 업데이트하고 commit & push 하세요.
 >
-> **마지막 작업: 2026-05-15** — P-02 ArticleDetail 레이아웃 정정 + 관련 기사 영구 사고 해소 (channel_id select 누락 → article fetch에 추가, related fetch 살아남). 사이드 광고 ↔ 추천 swap (광고 내용 0 변경). 사이드 관련 기사 영역 통째 삭제. Home.jsx 채널 카드 한글 URL 사고 해소 + CHECKLIST.md v1.0 박제 (협업 메타인지 10종 누적). **P-03 진행도 90% 유지, P-02 진행도 ~50% (레이아웃·핵심 fetch 완성)**. **다음 시작점: 단계 3-3 ("전체" 탭) 또는 3-6 (영문 키 재구성) 또는 단계 4 (전체 검증) 또는 P-02 후속 (본문 표시 정책 / 외부 원문 링크)** — 자세한 가이드는 `docs/session-handoff-2026-05-14.md` + 설계안 `docs/design-proposals/2026-05-13-channel-list-feature.md` + 협업 체크리스트 `docs/CHECKLIST.md`
+> **마지막 작업: 2026-05-15** — P-02 ArticleDetail 레이아웃 정정 + 관련 기사 영구 사고 해소 (channel_id select 누락 → article fetch에 추가, related fetch 살아남). 사이드 광고 ↔ 추천 swap (광고 내용 0 변경). 사이드 관련 기사 영역 통째 삭제. Home.jsx 채널 카드 한글 URL 사고 해소 + CHECKLIST.md v1.0 박제 (협업 메타인지 14종 누적). **P-03 진행도 95% (단계 4 검증 완료), P-02 진행도 ~50% (레이아웃·핵심 fetch 완성)**. **다음 시작점: 단계 3-3 ("전체" 탭) 또는 3-6 (영문 키 재구성) 또는 단계 4 (전체 검증) 또는 P-02 후속 (본문 표시 정책 / 외부 원문 링크)** — 자세한 가이드는 `docs/session-handoff-2026-05-14.md` + 설계안 `docs/design-proposals/2026-05-13-channel-list-feature.md` + 협업 체크리스트 `docs/CHECKLIST.md`
 
 ## 🎯 프로젝트 개요
 
@@ -389,9 +389,7 @@ Claude Code Desktop이 채팅 첨부 이미지를 모델 입력으로만 base64 
   - 원인: ArticleDetail.jsx가 아직 mock이라 slug `171203804` 못 찾고 mock fallback
   - HERO 카드 자체와 `/article/${slug}` 라우팅은 정상 작동
   - C-3에서 ArticleDetail 교체 시 자동 해결
-- **콘솔 `Uncaught (in promise)` 3개**
-  - 출처: 브라우저 확장(Grabbit, Linkify) — `content.js`, `(index):1`
-  - Supabase 호출과 무관, 무시 가능
+- **콘솔 `Uncaught (in promise)`** — 메인 3건 + 채널/상세 페이지 SPA 라우팅 시 페이지마다 누적 (2건씩). 에러 객체 shape `{name:'n', httpStatus:200, code:403}` Supabase JS 표준과 정면 불일치 = 외부 영역 결정적 증거. 시크릿 모드 검증으로 5/15 가설 A 확정 (사이트 코드 RLS 권한 거부 아님).
 
 ### 🆕 중요 발견
 
