@@ -461,6 +461,7 @@ Claude Code Desktop이 채팅 첨부 이미지를 모델 입력으로만 base64 
   - HERO 카드 자체와 `/article/${slug}` 라우팅은 정상 작동
   - C-3에서 ArticleDetail 교체 시 자동 해결
 - **콘솔 `Uncaught (in promise)`** — 메인 3건 + 채널/상세 페이지 SPA 라우팅 시 페이지마다 누적 (2건씩). 에러 객체 shape `{name:'n', httpStatus:200, code:403}` Supabase JS 표준과 정면 불일치 = 외부 영역 결정적 증거. 시크릿 모드 검증으로 5/15 가설 A 확정 (사이트 코드 RLS 권한 거부 아님).
+- **Home.jsx 카카오 채널 구독 버튼 `onClick` 미작동** (5/16 박제) — 사이드바 최하단 노란 버튼 placeholder 상태. ArticleDetail.jsx는 `onClick={onKakao}` (alert) 작동. **카카오 SDK 연동 별도 사이클** 진입 시 통합 처리 후보.
 
 ### 🆕 중요 발견
 
