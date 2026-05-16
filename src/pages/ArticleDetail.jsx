@@ -283,11 +283,7 @@ export default function ArticleDetail() {
           <img src={a.thumbnail} alt={a.title} style={{ width:"100%", height:"380px", objectFit:"cover", borderRadius:"4px", marginBottom:"10px", display:"block" }} />
           <div style={{ fontSize:"11px", color:"#9a9a9a", textAlign:"center", marginBottom:"32px", fontStyle:"italic" }}>{a.channel} / 이음미디어</div>
 
-          {/* 본문 — 미리보기 안내 + 평문 본문 + 원문 보기 (스테이지 1) */}
-          <div style={{ background:"#f5f5f5", borderLeft:"3px solid #0d2d52", padding:"8px 12px", marginBottom:"16px", fontSize:"13px", color:"#9a9a9a", lineHeight:"1.6" }}>
-            📰 이 페이지는 이음매거진 원문의 미리보기입니다.<br />
-            전체 본문은 아래 [원문 보기]에서 확인하세요.
-          </div>
+          {/* 본문 — 평문 + 원문 보기 (스테이지 1) */}
           <div style={{ fontFamily:"'Noto Sans KR', sans-serif", fontSize:"17px", lineHeight:"2.0", color:"#222", marginBottom:"24px" }}>
             {splitIntoParagraphs(a.content).flatMap((para, i, arr) => {
               const midIdx = Math.floor((arr.length - 1) / 2);
@@ -313,7 +309,9 @@ export default function ArticleDetail() {
             원문 보기 →
           </a>
           <div style={{ fontSize:"12px", color:"#9a9a9a", marginBottom:"24px" }}>
-            이 글은 이음매거진에 먼저 실린 글입니다. 전체 본문과 이미지는 매거진 사이트에서 보실 수 있습니다.
+            📖 이음매거진은 27년 라이프스타일 매거진의 정신을 이어,<br />
+            2026년 인터넷신문 이음미디어로 통합 발행됩니다.<br />
+            세상과 당신을 잇는, 더 넓은 미디어의 시작입니다.
           </div>
 
           {/* 광고 박스 — 정세연 본인 광고 (광고 샘플 역할) */}
