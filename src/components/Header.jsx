@@ -51,6 +51,12 @@ export default function Header() {
 
         {/* 우측 버튼 */}
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <Link to="/advertise" style={{
+            color: "#c9a84c",
+            textDecoration: "none",
+            fontSize: 13,
+            padding: "5px 8px"
+          }}>광고문의</Link>
           <Link to="/login" style={{
             color: "#c9a84c",
             textDecoration: "none",

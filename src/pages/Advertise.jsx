@@ -32,6 +32,39 @@ const inp = {
 }
 const lbl = { fontSize: 12, fontWeight: 700, color: '#3a3a3a', marginBottom: 6, display: 'block' }
 
+const CARD_NEWS = [
+  {
+    bg: 'linear-gradient(135deg, #0d2d52, #1c4f8a)',
+    text: 'white',
+    title: '27년, 두피가 말해준 것들',
+    sub: '닥터리부트 정세연 원장의 27년 통찰',
+  },
+  {
+    bg: '#f5f5f5',
+    text: '#0d2d52',
+    title: '혹시 이런 고민?',
+    items: ['빠지는 머리카락', '가려운 두피', '예민한 모근'],
+  },
+  {
+    bg: 'linear-gradient(135deg, #0d2d52, #1c4f8a)',
+    text: 'white',
+    title: '"두피는 거짓말을 안 합니다"',
+    sub: '— 정세연 원장',
+  },
+  {
+    bg: 'white',
+    text: '#0d2d52',
+    title: '마이크로커런트 3단계',
+    items: ['1. 진단', '2. 케어', '3. 회복'],
+  },
+  {
+    bg: 'linear-gradient(135deg, #0d2d52 0%, #000 100%)',
+    text: 'white',
+    title: '지금 바로 상담',
+    sub: '예약·문의 → 정세연 원장 직접',
+  },
+]
+
 export default function Advertise() {
   const [form, setForm] = useState({
     company: '', name: '', phone: '', email: '', package: 'STEP 2', message: '', agree: false,
@@ -39,6 +72,7 @@ export default function Advertise() {
   const [selectedPkg, setSelectedPkg] = useState('STEP 2')
   const [stage, setStage] = useState('form')
   const [openFaq, setOpenFaq] = useState(null)
+  const [currentSlide, setCurrentSlide] = useState(0)
 
   const handleSubmit = () => {
     if (!form.company || !form.name || !form.phone || !form.email) {
@@ -80,15 +114,16 @@ export default function Advertise() {
             <div style={{ fontSize: 10, color: '#1c4f8a', fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>HOW IT WORKS</div>
             <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 22, fontWeight: 700, color: '#0d2d52' }}>광고 기사 제작 과정</div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 0 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 0 }}>
             {[
               { icon: '📞', title: '문의 접수', desc: '광고 상품 선택 후 문의 폼 제출' },
               { icon: '🤝', title: '미팅·인터뷰', desc: '편집국장과 상담 후 내용 확정' },
               { icon: '✍️', title: '기사 작성', desc: '전문 기자가 스토리 기사 작성' },
-              { icon: '🚀', title: '게시·배포', desc: '전 채널 동시 발행 + AI 최적화' },
+              { icon: '🚀', title: '게시·배포', desc: '전 채널 동시 발행' },
+              { icon: '🤖', title: 'AI·SEO 노출', desc: '구글·네이버·ChatGPT·Perplexity 최적화' },
             ].map((s, i) => (
               <div key={i} style={{ textAlign: 'center', padding: '24px 16px', background: 'white', border: '1px solid #e0e0e0', borderLeft: i > 0 ? 'none' : '1px solid #e0e0e0', position: 'relative' }}>
-                {i < 3 && <div style={{ position: 'absolute', right: -14, top: '50%', transform: 'translateY(-50%)', fontSize: 20, color: '#c0c8d4', zIndex: 1 }}>→</div>}
+                {i < 4 && <div style={{ position: 'absolute', right: -14, top: '50%', transform: 'translateY(-50%)', fontSize: 20, color: '#c0c8d4', zIndex: 1 }}>→</div>}
                 <div style={{ fontSize: 32, marginBottom: 10 }}>{s.icon}</div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#0d2d52', marginBottom: 4 }}>{s.title}</div>
                 <div style={{ fontSize: 11, color: '#6b6b6b', lineHeight: 1.6 }}>{s.desc}</div>
@@ -125,6 +160,41 @@ export default function Advertise() {
             </div>
             <div style={{ fontSize: 9, color: '#bbb', textAlign: 'right' }}>※ 본 기사는 광고주의 협찬으로 제작되었습니다</div>
           </div>
+        </div>
+      </div>
+
+      {/* ── 카드뉴스 미니 캐러셀 5장 ── */}
+      <div style={{ maxWidth: 760, margin: '0 auto', padding: '52px 24px 0' }}>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <div style={{ fontSize: 10, color: '#1c4f8a', fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>CARD NEWS SAMPLE</div>
+          <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 20, fontWeight: 700, color: '#0d2d52' }}>카드뉴스 미리보기 (5장)</div>
+          <div style={{ fontSize: 12, color: '#6b6b6b', marginTop: 6 }}>광고주 스토리를 시각 카드로 — SNS 배포용</div>
+        </div>
+        <div style={{ position: 'relative', overflow: 'hidden', border: '1px solid #e0e0e0' }}>
+          <div style={{ display: 'flex', transition: 'transform 0.4s ease', transform: `translateX(-${currentSlide * 100}%)` }}>
+            {CARD_NEWS.map((card, i) => (
+              <div key={i} style={{ flex: '0 0 100%', minHeight: 360, background: card.bg, color: card.text, padding: '36px 28px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', boxSizing: 'border-box' }}>
+                <div style={{ fontSize: 10, opacity: 0.6, letterSpacing: 2, marginBottom: 14 }}>{i+1} / 5</div>
+                <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 24, fontWeight: 700, lineHeight: 1.5, marginBottom: 16 }}>{card.title}</div>
+                {card.sub && <div style={{ fontSize: 13, opacity: 0.85, lineHeight: 1.8 }}>{card.sub}</div>}
+                {card.items && (
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 14, lineHeight: 2 }}>
+                    {card.items.map((it, j) => <li key={j}>{it}</li>)}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+          <button onClick={() => setCurrentSlide(s => Math.max(0, s-1))} disabled={currentSlide === 0}
+            style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,0.85)', cursor: currentSlide === 0 ? 'not-allowed' : 'pointer', fontSize: 20, fontWeight: 700, color: '#0d2d52', opacity: currentSlide === 0 ? 0.4 : 1, lineHeight: 1 }} aria-label="이전 카드">‹</button>
+          <button onClick={() => setCurrentSlide(s => Math.min(4, s+1))} disabled={currentSlide === 4}
+            style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,0.85)', cursor: currentSlide === 4 ? 'not-allowed' : 'pointer', fontSize: 20, fontWeight: 700, color: '#0d2d52', opacity: currentSlide === 4 ? 0.4 : 1, lineHeight: 1 }} aria-label="다음 카드">›</button>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, paddingTop: 14 }}>
+          {[0,1,2,3,4].map(i => (
+            <button key={i} onClick={() => setCurrentSlide(i)}
+              style={{ width: 9, height: 9, borderRadius: '50%', border: 'none', cursor: 'pointer', background: currentSlide === i ? '#0d2d52' : '#d0d0d0', padding: 0 }} aria-label={`슬라이드 ${i+1}`} />
+          ))}
         </div>
       </div>
 
@@ -178,10 +248,10 @@ export default function Advertise() {
       <div style={{ background: '#0d2d52', color: 'white', padding: '36px 0' }}>
         <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)' }}>
           {[
-            { num: '12,000+', label: '월간 순방문자' },
-            { num: '7개', label: '전문 채널' },
-            { num: '27년', label: '편집국장 전문 경력' },
-            { num: 'AI', label: 'ChatGPT·Perplexity 노출' },
+            { num: '39건', label: '발행 기사' },
+            { num: '7개', label: '콘텐츠 채널' },
+            { num: '모집 중', label: '시민기자' },
+            { num: '40~70대', label: '주요 독자층' },
           ].map((s, i) => (
             <div key={i} style={{ textAlign: 'center', padding: '0 20px', borderRight: i < 3 ? '1px solid rgba(255,255,255,0.1)' : 'none' }}>
               <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 30, fontWeight: 700, color: '#f0a882', marginBottom: 4 }}>{s.num}</div>
