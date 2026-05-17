@@ -319,6 +319,161 @@ export default function About() {
         </div>
       </section>
 
+      {/* ── 창간사 ── */}
+      <section style={{ background: '#f7f8fa', padding: '80px 32px', borderTop: '1px solid #e5e5e5', borderBottom: '1px solid #e5e5e5' }}>
+        <div style={{ maxWidth: 760, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 36 }}>
+            <div style={{
+              fontSize: 11, letterSpacing: 3, color: BLUE, fontWeight: 700,
+              textTransform: 'uppercase', marginBottom: 14,
+            }}>
+              FOUNDING STATEMENT
+            </div>
+            <h2 style={{
+              fontFamily: SERIF, fontSize: 30, fontWeight: 700, color: NAVY, lineHeight: 1.45,
+            }}>
+              창간사
+            </h2>
+          </div>
+          <div style={{
+            background: '#fff', borderLeft: `4px solid ${NAVY}`,
+            padding: '36px 40px', fontFamily: SERIF, fontSize: 17, lineHeight: 2, color: '#2a2a2a',
+          }}>
+            <p style={{ marginBottom: 14 }}>"세상에는 기록되지 못한 이야기가 너무 많습니다.</p>
+            <p style={{ marginBottom: 14 }}>이음미디어는 그 이야기들을 잇겠습니다.</p>
+            <p style={{ marginBottom: 14 }}>속보보다 늦어도 괜찮습니다.</p>
+            <p style={{ marginBottom: 14 }}>깊이 있게 기록하면 됩니다.</p>
+            <p style={{ marginBottom: 22 }}>당신의 이야기가 곧 우리의 뉴스입니다."</p>
+            <div style={{
+              fontFamily: SANS, fontSize: 13, color: '#6b6b6b',
+              textAlign: 'right', paddingTop: 16, borderTop: '1px solid #e5e5e5',
+            }}>
+              — 정세연 편집국장, 창간사 중에서
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 이음미디어 패밀리 ── */}
+      <section style={{ padding: '80px 32px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <div style={{
+              fontSize: 11, letterSpacing: 3, color: BLUE, fontWeight: 700,
+              textTransform: 'uppercase', marginBottom: 14,
+            }}>
+              EUM MEDIA FAMILY
+            </div>
+            <h2 style={{
+              fontFamily: SERIF, fontSize: 30, fontWeight: 700, color: NAVY, lineHeight: 1.45,
+            }}>
+              이음미디어 패밀리
+            </h2>
+          </div>
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24,
+          }}>
+            {[
+              {
+                icon: '🎤',
+                name: '봉숭아학당 문화혁신학교',
+                desc: '방송스피치 교육. 이음미디어 발행 법인. 수료 후 이음미디어 시민기자로 활동 가능.',
+              },
+              {
+                icon: '😄',
+                name: '웃자대한민국 협회',
+                desc: '웃음치료·문화 협회. 이음미디어와 긍정 에너지를 함께 전합니다.',
+              },
+              {
+                icon: '🎓',
+                name: '이음평생교육원',
+                desc: '준비 중 · 시민기자 과정. 이음미디어 1년 실적 기반 2027 설립 예정.',
+              },
+            ].map(f => (
+              <div key={f.name} style={{
+                background: '#fff', border: '1px solid #e5e5e5', borderTop: `3px solid ${NAVY}`,
+                padding: '32px 28px', textAlign: 'center',
+              }}>
+                <div style={{ fontSize: 38, marginBottom: 16 }}>{f.icon}</div>
+                <div style={{
+                  fontFamily: SERIF, fontSize: 18, fontWeight: 700,
+                  color: NAVY, marginBottom: 12, lineHeight: 1.5,
+                }}>
+                  {f.name}
+                </div>
+                <div style={{ fontSize: 14, color: '#5a5a5a', lineHeight: 1.85 }}>
+                  {f.desc}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 회사 정보 + 편집 방침 ── */}
+      <section style={{ background: '#fff', padding: '80px 32px', borderTop: '1px solid #e5e5e5' }}>
+        <div style={{ maxWidth: 880, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <div style={{
+              fontSize: 11, letterSpacing: 3, color: BLUE, fontWeight: 700,
+              textTransform: 'uppercase', marginBottom: 14,
+            }}>
+              COMPANY INFO
+            </div>
+            <h2 style={{
+              fontFamily: SERIF, fontSize: 30, fontWeight: 700, color: NAVY, lineHeight: 1.45,
+            }}>
+              회사 정보
+            </h2>
+          </div>
+          <table style={{
+            width: '100%', borderCollapse: 'collapse', background: '#fff',
+            border: '1px solid #e5e5e5', marginBottom: 40, fontSize: 14, lineHeight: 1.8,
+          }}>
+            <tbody>
+              {[
+                ['매체명', '이음미디어 (E-UM MEDIA)'],
+                ['발행인', '성창운'],
+                ['발행 형태', '인터넷신문'],
+                ['등록번호', '서울,아56526'],
+                ['등록일', '2026년 04월 27일'],
+                ['발행소', '서울시 관악구 남부순환로 1699, 2층'],
+                ['전화번호', '02-6956-0339'],
+                ['도메인', 'eummedia.kr'],
+                ['제보·광고 문의', 'press@eummedia.kr'],
+                ['발행 법인', '주식회사 봉숭아학당문화혁신학교'],
+              ].map(([k, v]) => (
+                <tr key={k} style={{ borderBottom: '1px solid #ebebeb' }}>
+                  <th style={{
+                    width: 180, textAlign: 'left', padding: '14px 20px',
+                    background: '#fafafa', color: NAVY, fontWeight: 700,
+                    borderRight: '1px solid #ebebeb', verticalAlign: 'top',
+                  }}>{k}</th>
+                  <td style={{ padding: '14px 20px', color: '#2a2a2a' }}>{v}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div style={{
+            background: '#f7f8fa', borderLeft: `4px solid ${NAVY}`,
+            padding: '28px 32px',
+          }}>
+            <div style={{
+              fontFamily: SERIF, fontSize: 18, fontWeight: 700, color: NAVY, marginBottom: 18,
+            }}>
+              편집 방침
+            </div>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 14.5, lineHeight: 2, color: '#3a3a3a' }}>
+              <li><strong style={{ color: NAVY, marginRight: 10 }}>01.</strong>속보보다 깊이를 추구합니다.</li>
+              <li><strong style={{ color: NAVY, marginRight: 10 }}>02.</strong>사람 중심으로 기사를 씁니다.</li>
+              <li><strong style={{ color: NAVY, marginRight: 10 }}>03.</strong>광고와 기사를 명확히 구분합니다.</li>
+              <li><strong style={{ color: NAVY, marginRight: 10 }}>04.</strong>독자의 제보와 의견을 소중히 여깁니다.</li>
+              <li><strong style={{ color: NAVY, marginRight: 10 }}>05.</strong>SEO·AEO 최적화로 더 많은 사람에게 전합니다.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
       {/* ── CTA ── */}
       <section style={{ background: '#fafafa', padding: '80px 32px', borderBottom: '1px solid #e5e5e5' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto', textAlign: 'center' }}>
