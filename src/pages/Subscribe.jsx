@@ -338,6 +338,9 @@ export default function Subscribe() {
               <p style={{ fontSize: 13, color: '#6b6b6b', lineHeight: 1.8, margin: 0 }}>
                 구독에 관한 문의는 <a href="mailto:press@eummedia.kr" style={{ color: BLUE, textDecoration: 'none', fontWeight: 600 }}>press@eummedia.kr</a>로 연락 주세요.
               </p>
+              <p style={{ fontSize: 13, color: '#6b6b6b', lineHeight: 1.8, margin: '12px 0 0 0' }}>
+                개인정보 처리 영역 자세히 보기 → <Link to="/privacy" style={{ color: BLUE, textDecoration: 'none', fontWeight: 600 }}>개인정보처리방침</Link>
+              </p>
             </div>
           </div>
 
