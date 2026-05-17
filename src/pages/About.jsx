@@ -10,10 +10,10 @@ const VALUES = [
 const CHANNELS = [
   { name: '이음매거진', desc: '시대를 읽는 깊이 있는 기획·인터뷰', path: '/channel/magazine' },
   { name: '이음피플',   desc: '평범한 사람들의 비범한 이야기',     path: '/channel/people' },
-  { name: '이음로컬',   desc: '고양·일산을 비롯한 지역 밀착 보도', path: '/channel/local' },
+  { name: '이음로컬',   desc: '지역 소상공인 밀착 보도',           path: '/channel/local' },
   { name: '이음에듀',   desc: '학교, 교육 정책, 평생학습 이야기',  path: '/channel/edu' },
   { name: '이음뷰',     desc: '편집국과 기고자의 칼럼·논평',       path: '/channel/view' },
-  { name: '이음트렌드', desc: '문화·라이프스타일·소비 트렌드',     path: '/channel/trend' },
+  { name: '이음트렌드', desc: '문화·AI 디지털 트렌드·라이프스타일', path: '/channel/trend' },
   { name: '이음보이스', desc: '시민의 목소리, 제보와 인터뷰',     path: '/channel/voice' },
 ]
 
