@@ -57,6 +57,15 @@ export default function Header() {
             fontSize: 13,
             padding: "5px 8px"
           }}>광고문의</Link>
+          <Link to="/write" style={{
+            background: "#1c4f8a",
+            color: "#fff",
+            textDecoration: "none",
+            fontSize: 13,
+            fontWeight: 700,
+            padding: "5px 14px",
+            borderRadius: 4
+          }}>✍️ 기사 쓰기</Link>
           <Link to="/login" style={{
             color: "#c9a84c",
             textDecoration: "none",

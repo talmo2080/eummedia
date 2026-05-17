@@ -13,6 +13,7 @@ import CitizenReporter from './pages/CitizenReporter'
 import Subscribe from './pages/Subscribe'
 import About from './pages/About'
 import Privacy from './pages/Privacy'
+import ArticleEditor from './pages/ArticleEditor'
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           <Route path="/subscribe" element={<Subscribe />} />
           <Route path="/about" element={<About />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/write" element={<ArticleEditor />} />
         </Routes>
       </main>
       <Footer />
