@@ -342,7 +342,7 @@ export default function About() {
             <p style={{ marginBottom: 14 }}>"세상에는 기록되지 못한 이야기가 너무 많습니다.</p>
             <p style={{ marginBottom: 14 }}>이음미디어는 그 이야기들을 잇겠습니다.</p>
             <p style={{ marginBottom: 14 }}>속보보다 늦어도 괜찮습니다.</p>
-            <p style={{ marginBottom: 14 }}>깊이 있게 기록하면 됩니다.</p>
+            <p style={{ marginBottom: 14 }}>깊이 있게 기록하겠습니다.</p>
             <p style={{ marginBottom: 22 }}>당신의 이야기가 곧 우리의 뉴스입니다."</p>
             <div style={{
               fontFamily: SANS, fontSize: 13, color: '#6b6b6b',
