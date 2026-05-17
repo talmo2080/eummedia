@@ -101,7 +101,7 @@ export default function About() {
             </p>
             <p style={{ marginBottom: 18 }}>
               이음미디어는 <strong style={{ color: NAVY }}>"천천히, 정확하게, 끝까지"</strong>를 약속합니다.
-              매일 100건의 속보가 아니라 매주 1건의 깊이 있는 기획을, 클릭 유도가 아니라 맥락을 전합니다.
+              매일 쏟아지는 속보가 아니라, 깊이 있는 기획을, 클릭 유도가 아니라 맥락을 전합니다.
             </p>
             <p style={{ marginBottom: 0 }}>
               그리고 <strong style={{ color: NAVY }}>독자 한 사람의 이야기</strong>를 출발점으로 삼습니다.
