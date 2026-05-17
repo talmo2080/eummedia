@@ -83,6 +83,12 @@ export default function Header() {
             padding: "5px 14px",
             borderRadius: 4
           }}>회원가입</Link>
+          <Link to="/admin" style={{
+            color: "#888",
+            textDecoration: "none",
+            fontSize: 12,
+            padding: "5px 8px"
+          }}>⚙️ 관리자</Link>
         </div>
       </div>
 
