@@ -5,15 +5,15 @@ const KAKAO_URL = 'http://pf.kakao.com/_xmVHxen'
 const CHANNELS = [
   { name: '이음매거진', tagline: '시대를 읽는 깊이 있는 기획' },
   { name: '이음피플', tagline: '평범한 사람들의 비범한 순간' },
-  { name: '이음로컬', tagline: '고양·일산 지역 밀착 보도' },
+  { name: '이음로컬', tagline: '지역 소상공인 밀착 보도' },
   { name: '이음에듀', tagline: '학교와 평생학습 이야기' },
   { name: '이음뷰', tagline: '편집국과 기고자의 칼럼' },
-  { name: '이음트렌드', tagline: '문화·라이프스타일·소비' },
+  { name: '이음트렌드', tagline: '문화·AI 디지털 트렌드·라이프스타일' },
   { name: '이음보이스', tagline: '시민의 목소리, 제보·인터뷰' },
 ]
 
 const BENEFITS = [
-  { icon: '📰', title: '매주 큐레이션', desc: '편집국장이 직접 고른 한 주의 핵심 기사를 토요일 아침 카카오톡으로 받아보세요.' },
+  { icon: '📰', title: '매주 큐레이션', desc: '편집국장이 직접 고른 한 주의 핵심 기사를 카카오톡으로 받아보세요.' },
   { icon: '🤖', title: 'AI 검색 동시 노출', desc: '구독자에게 먼저 발송된 기사가 ChatGPT·Perplexity·구글·네이버에 동시 인용됩니다.' },
   { icon: '🎤', title: '시민기자 우선 안내', desc: '봉숭아학당 27기 모집, 시민기자 양성 과정 등의 모집 소식을 가장 먼저 전합니다.' },
   { icon: '💸', title: '평생 무료', desc: '구독료 0원. 광고와 협찬으로 운영되며 독자에게 비용을 청구하지 않습니다.' },
@@ -22,7 +22,7 @@ const BENEFITS = [
 const STEPS = [
   { num: '01', title: '버튼 클릭', desc: '아래 "카카오톡 채널 추가" 버튼을 누르면 카카오톡 앱이 열립니다.' },
   { num: '02', title: '채널 추가', desc: '카카오톡에서 "이음미디어" 채널을 확인하고 "채널 추가"를 누르세요.' },
-  { num: '03', title: '매주 토요일 받기', desc: '매주 토요일 오전, 한 주의 핵심 기사 5건이 카카오톡 메시지로 도착합니다.' },
+  { num: '03', title: '카카오톡으로 받기', desc: '새 기사가 발행되면 카카오톡 메시지로 도착합니다.' },
 ]
 
 const NAVY = '#0d2d52'
@@ -356,6 +356,76 @@ export default function Subscribe() {
           </div>
         </div>
       </section>
+
+      {/* ── 편집국장 인사 ── */}
+      <section style={{ background: NAVY, color: '#fff', padding: '64px 32px' }}>
+        <div style={{
+          maxWidth: 720, margin: '0 auto',
+          borderLeft: `4px solid ${SUB}`,
+          paddingLeft: 32,
+        }}>
+          <h2 style={{
+            fontFamily: SERIF, fontSize: 24, fontWeight: 700,
+            textAlign: 'center', marginBottom: 32, lineHeight: 1.5,
+          }}>
+            이음미디어의 독자가 되어주세요
+          </h2>
+          <div style={{
+            fontFamily: SERIF, fontSize: 16, lineHeight: 1.9, opacity: 0.9,
+          }}>
+            <p style={{ marginBottom: 16 }}>카카오톡 채널 추가는 30초.</p>
+            <p style={{ marginBottom: 28 }}>하지만 그 30초가 모여 우리의 매체가 됩니다.</p>
+            <p style={{ marginBottom: 28 }}>당신의 이야기를 들려주세요.</p>
+            <p style={{ margin: 0 }}>당신의 이야기가 곧 이음미디어의 뉴스입니다.</p>
+          </div>
+          <div style={{
+            textAlign: 'right', fontSize: 14, opacity: 0.65, marginTop: 24,
+          }}>
+            — 정세연 편집국장
+          </div>
+        </div>
+      </section>
+
+      {/* ── 광고 문의 박스 ── */}
+      <div style={{
+        background: '#fff',
+        border: '1px solid #e0e0e0',
+        borderTop: '4px solid #c9a84c',
+        borderRadius: 8,
+        boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+        padding: '48px 32px',
+        maxWidth: 720, margin: '64px auto 80px',
+        textAlign: 'center',
+      }}>
+        <h2 style={{
+          fontFamily: SERIF, fontSize: 22, fontWeight: 700,
+          color: NAVY, marginBottom: 20, lineHeight: 1.5,
+        }}>
+          🎯 광고 문의
+        </h2>
+        <div style={{
+          fontFamily: SANS, fontSize: 14, lineHeight: 1.8,
+          color: '#6b6b6b', marginBottom: 32,
+        }}>
+          <p style={{ marginBottom: 12 }}>이음미디어는 시니어·소상공인·평생학습 영역에 특화된 신뢰 매체입니다.</p>
+          <p style={{ margin: 0 }}>기획 기사·배너·시리즈 등 다양한 광고 모델이 있습니다.</p>
+        </div>
+        <Link to="/advertise"
+          style={{
+            display: 'inline-block',
+            background: NAVY, color: '#fff',
+            padding: '14px 32px', borderRadius: 4,
+            fontSize: 14, fontWeight: 600,
+            textDecoration: 'none', fontFamily: SANS,
+            boxShadow: '0 4px 12px rgba(13,45,82,0.2)',
+            transition: 'background 0.2s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = BLUE }}
+          onMouseLeave={e => { e.currentTarget.style.background = NAVY }}
+        >
+          📩 광고 문의 자세히 보기 →
+        </Link>
+      </div>
 
     </div>
   )
