@@ -4,12 +4,12 @@ const KAKAO_URL = 'http://pf.kakao.com/_xmVHxen'
 
 const CHANNELS = [
   { name: '이음매거진', tagline: '시대를 읽는 깊이 있는 기획' },
+  { name: '이음피플', tagline: '평범한 사람들의 비범한 순간' },
   { name: '이음로컬', tagline: '고양·일산 지역 밀착 보도' },
   { name: '이음에듀', tagline: '학교와 평생학습 이야기' },
-  { name: '이음피플', tagline: '평범한 사람들의 비범한 순간' },
+  { name: '이음뷰', tagline: '편집국과 기고자의 칼럼' },
   { name: '이음트렌드', tagline: '문화·라이프스타일·소비' },
   { name: '이음보이스', tagline: '시민의 목소리, 제보·인터뷰' },
-  { name: '이음뷰', tagline: '편집국과 기고자의 칼럼' },
 ]
 
 const BENEFITS = [
@@ -58,10 +58,55 @@ export default function Subscribe() {
           }}>
             매주 깊이 있는 이야기,<br /><span style={{ color: SUB }}>카카오톡으로 받아보세요</span>
           </h1>
-          <p style={{ fontSize: 17, lineHeight: 1.9, opacity: 0.85, fontWeight: 300, marginBottom: 40 }}>
+          <p style={{ fontSize: 17, lineHeight: 1.9, opacity: 0.85, fontWeight: 300, marginBottom: 36 }}>
             매주 토요일 아침, 편집국장이 직접 고른 핵심 기사 5건을 보내드립니다.<br />
             구독료 0원, 가입 30초, 언제든지 해지 가능합니다.
           </p>
+
+          {/* 이음미디어 공식 매체 정보 박스 (Hero 안 신뢰 영역, 반투명 통일) */}
+          <div style={{
+            background: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.18)',
+            borderRadius: 8,
+            padding: '24px 28px',
+            marginBottom: 24,
+            maxWidth: 480, marginLeft: 'auto', marginRight: 'auto',
+            textAlign: 'left',
+          }}>
+            <div style={{
+              fontSize: 14, fontWeight: 700, marginBottom: 14,
+              opacity: 0.85, letterSpacing: 0.5,
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <span>📋</span>
+              <span>이음미디어 공식 매체 정보</span>
+            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, lineHeight: 1.7 }}>
+              <tbody>
+                <tr>
+                  <td style={{ width: 100, padding: '8px 0 0 0', opacity: 0.55, fontWeight: 500, verticalAlign: 'top' }}>등록번호</td>
+                  <td style={{ padding: '8px 0 0 0', opacity: 0.95 }}>서울,아56526</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '8px 0 0 0', opacity: 0.55, fontWeight: 500, verticalAlign: 'top' }}>발행 법인</td>
+                  <td style={{ padding: '8px 0 0 0', opacity: 0.95 }}>주식회사 봉숭아학당문화혁신학교</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '8px 0 0 0', opacity: 0.55, fontWeight: 500, verticalAlign: 'top' }}>발행인</td>
+                  <td style={{ padding: '8px 0 0 0', opacity: 0.95 }}>성창운 · 편집인 정세연</td>
+                </tr>
+                <tr>
+                  <td colSpan={2} style={{
+                    padding: '10px 0 0 0', marginTop: 4,
+                    borderTop: '1px solid rgba(255,255,255,0.12)',
+                    color: SUB, fontWeight: 600,
+                  }}>
+                    ✅ 서울특별시 공식 등록 인터넷신문
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
           {/* 카카오 채널 추가 메인 버튼 */}
           <a
@@ -302,8 +347,11 @@ export default function Subscribe() {
             <Link to="/citizen-reporter" style={{ color: BLUE, textDecoration: 'none', fontWeight: 600, marginRight: 14 }}>
               시민기자 지원 →
             </Link>
-            <Link to="/about" style={{ color: BLUE, textDecoration: 'none', fontWeight: 600 }}>
+            <Link to="/about" style={{ color: BLUE, textDecoration: 'none', fontWeight: 600, marginRight: 14 }}>
               이음미디어 소개 →
+            </Link>
+            <Link to="/advertise" style={{ color: BLUE, textDecoration: 'none', fontWeight: 600 }}>
+              광고 문의 →
             </Link>
           </div>
         </div>
