@@ -304,10 +304,21 @@ export default function ArticleDetail() {
               return items;
             })}
           </div>
-          <a href={externalUrl} target="_blank" rel="noopener noreferrer"
-             style={{ display:"inline-block", background:"#0d2d52", color:"white", padding:"14px 28px", fontSize:"15px", fontWeight:"700", textDecoration:"none", margin:"8px 0", fontFamily:"inherit" }}>
-            원문 보기 →
-          </a>
+          <div style={{ borderTop:"2px solid #bbb", margin:"24px 0" }} />
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"24px" }}>
+            <a href={externalUrl} target="_blank" rel="noopener noreferrer"
+               style={{ display:"inline-block", background:"#0d2d52", color:"white", padding:"14px 28px", fontSize:"15px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit" }}>
+              원문 보기 →
+            </a>
+            <div style={{ textAlign:"right" }}>
+              <div style={{ fontSize:"13px", color:"#555", marginBottom:"4px" }}>
+                정세연 편집국장 | press@eummedia.kr
+              </div>
+              <div style={{ fontSize:"12px", color:"#888", fontWeight:"600" }}>
+                ⓒ 이음미디어, 무단전재 및 재배포 금지
+              </div>
+            </div>
+          </div>
           <div style={{ fontSize:"12px", color:"#9a9a9a", marginBottom:"24px" }}>
             이음매거진은 인터넷신문 이음미디어로 통합되었습니다.<br />
             '세상과 당신을 잇는, 더 넓은 미디어의 시작입니다.'
