@@ -59,7 +59,7 @@ export default function Subscribe() {
             매주 깊이 있는 이야기,<br /><span style={{ color: SUB }}>카카오톡으로 받아보세요</span>
           </h1>
           <p style={{ fontSize: 17, lineHeight: 1.9, opacity: 0.85, fontWeight: 300, marginBottom: 36 }}>
-            매주 토요일 아침, 편집국장이 직접 고른 핵심 기사 5건을 보내드립니다.<br />
+            편집국장이 직접 고른 핵심 기사를 카카오톡으로 보내드립니다.<br />
             구독료 0원, 가입 30초, 언제든지 해지 가능합니다.
           </p>
 
