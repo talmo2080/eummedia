@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -7,17 +8,16 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleLogin(e) {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      // TODO: Supabase Auth 연동 시 아래 주석 해제
-      // const { error } = await supabase.auth.signInWithPassword({ email, password });
-      // if (error) throw error;
-      // navigate("/");
-      alert("로그인 기능은 Supabase 연동 후 활성화됩니다!");
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError) throw signInError;
+      navigate("/");
     } catch (err) {
       setError("이메일 또는 비밀번호가 올바르지 않습니다.");
     } finally {
@@ -48,14 +48,24 @@ export default function Login() {
             </div>
             <div style={s.field}>
               <label style={s.label}>비밀번호</label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="비밀번호 입력"
-                style={s.input}
-                required
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="비밀번호 입력"
+                  style={{ ...s.input, paddingRight: 50 }}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  style={s.eyeBtn}
+                  aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
+                >
+                  {showPassword ? '🙈' : '👁'}
+                </button>
+              </div>
             </div>
             <button type="submit" style={s.loginBtn} disabled={loading}>
               {loading ? "로그인 중..." : "로그인"}
@@ -89,7 +99,8 @@ const s = {
   form:       { display:"flex", flexDirection:"column", gap:16 },
   field:      { display:"flex", flexDirection:"column", gap:6 },
   label:      { fontSize:"0.85rem", fontWeight:600, color:"#444" },
-  input:      { border:"1.5px solid #e2e8f0", borderRadius:10, padding:"12px 14px", fontSize:"0.95rem", outline:"none", fontFamily:"'Noto Sans KR',sans-serif", transition:"border 0.2s" },
+  input:      { border:"1.5px solid #e2e8f0", borderRadius:10, padding:"12px 14px", fontSize:"0.95rem", outline:"none", fontFamily:"'Noto Sans KR',sans-serif", transition:"border 0.2s", width:"100%", boxSizing:"border-box" },
+  eyeBtn:     { position:"absolute", right:16, top:"50%", transform:"translateY(-50%)", background:"transparent", border:"none", cursor:"pointer", fontSize:20, padding:0, lineHeight:1 },
   loginBtn:   { background:"#0d2d52", color:"#fff", border:"none", borderRadius:10, padding:"13px", fontSize:"1rem", fontWeight:700, cursor:"pointer", fontFamily:"'Noto Sans KR',sans-serif", marginTop:4 },
   divider:    { display:"flex", alignItems:"center", gap:12, margin:"20px 0", color:"#ccc", fontSize:"0.82rem" },
   kakaoBtn:   { width:"100%", background:"#FEE500", color:"#3C1E1E", border:"none", borderRadius:10, padding:"13px", fontSize:"0.95rem", fontWeight:700, cursor:"pointer", fontFamily:"'Noto Sans KR',sans-serif", display:"flex", alignItems:"center", justifyContent:"center", gap:8 },

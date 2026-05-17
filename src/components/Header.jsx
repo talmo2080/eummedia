@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { supabase } from "../lib/supabase";
 
 const channels = [
   { name: "이음매거진", path: "/channel/magazine" },
@@ -12,6 +13,18 @@ const channels = [
 ];
 
 export default function Header() {
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
+  const isLoggedIn = !!user;
+  const role = profile?.role;
+  const canWrite = role === "writer" || role === "admin";
+  const isAdmin = role === "admin";
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    navigate("/");
+  }
+
   return (
     <header style={{
       backgroundColor: "#0d2d52",
@@ -57,38 +70,64 @@ export default function Header() {
             fontSize: 13,
             padding: "5px 8px"
           }}>광고문의</Link>
-          <Link to="/write" style={{
-            background: "#1c4f8a",
-            color: "#fff",
-            textDecoration: "none",
-            fontSize: 13,
-            fontWeight: 700,
-            padding: "5px 14px",
-            borderRadius: 4
-          }}>✍️ 기사 쓰기</Link>
-          <Link to="/login" style={{
-            color: "#c9a84c",
-            textDecoration: "none",
-            fontSize: 13,
-            border: "1px solid #c9a84c",
-            padding: "5px 14px",
-            borderRadius: 4
-          }}>로그인</Link>
-          <Link to="/signup" style={{
-            backgroundColor: "#c9a84c",
-            color: "#0d2d52",
-            textDecoration: "none",
-            fontSize: 13,
-            fontWeight: 700,
-            padding: "5px 14px",
-            borderRadius: 4
-          }}>회원가입</Link>
-          <Link to="/admin" style={{
-            color: "#888",
-            textDecoration: "none",
-            fontSize: 12,
-            padding: "5px 8px"
-          }}>⚙️ 관리자</Link>
+          {canWrite && (
+            <Link to="/write" style={{
+              background: "#1c4f8a",
+              color: "#fff",
+              textDecoration: "none",
+              fontSize: 13,
+              fontWeight: 700,
+              padding: "5px 14px",
+              borderRadius: 4
+            }}>✍️ 기사 쓰기</Link>
+          )}
+          {!isLoggedIn ? (
+            <>
+              <Link to="/login" style={{
+                color: "#c9a84c",
+                textDecoration: "none",
+                fontSize: 13,
+                border: "1px solid #c9a84c",
+                padding: "5px 14px",
+                borderRadius: 4
+              }}>로그인</Link>
+              <Link to="/signup" style={{
+                backgroundColor: "#c9a84c",
+                color: "#0d2d52",
+                textDecoration: "none",
+                fontSize: 13,
+                fontWeight: 700,
+                padding: "5px 14px",
+                borderRadius: 4
+              }}>회원가입</Link>
+            </>
+          ) : (
+            <>
+              <span style={{
+                color: "#c9a84c",
+                fontSize: 13,
+                padding: "5px 8px"
+              }}>안녕하세요, {profile?.name || "회원"}님</span>
+              <button onClick={handleLogout} style={{
+                color: "#c9a84c",
+                background: "transparent",
+                cursor: "pointer",
+                fontSize: 13,
+                border: "1px solid #c9a84c",
+                padding: "5px 14px",
+                borderRadius: 4,
+                fontFamily: "'Noto Sans KR', sans-serif"
+              }}>로그아웃</button>
+            </>
+          )}
+          {isAdmin && (
+            <Link to="/admin" style={{
+              color: "#888",
+              textDecoration: "none",
+              fontSize: 12,
+              padding: "5px 8px"
+            }}>⚙️ 관리자</Link>
+          )}
         </div>
       </div>
 

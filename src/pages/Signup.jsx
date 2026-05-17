@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 
 export default function Signup() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ name:"", email:"", password:"", password2:"", agree:false });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
@@ -18,15 +22,45 @@ export default function Signup() {
     if (!form.agree) { setError("이용약관에 동의해주세요."); return; }
     setLoading(true); setError("");
     try {
-      // TODO: Supabase Auth 연동 시 아래 주석 해제
-      // const { error } = await supabase.auth.signUp({ email: form.email, password: form.password });
-      // if (error) throw error;
-      alert("회원가입 기능은 Supabase 연동 후 활성화됩니다!");
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: form.email,
+        password: form.password,
+        options: { data: { name: form.name } },
+      });
+      if (signUpError) throw signUpError;
+      // auth_trigger 미작동 대비 클라이언트 INSERT (회원 영역 영역 정합)
+      if (data?.user) {
+        await supabase.from('users').insert({
+          id: data.user.id,
+          name: form.name,
+          email: form.email,
+          role: 'reader',
+        });
+      }
+      setSuccess(true);
     } catch (err) {
-      setError("회원가입 중 오류가 발생했습니다.");
+      setError(err?.message || "회원가입 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
+  }
+
+  if (success) {
+    return (
+      <div style={s.page}>
+        <main style={s.main}>
+          <div style={s.card}>
+            <div style={{ fontSize: 48, textAlign: 'center', marginBottom: 16 }}>🎉</div>
+            <h1 style={s.title}>회원가입 완료!</h1>
+            <p style={s.subtitle}>
+              편집국장 승인 후 기사 작성이 가능합니다.<br />
+              승인은 카카오톡(<strong>press@eummedia.kr</strong>)으로 안내드립니다.
+            </p>
+            <Link to="/login" style={s.btnLink}>로그인하기</Link>
+          </div>
+        </main>
+      </div>
+    );
   }
 
   return (
@@ -51,13 +85,27 @@ export default function Signup() {
             </div>
             <div style={s.field}>
               <label style={s.label}>비밀번호</label>
-              <input name="password" type="password" value={form.password} onChange={handleChange}
-                placeholder="8자 이상 입력" style={s.input} required minLength={8} />
+              <div style={{ position: 'relative' }}>
+                <input name="password" type={showPassword ? 'text' : 'password'} value={form.password} onChange={handleChange}
+                  placeholder="8자 이상 입력" style={{ ...s.input, paddingRight: 50 }} required minLength={8} />
+                <button type="button" onClick={() => setShowPassword(v => !v)}
+                  style={s.eyeBtn}
+                  aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}>
+                  {showPassword ? '🙈' : '👁'}
+                </button>
+              </div>
             </div>
             <div style={s.field}>
               <label style={s.label}>비밀번호 확인</label>
-              <input name="password2" type="password" value={form.password2} onChange={handleChange}
-                placeholder="비밀번호 재입력" style={s.input} required />
+              <div style={{ position: 'relative' }}>
+                <input name="password2" type={showPassword2 ? 'text' : 'password'} value={form.password2} onChange={handleChange}
+                  placeholder="비밀번호 재입력" style={{ ...s.input, paddingRight: 50 }} required />
+                <button type="button" onClick={() => setShowPassword2(v => !v)}
+                  style={s.eyeBtn}
+                  aria-label={showPassword2 ? '비밀번호 숨기기' : '비밀번호 보기'}>
+                  {showPassword2 ? '🙈' : '👁'}
+                </button>
+              </div>
             </div>
 
             <div style={s.agreeRow}>
@@ -92,11 +140,13 @@ const s = {
   form:       { display:"flex", flexDirection:"column", gap:14 },
   field:      { display:"flex", flexDirection:"column", gap:6 },
   label:      { fontSize:"0.85rem", fontWeight:600, color:"#444" },
-  input:      { border:"1.5px solid #e2e8f0", borderRadius:10, padding:"12px 14px", fontSize:"0.95rem", outline:"none", fontFamily:"'Noto Sans KR',sans-serif" },
+  input:      { border:"1.5px solid #e2e8f0", borderRadius:10, padding:"12px 14px", fontSize:"0.95rem", outline:"none", fontFamily:"'Noto Sans KR',sans-serif", width:"100%", boxSizing:"border-box" },
+  eyeBtn:     { position:"absolute", right:16, top:"50%", transform:"translateY(-50%)", background:"transparent", border:"none", cursor:"pointer", fontSize:20, padding:0, lineHeight:1 },
   agreeRow:   { display:"flex", alignItems:"center", gap:8, marginTop:4 },
   agreeLabel: { fontSize:"0.83rem", color:"#555" },
   agreeLink:  { color:"#0d2d52", fontWeight:600, textDecoration:"underline" },
   submitBtn:  { background:"#0d2d52", color:"#fff", border:"none", borderRadius:10, padding:"13px", fontSize:"1rem", fontWeight:700, cursor:"pointer", fontFamily:"'Noto Sans KR',sans-serif", marginTop:4 },
+  btnLink:    { display:"block", textAlign:"center", background:"#0d2d52", color:"#fff", borderRadius:10, padding:"13px", fontSize:"1rem", fontWeight:700, textDecoration:"none", fontFamily:"'Noto Sans KR',sans-serif", marginTop:12 },
   loginLink:  { textAlign:"center", marginTop:20, fontSize:"0.85rem", color:"#888" },
   link:       { color:"#4a6fa5", fontWeight:600, textDecoration:"none" },
 };
