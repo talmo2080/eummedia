@@ -341,19 +341,6 @@ export default function Subscribe() {
             </div>
           </div>
 
-          {/* Related Links */}
-          <div style={{ marginTop: 32, textAlign: 'center', fontSize: 14, color: '#6b6b6b' }}>
-            <span>구독 외에 더 깊이 참여하고 싶다면?  </span>
-            <Link to="/citizen-reporter" style={{ color: BLUE, textDecoration: 'none', fontWeight: 600, marginRight: 14 }}>
-              시민기자 지원 →
-            </Link>
-            <Link to="/about" style={{ color: BLUE, textDecoration: 'none', fontWeight: 600, marginRight: 14 }}>
-              이음미디어 소개 →
-            </Link>
-            <Link to="/advertise" style={{ color: BLUE, textDecoration: 'none', fontWeight: 600 }}>
-              광고 문의 →
-            </Link>
-          </div>
         </div>
       </section>
 
