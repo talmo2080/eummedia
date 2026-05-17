@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const NAVY = '#0d2d52'
 const BLUE = '#1c4f8a'
@@ -196,7 +197,33 @@ function CheckItem({ item, onToggle }) {
   )
 }
 
+function formatNow() {
+  const d = new Date()
+  const yyyy = d.getFullYear()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mi = String(d.getMinutes()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd} ${hh}:${mi}`
+}
+
+function InfoRow({ label, value, last }) {
+  return (
+    <div style={{
+      display: 'flex', padding: '10px 0',
+      borderBottom: last ? 'none' : '1px solid #e5e5e5',
+      fontSize: 17,
+    }}>
+      <span style={{ width: 110, color: '#666', fontWeight: 600 }}>{label}</span>
+      <span style={{ flex: 1, color: '#1a1a1a' }}>{value}</span>
+    </div>
+  )
+}
+
 export default function ArticleEditor() {
+  const navigate = useNavigate()
+  const [viewMode, setViewMode] = useState('edit')
+  const [savedAt, setSavedAt] = useState('')
   const [activeTab, setActiveTab] = useState(1)
   const [channel, setChannel] = useState('')
   const [title, setTitle] = useState('')
@@ -271,11 +298,31 @@ export default function ArticleEditor() {
 
   const handleDraft = () => {
     if (!title.trim()) { alert('제목을 입력해주세요.'); return }
-    alert('임시저장됐습니다! Supabase 연동 후 실제 저장됩니다.')
+    setSavedAt(formatNow())
+    setViewMode('draftSuccess')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
   const handleSubmit = () => {
     if (!allComplete) { alert('체크리스트를 모두 완료해주세요!'); return }
-    alert('편집국장에게 전달됐습니다! 승인 후 발행됩니다.')
+    setSavedAt(formatNow())
+    setViewMode('submitSuccess')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+  const resetForm = () => {
+    setChannel(''); setTitle(''); setReporter(''); setTagInput(''); setTags([])
+    setSummary(''); setThumbnailUrl(''); setImageAlt(''); setVideoUrl(''); setContent('')
+    setManualChecks({
+      titleClear: false, leadParagraph: false, thumbnail: false, contentLength: false, spelling: false,
+      channelCorrect: false, tags: false, titleKeyword: false, summary: false, alt: false,
+      fact: false, source: false, kakao: false, instagram: false, editorReview: false,
+    })
+    setActiveTab(1)
+    setViewMode('edit')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+  const continueEditing = () => {
+    setViewMode('edit')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const switchTab = (n) => {
@@ -289,6 +336,130 @@ export default function ArticleEditor() {
     { num: 3, icon: '📖', label: '글쓰기 가이드' },
   ]
 
+  // ━━ 임시저장 완료 화면 ━━
+  if (viewMode === 'draftSuccess') {
+    return (
+      <div style={{ background: '#f9f8f6', minHeight: '100vh', padding: '80px 24px', fontFamily: SANS }}>
+        <div style={{
+          maxWidth: 600, margin: '0 auto', background: '#fff',
+          borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+          padding: '48px', textAlign: 'center', boxSizing: 'border-box',
+        }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>💾</div>
+          <h1 style={{
+            fontFamily: SERIF, fontSize: 26, fontWeight: 700,
+            color: NAVY, margin: '0 0 10px 0', lineHeight: 1.4,
+          }}>
+            임시저장 완료!
+          </h1>
+          <p style={{ fontSize: 18, color: '#666', margin: '0 0 32px 0', lineHeight: 1.6 }}>
+            언제든지 이어서 작성할 수 있습니다.
+          </p>
+
+          <div style={{
+            background: '#f8f9fa', borderRadius: 12,
+            padding: 24, marginBottom: 24, textAlign: 'left',
+          }}>
+            <InfoRow label="기사 제목" value={title || '(제목 없음)'} />
+            <InfoRow label="채널" value={channel || '(미선택)'} />
+            <InfoRow label="저장 시각" value={savedAt} />
+            <InfoRow label="완성도" value={`${totalDone}/15 체크 완료`} last />
+          </div>
+
+          <p style={{ fontSize: 18, color: '#888', margin: '0 0 32px 0', lineHeight: 1.6 }}>
+            Supabase 연동 후 실제 저장 및 불러오기가 가능합니다.
+          </p>
+
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button onClick={continueEditing} style={{
+              flex: 1, height: 52, fontSize: 18, fontWeight: 700,
+              background: NAVY, color: '#fff', border: 'none', borderRadius: 8,
+              cursor: 'pointer', fontFamily: SANS,
+            }}>
+              ✍️ 이어서 작성하기
+            </button>
+            <button onClick={() => navigate('/')} style={{
+              flex: 1, height: 52, fontSize: 18, fontWeight: 700,
+              background: '#fff', color: NAVY, border: `1px solid ${NAVY}`, borderRadius: 8,
+              cursor: 'pointer', fontFamily: SANS,
+            }}>
+              🏠 홈으로 가기
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ━━ 편집국장 전달 완료 화면 ━━
+  if (viewMode === 'submitSuccess') {
+    return (
+      <div style={{ background: '#f9f8f6', minHeight: '100vh', padding: '80px 24px', fontFamily: SANS }}>
+        <div style={{
+          maxWidth: 600, margin: '0 auto', background: '#fff',
+          borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+          padding: '48px', textAlign: 'center', boxSizing: 'border-box',
+        }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>
+          <h1 style={{
+            fontFamily: SERIF, fontSize: 26, fontWeight: 700,
+            color: NAVY, margin: '0 0 10px 0', lineHeight: 1.4,
+          }}>
+            편집국장에게 전달됐습니다!
+          </h1>
+          <p style={{ fontSize: 18, color: '#666', margin: '0 0 32px 0', lineHeight: 1.6 }}>
+            정세연 편집국장이 검토 후 연락드립니다.
+          </p>
+
+          <div style={{
+            background: '#eef7f2', borderRadius: 12,
+            padding: 24, marginBottom: 24, textAlign: 'left',
+          }}>
+            <InfoRow label="기사 제목" value={title} />
+            <InfoRow label="채널" value={channel} />
+            <InfoRow label="기자 이름" value={reporter} />
+            <InfoRow label="전달 시각" value={savedAt} />
+            <InfoRow label="체크리스트" value="15/15 ✅ 완료" last />
+          </div>
+
+          <div style={{
+            background: '#eef3fa', borderRadius: 8,
+            padding: 20, marginBottom: 32, textAlign: 'left',
+            fontSize: 18, lineHeight: 1.85,
+          }}>
+            <div style={{ fontWeight: 700, color: NAVY, marginBottom: 12 }}>
+              📋 다음 단계 안내
+            </div>
+            <ol style={{ margin: 0, padding: '0 0 0 24px', color: '#3a3a3a' }}>
+              <li style={{ marginBottom: 6 }}>편집국장 검토 후 카카오톡으로 연락드립니다.</li>
+              <li style={{ marginBottom: 6 }}>수정 요청이 있을 수 있습니다.</li>
+              <li style={{ marginBottom: 6 }}>최종 승인 후 이음미디어에 발행됩니다.</li>
+              <li>발행 즉시 카카오·인스타에 공유해주세요!</li>
+            </ol>
+          </div>
+
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button onClick={resetForm} style={{
+              flex: 1, height: 52, fontSize: 18, fontWeight: 700,
+              background: NAVY, color: '#fff', border: 'none', borderRadius: 8,
+              cursor: 'pointer', fontFamily: SANS,
+            }}>
+              ✍️ 새 기사 작성하기
+            </button>
+            <button onClick={() => navigate('/')} style={{
+              flex: 1, height: 52, fontSize: 18, fontWeight: 700,
+              background: '#fff', color: NAVY, border: `1px solid ${NAVY}`, borderRadius: 8,
+              cursor: 'pointer', fontFamily: SANS,
+            }}>
+              🏠 홈으로 가기
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ━━ 기본 화면 (edit) ━━
   return (
     <div style={{ background: '#f9f8f6', fontFamily: SANS, minHeight: '100vh' }}>
       {/* 탭 영역 (상단 고정) */}
