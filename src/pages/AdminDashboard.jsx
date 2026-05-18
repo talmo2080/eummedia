@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 
 const NAVY = '#0d2d52'
 const BLUE = '#1c4f8a'
@@ -8,30 +9,6 @@ const ORANGE = '#c45c0a'
 const GOLD = '#c9a84c'
 const SERIF = "'Noto Serif KR', serif"
 const SANS = "'Noto Sans KR', sans-serif"
-
-const INITIAL_ARTICLES = [
-  {
-    id: 1, title: '고양시 일산 파크골프 동호회 창단식 성료',
-    channel: '이음로컬', reporter: '김영희', status: 'pending',
-    completeness: 13, submittedAt: '2026-05-17 14:30',
-    summary: '고양시 일산에서 파크골프 동호회가 정식 창단했습니다. 50명 이상의 회원이 참석한 가운데 활기찬 분위기로 진행됐습니다.',
-    thumb: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800',
-  },
-  {
-    id: 2, title: '두피케어 전문가 정세연 원장 인터뷰',
-    channel: '이음피플', reporter: '박철수', status: 'published',
-    completeness: 15, submittedAt: '2026-05-15 10:00',
-    summary: '닥터리부트 두피관리센터 정세연 원장. 27년의 두피전문가 경력과 함께 이음미디어 편집국장으로 활동 중인 정 원장을 만났습니다.',
-    thumb: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800',
-  },
-  {
-    id: 3, title: '고양시 청소년 진로교육 프로그램 현장',
-    channel: '이음에듀', reporter: '이순자', status: 'rejected',
-    completeness: 9, submittedAt: '2026-05-16 16:20',
-    summary: '고양시 청소년수련관에서 진행된 진로교육 프로그램. 다양한 직군의 전문가들이 참여해 학생들과 직접 만남의 시간을 가졌습니다.',
-    thumb: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800',
-  },
-]
 
 const INITIAL_USERS = [
   {
@@ -56,6 +33,17 @@ const INITIAL_USERS = [
     pressNo: '26-003', validFrom: '25-06-01', validUntil: '26-05-31', agreed: true,
   },
 ]
+
+function formatDateTime(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const y = d.getFullYear()
+  const mo = String(d.getMonth() + 1).padStart(2, '0')
+  const da = String(d.getDate()).padStart(2, '0')
+  const h = String(d.getHours()).padStart(2, '0')
+  const mi = String(d.getMinutes()).padStart(2, '0')
+  return `${y}-${mo}-${da} ${h}:${mi}`
+}
 
 function formatDateShort(d) {
   const yy = String(d.getFullYear()).slice(2)
@@ -82,8 +70,7 @@ function getExpiryStatus(validUntil) {
 }
 
 const ARTICLE_STATUS_LABELS = {
-  pending: { label: '검토대기', color: RED, bg: '#fef0ef' },
-  approved: { label: '승인됨', color: BLUE, bg: '#eef3fa' },
+  submitted: { label: '검토대기', color: RED, bg: '#fef0ef' },
   rejected: { label: '반려됨', color: ORANGE, bg: '#fff8f0' },
   published: { label: '발행됨', color: GREEN, bg: '#eef7f2' },
 }
@@ -113,8 +100,7 @@ const TABS = [
 
 const ARTICLE_FILTERS = [
   { key: 'all', label: '전체' },
-  { key: 'pending', label: '검토대기 🔴' },
-  { key: 'approved', label: '승인됨' },
+  { key: 'submitted', label: '검토대기 🔴' },
   { key: 'rejected', label: '반려됨' },
   { key: 'published', label: '발행됨' },
 ]
@@ -350,7 +336,7 @@ function CardNewsModal({ article, onClose }) {
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState(1)
-  const [articles, setArticles] = useState(INITIAL_ARTICLES)
+  const [articles, setArticles] = useState([])
   const [users, setUsers] = useState(INITIAL_USERS)
   const [articleFilter, setArticleFilter] = useState('all')
   const [userFilter, setUserFilter] = useState('all')
@@ -359,6 +345,18 @@ export default function AdminDashboard() {
   const [approvedId, setApprovedId] = useState(null)
   const [approvedUserId, setApprovedUserId] = useState(null)
   const [modalArticle, setModalArticle] = useState(null)
+
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*, channels(name)')
+        .neq('status', 'draft')
+        .order('created_at', { ascending: false })
+      if (error) { console.error('articles fetch:', error); return }
+      setArticles(data || [])
+    })()
+  }, [])
 
   const switchTab = (n) => {
     setActiveTab(n)
@@ -372,18 +370,35 @@ export default function AdminDashboard() {
     ? users
     : users.filter(u => u.status === userFilter)
 
-  const approveArticle = (id) => {
-    setArticles(articles.map(a => a.id === id ? { ...a, status: 'published' } : a))
+  const approveArticle = async (id) => {
+    const nowIso = new Date().toISOString()
+    const { error } = await supabase
+      .from('articles')
+      .update({ status: 'published', published_at: nowIso })
+      .eq('id', id)
+    if (error) { alert(`승인 실패: ${error.message}`); return }
+    setArticles(articles.map(a => a.id === id ? { ...a, status: 'published', published_at: nowIso } : a))
     setApprovedId(id)
   }
   const startReject = (id) => { setRejectingId(id); setRejectReason('') }
-  const confirmReject = (id) => {
-    setArticles(articles.map(a => a.id === id ? { ...a, status: 'rejected' } : a))
+  const confirmReject = async (id) => {
+    const reason = rejectReason.trim() || null
+    const { error } = await supabase
+      .from('articles')
+      .update({ status: 'rejected', reject_reason: reason })
+      .eq('id', id)
+    if (error) { alert(`반려 실패: ${error.message}`); return }
+    setArticles(articles.map(a => a.id === id ? { ...a, status: 'rejected', reject_reason: reason } : a))
     setRejectingId(null); setRejectReason('')
   }
   const cancelReject = () => { setRejectingId(null); setRejectReason('') }
-  const reReview = (id) => {
-    setArticles(articles.map(a => a.id === id ? { ...a, status: 'pending' } : a))
+  const reReview = async (id) => {
+    const { error } = await supabase
+      .from('articles')
+      .update({ status: 'submitted', reject_reason: null })
+      .eq('id', id)
+    if (error) { alert(`재검토 실패: ${error.message}`); return }
+    setArticles(articles.map(a => a.id === id ? { ...a, status: 'submitted', reject_reason: null } : a))
   }
   const approveUser = (id) => {
     const today = new Date()
@@ -490,9 +505,10 @@ export default function AdminDashboard() {
               </div>
             )}
             {filteredArticles.map(a => {
-              const sb = ARTICLE_STATUS_LABELS[a.status]
+              const sb = ARTICLE_STATUS_LABELS[a.status] || { label: a.status, color: '#888', bg: '#f0f0f0' }
               const showApprovedBanner = approvedId === a.id && a.status === 'published'
               const isRejecting = rejectingId === a.id
+              const completeness = a.status === 'draft' ? 0 : 15
               return (
                 <div key={a.id} style={card}>
                   {showApprovedBanner && (
@@ -512,12 +528,12 @@ export default function AdminDashboard() {
                     <span style={{
                       background: '#eef3fa', color: NAVY, fontWeight: 700,
                       padding: '4px 10px', borderRadius: 12,
-                    }}>{a.channel}</span>
+                    }}>{a.channels?.name || '-'}</span>
                     <span style={{
                       background: sb.bg, color: sb.color, fontWeight: 700,
                       padding: '4px 10px', borderRadius: 12,
                     }}>{sb.label}</span>
-                    <span style={{ color: '#888', marginLeft: 'auto' }}>{a.submittedAt}</span>
+                    <span style={{ color: '#888', marginLeft: 'auto' }}>{formatDateTime(a.created_at)}</span>
                   </div>
 
                   <div style={{
@@ -528,11 +544,11 @@ export default function AdminDashboard() {
                   </div>
 
                   <div style={{ fontSize: 15, color: '#666', marginBottom: 12 }}>
-                    기자: <strong style={{ color: '#1a1a1a' }}>{a.reporter}</strong>
+                    기자: <strong style={{ color: '#1a1a1a' }}>{a.author_name || '-'}</strong>
                     {' · '}
                     완성도: <strong style={{
-                      color: a.completeness === 15 ? GREEN : (a.completeness >= 12 ? BLUE : ORANGE),
-                    }}>{a.completeness}/15</strong>
+                      color: completeness === 15 ? GREEN : (completeness >= 12 ? BLUE : ORANGE),
+                    }}>{completeness}/15</strong>
                   </div>
 
                   <div style={{
@@ -581,7 +597,7 @@ export default function AdminDashboard() {
 
                   {!isRejecting && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                      {a.status === 'pending' && (
+                      {a.status === 'submitted' && (
                         <>
                           <button onClick={() => approveArticle(a.id)} style={btnStyle(GREEN)}>✅ 승인·발행</button>
                           <button onClick={() => startReject(a.id)} style={btnStyle(ORANGE)}>❌ 반려</button>
@@ -590,7 +606,13 @@ export default function AdminDashboard() {
                       )}
                       {a.status === 'published' && (
                         <>
-                          <button onClick={() => setModalArticle(a)} style={btnStyle(NAVY)}>🖼 카드뉴스 만들기</button>
+                          <button onClick={() => setModalArticle({
+                            ...a,
+                            thumb: a.thumbnail_url,
+                            channel: a.channels?.name || '',
+                            reporter: a.author_name || '',
+                            submittedAt: formatDateTime(a.created_at),
+                          })} style={btnStyle(NAVY)}>🖼 카드뉴스 만들기</button>
                           <button onClick={() => alert(`기사 보기: ${a.title}`)} style={btnStyle('#666', true)}>👁 기사 보기</button>
                         </>
                       )}
@@ -599,9 +621,6 @@ export default function AdminDashboard() {
                           <button onClick={() => reReview(a.id)} style={btnStyle(BLUE)}>🔄 재검토</button>
                           <button onClick={() => alert(`미리보기: ${a.title}`)} style={btnStyle('#666', true)}>👁 미리보기</button>
                         </>
-                      )}
-                      {a.status === 'approved' && (
-                        <button onClick={() => approveArticle(a.id)} style={btnStyle(GREEN)}>🚀 발행</button>
                       )}
                     </div>
                   )}
