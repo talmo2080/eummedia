@@ -23,12 +23,10 @@ export default function Footer() {
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
 
         {/* 상단 3열 */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: '40px',
-          marginBottom: '40px'
-        }}>
+        <div
+          className="grid grid-cols-1 md:grid-cols-3 gap-10"
+          style={{ marginBottom: '40px' }}
+        >
 
           {/* [A] 로고 영역 (좌측) */}
           <div>

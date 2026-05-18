@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../lib/supabase";
 
@@ -19,8 +20,25 @@ export default function Header() {
   const role = profile?.role;
   const canWrite = role === "writer" || role === "admin";
   const isAdmin = role === "admin";
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = () => setMenuOpen(false);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e) => { if (e.key === "Escape") setMenuOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [menuOpen]);
 
   async function handleLogout() {
+    setMenuOpen(false);
     await supabase.auth.signOut();
     navigate("/");
   }
@@ -62,8 +80,8 @@ export default function Header() {
           </div>
         </Link>
 
-        {/* 우측 버튼 */}
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        {/* 우측 버튼 — 데스크탑 (768px+) */}
+        <div className="hidden md:flex" style={{ gap: 12, alignItems: "center" }}>
           <Link to="/advertise" style={{
             color: "#c9a84c",
             textDecoration: "none",
@@ -129,10 +147,24 @@ export default function Header() {
             }}>⚙️ 관리자</Link>
           )}
         </div>
+
+        {/* 햄버거 버튼 — 모바일 (768px 미만) */}
+        <button
+          onClick={() => setMenuOpen(true)}
+          aria-label="메뉴 열기"
+          className="flex md:hidden items-center justify-center"
+          style={{
+            width: 52, height: 52,
+            background: "transparent", border: "none",
+            color: "#c9a84c", fontSize: 28,
+            cursor: "pointer", padding: 0,
+            fontFamily: "inherit",
+          }}
+        >☰</button>
       </div>
 
-      {/* 채널 메뉴 */}
-      <nav style={{
+      {/* 채널 메뉴 — 데스크탑 (768px+) */}
+      <nav className="hidden md:block" style={{
         backgroundColor: "#0a2240",
         borderTop: "1px solid rgba(201,168,76,0.3)"
       }}>
@@ -169,6 +201,172 @@ export default function Header() {
           ))}
         </div>
       </nav>
+
+      {/* 모바일 풀스크린 오버레이 (768px 미만 + menuOpen) */}
+      {menuOpen && (
+        <div
+          onClick={closeMenu}
+          role="dialog"
+          aria-modal="true"
+          aria-label="전체 메뉴"
+          className="md:hidden"
+          style={{
+            position: "fixed", inset: 0,
+            background: "#0a2240",
+            zIndex: 2000,
+            overflowY: "auto",
+            padding: "16px 20px 32px",
+            boxSizing: "border-box",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: 480, margin: "0 auto" }}
+          >
+            {/* 닫기 버튼 */}
+            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+              <button
+                onClick={closeMenu}
+                aria-label="메뉴 닫기"
+                style={{
+                  width: 52, height: 52,
+                  background: "transparent", border: "none",
+                  color: "#c9a84c", fontSize: 28,
+                  cursor: "pointer", padding: 0,
+                  fontFamily: "inherit",
+                }}
+              >✕</button>
+            </div>
+
+            {/* 채널 7개 */}
+            <div style={{ marginBottom: 28 }}>
+              <div style={{
+                color: "rgba(201,168,76,0.75)",
+                fontSize: 13, fontWeight: 700,
+                letterSpacing: 2, marginBottom: 10, paddingLeft: 4,
+              }}>채널</div>
+              {channels.map((ch) => (
+                <Link
+                  key={ch.path}
+                  to={ch.path}
+                  onClick={closeMenu}
+                  style={{
+                    display: "flex", alignItems: "center",
+                    minHeight: 52, padding: "10px 16px",
+                    color: "#e0e8f0", textDecoration: "none",
+                    fontSize: 19, fontWeight: 600,
+                    borderBottom: "1px solid rgba(255,255,255,0.08)",
+                  }}
+                >{ch.name}</Link>
+              ))}
+            </div>
+
+            {/* 활동 버튼 */}
+            <div style={{ marginBottom: 28 }}>
+              <div style={{
+                color: "rgba(201,168,76,0.75)",
+                fontSize: 13, fontWeight: 700,
+                letterSpacing: 2, marginBottom: 10, paddingLeft: 4,
+              }}>활동</div>
+
+              {canWrite && (
+                <Link
+                  to="/write"
+                  onClick={closeMenu}
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    minHeight: 52, padding: "10px 16px", marginBottom: 10,
+                    background: "#1c4f8a", color: "#fff",
+                    fontSize: 19, fontWeight: 700, textDecoration: "none",
+                    borderRadius: 4,
+                  }}
+                >✍️ 기사 쓰기</Link>
+              )}
+
+              <Link
+                to="/advertise"
+                onClick={closeMenu}
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  minHeight: 52, padding: "10px 16px", marginBottom: 10,
+                  color: "#c9a84c", border: "1px solid #c9a84c",
+                  fontSize: 19, fontWeight: 600, textDecoration: "none",
+                  borderRadius: 4,
+                }}
+              >📢 광고문의</Link>
+
+              {!isLoggedIn ? (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={closeMenu}
+                    style={{
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      minHeight: 52, padding: "10px 16px", marginBottom: 10,
+                      color: "#c9a84c", border: "1px solid #c9a84c",
+                      fontSize: 19, fontWeight: 600, textDecoration: "none",
+                      borderRadius: 4,
+                    }}
+                  >로그인</Link>
+                  <Link
+                    to="/signup"
+                    onClick={closeMenu}
+                    style={{
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      minHeight: 52, padding: "10px 16px",
+                      background: "#c9a84c", color: "#0d2d52",
+                      fontSize: 19, fontWeight: 700, textDecoration: "none",
+                      borderRadius: 4,
+                    }}
+                  >회원가입</Link>
+                </>
+              ) : (
+                <>
+                  <div style={{
+                    color: "#c9a84c", fontSize: 17,
+                    padding: "12px 16px", marginBottom: 6,
+                    textAlign: "center",
+                  }}>
+                    안녕하세요, {profile?.nickname || "회원"}님
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    style={{
+                      width: "100%", minHeight: 52, padding: "10px 16px",
+                      color: "#c9a84c", background: "transparent",
+                      border: "1px solid #c9a84c",
+                      fontSize: 19, fontWeight: 600, borderRadius: 4,
+                      cursor: "pointer",
+                      fontFamily: "'Noto Sans KR', sans-serif",
+                    }}
+                  >로그아웃</button>
+                </>
+              )}
+            </div>
+
+            {isAdmin && (
+              <div>
+                <div style={{
+                  color: "rgba(201,168,76,0.75)",
+                  fontSize: 13, fontWeight: 700,
+                  letterSpacing: 2, marginBottom: 10, paddingLeft: 4,
+                }}>관리</div>
+                <Link
+                  to="/admin"
+                  onClick={closeMenu}
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    minHeight: 52, padding: "10px 16px",
+                    color: "#aaa", border: "1px solid #555",
+                    fontSize: 17, fontWeight: 600, textDecoration: "none",
+                    borderRadius: 4,
+                  }}
+                >⚙️ 관리자 페이지</Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

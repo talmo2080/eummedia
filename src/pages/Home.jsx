@@ -185,7 +185,7 @@ export default function Home() {
       )}
 
       {/* 본문 */}
-      <div style={{ maxWidth:"1200px", margin:"0 auto", padding:"32px 32px 56px", display:"grid", gridTemplateColumns:"1fr 300px", gap:"40px", alignItems:"start" }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px]" style={{ maxWidth:"1200px", margin:"0 auto", padding:"32px 32px 56px", gap:"40px", alignItems:"start" }}>
 
         <main>
           {/* 히어로 */}
@@ -210,7 +210,7 @@ export default function Home() {
           )}
 
           {/* 채널 아이콘 바 */}
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:"8px", marginBottom:"24px" }}>
+          <div className="grid grid-cols-4 lg:grid-cols-7" style={{ gap:"8px", marginBottom:"24px" }}>
             {CHANNELS.map(ch => (
               <Link key={ch.slug} to={"/channel/" + ch.slug}
                 style={{ textDecoration:"none", textAlign:"center", padding:"12px 4px", background:"#fff", border:"1px solid #e8e8e8" }}>
@@ -221,7 +221,7 @@ export default function Home() {
           </div>
 
           {/* 기사 그리드 */}
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"20px" }}>
+          <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap:"20px" }}>
             {articles.length > 0
               ? articles.map(a => (
                   <Link key={a.slug} to={"/article/" + a.slug}
@@ -255,7 +255,7 @@ export default function Home() {
         </main>
 
         {/* 사이드바 */}
-        <aside style={{ display:"flex", flexDirection:"column", gap:"24px", position:"sticky", top:"20px" }}>
+        <aside className="lg:sticky lg:top-5" style={{ display:"flex", flexDirection:"column", gap:"24px" }}>
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
             <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
             <div style={{ width:"100%", height:"120px", background:"linear-gradient(135deg,#0d2d52,#1c4f8a)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:"12px", borderRadius:"2px" }}>
