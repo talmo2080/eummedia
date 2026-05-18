@@ -107,7 +107,7 @@ export default function Header() {
                 color: "#c9a84c",
                 fontSize: 13,
                 padding: "5px 8px"
-              }}>안녕하세요, {profile?.name || "회원"}님</span>
+              }}>안녕하세요, {profile?.nickname || "회원"}님</span>
               <button onClick={handleLogout} style={{
                 color: "#c9a84c",
                 background: "transparent",

@@ -32,7 +32,7 @@ export default function Signup() {
       if (data?.user) {
         await supabase.from('users').insert({
           id: data.user.id,
-          name: form.name,
+          nickname: form.name,
           email: form.email,
           role: 'reader',
         });
