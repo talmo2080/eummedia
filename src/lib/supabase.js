@@ -9,4 +9,4 @@ if (!url || !anonKey) {
   )
 }
 
-export const supabase = createClient(url, anonKey)
+export const supabase = createClient(url.trim(), anonKey.trim())
