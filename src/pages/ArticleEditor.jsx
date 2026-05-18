@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
 
 const NAVY = '#0d2d52'
 const BLUE = '#1c4f8a'
@@ -14,6 +16,16 @@ const CHANNELS = [
   '이음매거진', '이음피플', '이음로컬',
   '이음에듀', '이음트렌드', '이음보이스', '이음뷰',
 ]
+
+const CHANNEL_ID_MAP = {
+  '이음매거진': 'd8306e54-ca06-4929-8d27-8419c3ffe838',
+  '이음피플':   '0208677a-f569-4dc4-be76-6d9cb50272ca',
+  '이음로컬':   'e4eef54f-edd2-4511-90ea-256ebfca1613',
+  '이음에듀':   'de1c5c18-ae09-4c2b-8525-ef02d6e17ec6',
+  '이음트렌드': 'e41c0a6c-88dd-4098-b948-a7d64f4379c1',
+  '이음보이스': '18b19e3f-0053-4038-9c25-18de51c60bac',
+  '이음뷰':     'a9eb95f1-3ef9-4596-b53a-938523239367',
+}
 
 const GUIDE_CARDS = [
   {
@@ -222,8 +234,10 @@ function InfoRow({ label, value, last }) {
 
 export default function ArticleEditor() {
   const navigate = useNavigate()
+  const { user, profile } = useAuth()
   const [viewMode, setViewMode] = useState('edit')
   const [savedAt, setSavedAt] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const [activeTab, setActiveTab] = useState(1)
   const [channel, setChannel] = useState('')
   const [title, setTitle] = useState('')
@@ -296,14 +310,43 @@ export default function ArticleEditor() {
     alert('이미지 업로드는 Supabase Storage 연동 후 사용 가능합니다. 현재는 URL을 직접 입력해주세요.')
   }
 
-  const handleDraft = () => {
+  const buildPayload = (status) => ({
+    channel_id: CHANNEL_ID_MAP[channel] || null,
+    author_id: user.id,
+    title: title.trim(),
+    slug: `article-${crypto.randomUUID().slice(0, 8)}`,
+    summary: summary.trim() || null,
+    content: content || null,
+    status,
+    thumbnail_url: thumbnailUrl.trim() || null,
+    tags: tags.length > 0 ? tags : null,
+    video_url: videoUrl.trim() || null,
+    author_name: (reporter || profile?.nickname || '').trim() || null,
+    image_alt: imageAlt.trim() || null,
+  })
+
+  const handleDraft = async () => {
+    if (submitting) return
     if (!title.trim()) { alert('제목을 입력해주세요.'); return }
+    if (!user) { alert('로그인이 필요합니다.'); return }
+    setSubmitting(true)
+    const { error } = await supabase.from('articles').insert(buildPayload('draft'))
+    setSubmitting(false)
+    if (error) { alert(`임시저장 실패: ${error.message}`); return }
     setSavedAt(formatNow())
     setViewMode('draftSuccess')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-  const handleSubmit = () => {
+
+  const handleSubmit = async () => {
+    if (submitting) return
     if (!allComplete) { alert('체크리스트를 모두 완료해주세요!'); return }
+    if (!user) { alert('로그인이 필요합니다.'); return }
+    if (!CHANNEL_ID_MAP[channel]) { alert('채널을 선택해주세요.'); return }
+    setSubmitting(true)
+    const { error } = await supabase.from('articles').insert(buildPayload('submitted'))
+    setSubmitting(false)
+    if (error) { alert(`편집국장 전송 실패: ${error.message}`); return }
     setSavedAt(formatNow())
     setViewMode('submitSuccess')
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -367,7 +410,7 @@ export default function ArticleEditor() {
           </div>
 
           <p style={{ fontSize: 18, color: '#888', margin: '0 0 32px 0', lineHeight: 1.6 }}>
-            Supabase 연동 후 실제 저장 및 불러오기가 가능합니다.
+            임시저장된 기사는 편집국장 전송 전까지 수정할 수 있습니다.
           </p>
 
           <div style={{ display: 'flex', gap: 12 }}>
@@ -553,7 +596,7 @@ export default function ArticleEditor() {
                 기자 이름 <span style={{ color: RED }}>*</span>
               </label>
               <input style={inp({ height: 52 })}
-                value={reporter} onChange={e => setReporter(e.target.value)}
+                value={reporter || profile?.nickname || ''} onChange={e => setReporter(e.target.value)}
                 placeholder="이름을 입력하세요" />
             </div>
 
