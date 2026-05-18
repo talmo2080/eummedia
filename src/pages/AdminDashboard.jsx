@@ -10,30 +10,6 @@ const GOLD = '#c9a84c'
 const SERIF = "'Noto Serif KR', serif"
 const SANS = "'Noto Sans KR', sans-serif"
 
-const INITIAL_USERS = [
-  {
-    id: 1, name: '홍길동', status: 'pending',
-    bio: '고양시 거주 20년 주부입니다. 지역 소식을 전하고 싶어요.',
-    appliedAt: '2026-05-15',
-    articlesCount: 0, publishedCount: 0, pendingCount: 0, rejectedCount: 0,
-    pressNo: null, validFrom: null, validUntil: null, agreed: false,
-  },
-  {
-    id: 2, name: '김영희', status: 'active',
-    bio: '전직 교사. 교육과 지역사회에 관심이 많습니다.',
-    appliedAt: '2026-02-01',
-    articlesCount: 5, publishedCount: 3, pendingCount: 1, rejectedCount: 1,
-    pressNo: '26-002', validFrom: '26-02-01', validUntil: '27-01-31', agreed: true,
-  },
-  {
-    id: 3, name: '이순자', status: 'active',
-    bio: '요리연구가. 지역 맛집과 문화를 알리고 싶습니다.',
-    appliedAt: '2025-06-01',
-    articlesCount: 2, publishedCount: 1, pendingCount: 1, rejectedCount: 0,
-    pressNo: '26-003', validFrom: '25-06-01', validUntil: '26-05-31', agreed: true,
-  },
-]
-
 function formatDateTime(iso) {
   if (!iso) return ''
   const d = new Date(iso)
@@ -45,28 +21,29 @@ function formatDateTime(iso) {
   return `${y}-${mo}-${da} ${h}:${mi}`
 }
 
-function formatDateShort(d) {
-  const yy = String(d.getFullYear()).slice(2)
-  const mm = String(d.getMonth() + 1).padStart(2, '0')
-  const dd = String(d.getDate()).padStart(2, '0')
-  return `${yy}-${mm}-${dd}`
+function isoDate(d) {
+  return d.toISOString().slice(0, 10)
 }
 
-function parseShortDate(s) {
-  if (!s) return null
-  const parts = s.split('-')
-  if (parts.length !== 3) return null
-  return new Date(2000 + parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10))
+function dbDateToShort(s) {
+  if (!s) return ''
+  return s.length >= 10 ? s.slice(2, 10) : s
 }
 
 function getExpiryStatus(validUntil) {
-  const expiry = parseShortDate(validUntil)
-  if (!expiry) return 'none'
+  if (!validUntil) return 'none'
+  const expiry = new Date(validUntil)
+  if (isNaN(expiry.getTime())) return 'none'
   const now = new Date()
   const diffDays = Math.floor((expiry - now) / (1000 * 60 * 60 * 24))
   if (diffDays < 0) return 'expired'
   if (diffDays <= 30) return 'warning'
   return 'valid'
+}
+
+function getUserStatus(u) {
+  if (u.role === 'reader') return 'pending'
+  return u.is_active ? 'active' : 'suspended'
 }
 
 const ARTICLE_STATUS_LABELS = {
@@ -337,7 +314,7 @@ function CardNewsModal({ article, onClose }) {
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState(1)
   const [articles, setArticles] = useState([])
-  const [users, setUsers] = useState(INITIAL_USERS)
+  const [users, setUsers] = useState([])
   const [articleFilter, setArticleFilter] = useState('all')
   const [userFilter, setUserFilter] = useState('all')
   const [rejectingId, setRejectingId] = useState(null)
@@ -356,6 +333,14 @@ export default function AdminDashboard() {
       if (error) { console.error('articles fetch:', error); return }
       setArticles(data || [])
     })()
+    ;(async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .order('created_at', { ascending: false })
+      if (error) { console.error('users fetch:', error); return }
+      setUsers(data || [])
+    })()
   }, [])
 
   const switchTab = (n) => {
@@ -368,7 +353,7 @@ export default function AdminDashboard() {
     : articles.filter(a => a.status === articleFilter)
   const filteredUsers = userFilter === 'all'
     ? users
-    : users.filter(u => u.status === userFilter)
+    : users.filter(u => getUserStatus(u) === userFilter)
 
   const approveArticle = async (id) => {
     const nowIso = new Date().toISOString()
@@ -400,39 +385,78 @@ export default function AdminDashboard() {
     if (error) { alert(`재검토 실패: ${error.message}`); return }
     setArticles(articles.map(a => a.id === id ? { ...a, status: 'submitted', reject_reason: null } : a))
   }
-  const approveUser = (id) => {
+  const approveUser = async (id) => {
     const today = new Date()
     const oneYearLater = new Date(today)
     oneYearLater.setFullYear(today.getFullYear() + 1)
     oneYearLater.setDate(today.getDate() - 1)
-    const activeCount = users.filter(u => u.pressNo).length
-    const nextNo = `26-${String(activeCount + 2).padStart(3, '0')}`
+    const yy = String(today.getFullYear()).slice(2)
+    const activeCount = users.filter(u => u.press_no).length
+    const nextNo = `${yy}-${String(activeCount + 1).padStart(3, '0')}`
+    const validFromIso = isoDate(today)
+    const validUntilIso = isoDate(oneYearLater)
+
+    const { error } = await supabase
+      .from('users')
+      .update({
+        role: 'writer',
+        is_active: true,
+        press_no: nextNo,
+        valid_from: validFromIso,
+        valid_until: validUntilIso,
+      })
+      .eq('id', id)
+    if (error) { alert(`승인 실패: ${error.message}`); return }
+
     setUsers(users.map(u => u.id === id ? {
-      ...u, status: 'active',
-      pressNo: nextNo,
-      validFrom: formatDateShort(today),
-      validUntil: formatDateShort(oneYearLater),
-      agreed: true,
+      ...u, role: 'writer', is_active: true,
+      press_no: nextNo,
+      valid_from: validFromIso,
+      valid_until: validUntilIso,
     } : u))
     setApprovedUserId(id)
   }
-  const renewUser = (id) => {
+  const renewUser = async (id) => {
     const user = users.find(u => u.id === id)
     if (!user) return
-    const expiry = parseShortDate(user.validUntil) || new Date()
+    const expiry = user.valid_until ? new Date(user.valid_until) : new Date()
     const newExpiry = new Date(expiry)
     newExpiry.setFullYear(expiry.getFullYear() + 1)
-    setUsers(users.map(u => u.id === id ? {
-      ...u, validUntil: formatDateShort(newExpiry),
-    } : u))
+    const newIso = isoDate(newExpiry)
+
+    const { error } = await supabase
+      .from('users')
+      .update({ valid_until: newIso })
+      .eq('id', id)
+    if (error) { alert(`갱신 실패: ${error.message}`); return }
+
+    setUsers(users.map(u => u.id === id ? { ...u, valid_until: newIso } : u))
     alert('자격이 1년 갱신됐습니다!')
   }
-  const rejectUser = (id) => {
+  const rejectUser = async (id) => {
+    const { error } = await supabase
+      .from('users')
+      .update({ is_active: false })
+      .eq('id', id)
+    if (error) { alert(`반려 실패: ${error.message}`); return }
+    setUsers(users.map(u => u.id === id ? { ...u, is_active: false } : u))
     alert('반려됐습니다.')
-    setUsers(users.map(u => u.id === id ? { ...u, status: 'suspended' } : u))
   }
-  const suspendUser = (id) => {
-    setUsers(users.map(u => u.id === id ? { ...u, status: 'suspended' } : u))
+  const suspendUser = async (id) => {
+    const { error } = await supabase
+      .from('users')
+      .update({ is_active: false })
+      .eq('id', id)
+    if (error) { alert(`정지 실패: ${error.message}`); return }
+    setUsers(users.map(u => u.id === id ? { ...u, is_active: false } : u))
+  }
+  const reactivateUser = async (id) => {
+    const { error } = await supabase
+      .from('users')
+      .update({ is_active: true })
+      .eq('id', id)
+    if (error) { alert(`재활성화 실패: ${error.message}`); return }
+    setUsers(users.map(u => u.id === id ? { ...u, is_active: true } : u))
   }
 
   const maxChannelCount = Math.max(...CHANNEL_STATS.map(c => c.count))
@@ -666,13 +690,15 @@ export default function AdminDashboard() {
               </div>
             )}
             {filteredUsers.map(u => {
-              const sb = USER_STATUS_LABELS[u.status]
-              const showApprovedBanner = approvedUserId === u.id && u.status === 'active'
-              const expiryStatus = getExpiryStatus(u.validUntil)
+              const ustatus = getUserStatus(u)
+              const sb = USER_STATUS_LABELS[ustatus] || { label: ustatus, color: '#888', bg: '#f0f0f0' }
+              const showApprovedBanner = approvedUserId === u.id && ustatus === 'active'
+              const expiryStatus = getExpiryStatus(u.valid_until)
               const expiryColor = expiryStatus === 'expired' ? RED : (expiryStatus === 'warning' ? ORANGE : '#3a3a3a')
               const expiryLabel = expiryStatus === 'expired'
                 ? '🔴 자격 만료'
                 : (expiryStatus === 'warning' ? '⚠️ 갱신 필요' : '')
+              const agreed = !!u.press_no
               return (
                 <div key={u.id} style={card}>
                   {showApprovedBanner && (
@@ -681,8 +707,8 @@ export default function AdminDashboard() {
                       padding: '14px 18px', marginBottom: 14,
                       fontSize: 16, color: GREEN, fontWeight: 600, lineHeight: 1.7,
                     }}>
-                      ✅ 승인됐습니다! 기자증 번호: <strong>이음미디어/No. {u.pressNo}</strong><br />
-                      유효기간: {u.validFrom} ~ {u.validUntil}
+                      ✅ 승인됐습니다! 기자증 번호: <strong>이음미디어/No. {u.press_no}</strong><br />
+                      유효기간: {dbDateToShort(u.valid_from)} ~ {dbDateToShort(u.valid_until)}
                     </div>
                   )}
 
@@ -692,13 +718,13 @@ export default function AdminDashboard() {
                   }}>
                     <span style={{
                       fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: NAVY,
-                    }}>{u.name}</span>
+                    }}>{u.nickname || '(이름 없음)'}</span>
                     <span style={{
                       background: sb.bg, color: sb.color, fontWeight: 700,
                       padding: '4px 10px', borderRadius: 12, fontSize: 13,
                     }}>{sb.label}</span>
                     <span style={{ color: '#888', fontSize: 13, marginLeft: 'auto' }}>
-                      신청일: {u.appliedAt}
+                      신청일: {dbDateToShort(u.created_at)}
                     </span>
                   </div>
 
@@ -707,21 +733,21 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* 기자증 영역 (활동중/정지됨만 표시) */}
-                  {u.pressNo && (
+                  {u.press_no && (
                     <div style={{
                       background: '#f7f8fa', borderRadius: 8,
                       padding: '12px 16px', marginBottom: 12,
                       fontSize: 14, lineHeight: 1.85,
                     }}>
                       <div style={{ color: '#666' }}>
-                        기자증: <strong style={{ color: NAVY }}>이음미디어/No. {u.pressNo}</strong>
+                        기자증: <strong style={{ color: NAVY }}>이음미디어/No. {u.press_no}</strong>
                       </div>
                       <div style={{ color: expiryColor, fontWeight: expiryStatus !== 'valid' ? 700 : 500 }}>
-                        유효기간: {u.validFrom} ~ {u.validUntil}
+                        유효기간: {dbDateToShort(u.valid_from)} ~ {dbDateToShort(u.valid_until)}
                         {expiryLabel && <span style={{ marginLeft: 8 }}>{expiryLabel}</span>}
                       </div>
-                      <div style={{ color: u.agreed ? GREEN : ORANGE, fontWeight: 600 }}>
-                        {u.agreed ? '유의사항 동의 ✅' : '미동의 ⚠️'}
+                      <div style={{ color: agreed ? GREEN : ORANGE, fontWeight: 600 }}>
+                        {agreed ? '유의사항 동의 ✅' : '미동의 ⚠️'}
                       </div>
                     </div>
                   )}
@@ -731,44 +757,44 @@ export default function AdminDashboard() {
                       background: '#f0f0f0', borderRadius: 6, padding: '4px 10px',
                       fontSize: 13, color: '#3a3a3a', fontWeight: 600,
                     }}>
-                      작성 {u.articlesCount}건
+                      작성 0건
                     </span>
                     <span style={{
                       background: '#f0f0f0', borderRadius: 6, padding: '4px 10px',
                       fontSize: 13, color: GREEN, fontWeight: 700,
                     }}>
-                      발행 {u.publishedCount}건
+                      발행 0건
                     </span>
                     <span style={{
                       background: '#f0f0f0', borderRadius: 6, padding: '4px 10px',
                       fontSize: 13, color: ORANGE, fontWeight: 700,
                     }}>
-                      검토대기 {u.pendingCount}건
+                      검토대기 0건
                     </span>
                     <span style={{
                       background: '#f0f0f0', borderRadius: 6, padding: '4px 10px',
                       fontSize: 13, color: RED, fontWeight: 700,
                     }}>
-                      반려 {u.rejectedCount}건
+                      반려 0건
                     </span>
                   </div>
 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                    {u.status === 'pending' && (
+                    {ustatus === 'pending' && (
                       <>
                         <button onClick={() => approveUser(u.id)} style={btnStyle(GREEN)}>✅ 시민기자 승인</button>
                         <button onClick={() => rejectUser(u.id)} style={btnStyle(ORANGE)}>❌ 반려</button>
                       </>
                     )}
-                    {u.status === 'active' && (
+                    {ustatus === 'active' && (
                       <>
                         <button onClick={() => renewUser(u.id)} style={btnStyle(BLUE)}>🔄 1년 갱신</button>
                         <button onClick={() => suspendUser(u.id)} style={btnStyle(ORANGE)}>🚫 활동 정지</button>
-                        <button onClick={() => alert(`${u.name} 기자의 기사 목록으로 이동합니다.`)} style={btnStyle('#666', true)}>📋 기사 보기</button>
+                        <button onClick={() => alert(`${u.nickname} 기자의 기사 목록으로 이동합니다.`)} style={btnStyle('#666', true)}>📋 기사 보기</button>
                       </>
                     )}
-                    {u.status === 'suspended' && (
-                      <button onClick={() => approveUser(u.id)} style={btnStyle(BLUE)}>🔄 재활성화</button>
+                    {ustatus === 'suspended' && (
+                      <button onClick={() => reactivateUser(u.id)} style={btnStyle(BLUE)}>🔄 재활성화</button>
                     )}
                   </div>
                 </div>
@@ -893,12 +919,8 @@ export default function AdminDashboard() {
               }}>
                 🔐 시민기자 권한 시스템 안내
               </h3>
-              <p style={{ fontSize: 16, color: '#3a3a3a', lineHeight: 1.85, margin: '0 0 16px 0' }}>
-                현재는 더미 데이터로 작동합니다.<br />
-                Supabase Auth 연동 후 실제 권한 관리가 가능합니다.
-              </p>
               <p style={{ fontSize: 16, color: '#3a3a3a', lineHeight: 1.85, margin: 0 }}>
-                <strong style={{ color: NAVY }}>실제 구현 시:</strong>
+                <strong style={{ color: NAVY }}>권한 시스템 흐름:</strong>
               </p>
               <ul style={{ fontSize: 15, color: '#3a3a3a', lineHeight: 1.85, margin: '8px 0 16px 0', paddingLeft: 24 }}>
                 <li>회원가입 → 편집국장 승인 → 시민기자 권한 부여</li>
