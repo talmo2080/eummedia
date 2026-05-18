@@ -32,9 +32,9 @@ const AUTHOR_ARTICLES = [
 ];
 
 const VIDEOS = [
-  { id:"v1", title:"이천도자기축제 현장 스케치", duration:"3:24", thumb:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400&q=80" },
-  { id:"v2", title:"닥터리부트 두피 건강 비법", duration:"5:12", thumb:"https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80" },
-  { id:"v3", title:"봉숭아학당 27기 수료식 현장", duration:"4:08", thumb:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80" },
+  { id:"v1", title:"이천도자기축제 현장 스케치", description:"도예와 차 문화, 공예에 관심 있는 시민이라면 놓치지 말아야 할 현장을 담았습니다.", duration:"3:24", thumb:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400&q=80" },
+  { id:"v2", title:"닥터리부트 두피 건강 비법", description:"두피전문가 27년의 노하우, 일상에서 바로 실천할 수 있는 두피 건강 5가지 습관을 알려드립니다.", duration:"5:12", thumb:"https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80" },
+  { id:"v3", title:"봉숭아학당 27기 수료식 현장", description:"문화혁신학교 봉숭아학당 27기 수료생들의 시민기자 도전기, 그 뜨거운 현장을 함께합니다.", duration:"4:08", thumb:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80" },
 ];
 
 const CARDS = [
@@ -56,6 +56,19 @@ function ArrowBtn({ onClick, dir }) {
       style={{ width:"32px", height:"32px", borderRadius:"50%", background: h ? "#0d2d52" : "#fff", border:"2px solid " + (h ? "#0d2d52" : "#ddd"), color: h ? "#fff" : "#0d2d52", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:"18px", fontWeight:"900", transition:"all 0.2s", lineHeight:1 }}>
       {dir === "prev" ? "‹" : "›"}
     </button>
+  );
+}
+
+function CardThumb({ card }) {
+  const [h, setH] = useState(false);
+  return (
+    <div onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
+      style={{ position:"relative", aspectRatio:"1/1", borderRadius:"12px", overflow:"hidden", cursor:"pointer", transition:"transform 0.2s", boxShadow:"0 2px 8px rgba(0,0,0,0.10)", transform: h ? "scale(1.03)" : "scale(1)" }}>
+      <img src={card.thumb} alt={card.title} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+      <div style={{ position:"absolute", bottom:0, left:0, right:0, background:"linear-gradient(transparent, rgba(13,45,82,0.82))", padding:"24px 12px 12px" }}>
+        <div style={{ color:"#fff", fontSize:"16px", fontWeight:"700", lineHeight:"1.4" }}>{card.title}</div>
+      </div>
+    </div>
   );
 }
 
@@ -130,7 +143,6 @@ export default function ArticleDetail() {
   const [cName, setCName] = useState("");
   const [cText, setCText] = useState("");
   const [videoIdx, setVideoIdx] = useState(0);
-  const [cardIdx, setCardIdx] = useState(0);
   const [showAuthorMore, setShowAuthorMore] = useState(false);
 
   const onLike = () => { setLiked(p => !p); setLikeCount(p => liked ? p - 1 : p + 1); };
@@ -390,41 +402,46 @@ export default function ArticleDetail() {
             </div>
           </div>
 
-          {/* 영상 + 카드뉴스 */}
-          <div style={{ margin:"32px 0" }}>
-            <div style={{ fontSize:"13px", fontWeight:"700", color:"#0d2d52", borderLeft:"3px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>📹 영상 · 🃏 카드뉴스</div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"20px" }}>
-              <div>
-                <div style={{ position:"relative", height:"180px", borderRadius:"8px", overflow:"hidden", marginBottom:"12px" }}>
-                  <img src={VIDEOS[videoIdx].thumb} alt={VIDEOS[videoIdx].title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                  <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.35)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <div style={{ width:"48px", height:"48px", borderRadius:"50%", background:"rgba(255,255,255,0.9)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"18px" }}>▶</div>
-                  </div>
-                  <span style={{ position:"absolute", top:"8px", left:"8px", background:"#0d2d52", color:"white", fontSize:"9px", fontWeight:"700", padding:"3px 8px", borderRadius:"3px" }}>영상</span>
-                  <span style={{ position:"absolute", bottom:"8px", right:"8px", background:"rgba(0,0,0,0.7)", color:"white", fontSize:"10px", padding:"2px 6px", borderRadius:"3px" }}>{VIDEOS[videoIdx].duration}</span>
-                </div>
-                <div style={{ fontSize:"12px", fontWeight:"600", color:"#1a1a1a", marginBottom:"10px", lineHeight:"1.4" }}>{VIDEOS[videoIdx].title}</div>
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"16px" }}>
-                  <ArrowBtn onClick={() => setVideoIdx(p => (p - 1 + VIDEOS.length) % VIDEOS.length)} dir="prev" />
-                  <span style={{ fontSize:"11px", color:"#9a9a9a" }}>{videoIdx + 1} / {VIDEOS.length}</span>
-                  <ArrowBtn onClick={() => setVideoIdx(p => (p + 1) % VIDEOS.length)} dir="next" />
-                </div>
-              </div>
-              <div>
-                <div style={{ position:"relative", height:"180px", borderRadius:"8px", overflow:"hidden", marginBottom:"12px", cursor:"pointer" }}>
-                  <img src={CARDS[cardIdx].thumb} alt={CARDS[cardIdx].title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                  <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.3)" }} />
-                  <span style={{ position:"absolute", top:"8px", left:"8px", background:"rgba(255,255,255,0.25)", color:"white", fontSize:"9px", fontWeight:"700", padding:"3px 8px", borderRadius:"3px" }}>카드뉴스</span>
-                  <div style={{ position:"absolute", bottom:"10px", left:"10px", right:"10px", color:"white", fontSize:"12px", fontWeight:"700", lineHeight:"1.4", textShadow:"0 1px 4px rgba(0,0,0,0.5)" }}>{CARDS[cardIdx].title}</div>
-                </div>
-                <div style={{ fontSize:"12px", fontWeight:"600", color:"#1a1a1a", marginBottom:"10px", lineHeight:"1.4" }}>{CARDS[cardIdx].title}</div>
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"16px" }}>
-                  <ArrowBtn onClick={() => setCardIdx(p => (p - 1 + CARDS.length) % CARDS.length)} dir="prev" />
-                  <span style={{ fontSize:"11px", color:"#9a9a9a" }}>{cardIdx + 1} / {CARDS.length}</span>
-                  <ArrowBtn onClick={() => setCardIdx(p => (p + 1) % CARDS.length)} dir="next" />
-                </div>
-              </div>
+          {/* 📱 카드뉴스 섹션 */}
+          <div style={{ marginBottom:"32px" }}>
+            <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #c0392b", paddingLeft:"12px", marginBottom:"8px" }}>📱 카드뉴스 (3가지 이야기)</div>
+            <div style={{ fontSize:"14px", color:"#888", marginBottom:"16px" }}>각 카드를 클릭해서 골라보세요 👆</div>
+
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"12px", overflowX:"auto" }}>
+              {CARDS.map(card => <CardThumb key={card.id} card={card} />)}
             </div>
+          </div>
+
+          {/* 구분선 */}
+          <div style={{ borderTop:"1px solid #e0e0e0", margin:"32px 0" }} />
+
+          {/* 🎬 영상 섹션 */}
+          <div style={{ marginTop:"32px" }}>
+            <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>🎬 영상</div>
+
+            <div style={{ position:"relative", width:"100%", aspectRatio:"16/9", borderRadius:"12px", overflow:"hidden", boxShadow:"0 4px 16px rgba(0,0,0,0.12)" }}>
+              <img src={VIDEOS[videoIdx].thumb} alt={VIDEOS[videoIdx].title} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+              <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.35)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                <div style={{ width:"64px", height:"64px", borderRadius:"50%", background:"rgba(255,255,255,0.9)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"24px" }}>▶</div>
+              </div>
+              <span style={{ position:"absolute", top:"12px", left:"12px", background:"#0d2d52", color:"white", fontSize:"11px", fontWeight:"700", padding:"4px 10px", borderRadius:"4px" }}>영상</span>
+              <span style={{ position:"absolute", bottom:"12px", right:"12px", background:"rgba(0,0,0,0.7)", color:"white", fontSize:"12px", padding:"3px 8px", borderRadius:"4px" }}>{VIDEOS[videoIdx].duration}</span>
+            </div>
+
+            <div style={{ padding:"12px 0" }}>
+              <div style={{ fontSize:"18px", fontWeight:"700", color:"#1c1917", lineHeight:"1.4", marginBottom:"8px" }}>{VIDEOS[videoIdx].title}</div>
+              {VIDEOS[videoIdx].description && (
+                <div style={{ fontSize:"16px", color:"#666", lineHeight:"1.7" }}>{VIDEOS[videoIdx].description}</div>
+              )}
+            </div>
+
+            {VIDEOS.length > 1 && (
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"16px", marginTop:"8px" }}>
+                <ArrowBtn onClick={() => setVideoIdx(p => (p - 1 + VIDEOS.length) % VIDEOS.length)} dir="prev" />
+                <span style={{ fontSize:"13px", color:"#9a9a9a" }}>{videoIdx + 1} / {VIDEOS.length}</span>
+                <ArrowBtn onClick={() => setVideoIdx(p => (p + 1) % VIDEOS.length)} dir="next" />
+              </div>
+            )}
           </div>
 
           {/* 댓글 */}
