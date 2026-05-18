@@ -15,18 +15,21 @@ const INITIAL_ARTICLES = [
     channel: '이음로컬', reporter: '김영희', status: 'pending',
     completeness: 13, submittedAt: '2026-05-17 14:30',
     summary: '고양시 일산에서 파크골프 동호회가 정식 창단했습니다. 50명 이상의 회원이 참석한 가운데 활기찬 분위기로 진행됐습니다.',
+    thumb: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800',
   },
   {
     id: 2, title: '두피케어 전문가 정세연 원장 인터뷰',
     channel: '이음피플', reporter: '박철수', status: 'published',
     completeness: 15, submittedAt: '2026-05-15 10:00',
     summary: '닥터리부트 두피관리센터 정세연 원장. 27년의 두피전문가 경력과 함께 이음미디어 편집국장으로 활동 중인 정 원장을 만났습니다.',
+    thumb: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800',
   },
   {
     id: 3, title: '고양시 청소년 진로교육 프로그램 현장',
     channel: '이음에듀', reporter: '이순자', status: 'rejected',
     completeness: 9, submittedAt: '2026-05-16 16:20',
     summary: '고양시 청소년수련관에서 진행된 진로교육 프로그램. 다양한 직군의 전문가들이 참여해 학생들과 직접 만남의 시간을 가졌습니다.',
+    thumb: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800',
   },
 ]
 
@@ -163,8 +166,133 @@ function StatCard({ label, value, color }) {
   )
 }
 
+function SquareCards({ article, dateShort }) {
+  const size = 340
+  return (
+    <>
+      {/* 카드 1 — 표지 */}
+      <div style={{ position: 'relative', width: size, height: size, borderRadius: 12, overflow: 'hidden' }}>
+        <img src={article.thumb} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: 12, background: 'linear-gradient(rgba(13,45,82,0.7), transparent)' }}>
+          <div style={{ color: '#fff', fontSize: 14, fontWeight: 700 }}>이음미디어</div>
+          <div style={{ color: '#fff', fontSize: 12, marginTop: 2 }}>{article.channel}</div>
+        </div>
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '24px 12px 12px', background: 'linear-gradient(transparent, rgba(0,0,0,0.75))' }}>
+          <div style={{ color: '#fff', fontSize: 17, fontWeight: 700, lineHeight: 1.4, marginBottom: 6 }}>{article.title}</div>
+          <div style={{ color: '#fff', fontSize: 12 }}>{dateShort}</div>
+        </div>
+      </div>
+
+      {/* 카드 2 — 핵심 내용 */}
+      <div style={{ width: size, height: size, borderRadius: 12, overflow: 'hidden', background: '#fff', border: '1px solid #e5e5e5', padding: 16, boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <div style={{ background: NAVY, color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 10 }}>{article.channel}</div>
+          <div style={{ color: NAVY, fontSize: 14, fontWeight: 700 }}>이음미디어</div>
+        </div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ color: NAVY, fontSize: 15, fontWeight: 700, marginBottom: 8 }}>📌 핵심 요약</div>
+          <div style={{ fontSize: 15, color: '#333', lineHeight: 1.8 }}>{article.summary}</div>
+          <div style={{ borderTop: '1px solid #e0e0e0', margin: '12px 0' }} />
+          <div style={{ fontSize: 13, color: '#666' }}>글 · {article.reporter} 시민기자</div>
+        </div>
+        <div style={{ textAlign: 'center', color: NAVY, fontSize: 14, fontWeight: 700, marginTop: 8 }}>
+          eummedia.kr 에서 전문 보기 👆
+        </div>
+      </div>
+
+      {/* 카드 3 — 마무리 */}
+      <div style={{ width: size, height: size, borderRadius: 12, overflow: 'hidden', background: 'linear-gradient(135deg, #0d2d52 0%, #1c4f8a 100%)', padding: 20, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ color: '#fff', fontSize: 22, fontWeight: 700 }}>이음미디어</div>
+          <div style={{ color: '#fff', fontSize: 11, letterSpacing: '0.2em', marginTop: 4 }}>E·UM MEDIA</div>
+        </div>
+        <div style={{ textAlign: 'center', lineHeight: 1.7 }}>
+          <div style={{ color: '#fff', fontSize: 13 }}>세상을 잇고, 당신을 잇는</div>
+          <div style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>인터넷신문 이음미디어</div>
+          <div style={{ color: '#f0a882', fontSize: 15, fontWeight: 700, marginTop: 4 }}>eummedia.kr</div>
+        </div>
+        <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: 8, padding: 10, textAlign: 'center', boxSizing: 'border-box' }}>
+          <div style={{ color: '#fff', fontSize: 11 }}>#이음미디어 #인터넷신문 #고양시</div>
+          <div style={{ color: '#fff', fontSize: 13, fontWeight: 700, marginTop: 4 }}>팔로우 & 구독하기 ❤️</div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+function StoryCards({ article }) {
+  const w = 202, h = 360
+  return (
+    <>
+      {/* 카드 1 — 표지 세로형 */}
+      <div style={{ position: 'relative', width: w, height: h, borderRadius: 12, overflow: 'hidden' }}>
+        <img src={article.thumb} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent 0%, rgba(13,45,82,0.2) 35%, rgba(13,45,82,0.92) 100%)' }} />
+        <div style={{ position: 'absolute', top: 12, left: 12, color: '#fff', fontSize: 13, fontWeight: 700 }}>이음미디어</div>
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '20px 14px 14px' }}>
+          <div style={{ color: '#fff', fontSize: 19, fontWeight: 700, lineHeight: 1.4, marginBottom: 8 }}>{article.title}</div>
+          <div style={{ display: 'inline-block', border: '1px solid #fff', color: '#fff', fontSize: 11, padding: '3px 8px', borderRadius: 4 }}>{article.channel}</div>
+          <div style={{ color: '#fff', fontSize: 13, marginTop: 6 }}>{article.reporter} 시민기자</div>
+          <div style={{ color: '#fff', fontSize: 11, marginTop: 4 }}>자세히 보기 → eummedia.kr</div>
+          <div style={{ color: '#fff', fontSize: 11 }}>👆 프로필 링크</div>
+        </div>
+      </div>
+
+      {/* 카드 2 — 핵심 내용 세로형 */}
+      <div style={{ width: w, height: h, borderRadius: 12, overflow: 'hidden', background: '#fff', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ color: NAVY, fontSize: 14, fontWeight: 700 }}>이음미디어</div>
+          <div style={{ background: NAVY, color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 10 }}>{article.channel}</div>
+        </div>
+        <div style={{ flex: 1, padding: '0 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ color: NAVY, fontSize: 15, fontWeight: 700, marginBottom: 10 }}>📌 핵심 요약</div>
+          <div style={{ fontSize: 15, color: '#333', lineHeight: 2.0 }}>{article.summary}</div>
+          <div style={{ borderTop: '1px solid #e0e0e0', margin: '10px 0' }} />
+          <div style={{ fontSize: 13, color: '#666' }}>{article.reporter} 시민기자</div>
+        </div>
+        <div style={{ background: NAVY, padding: 10, textAlign: 'center' }}>
+          <div style={{ color: '#fff', fontSize: 12 }}>더 자세한 내용은</div>
+          <div style={{ color: '#fff', fontSize: 15, fontWeight: 700, marginTop: 2 }}>👆 프로필 링크 클릭</div>
+          <div style={{ color: '#fff', fontSize: 12, marginTop: 2 }}>eummedia.kr</div>
+        </div>
+      </div>
+
+      {/* 카드 3 — 마무리 세로형 */}
+      <div style={{ width: w, height: h, borderRadius: 12, overflow: 'hidden', background: 'linear-gradient(180deg, #f9f8f6 0%, #eef3fa 55%, #0d2d52 100%)', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flexBasis: '35%', textAlign: 'center', paddingTop: 24, boxSizing: 'border-box' }}>
+          <div style={{ color: NAVY, fontSize: 24, fontWeight: 700 }}>이음미디어</div>
+          <div style={{ color: '#1c4f8a', fontSize: 10, letterSpacing: '0.2em', marginTop: 4 }}>E·UM MEDIA</div>
+        </div>
+        <div style={{ flexBasis: '30%', textAlign: 'center', lineHeight: 1.7 }}>
+          <div style={{ color: NAVY, fontSize: 14 }}>세상을 잇고, 당신을 잇는</div>
+          <div style={{ color: NAVY, fontSize: 17, fontWeight: 700 }}>인터넷신문 이음미디어</div>
+          <div style={{ color: '#1c4f8a', fontSize: 14 }}>eummedia.kr</div>
+        </div>
+        <div style={{ flexBasis: '35%', background: NAVY, padding: 14, textAlign: 'center', boxSizing: 'border-box' }}>
+          <div style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>팔로우 & 구독하기 ❤️</div>
+          <div style={{ color: '#fff', fontSize: 11, marginTop: 6 }}>#이음미디어 #인터넷신문 #고양시</div>
+          <div style={{ color: '#fff', fontSize: 10, marginTop: 4, opacity: 0.8 }}>매주 토요일 카카오 채널 발송</div>
+        </div>
+      </div>
+    </>
+  )
+}
+
 function CardNewsModal({ article, onClose }) {
+  const [tab, setTab] = useState('square')
   if (!article) return null
+
+  const isSquare = tab === 'square'
+  const dateShort = article.submittedAt?.slice(0, 10)
+
+  const tabBtnStyle = (active) => ({
+    flex: 1, padding: '10px 8px', fontSize: 12, fontWeight: 700,
+    fontFamily: SANS, cursor: 'pointer', lineHeight: 1.35,
+    background: active ? NAVY : '#f0f0f0',
+    color: active ? '#fff' : '#888',
+    border: 'none', borderRadius: 8,
+  })
+
   return (
     <div onClick={onClose} style={{
       position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
@@ -172,112 +300,49 @@ function CardNewsModal({ article, onClose }) {
       zIndex: 1000, padding: 20,
     }}>
       <div onClick={e => e.stopPropagation()} style={{
-        background: '#fff', maxWidth: 400, width: '100%',
-        maxHeight: '90vh', overflowY: 'auto',
+        background: '#fff', maxWidth: 460, width: '100%',
+        maxHeight: '85vh', overflowY: 'auto',
         borderRadius: 12, padding: 24, boxSizing: 'border-box',
+        position: 'relative',
       }}>
+        <button onClick={onClose} aria-label="닫기" style={{
+          position: 'absolute', top: 10, right: 10,
+          width: 36, height: 36, border: 'none', background: 'transparent',
+          fontSize: 22, cursor: 'pointer', color: '#666', lineHeight: 1,
+        }}>✕</button>
+
         <h2 style={{
-          fontFamily: SERIF, fontSize: 22, fontWeight: 700,
-          color: NAVY, margin: '0 0 20px 0', textAlign: 'center',
+          fontFamily: SERIF, fontSize: 20, fontWeight: 700,
+          color: NAVY, margin: '0 0 16px 0', textAlign: 'center',
         }}>
-          📱 카드뉴스 미리보기
+          📱 카드뉴스 & 스토리/릴스 만들기
         </h2>
 
-        {/* 카드 1 — 표지 */}
-        <div style={{
-          background: NAVY, color: '#fff', borderRadius: 12,
-          padding: '32px 24px', marginBottom: 14, minHeight: 320,
-          display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-        }}>
-          <div style={{
-            fontFamily: SERIF, fontSize: 18, fontWeight: 700,
-            color: GOLD, letterSpacing: 2,
-          }}>
-            이음미디어
-          </div>
-          <div style={{
-            fontFamily: SERIF, fontSize: 24, fontWeight: 700,
-            lineHeight: 1.5, textAlign: 'center',
-          }}>
-            {article.title}
-          </div>
-          <div style={{ fontSize: 14, opacity: 0.7, textAlign: 'right' }}>
-            {article.channel} · {article.submittedAt?.slice(0, 10)}
-          </div>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+          <button onClick={() => setTab('square')} style={tabBtnStyle(isSquare)}>📱 카드뉴스 1:1<br/>(이음미디어용)</button>
+          <button onClick={() => setTab('story')} style={tabBtnStyle(!isSquare)}>📖 스토리/릴스 9:16<br/>(인스타·숏폼용)</button>
         </div>
 
-        {/* 카드 2 — 핵심 내용 */}
-        <div style={{
-          background: '#fff', border: '1px solid #e5e5e5',
-          borderRadius: 12, padding: '32px 24px', marginBottom: 14, minHeight: 320,
-        }}>
-          <div style={{
-            display: 'inline-block',
-            fontSize: 12, fontWeight: 700, color: NAVY,
-            background: '#eef3fa', padding: '4px 12px', borderRadius: 12,
-            marginBottom: 20,
-          }}>
-            {article.channel}
-          </div>
-          <div style={{
-            fontSize: 18, color: '#1a1a1a', lineHeight: 1.85, marginBottom: 24,
-          }}>
-            {article.summary}
-          </div>
-          <div style={{
-            fontSize: 14, color: '#666', borderTop: '1px solid #e5e5e5',
-            paddingTop: 14, textAlign: 'right',
-          }}>
-            글 · {article.reporter} 시민기자
-          </div>
+        <div style={{ fontSize: 14, color: '#888', marginBottom: 12, textAlign: 'center' }}>
+          {isSquare ? '이음미디어 기사 하단 + 인스타 피드용' : '인스타 스토리 + 릴스 + 유튜브쇼츠 + 틱톡용'}
         </div>
 
-        {/* 카드 3 — 마무리 */}
-        <div style={{
-          background: '#f9f8f6', borderRadius: 12,
-          padding: '32px 24px', marginBottom: 20, minHeight: 320,
-          display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center',
-          textAlign: 'center',
-        }}>
-          <div style={{
-            fontFamily: SERIF, fontSize: 28, fontWeight: 700,
-            color: NAVY, marginBottom: 16,
-          }}>
-            <span>이</span>
-            <span style={{ color: GOLD }}>음</span>
-            <span>미디어</span>
-          </div>
-          <div style={{
-            fontSize: 15, color: '#3a3a3a', lineHeight: 1.7, marginBottom: 20,
-          }}>
-            세상을 잇고, 당신을 잇는<br />인터넷신문
-          </div>
-          <div style={{
-            fontSize: 13, color: '#888', fontWeight: 600, letterSpacing: 1,
-          }}>
-            eummedia.kr
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, marginBottom: 20 }}>
+          {isSquare
+            ? <SquareCards article={article} dateShort={dateShort} />
+            : <StoryCards article={article} />}
         </div>
 
-        <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={() => alert('이미지 저장 기능은 추후 업데이트됩니다. 현재는 화면 캡처를 이용해주세요.')}
-            style={{
-              flex: 1, height: 48, fontSize: 16, fontWeight: 700,
-              background: NAVY, color: '#fff', border: 'none', borderRadius: 8,
-              cursor: 'pointer', fontFamily: SANS,
-            }}>
-            💾 이미지로 저장
-          </button>
-          <button onClick={onClose}
-            style={{
-              flex: 1, height: 48, fontSize: 16, fontWeight: 700,
-              background: '#fff', color: NAVY, border: `1px solid ${NAVY}`, borderRadius: 8,
-              cursor: 'pointer', fontFamily: SANS,
-            }}>
-            ✕ 닫기
-          </button>
-        </div>
+        <button onClick={() => alert(isSquare
+          ? '이음미디어 카드뉴스(1:1) 저장 기능은 추후 업데이트됩니다.\n현재는 화면 캡처를 이용해주세요.'
+          : '인스타 스토리/릴스용(9:16) 저장 기능은 추후 업데이트됩니다.\n현재는 화면 캡처를 이용해주세요.'
+        )} style={{
+          width: '100%', height: 48, fontSize: 16, fontWeight: 700,
+          background: isSquare ? NAVY : RED, color: '#fff',
+          border: 'none', borderRadius: 8, cursor: 'pointer', fontFamily: SANS,
+        }}>
+          {isSquare ? '💾 카드뉴스 저장 (1:1)' : '💾 스토리/릴스용 저장 (9:16)'}
+        </button>
       </div>
     </div>
   )
