@@ -14,12 +14,11 @@ const GOLD = '#c9a84c'
 export default function Footer() {
   return (
     <footer style={{
-      background: '#0d2d52',
-      color: '#ccc',
-      padding: '56px 0 24px',
       marginTop: '80px',
       fontFamily: "'Noto Sans KR', sans-serif"
     }}>
+      {/* ━━━━━━━━━━━ 데스크탑 (lg 이상) — 기존 푸터 ━━━━━━━━━━━ */}
+      <div className="hidden lg:block" style={{ background: '#0d2d52', color: '#ccc', padding: '56px 0 24px' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
 
         {/* 상단 3열 */}
@@ -146,6 +145,92 @@ export default function Footer() {
           textAlign: 'center',
         }}>
           © 2026 이음미디어. All rights reserved.
+        </div>
+      </div>
+      </div>
+
+      {/* ━━━━━━━━━━━ 모바일·태블릿 (lg 미만) — 신문형 푸터 (2색 분할) ━━━━━━━━━━━ */}
+      <div className="lg:hidden">
+
+        {/* === 상단 영역: 다크 네이비 === */}
+        <div className="bg-[#0d2d52] text-white py-10 px-6 text-center">
+
+          {/* 섹션 1. 독자공간 */}
+          <div className="mb-8">
+            <h3 className="inline-block bg-white/10 text-white rounded-full px-4 py-1 text-sm font-bold mb-4">
+              독자공간
+            </h3>
+            <nav className="text-sm leading-loose">
+              <Link to="/report" className="mx-1.5">기사제보</Link>
+              <Link to="/citizen-reporter" className="mx-1.5">시민기자신청</Link>
+              <Link to="/advertise" className="mx-1.5">광고문의</Link>
+              <br />
+              <Link to="/terms" className="mx-1.5">이용약관</Link>
+              <Link to="/privacy" className="mx-1.5 font-bold">개인정보처리방침</Link>
+              <Link to="/youth" className="mx-1.5">청소년보호정책</Link>
+            </nav>
+          </div>
+
+          <div className="border-t border-white/20 mx-auto max-w-xs mb-8"></div>
+
+          {/* 섹션 2. 회사소개 */}
+          <div className="mb-8">
+            <h3 className="inline-block bg-white/10 text-white rounded-full px-4 py-1 text-sm font-bold mb-4">
+              회사소개
+            </h3>
+            <nav className="text-sm leading-loose">
+              <Link to="/about" className="mx-1.5">회사소개</Link>
+              <Link to="/about#editorial" className="mx-1.5">편집국 소개</Link>
+              <Link to="/advertise" className="mx-1.5">광고안내</Link>
+            </nav>
+          </div>
+
+          <div className="border-t border-white/20 mx-auto max-w-xs mb-8"></div>
+
+          {/* 섹션 3. 구독 신청 CTA */}
+          <div>
+            <Link
+              to="/subscribe"
+              className="inline-flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-md transition-colors"
+            >
+              📋 구독 신청하기
+            </Link>
+          </div>
+        </div>
+
+        {/* === 하단 영역: 연회색 === */}
+        <div className="bg-neutral-50 text-neutral-700 py-10 px-6 text-center">
+
+          {/* 섹션 4. 로고 + 매체명 */}
+          <div className="mb-6">
+            <div className="inline-block bg-[#0d2d52] rounded-md px-3 py-1.5 mb-3">
+              <span className="text-white font-bold text-lg tracking-tight">EM</span>
+            </div>
+            <h2 className="font-serif font-bold text-xl text-neutral-900">이음미디어</h2>
+          </div>
+
+          {/* 섹션 5. 회사 정보 */}
+          <div className="text-sm space-y-1 leading-relaxed mb-6 text-neutral-600">
+            <p>서울시 관악구 남부순환로 1699, 2층</p>
+            <p>제보·광고문의: 02-6956-0339</p>
+            <p>인터넷신문 등록일: 2026년 4월 27일</p>
+            <p>등록번호: 서울, 아56526</p>
+            <p>E-mail: press@eummedia.kr</p>
+          </div>
+
+          {/* 섹션 6. 신문법 표기 (절대 순서) */}
+          <div className="text-sm space-y-0.5 leading-relaxed mb-6 text-neutral-700">
+            <p>발행인: 성창운</p>
+            <p>편집인: 정세연</p>
+            <p>대표: 최일례</p>
+            <p>청소년보호책임자: 정세연</p>
+          </div>
+
+          {/* 섹션 7. 저작권 */}
+          <div className="text-xs leading-relaxed text-neutral-500">
+            <p>Copyright © 2026 eummedia.kr</p>
+            <p>All rights reserved.</p>
+          </div>
         </div>
       </div>
     </footer>
