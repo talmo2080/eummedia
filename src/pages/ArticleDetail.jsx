@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import { getChannelColorClasses } from "../lib/channelColors";
 
 const CC = {
   "이음매거진":"#0d2d52","이음뉴스":"#c0392b","이음에듀":"#1a6b3c",
@@ -336,22 +337,55 @@ export default function ArticleDetail() {
 
         {/* 기사 본문 */}
         <main className="pb-24 lg:pb-0">
-          <div style={{ fontSize:"10px", color:color, fontWeight:"700", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"14px", display:"flex", alignItems:"center", gap:"8px" }}>
-            <span style={{ width:"24px", height:"1px", background:color, display:"inline-block" }} />{a.channel}
-          </div>
-          <h1 style={{ fontFamily:"serif", fontSize:"34px", fontWeight:"700", lineHeight:"1.4", color:"#0d2d52", marginBottom:"16px", letterSpacing:"-1px" }}>{a.title}</h1>
-          <div style={{ fontFamily:"serif", fontSize:"17px", color:"#5a5a5a", lineHeight:"1.6", marginBottom:"24px", fontStyle:"italic", borderLeft:"3px solid #1c4f8a", paddingLeft:"16px" }}>{a.subtitle}</div>
 
-          {/* 기자 메타 */}
-          <div style={{ display:"flex", alignItems:"center", gap:"14px", padding:"16px 0", borderTop:"1px solid #e0e0e0", borderBottom:"1px solid #e0e0e0", marginBottom:"28px" }}>
-            <div style={{ width:"44px", height:"44px", borderRadius:"50%", background:color, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:"18px", fontWeight:"700", flexShrink:0 }}>정</div>
-            <div>
-              <div style={{ fontSize:"13px", fontWeight:"700", marginBottom:"3px" }}>{a.author_name}</div>
-              <div style={{ fontSize:"11px", color:"#9a9a9a" }}>{a.author_bio}</div>
+          {/* ━━━━━━━━━━━ 헤더 영역 — 데스크탑 (lg 이상, 기존) ━━━━━━━━━━━ */}
+          <div className="hidden lg:block">
+            <div style={{ fontSize:"10px", color:color, fontWeight:"700", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"14px", display:"flex", alignItems:"center", gap:"8px" }}>
+              <span style={{ width:"24px", height:"1px", background:color, display:"inline-block" }} />{a.channel}
             </div>
-            <div style={{ marginLeft:"auto", textAlign:"right", fontSize:"11px", color:"#9a9a9a", lineHeight:"1.8" }}>
-              <div>{a.published_at}</div>
-              <div>⏱ {a.read_time}분 · 👁 <strong style={{ color:"#555" }}>{a.views.toLocaleString()}</strong></div>
+            <h1 style={{ fontFamily:"serif", fontSize:"34px", fontWeight:"700", lineHeight:"1.4", color:"#0d2d52", marginBottom:"16px", letterSpacing:"-1px" }}>{a.title}</h1>
+            <div style={{ fontFamily:"serif", fontSize:"17px", color:"#5a5a5a", lineHeight:"1.6", marginBottom:"24px", fontStyle:"italic", borderLeft:"3px solid #1c4f8a", paddingLeft:"16px" }}>{a.subtitle}</div>
+
+            {/* 기자 메타 (데스크탑 기존) */}
+            <div style={{ display:"flex", alignItems:"center", gap:"14px", padding:"16px 0", borderTop:"1px solid #e0e0e0", borderBottom:"1px solid #e0e0e0", marginBottom:"28px" }}>
+              <div style={{ width:"44px", height:"44px", borderRadius:"50%", background:color, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:"18px", fontWeight:"700", flexShrink:0 }}>정</div>
+              <div>
+                <div style={{ fontSize:"13px", fontWeight:"700", marginBottom:"3px" }}>{a.author_name}</div>
+                <div style={{ fontSize:"11px", color:"#9a9a9a" }}>{a.author_bio}</div>
+              </div>
+              <div style={{ marginLeft:"auto", textAlign:"right", fontSize:"11px", color:"#9a9a9a", lineHeight:"1.8" }}>
+                <div>{a.published_at}</div>
+                <div>⏱ {a.read_time}분 · 👁 <strong style={{ color:"#555" }}>{a.views.toLocaleString()}</strong></div>
+              </div>
+            </div>
+          </div>
+
+          {/* ━━━━━━━━━━━ 헤더 영역 — 모바일 (lg 미만, 신문형 신규) ━━━━━━━━━━━ */}
+          <div className="lg:hidden">
+            {/* 채널 배지 */}
+            <span className={`inline-block ${getChannelColorClasses(a.channel)} text-[11px] font-bold px-2 py-1 rounded tracking-wider mb-3`}>
+              {a.channel}
+            </span>
+
+            {/* 명조체 헤드라인 */}
+            <h1 className="font-serif text-[24px] font-bold leading-[1.3] tracking-tight text-neutral-900 mb-3">
+              {a.title}
+            </h1>
+
+            {/* 부제목 (요약) */}
+            <div className="font-serif text-[15px] text-neutral-600 italic leading-[1.6] mb-4 border-l-[3px] border-blue-700 pl-4">
+              {a.subtitle}
+            </div>
+
+            {/* 기자 메타 — 한 줄 (모바일 본문 진입 빠르게, 하단 기자란에 풀 이력 있음) */}
+            <div className="my-3 text-sm text-neutral-600 leading-relaxed">
+              <span className="font-bold text-neutral-900">{a.author_name}</span>
+              <span className="mx-1.5 text-neutral-400">·</span>
+              <span>{a.published_at}</span>
+              <span className="mx-1.5 text-neutral-400">·</span>
+              <span>읽기 {a.read_minutes || a.read_time || 5}분</span>
+              <span className="mx-1.5 text-neutral-400">·</span>
+              <span>{(a.view_count ?? a.views ?? 0).toLocaleString()}</span>
             </div>
           </div>
 
@@ -359,8 +393,8 @@ export default function ArticleDetail() {
           <img src={a.thumbnail} alt={a.title} style={{ width:"100%", height:"380px", objectFit:"cover", borderRadius:"4px", marginBottom:"10px", display:"block" }} />
           <div style={{ fontSize:"11px", color:"#9a9a9a", textAlign:"center", marginBottom:"32px", fontStyle:"italic" }}>{a.channel} / 이음미디어</div>
 
-          {/* 본문 — 평문 + 원문 보기 (스테이지 1) */}
-          <div style={{ fontFamily:"'Noto Sans KR', sans-serif", fontSize:"17px", lineHeight:"2.0", color:"#222", marginBottom:"24px" }}>
+          {/* 본문 — 평문 + 원문 보기 (스테이지 1) — 모바일 16/1.8, 데스크탑 17/2.0 */}
+          <div className="text-[16px] leading-[1.8] lg:text-[17px] lg:leading-[2.0] text-neutral-800" style={{ fontFamily:"'Noto Sans KR', sans-serif", marginBottom:"24px" }}>
             {splitIntoParagraphs(a.content).flatMap((para, i, arr) => {
               const midIdx = Math.floor((arr.length - 1) / 2);
               const items = [<p key={"p-"+i} style={{ margin:"0 0 1em 0" }}>{para}</p>];
@@ -400,28 +434,31 @@ export default function ArticleDetail() {
             '세상과 당신을 잇는, 더 넓은 미디어의 시작입니다.'
           </div>
 
-          {/* 광고 박스 — 정세연 본인 광고 (광고 샘플 역할) */}
-          <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", borderLeft:"4px solid #1c4f8a", padding:"24px 24px 16px", margin:"32px 0" }}>
-            <div style={{ fontSize:"10px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
-            <div style={{ fontFamily:"serif", fontSize:"17px", fontWeight:"700", color:"#0d2d52", lineHeight:"1.5", marginBottom:"8px", fontStyle:"italic" }}>
-              "고객의 마지막 희망이 되고픈 두피전문가"
+          {/* 💬 댓글 — 광고 박스 위로 이동 (commit 44 섹션 순서 정정) */}
+          <div id="comment-section" style={{ margin:"32px 0" }}>
+            <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", borderBottom:"2px solid #0d2d52", paddingBottom:"10px", marginBottom:"20px" }}>댓글 {comments.length}개</div>
+            <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px", marginBottom:"20px" }}>
+              <input value={cName} onChange={e => setCName(e.target.value)} placeholder="이름" style={{ width:"100%", border:"1px solid #d0d0d0", padding:"8px 12px", fontSize:"12px", fontFamily:"inherit", marginBottom:"8px", outline:"none", boxSizing:"border-box" }} />
+              <textarea value={cText} onChange={e => setCText(e.target.value)} placeholder="의견을 남겨주세요..." rows={3} style={{ width:"100%", border:"1px solid #d0d0d0", padding:"10px 12px", fontSize:"13px", fontFamily:"inherit", resize:"none", outline:"none", boxSizing:"border-box", marginBottom:"8px" }} />
+              <div style={{ display:"flex", justifyContent:"flex-end" }}>
+                <button onClick={onComment} style={{ background:"#0d2d52", color:"white", border:"none", padding:"8px 20px", fontSize:"12px", fontWeight:"700", cursor:"pointer", fontFamily:"inherit" }}>댓글 등록</button>
+              </div>
             </div>
-            <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", marginBottom:"4px" }}>닥터리부트 두피관리센터</div>
-            <div style={{ fontSize:"12px", color:"#6b6b6b", marginBottom:"3px" }}>정세연 원장 · 두피전문가 27년</div>
-            <div style={{ fontSize:"12px", color:"#6b6b6b", marginBottom:"18px" }}>일산 · 브레인트레이너 · SMP디자인전문가</div>
-            <a href="https://naver.me/GWeDuL23" target="_blank" rel="noopener noreferrer"
-               style={{ display:"inline-block", background:"#0d2d52", color:"white", padding:"11px 24px", fontSize:"12px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit", marginBottom:"16px" }}>
-              예약 · 문의 →
-            </a>
-            <div style={{ display:"flex", gap:"18px", paddingTop:"16px", borderTop:"1px solid #e8e8e8" }}>
-              <a href="http://dr-reboot.co.kr/" target="_blank" rel="noopener noreferrer" title="홈페이지" style={socialIconStyle}>🏠</a>
-              <a href="https://naver.me/GWeDuL23" target="_blank" rel="noopener noreferrer" title="네이버 지도" style={socialIconStyle}>📍</a>
-              <a href="https://www.youtube.com/channel/UCVdGlBOwnxzPs5rnNGhAZuQ" target="_blank" rel="noopener noreferrer" title="유튜브" style={socialIconStyle}>🎥</a>
-              <a href="https://blog.naver.com/mzk6682" target="_blank" rel="noopener noreferrer" title="네이버 블로그" style={socialIconStyle}>✍️</a>
-            </div>
-            <div style={{ marginTop:"14px", paddingTop:"12px", borderTop:"1px dashed #e0e0e0", fontSize:"11px", color:"#9a9a9a", textAlign:"right" }}>
-              광고 문의: <a href="mailto:press@eummedia.kr" style={{ color:"#1c4f8a", textDecoration:"none" }}>press@eummedia.kr</a>
-            </div>
+            {comments.map(c => (
+              <div key={c.id} style={{ padding:"16px 0", borderBottom:"1px solid #f0f0f0" }}>
+                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"8px" }}>
+                  <div style={{ display:"flex", gap:"10px", alignItems:"center" }}>
+                    <div style={{ width:"32px", height:"32px", borderRadius:"50%", background:"#e0e0e0", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"14px", fontWeight:"700", color:"#555" }}>{c.name.slice(0, 1)}</div>
+                    <div>
+                      <div style={{ fontSize:"12px", fontWeight:"700" }}>{c.name}</div>
+                      <div style={{ fontSize:"10px", color:"#9a9a9a" }}>{c.date}</div>
+                    </div>
+                  </div>
+                  <button style={{ fontSize:"11px", color:"#9a9a9a", background:"none", border:"none", cursor:"pointer" }}>👍 {c.likes}</button>
+                </div>
+                <div style={{ fontSize:"13px", color:"#3a3a3a", lineHeight:"1.7", paddingLeft:"42px" }}>{c.content}</div>
+              </div>
+            ))}
           </div>
 
           {/* 태그 */}
@@ -466,6 +503,30 @@ export default function ArticleDetail() {
             </div>
           </div>
 
+          {/* 광고 박스 — 정세연 본인 광고 (광고 샘플 역할) — 태그·기자란 뒤로 이동 (commit 44) */}
+          <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", borderLeft:"4px solid #1c4f8a", padding:"24px 24px 16px", margin:"32px 0" }}>
+            <div style={{ fontSize:"10px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
+            <div style={{ fontFamily:"serif", fontSize:"17px", fontWeight:"700", color:"#0d2d52", lineHeight:"1.5", marginBottom:"8px", fontStyle:"italic" }}>
+              "고객의 마지막 희망이 되고픈 두피전문가"
+            </div>
+            <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", marginBottom:"4px" }}>닥터리부트 두피관리센터</div>
+            <div style={{ fontSize:"12px", color:"#6b6b6b", marginBottom:"3px" }}>정세연 원장 · 두피전문가 27년</div>
+            <div style={{ fontSize:"12px", color:"#6b6b6b", marginBottom:"18px" }}>일산 · 브레인트레이너 · SMP디자인전문가</div>
+            <a href="https://naver.me/GWeDuL23" target="_blank" rel="noopener noreferrer"
+               style={{ display:"inline-block", background:"#0d2d52", color:"white", padding:"11px 24px", fontSize:"12px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit", marginBottom:"16px" }}>
+              예약 · 문의 →
+            </a>
+            <div style={{ display:"flex", gap:"18px", paddingTop:"16px", borderTop:"1px solid #e8e8e8" }}>
+              <a href="http://dr-reboot.co.kr/" target="_blank" rel="noopener noreferrer" title="홈페이지" style={socialIconStyle}>🏠</a>
+              <a href="https://naver.me/GWeDuL23" target="_blank" rel="noopener noreferrer" title="네이버 지도" style={socialIconStyle}>📍</a>
+              <a href="https://www.youtube.com/channel/UCVdGlBOwnxzPs5rnNGhAZuQ" target="_blank" rel="noopener noreferrer" title="유튜브" style={socialIconStyle}>🎥</a>
+              <a href="https://blog.naver.com/mzk6682" target="_blank" rel="noopener noreferrer" title="네이버 블로그" style={socialIconStyle}>✍️</a>
+            </div>
+            <div style={{ marginTop:"14px", paddingTop:"12px", borderTop:"1px dashed #e0e0e0", fontSize:"11px", color:"#9a9a9a", textAlign:"right" }}>
+              광고 문의: <a href="mailto:press@eummedia.kr" style={{ color:"#1c4f8a", textDecoration:"none" }}>press@eummedia.kr</a>
+            </div>
+          </div>
+
           {/* 📱 카드뉴스 섹션 */}
           <div style={{ marginBottom:"32px" }}>
             <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #c0392b", paddingLeft:"12px", marginBottom:"8px" }}>📱 카드뉴스 (3가지 이야기)</div>
@@ -506,33 +567,6 @@ export default function ArticleDetail() {
                 <ArrowBtn onClick={() => setVideoIdx(p => (p + 1) % VIDEOS.length)} dir="next" />
               </div>
             )}
-          </div>
-
-          {/* 댓글 */}
-          <div id="comment-section" style={{ margin:"32px 0" }}>
-            <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", borderBottom:"2px solid #0d2d52", paddingBottom:"10px", marginBottom:"20px" }}>댓글 {comments.length}개</div>
-            <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px", marginBottom:"20px" }}>
-              <input value={cName} onChange={e => setCName(e.target.value)} placeholder="이름" style={{ width:"100%", border:"1px solid #d0d0d0", padding:"8px 12px", fontSize:"12px", fontFamily:"inherit", marginBottom:"8px", outline:"none", boxSizing:"border-box" }} />
-              <textarea value={cText} onChange={e => setCText(e.target.value)} placeholder="의견을 남겨주세요..." rows={3} style={{ width:"100%", border:"1px solid #d0d0d0", padding:"10px 12px", fontSize:"13px", fontFamily:"inherit", resize:"none", outline:"none", boxSizing:"border-box", marginBottom:"8px" }} />
-              <div style={{ display:"flex", justifyContent:"flex-end" }}>
-                <button onClick={onComment} style={{ background:"#0d2d52", color:"white", border:"none", padding:"8px 20px", fontSize:"12px", fontWeight:"700", cursor:"pointer", fontFamily:"inherit" }}>댓글 등록</button>
-              </div>
-            </div>
-            {comments.map(c => (
-              <div key={c.id} style={{ padding:"16px 0", borderBottom:"1px solid #f0f0f0" }}>
-                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"8px" }}>
-                  <div style={{ display:"flex", gap:"10px", alignItems:"center" }}>
-                    <div style={{ width:"32px", height:"32px", borderRadius:"50%", background:"#e0e0e0", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"14px", fontWeight:"700", color:"#555" }}>{c.name.slice(0, 1)}</div>
-                    <div>
-                      <div style={{ fontSize:"12px", fontWeight:"700" }}>{c.name}</div>
-                      <div style={{ fontSize:"10px", color:"#9a9a9a" }}>{c.date}</div>
-                    </div>
-                  </div>
-                  <button style={{ fontSize:"11px", color:"#9a9a9a", background:"none", border:"none", cursor:"pointer" }}>👍 {c.likes}</button>
-                </div>
-                <div style={{ fontSize:"13px", color:"#3a3a3a", lineHeight:"1.7", paddingLeft:"42px" }}>{c.content}</div>
-              </div>
-            ))}
           </div>
 
           {/* 관련 기사 — 같은 채널 다른 기사 (STEP 5-C, 5/15 사고 해소로 살아남) */}
