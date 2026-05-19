@@ -3,6 +3,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import ScrollToTop from './components/ScrollToTop'
 import Home from './pages/Home'
 import ArticleDetail from './pages/ArticleDetail'
 import ChannelList from './pages/ChannelList'
@@ -22,6 +23,7 @@ import ArticleEditor from './pages/ArticleEditor'
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <Header />
         <main>
