@@ -129,6 +129,68 @@ function StickyReactionBar({ liked, likeCount, onLike, bookmarked, onBookmark, o
   );
 }
 
+function BottomReactionBar({ liked, likeCount, onLike, bookmarked, onBookmark, onCopy, copied, onKakao, onFb, commentCount }) {
+  const items = [
+    { icon: liked ? "❤️" : "🤍", label: likeCount, onClick: onLike, title: "좋아요", active: liked, activeColor: "#e74c3c" },
+    { icon: "💬", label: commentCount, onClick: () => document.getElementById("comment-section")?.scrollIntoView({ behavior: "smooth" }), title: "댓글" },
+    { icon: bookmarked ? "🔖" : "📌", label: bookmarked ? "저장됨" : "저장", onClick: onBookmark, title: "저장", active: bookmarked, activeColor: "#c9a84c" },
+    { icon: "K", label: "카톡", onClick: onKakao, title: "카카오 공유", bg: "#FEE500", fg: "#3C1E1E", isBrand: true },
+    { icon: "f", label: "FB", onClick: onFb, title: "페이스북 공유", bg: "#1877F2", fg: "white", isBrand: true },
+    { icon: copied ? "✅" : "🔗", label: copied ? "복사됨" : "링크", onClick: onCopy, title: "링크 복사" },
+  ];
+
+  return (
+    <div
+      className="flex lg:hidden"
+      role="toolbar"
+      aria-label="기사 반응"
+      style={{
+        position: "fixed", bottom: 0, left: 0, right: 0,
+        background: "#fff",
+        borderTop: "1px solid #e0e0e0",
+        boxShadow: "0 -2px 8px rgba(0,0,0,0.08)",
+        zIndex: 1000,
+        paddingTop: 8,
+        paddingBottom: "calc(8px + env(safe-area-inset-bottom, 0px))",
+        paddingLeft: 8, paddingRight: 8,
+        justifyContent: "space-around", alignItems: "center",
+        gap: 4,
+      }}
+    >
+      {items.map((it, i) => (
+        <button
+          key={i}
+          onClick={it.onClick}
+          title={it.title}
+          aria-label={it.title}
+          style={{
+            minWidth: 52, minHeight: 52,
+            padding: "6px 8px",
+            background: it.bg || "transparent",
+            border: "none",
+            borderRadius: it.isBrand ? 10 : 0,
+            cursor: "pointer",
+            fontFamily: "'Noto Sans KR', sans-serif",
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            gap: 2,
+            flex: "1 1 0",
+          }}
+        >
+          <span style={
+            it.isBrand
+              ? { fontSize: 18, fontWeight: 900, color: it.fg, lineHeight: 1 }
+              : { fontSize: 24, lineHeight: 1 }
+          }>{it.icon}</span>
+          <span style={{
+            fontSize: 12, fontWeight: 600, lineHeight: 1,
+            color: it.fg || (it.active ? it.activeColor : "#666"),
+          }}>{it.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function ArticleDetail() {
   const { slug } = useParams();
   const [article, setArticle] = useState(null);
@@ -148,7 +210,7 @@ export default function ArticleDetail() {
   const onLike = () => { setLiked(p => !p); setLikeCount(p => liked ? p - 1 : p + 1); };
   const onBookmark = () => setBookmarked(p => !p);
   const onCopy = async () => {
-    try { await navigator.clipboard.writeText(window.location.href); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch(e) {}
+    try { await navigator.clipboard.writeText(window.location.href); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* clipboard 미지원 시 무시 */ }
   };
   const onKakao = () => alert("카카오 공유: SDK 연동 후 사용 가능합니다.");
   const onFb = () => window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(window.location.href), "_blank");
@@ -258,20 +320,22 @@ export default function ArticleDetail() {
         </div>
       </div>
 
-      {/* 본문 레이아웃: 플로팅바 | 기사 | 사이드바 */}
-      <div style={{ maxWidth:"1280px", margin:"0 auto", padding:"48px 32px", display:"grid", gridTemplateColumns:"60px 1fr 300px", gap:"32px", alignItems:"start" }}>
+      {/* 본문 레이아웃: 플로팅바 | 기사 | 사이드바 — lg(≥1024px)에서만 3컬럼 */}
+      <div className="grid grid-cols-1 lg:grid-cols-[60px_1fr_300px]" style={{ maxWidth:"1280px", margin:"0 auto", padding:"48px 32px", gap:"32px", alignItems:"start" }}>
 
-        {/* ★ 왼쪽 sticky 반응 바 */}
-        <StickyReactionBar
-          liked={liked} likeCount={likeCount} onLike={onLike}
-          bookmarked={bookmarked} onBookmark={onBookmark}
-          onCopy={onCopy} copied={copied}
-          onKakao={onKakao} onFb={onFb}
-          commentCount={comments.length}
-        />
+        {/* ★ 왼쪽 sticky 반응 바 — 데스크탑(≥1024px) 전용 */}
+        <div className="hidden lg:block" style={{ alignSelf: "stretch" }}>
+          <StickyReactionBar
+            liked={liked} likeCount={likeCount} onLike={onLike}
+            bookmarked={bookmarked} onBookmark={onBookmark}
+            onCopy={onCopy} copied={copied}
+            onKakao={onKakao} onFb={onFb}
+            commentCount={comments.length}
+          />
+        </div>
 
         {/* 기사 본문 */}
-        <main>
+        <main className="pb-24 lg:pb-0">
           <div style={{ fontSize:"10px", color:color, fontWeight:"700", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"14px", display:"flex", alignItems:"center", gap:"8px" }}>
             <span style={{ width:"24px", height:"1px", background:color, display:"inline-block" }} />{a.channel}
           </div>
@@ -407,7 +471,7 @@ export default function ArticleDetail() {
             <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #c0392b", paddingLeft:"12px", marginBottom:"8px" }}>📱 카드뉴스 (3가지 이야기)</div>
             <div style={{ fontSize:"14px", color:"#888", marginBottom:"16px" }}>각 카드를 클릭해서 골라보세요 👆</div>
 
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"12px", overflowX:"auto" }}>
+            <div className="grid grid-cols-1 md:grid-cols-3" style={{ gap:"12px" }}>
               {CARDS.map(card => <CardThumb key={card.id} card={card} />)}
             </div>
           </div>
@@ -499,7 +563,7 @@ export default function ArticleDetail() {
         </main>
 
         {/* 사이드바 */}
-        <aside style={{ display:"flex", flexDirection:"column", gap:"24px", position:"sticky", top:"20px" }}>
+        <aside className="lg:sticky lg:top-5" style={{ display:"flex", flexDirection:"column", gap:"24px" }}>
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
             <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
             <div style={{ width:"100%", height:"120px", background:"linear-gradient(135deg,#0d2d52,#1c4f8a)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:"12px", borderRadius:"2px" }}>
@@ -565,6 +629,14 @@ export default function ArticleDetail() {
         </aside>
       </div>
 
+      {/* 모바일·태블릿(<1024px) 하단 고정 반응 바 */}
+      <BottomReactionBar
+        liked={liked} likeCount={likeCount} onLike={onLike}
+        bookmarked={bookmarked} onBookmark={onBookmark}
+        onCopy={onCopy} copied={copied}
+        onKakao={onKakao} onFb={onFb}
+        commentCount={comments.length}
+      />
     </div>
   );
 }
