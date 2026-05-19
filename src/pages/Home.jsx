@@ -53,6 +53,46 @@ const STOCKS = {
   ],
 };
 
+// ━━━━━━━━━━━ 모바일 신문형 (lg 미만) 상수 ━━━━━━━━━━━
+// Tailwind JIT 호환 — 클래스 문자열 그대로 박아둠
+const CHANNEL_COLORS = {
+  rose:    'bg-rose-100 text-rose-800',
+  emerald: 'bg-emerald-100 text-emerald-800',
+  sky:     'bg-sky-100 text-sky-800',
+  amber:   'bg-amber-100 text-amber-800',
+  violet:  'bg-violet-100 text-violet-800',
+  orange:  'bg-orange-100 text-orange-800',
+  slate:   'bg-slate-100 text-slate-800',
+};
+
+// 7채널 가로 스크롤 칩 — 데스크탑 CHANNELS와 별개 (충돌 회피)
+const NAV_CHANNELS = [
+  { slug: 'magazine', name: '이음매거진', color: 'rose' },
+  { slug: 'local',    name: '이음로컬',   color: 'emerald' },
+  { slug: 'edu',      name: '이음에듀',   color: 'sky' },
+  { slug: 'people',   name: '이음피플',   color: 'amber' },
+  { slug: 'trend',    name: '이음트렌드', color: 'violet' },
+  { slug: 'voice',    name: '이음보이스', color: 'orange' },
+  { slug: 'view',     name: '이음뷰',     color: 'slate' },
+];
+
+// Mock 카드뉴스 4건 (편집 3 + 광고 1) — Supabase 토큰 갱신 후 실데이터로 교체 예정
+// 이미지는 unsplash 임시 placeholder, 추후 /img/cardnews-N.jpg 로 교체
+const MOCK_CARDNEWS = [
+  { id: 'c1', title: '600번의 월요일, 웃음으로 지은 기적',
+    thumb: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80',
+    channel: '이음매거진', channel_color: 'rose', is_sponsored: false },
+  { id: 'c2', title: '닥터리부트 정세연 원장의 두피 인사이트',
+    thumb: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80',
+    channel: '이음로컬', channel_color: 'emerald', is_sponsored: true },
+  { id: 'c3', title: '태리TV 윤진희, 13만 유튜버 인터뷰',
+    thumb: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80',
+    channel: '이음피플', channel_color: 'amber', is_sponsored: false },
+  { id: 'c4', title: '고양시 청소년 진로교육 현장 스케치',
+    thumb: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400&q=80',
+    channel: '이음에듀', channel_color: 'sky', is_sponsored: false },
+];
+
 function formatDate(iso) {
   const d = new Date(iso);
   return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
@@ -133,7 +173,7 @@ export default function Home() {
     (async () => {
       const { data, error: queryError } = await supabase
         .from('articles')
-        .select('slug, title, summary, thumbnail_url, published_at, channels(name)')
+        .select('slug, title, summary, thumbnail_url, published_at, author_name, channels(name)')
         .eq('status', 'published')
         .order('published_at', { ascending: false })
         .limit(7);
@@ -172,8 +212,6 @@ export default function Home() {
   return (
     <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f7f8fa", color:"#1a1a1a", minHeight:"100vh" }}>
 
-      
-
       {error && (
         <div role="alert" style={{
           maxWidth:"1200px", margin:"24px auto 0", padding:"14px 20px",
@@ -184,8 +222,139 @@ export default function Home() {
         </div>
       )}
 
-      {/* 본문 */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px]" style={{ maxWidth:"1200px", margin:"0 auto", padding:"32px 32px 56px", gap:"40px", alignItems:"start" }}>
+      {/* ━━━━━━━━━━━ 모바일·태블릿 신문형 (lg 미만) ━━━━━━━━━━━ */}
+      <div className="lg:hidden">
+
+        {/* ① HERO 톱 1개 */}
+        {heroArticle && (
+          <Link to={"/article/" + heroArticle.slug}
+            className="block px-4 pt-5 pb-5 mb-5 border-b border-neutral-200">
+            <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100 rounded-sm mb-3">
+              <img src={heroArticle.thumbnail_url} alt={heroArticle.title}
+                className="w-full h-full object-cover" />
+              {heroArticle.channels?.name && (
+                <span className="absolute top-2 right-2 bg-white/95 text-neutral-900 text-[10px] font-bold px-2 py-0.5 rounded">
+                  {heroArticle.channels.name}
+                </span>
+              )}
+            </div>
+            <h2 className="font-serif text-[22px] font-bold leading-[1.3] text-neutral-900 mb-2 line-clamp-3">
+              {heroArticle.title}
+            </h2>
+            <p className="text-[14px] text-neutral-600 line-clamp-1 mb-1">
+              {heroArticle.summary}
+            </p>
+            <div className="text-[11px] text-neutral-500">
+              {heroArticle.author_name ? `${heroArticle.author_name} · ` : ''}{formatDate(heroArticle.published_at)}
+            </div>
+          </Link>
+        )}
+
+        {/* ② 서브 톱 2개 */}
+        {articles.length >= 2 && (
+          <div className="grid grid-cols-2 gap-3 px-4 pb-5 mb-6 border-b border-neutral-200">
+            {articles.slice(0, 2).map(a => (
+              <Link key={a.slug} to={"/article/" + a.slug} className="block">
+                <div className="relative aspect-square overflow-hidden bg-neutral-100 rounded-sm mb-2">
+                  <img src={a.thumbnail_url} alt={a.title}
+                    className="w-full h-full object-cover" loading="lazy" />
+                  {a.channels?.name && (
+                    <span className="absolute top-2 left-2 bg-white/95 text-neutral-900 text-[10px] font-bold px-2 py-0.5 rounded">
+                      {a.channels.name}
+                    </span>
+                  )}
+                </div>
+                <h3 className="font-serif font-bold text-[14px] leading-snug line-clamp-2 text-neutral-900">
+                  {a.title}
+                </h3>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* ③ 카드뉴스 모음 (편집 3 + 광고 1) */}
+        <div className="px-4 mb-7">
+          <div className="flex items-end justify-between border-b-2 border-neutral-900 pb-2 mb-3">
+            <h2 className="font-serif font-bold text-[18px]">📱 카드뉴스 모음</h2>
+            <Link to="/" className="text-[11px] text-neutral-500">더보기 →</Link>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {MOCK_CARDNEWS.map(item => (
+              <article key={item.id}>
+                <div className="relative aspect-square overflow-hidden bg-neutral-100 rounded-sm mb-2">
+                  <img src={item.thumb} alt={item.title}
+                    className="w-full h-full object-cover" loading="lazy" />
+                  {item.is_sponsored ? (
+                    <span className="absolute top-2 left-2 bg-orange-600 text-white text-[10px] font-bold px-2 py-0.5 rounded tracking-wider">
+                      SPONSORED
+                    </span>
+                  ) : (
+                    <span className={`absolute top-2 left-2 ${CHANNEL_COLORS[item.channel_color]} text-[10px] font-bold px-2 py-0.5 rounded`}>
+                      {item.channel}
+                    </span>
+                  )}
+                </div>
+                <h3 className="font-serif font-bold text-[14px] leading-snug line-clamp-2 text-neutral-900">
+                  {item.title}
+                </h3>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        {/* ④ 최신 기사 (신문형 리스트 5건) */}
+        <div className="px-4 mb-7">
+          <div className="flex items-end justify-between border-b-2 border-neutral-900 pb-2 mb-3">
+            <h2 className="font-serif font-bold text-[18px]">📰 최신 기사</h2>
+            <Link to="/" className="text-[11px] text-neutral-500">더보기 →</Link>
+          </div>
+          <ul className="divide-y divide-neutral-200">
+            {articles.slice(2, 7).map(a => (
+              <li key={a.slug}>
+                <Link to={"/article/" + a.slug} className="flex gap-3 py-3.5 active:bg-neutral-50">
+                  <div className="flex-shrink-0 w-[88px] h-[88px] overflow-hidden bg-neutral-100 rounded-sm">
+                    <img src={a.thumbnail_url} alt={a.title}
+                      className="w-full h-full object-cover" loading="lazy" />
+                  </div>
+                  <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                    <div>
+                      <h3 className="font-serif font-bold text-[15px] leading-snug line-clamp-2 mb-1 text-neutral-900">
+                        {a.title}
+                      </h3>
+                      <p className="text-[12px] text-neutral-600 line-clamp-1">
+                        {a.summary}
+                      </p>
+                    </div>
+                    <div className="text-[10px] text-neutral-500 mt-1">
+                      {a.author_name ? `${a.author_name} · ` : ''}{formatDate(a.published_at)}
+                    </div>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* ⑤ 7채널 가로 스크롤 칩 */}
+        <div className="px-4 mb-7">
+          <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+            {NAV_CHANNELS.map(ch => (
+              <Link
+                key={ch.slug}
+                to={`/channel/${ch.slug}`}
+                className={`flex-shrink-0 px-4 py-2 rounded-full ${CHANNEL_COLORS[ch.color]} text-[12px] font-bold`}
+              >
+                {ch.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* TODO: commit 44+ 에서 채널별 미니 섹션 추가 (세연님 Q4=c 차후) */}
+      </div>
+
+      {/* ━━━━━━━━━━━ 데스크탑 본문 (lg 이상) — 기존 그대로 ━━━━━━━━━━━ */}
+      <div className="hidden lg:grid lg:grid-cols-[1fr_300px]" style={{ maxWidth:"1200px", margin:"0 auto", padding:"32px 32px 56px", gap:"40px", alignItems:"start" }}>
 
         <main>
           {/* 히어로 */}
