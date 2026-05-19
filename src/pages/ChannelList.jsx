@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import { getChannelColorClasses, getChannelBorderClass } from "../lib/channelColors";
 
 const CHANNELS = ["전체", "이음매거진", "이음피플", "이음로컬", "이음에듀", "이음뷰", "이음트렌드", "이음보이스"];
 
@@ -27,6 +28,7 @@ const SLUG_BY_NAME = {
 
 const PAGE_SIZE = 9;
 
+// eslint-disable-next-line no-unused-vars
 function timeAgo(dateStr) {
   const diff = (Date.now() - new Date(dateStr)) / 1000;
   if (diff < 60) return "방금 전";
@@ -52,6 +54,7 @@ export default function ChannelList() {
   const [sortBy, setSortBy] = useState("latest");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const [page, setPage] = useState(1);
 
   const switchChannel = useCallback((ch) => {
@@ -62,6 +65,7 @@ export default function ChannelList() {
   useEffect(() => {
     if (!englishSlug) return;
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
     setChannel(null);
     setFeatured(null);
@@ -150,7 +154,9 @@ export default function ChannelList() {
   const meta = CHANNEL_META[channel?.name] || CHANNEL_META[activeChannel] || CHANNEL_META["전체"];
 
   return (
-    <div style={s.page}>
+    <>
+    {/* ━━━━━━━━━━━ 데스크탑 (lg 이상) — 기존 레이아웃 ━━━━━━━━━━━ */}
+    <div className="hidden lg:block" style={s.page}>
       <div style={{...s.banner,background:`linear-gradient(135deg,${meta.color} 0%,${meta.color}dd 100%)`}}>
         <div style={s.bannerInner}>
           <span style={s.bannerIcon}>{meta.icon}</span>
@@ -192,6 +198,7 @@ export default function ChannelList() {
 
         {searchQuery&&(
           <div style={s.searchResult}>
+            {/* eslint-disable-next-line no-undef */}
             <strong>"{searchQuery}"</strong> 검색결과 {filtered.length}건
             <button onClick={()=>{setSearchQuery("");setSearchInput("");}} style={s.clearBtn}>✕ 초기화</button>
           </div>
@@ -238,6 +245,169 @@ export default function ChannelList() {
 
       <style>{`@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}.ecard:hover{transform:translateY(-4px)!important;box-shadow:0 12px 32px rgba(0,0,0,0.13)!important}.ecard:hover img{transform:scale(1.05)!important}`}</style>
     </div>
+
+    {/* ━━━━━━━━━━━ 모바일·태블릿 (lg 미만) — 신문형 4섹션 ━━━━━━━━━━━ */}
+    <div className="lg:hidden bg-white min-h-screen pb-12" style={{fontFamily:"'Noto Sans KR',sans-serif"}}>
+
+      {/* ① 채널 헤더 (좌측 색상 라인 + 아이콘 + 이름 + 한 줄 설명) */}
+      <header className={`border-l-4 ${getChannelBorderClass(channel?.name || activeChannel)} bg-white px-4 py-4 mb-4`}>
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-xl">{CHANNEL_META[channel?.name || activeChannel]?.icon}</span>
+          <h1 className="font-serif font-bold text-xl text-neutral-900">
+            {channel?.name ?? activeChannel}
+          </h1>
+        </div>
+        <p className="text-sm text-neutral-600 leading-relaxed">
+          {CHANNEL_META[channel?.name || activeChannel]?.desc}
+        </p>
+      </header>
+
+      {/* 에러 배너 */}
+      {error && (
+        <div role="alert" className="mx-4 mb-4 px-4 py-3 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm flex items-center justify-between gap-3">
+          <span>⚠️ {error}</span>
+          <button onClick={handleRetry} className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold flex-shrink-0">
+            다시 시도
+          </button>
+        </div>
+      )}
+
+      {/* ② 필터 한 줄 (채널 칩 제거, 정렬 + 검색 토글) */}
+      <div className="flex items-center gap-2 px-4 mb-3">
+        {[["latest","최신순"],["popular","인기순"]].map(([v,l]) => (
+          <button
+            key={v}
+            onClick={() => { setSortBy(v); setPage(1); }}
+            className={`px-3 py-1.5 rounded-full text-sm font-bold ${sortBy===v ? 'bg-[#0d2d52] text-white' : 'bg-neutral-100 text-neutral-700'}`}
+          >
+            {l}
+          </button>
+        ))}
+        <div className="flex-1"></div>
+        <button
+          onClick={() => setSearchOpen(o => !o)}
+          aria-label="검색"
+          className="w-9 h-9 flex items-center justify-center text-neutral-600 rounded-full active:bg-neutral-100"
+        >
+          🔍
+        </button>
+      </div>
+
+      {/* 검색 input (토글) */}
+      {searchOpen && (
+        <form
+          onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); setPage(1); }}
+          className="flex gap-2 px-4 mb-3"
+        >
+          <input
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
+            placeholder="기사 검색..."
+            autoFocus
+            className="flex-1 border border-neutral-300 rounded-md px-3 py-2 text-sm outline-none focus:border-[#0d2d52]"
+          />
+          <button type="submit" className="bg-[#0d2d52] text-white px-4 py-2 rounded-md text-sm font-bold">
+            검색
+          </button>
+        </form>
+      )}
+
+      {/* 검색 적용 표시 (filtered 변수 버그라 단순 안내만 — commit 47 후보) */}
+      {searchQuery && (
+        <div className="mx-4 mb-3 px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-md text-sm text-neutral-700 flex items-center gap-2">
+          <span><strong>"{searchQuery}"</strong> 검색 적용 중</span>
+          <button
+            onClick={() => { setSearchQuery(""); setSearchInput(""); }}
+            className="ml-auto text-xs border border-neutral-400 rounded-md px-2 py-0.5"
+          >
+            ✕ 초기화
+          </button>
+        </div>
+      )}
+
+      {/* 로딩 스켈레톤 */}
+      {!channel && !error && (
+        <ul className="divide-y divide-neutral-200 px-4">
+          {[0,1,2].map(i => (
+            <li key={i} className="flex gap-3 py-3.5" aria-busy="true">
+              <div className="flex-shrink-0 w-[88px] h-[88px] bg-neutral-200 rounded-sm" />
+              <div className="flex-1 min-w-0">
+                <div className="h-3 w-1/4 bg-neutral-200 rounded mb-2" />
+                <div className="h-4 w-full bg-neutral-200 rounded mb-1" />
+                <div className="h-4 w-3/4 bg-neutral-200 rounded mb-2" />
+                <div className="h-3 w-1/3 bg-neutral-200 rounded" />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* 빈 상태 */}
+      {channel && !featured && latest.length === 0 && !error && (
+        <div className="text-center py-16">
+          <div className="text-5xl mb-3">📭</div>
+          <p className="text-sm text-neutral-500">아직 기사가 없습니다.</p>
+        </div>
+      )}
+
+      {/* ③ 기사 리스트 (featured + latest 합쳐 단일 배열, ✦ 픽 배지) */}
+      {(featured || latest.length > 0) && (() => {
+        const allArticles = featured
+          ? [{ ...featured, _is_featured: true }, ...latest]
+          : latest;
+        return (
+          <>
+            <ul className="divide-y divide-neutral-200 px-4">
+              {allArticles.map(a => (
+                <li key={a.slug}>
+                  <Link to={`/article/${a.slug}`} className="flex gap-3 py-3.5 active:bg-neutral-50">
+                    <div className="flex-shrink-0 w-[88px] h-[88px] overflow-hidden bg-neutral-100 rounded-sm">
+                      <img src={a.thumbnail_url} alt={a.title} className="w-full h-full object-cover" loading="lazy" />
+                    </div>
+                    <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                          <span className={`${getChannelColorClasses(a.channels?.name || channel?.name)} text-[10px] font-bold px-1.5 py-0.5 rounded`}>
+                            {a.channels?.name || channel?.name}
+                          </span>
+                          {a._is_featured && (
+                            <span className="text-[10px] font-bold text-amber-700">
+                              ✦ 편집국장 픽
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="font-serif font-bold text-[15px] leading-snug line-clamp-2 mb-1 tracking-tight text-neutral-900">
+                          {a.title}
+                        </h3>
+                        <p className="text-[12px] text-neutral-600 line-clamp-1 leading-relaxed">
+                          {a.summary}
+                        </p>
+                      </div>
+                      <div className="text-[10px] text-neutral-500 mt-1">
+                        {formatDate(a.published_at)}
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            {/* ④ 더 보기 (기존 handleLoadMore 재사용) */}
+            {hasMore && (
+              <div className="px-4 mt-6">
+                <button
+                  onClick={handleLoadMore}
+                  className="block w-full text-center border-2 border-[#0d2d52] text-[#0d2d52] py-3 rounded-md text-sm font-bold active:bg-[#0d2d52]/5"
+                >
+                  기사 더 보기 ↓
+                </button>
+              </div>
+            )}
+          </>
+        );
+      })()}
+    </div>
+    </>
   );
 }
 

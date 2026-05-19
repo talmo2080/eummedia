@@ -29,3 +29,18 @@ export function getChannelColorKey(name) {
 export function getChannelColorClasses(name) {
   return CHANNEL_COLORS[getChannelColorKey(name)];
 }
+
+// 채널 border 색상 (좌측 라인용 — ChannelList 헤더 등)
+const BORDER_COLORS = {
+  rose:    'border-rose-400',
+  emerald: 'border-emerald-400',
+  sky:     'border-sky-400',
+  amber:   'border-amber-400',
+  violet:  'border-violet-400',
+  orange:  'border-orange-400',
+  slate:   'border-slate-400',
+};
+
+export function getChannelBorderClass(name) {
+  return BORDER_COLORS[getChannelColorKey(name)];
+}
