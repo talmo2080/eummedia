@@ -39,32 +39,21 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
+        max_tokens: 500,
         messages: [
           {
             role: 'user',
-            content: `다음 기사를 카드뉴스 5장으로 요약해줘.
-
-기사 제목: ${title || '(제목 없음)'}
-기사 내용: ${content}
-
-5장 구조:
-- 1장(표지): 카드뉴스 전체 핵심 제목 (15자 이내)
-- 2장(핵심1): 주요 내용 첫 번째 (제목 10자 + 내용 40자 이내)
-- 3장(핵심2): 주요 내용 두 번째 (제목 10자 + 내용 40자 이내)
-- 4장(핵심3): 주요 내용 세 번째 (제목 10자 + 내용 40자 이내)
-- 5장(마무리): 핵심 메시지 또는 행동 촉구 (30자 이내)
-
-시니어 독자가 쉽게 이해할 수 있게 쉬운 말로.
-
-반드시 아래 JSON 형식으로만 응답 (다른 텍스트 없이):
+            content: `다음 기사를 카드뉴스 5장 요약. JSON만 응답.
 [
-  {"order":1,"type":"cover","title":"표지 제목","text":""},
-  {"order":2,"type":"main","title":"핵심1 제목","text":"핵심1 내용"},
-  {"order":3,"type":"main","title":"핵심2 제목","text":"핵심2 내용"},
-  {"order":4,"type":"main","title":"핵심3 제목","text":"핵심3 내용"},
-  {"order":5,"type":"ending","title":"","text":"마무리 메시지"}
-]`,
+{"order":1,"title":"표지(15자)","text":""},
+{"order":2,"title":"핵심1(10자)","text":"내용(40자)"},
+{"order":3,"title":"핵심2(10자)","text":"내용(40자)"},
+{"order":4,"title":"핵심3(10자)","text":"내용(40자)"},
+{"order":5,"title":"","text":"마무리(30자)"}
+]
+
+기사: ${title || ''}
+${content}`,
           },
         ],
       }),

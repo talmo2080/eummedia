@@ -186,7 +186,7 @@ function CardNewsModal({ article, onClose }) {
     }
     setIsGenerating(true);
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 45000); // 45초 timeout
+    const timer = setTimeout(() => controller.abort(), 15000); // 15초 timeout
     try {
       const res = await fetch('/api/cardnews-ai', {
         method: 'POST',
@@ -218,7 +218,7 @@ function CardNewsModal({ article, onClose }) {
     } catch (err) {
       console.error('AI generate error:', err);
       if (err.name === 'AbortError') {
-        alert('AI 요약 생성 시간 초과 (45초). Vercel 함수 timeout 또는 Anthropic API 지연 가능성.');
+        alert('AI 요약 생성 시간 초과 (15초). 다시 시도해주세요.');
       } else {
         alert(`AI 요약 생성 중 오류: ${err.message || err.name || '알 수 없는 오류'}`);
       }
