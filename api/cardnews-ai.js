@@ -63,7 +63,11 @@ export default async function handler(req, res) {
     if (!response.ok) {
       const errBody = await response.text();
       console.error('Anthropic API 오류:', response.status, errBody);
-      return res.status(502).json({ error: `Anthropic API 오류 (${response.status})` });
+      // 진단용 — Anthropic API 응답 body 그대로 노출 (commit 47에서 정식 정리 예정)
+      return res.status(502).json({
+        error: `Anthropic API 오류 (${response.status})`,
+        detail: errBody.slice(0, 1000),
+      });
     }
 
     const data = await response.json();

@@ -201,7 +201,10 @@ function CardNewsModal({ article, onClose }) {
           return ai ? { ...s, title: ai.title || '', text: ai.text || '' } : s;
         }));
       } else {
-        alert(`AI 요약 생성 실패: ${data.error || '알 수 없는 오류'}`);
+        // 진단용 — detail에 Anthropic API 응답 body 포함
+        const msg = data.error || '알 수 없는 오류';
+        const detail = data.detail ? `\n\n[detail]\n${data.detail}` : '';
+        alert(`AI 요약 생성 실패: ${msg}${detail}`);
       }
     } catch (err) {
       console.error('AI generate error:', err);
