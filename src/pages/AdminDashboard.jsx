@@ -185,6 +185,8 @@ function CardNewsModal({ article, onClose }) {
       return;
     }
     setIsGenerating(true);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 45000); // 45초 timeout
     try {
       const res = await fetch('/api/cardnews-ai', {
         method: 'POST',
@@ -193,23 +195,35 @@ function CardNewsModal({ article, onClose }) {
           title: article.title,
           content: article.content || article.summary,
         }),
+        signal: controller.signal,
       });
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        alert(`AI 요약 생성 실패 (응답 JSON 아님, status=${res.status}):\n${text.slice(0, 500)}`);
+        return;
+      }
       if (data.slides) {
         setSlides(prev => prev.map(s => {
           const ai = data.slides.find(a => a.order === s.order);
           return ai ? { ...s, title: ai.title || '', text: ai.text || '' } : s;
         }));
       } else {
-        // 진단용 — detail에 Anthropic API 응답 body 포함
         const msg = data.error || '알 수 없는 오류';
         const detail = data.detail ? `\n\n[detail]\n${data.detail}` : '';
-        alert(`AI 요약 생성 실패: ${msg}${detail}`);
+        alert(`AI 요약 생성 실패 (status=${res.status}): ${msg}${detail}`);
       }
     } catch (err) {
       console.error('AI generate error:', err);
-      alert('AI 요약 생성 중 오류가 발생했습니다.');
+      if (err.name === 'AbortError') {
+        alert('AI 요약 생성 시간 초과 (45초). Vercel 함수 timeout 또는 Anthropic API 지연 가능성.');
+      } else {
+        alert(`AI 요약 생성 중 오류: ${err.message || err.name || '알 수 없는 오류'}`);
+      }
     } finally {
+      clearTimeout(timer);
       setIsGenerating(false);
     }
   };

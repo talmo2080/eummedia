@@ -3,23 +3,33 @@
 // 환경변수: ANTHROPIC_API_KEY (Vercel 대시보드 + 로컬 .env)
 // 클라이언트 노출 차단 — VITE_ prefix 없이 서버에서만 사용
 
+export const config = { maxDuration: 60 };  // Pro plan: 60s, Hobby plan: 10s 무시됨
+
 export default async function handler(req, res) {
+  console.log('[cardnews-ai] handler 진입, method=', req.method);
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const { content, title } = req.body || {};
+  console.log('[cardnews-ai] body 수신, content len=', content?.length || 0, 'title=', title?.slice(0, 40));
 
   if (!content) {
     return res.status(400).json({ error: '기사 내용이 없습니다' });
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  console.log('[cardnews-ai] API 키 상태: 존재=', !!apiKey, 'len=', apiKey?.length || 0);
+
+  if (!apiKey) {
     console.error('ANTHROPIC_API_KEY 환경변수 미설정');
     return res.status(500).json({ error: 'API 키 설정 누락 (서버)' });
   }
 
   try {
+    console.log('[cardnews-ai] Anthropic API 호출 시작...');
+    const t0 = Date.now();
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -60,10 +70,12 @@ export default async function handler(req, res) {
       }),
     });
 
+    const dt = Date.now() - t0;
+    console.log('[cardnews-ai] Anthropic 응답 도착:', response.status, `${dt}ms`);
+
     if (!response.ok) {
       const errBody = await response.text();
       console.error('Anthropic API 오류:', response.status, errBody);
-      // 진단용 — Anthropic API 응답 body 그대로 노출 (commit 47에서 정식 정리 예정)
       return res.status(502).json({
         error: `Anthropic API 오류 (${response.status})`,
         detail: errBody.slice(0, 1000),
@@ -72,8 +84,12 @@ export default async function handler(req, res) {
 
     const data = await response.json();
     const text = data?.content?.[0]?.text;
+    console.log('[cardnews-ai] 응답 파싱 OK, text len=', text?.length || 0);
     if (!text) {
-      return res.status(502).json({ error: 'AI 응답 형식 오류' });
+      return res.status(502).json({
+        error: 'AI 응답 형식 오류',
+        detail: JSON.stringify(data).slice(0, 500),
+      });
     }
 
     // JSON 파싱 (마크다운 펜스 제거 + 앞뒤 공백)
