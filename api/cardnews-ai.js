@@ -92,12 +92,20 @@ ${content}`,
     }
 
     if (!Array.isArray(slides) || slides.length !== 5) {
-      return res.status(502).json({ error: 'AI 응답 형식 불일치 (5장 아님)' });
+      console.error('[cardnews-ai] 5장 아님:', slides?.length);
+      return res.status(502).json({
+        error: 'AI 응답 형식 불일치 (5장 아님)',
+        detail: JSON.stringify(slides).slice(0, 500),
+      });
     }
 
+    console.log('[cardnews-ai] ✅ 완료 — 5장 생성 성공');
     return res.status(200).json({ slides });
   } catch (error) {
-    console.error('AI 생성 오류:', error);
-    return res.status(500).json({ error: 'AI 요약 생성 실패' });
+    console.error('[cardnews-ai] 🔴 catch 진입:', error?.name, error?.message);
+    return res.status(500).json({
+      error: 'AI 요약 생성 실패',
+      detail: `${error?.name || ''}: ${error?.message || error}`.slice(0, 500),
+    });
   }
 }
