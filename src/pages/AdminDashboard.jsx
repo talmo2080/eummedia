@@ -129,132 +129,145 @@ function StatCard({ label, value, color }) {
   )
 }
 
-function SquareCards({ article, dateShort }) {
-  const size = 340
-  return (
-    <>
-      {/* 카드 1 — 표지 */}
-      <div style={{ position: 'relative', width: size, height: size, borderRadius: 12, overflow: 'hidden' }}>
-        <img src={article.thumb} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: 12, background: 'linear-gradient(rgba(13,45,82,0.7), transparent)' }}>
-          <div style={{ color: '#fff', fontSize: 14, fontWeight: 700 }}>이음미디어</div>
-          <div style={{ color: '#fff', fontSize: 12, marginTop: 2 }}>{article.channel}</div>
-        </div>
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '24px 12px 12px', background: 'linear-gradient(transparent, rgba(0,0,0,0.75))' }}>
-          <div style={{ color: '#fff', fontSize: 17, fontWeight: 700, lineHeight: 1.4, marginBottom: 6 }}>{article.title}</div>
-          <div style={{ color: '#fff', fontSize: 12 }}>{dateShort}</div>
-        </div>
-      </div>
+// ━━━━━━━━━━━ CardNewsModal — 5장 데이터 기반 (commit 48) ━━━━━━━━━━━
+// 구조: 표지1 + 핵심3 + 마무리1
+// AI 자동 요약 (Vercel /api/cardnews-ai → Claude sonnet-4-5)
+// Supabase: cardnews 테이블 upsert + cardnews-images Storage 업로드
 
-      {/* 카드 2 — 핵심 내용 */}
-      <div style={{ width: size, height: size, borderRadius: 12, overflow: 'hidden', background: '#fff', border: '1px solid #e5e5e5', padding: 16, boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <div style={{ background: NAVY, color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 10 }}>{article.channel}</div>
-          <div style={{ color: NAVY, fontSize: 14, fontWeight: 700 }}>이음미디어</div>
-        </div>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ color: NAVY, fontSize: 15, fontWeight: 700, marginBottom: 8 }}>📌 핵심 요약</div>
-          <div style={{ fontSize: 15, color: '#333', lineHeight: 1.8 }}>{article.summary}</div>
-          <div style={{ borderTop: '1px solid #e0e0e0', margin: '12px 0' }} />
-          <div style={{ fontSize: 13, color: '#666' }}>글 · {article.reporter} 시민기자</div>
-        </div>
-        <div style={{ textAlign: 'center', color: NAVY, fontSize: 14, fontWeight: 700, marginTop: 8 }}>
-          eummedia.kr 에서 전문 보기 👆
-        </div>
-      </div>
+const EMPTY_SLIDES = [
+  { order: 1, type: 'cover',  title: '', text: '', image_url: '' },
+  { order: 2, type: 'main',   title: '', text: '', image_url: '' },
+  { order: 3, type: 'main',   title: '', text: '', image_url: '' },
+  { order: 4, type: 'main',   title: '', text: '', image_url: '' },
+  { order: 5, type: 'ending', title: '', text: '', image_url: '' },
+];
 
-      {/* 카드 3 — 마무리 */}
-      <div style={{ width: size, height: size, borderRadius: 12, overflow: 'hidden', background: 'linear-gradient(135deg, #0d2d52 0%, #1c4f8a 100%)', padding: 20, boxSizing: 'border-box', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ color: '#fff', fontSize: 22, fontWeight: 700 }}>이음미디어</div>
-          <div style={{ color: '#fff', fontSize: 11, letterSpacing: '0.2em', marginTop: 4 }}>E·UM MEDIA</div>
-        </div>
-        <div style={{ textAlign: 'center', lineHeight: 1.7 }}>
-          <div style={{ color: '#fff', fontSize: 13 }}>세상을 잇고, 당신을 잇는</div>
-          <div style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>인터넷신문 이음미디어</div>
-          <div style={{ color: '#f0a882', fontSize: 15, fontWeight: 700, marginTop: 4 }}>eummedia.kr</div>
-        </div>
-        <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: 8, padding: 10, textAlign: 'center', boxSizing: 'border-box' }}>
-          <div style={{ color: '#fff', fontSize: 11 }}>#이음미디어 #인터넷신문 #고양시</div>
-          <div style={{ color: '#fff', fontSize: 13, fontWeight: 700, marginTop: 4 }}>팔로우 & 구독하기 ❤️</div>
-        </div>
-      </div>
-    </>
-  )
-}
-
-function StoryCards({ article }) {
-  const w = 202, h = 360
-  return (
-    <>
-      {/* 카드 1 — 표지 세로형 */}
-      <div style={{ position: 'relative', width: w, height: h, borderRadius: 12, overflow: 'hidden' }}>
-        <img src={article.thumb} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent 0%, rgba(13,45,82,0.2) 35%, rgba(13,45,82,0.92) 100%)' }} />
-        <div style={{ position: 'absolute', top: 12, left: 12, color: '#fff', fontSize: 13, fontWeight: 700 }}>이음미디어</div>
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '20px 14px 14px' }}>
-          <div style={{ color: '#fff', fontSize: 19, fontWeight: 700, lineHeight: 1.4, marginBottom: 8 }}>{article.title}</div>
-          <div style={{ display: 'inline-block', border: '1px solid #fff', color: '#fff', fontSize: 11, padding: '3px 8px', borderRadius: 4 }}>{article.channel}</div>
-          <div style={{ color: '#fff', fontSize: 13, marginTop: 6 }}>{article.reporter} 시민기자</div>
-          <div style={{ color: '#fff', fontSize: 11, marginTop: 4 }}>자세히 보기 → eummedia.kr</div>
-          <div style={{ color: '#fff', fontSize: 11 }}>👆 프로필 링크</div>
-        </div>
-      </div>
-
-      {/* 카드 2 — 핵심 내용 세로형 */}
-      <div style={{ width: w, height: h, borderRadius: 12, overflow: 'hidden', background: '#fff', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ color: NAVY, fontSize: 14, fontWeight: 700 }}>이음미디어</div>
-          <div style={{ background: NAVY, color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 10 }}>{article.channel}</div>
-        </div>
-        <div style={{ flex: 1, padding: '0 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ color: NAVY, fontSize: 15, fontWeight: 700, marginBottom: 10 }}>📌 핵심 요약</div>
-          <div style={{ fontSize: 15, color: '#333', lineHeight: 2.0 }}>{article.summary}</div>
-          <div style={{ borderTop: '1px solid #e0e0e0', margin: '10px 0' }} />
-          <div style={{ fontSize: 13, color: '#666' }}>{article.reporter} 시민기자</div>
-        </div>
-        <div style={{ background: NAVY, padding: 10, textAlign: 'center' }}>
-          <div style={{ color: '#fff', fontSize: 12 }}>더 자세한 내용은</div>
-          <div style={{ color: '#fff', fontSize: 15, fontWeight: 700, marginTop: 2 }}>👆 프로필 링크 클릭</div>
-          <div style={{ color: '#fff', fontSize: 12, marginTop: 2 }}>eummedia.kr</div>
-        </div>
-      </div>
-
-      {/* 카드 3 — 마무리 세로형 */}
-      <div style={{ width: w, height: h, borderRadius: 12, overflow: 'hidden', background: 'linear-gradient(180deg, #f9f8f6 0%, #eef3fa 55%, #0d2d52 100%)', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ flexBasis: '35%', textAlign: 'center', paddingTop: 24, boxSizing: 'border-box' }}>
-          <div style={{ color: NAVY, fontSize: 24, fontWeight: 700 }}>이음미디어</div>
-          <div style={{ color: '#1c4f8a', fontSize: 10, letterSpacing: '0.2em', marginTop: 4 }}>E·UM MEDIA</div>
-        </div>
-        <div style={{ flexBasis: '30%', textAlign: 'center', lineHeight: 1.7 }}>
-          <div style={{ color: NAVY, fontSize: 14 }}>세상을 잇고, 당신을 잇는</div>
-          <div style={{ color: NAVY, fontSize: 17, fontWeight: 700 }}>인터넷신문 이음미디어</div>
-          <div style={{ color: '#1c4f8a', fontSize: 14 }}>eummedia.kr</div>
-        </div>
-        <div style={{ flexBasis: '35%', background: NAVY, padding: 14, textAlign: 'center', boxSizing: 'border-box' }}>
-          <div style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>팔로우 & 구독하기 ❤️</div>
-          <div style={{ color: '#fff', fontSize: 11, marginTop: 6 }}>#이음미디어 #인터넷신문 #고양시</div>
-          <div style={{ color: '#fff', fontSize: 10, marginTop: 4, opacity: 0.8 }}>매주 토요일 카카오 채널 발송</div>
-        </div>
-      </div>
-    </>
-  )
-}
+const SLIDE_TAB_LABEL = (order) => order === 1 ? '표지' : order === 5 ? '마무리' : `핵심${order-1}`;
 
 function CardNewsModal({ article, onClose }) {
-  const [tab, setTab] = useState('square')
-  if (!article) return null
+  const [tab, setTab] = useState('square');
+  const [slides, setSlides] = useState(EMPTY_SLIDES);
+  const [activeSlide, setActiveSlide] = useState(1);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const isSquare = tab === 'square'
-  const dateShort = article.submittedAt?.slice(0, 10)
+  const isSquare = tab === 'square';
+
+  // 모달 열릴 때 + 탭 변경 시 기존 cardnews fetch (재편집 지원)
+  useEffect(() => {
+    if (!article?.id) return;
+    let cancelled = false;
+    (async () => {
+      const dbType = tab === 'square' ? '1:1' : '9:16';
+      const { data, error } = await supabase
+        .from('cardnews')
+        .select('slides')
+        .eq('article_id', article.id)
+        .eq('type', dbType)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error) { console.error('cardnews fetch:', error); return; }
+      if (data?.slides && Array.isArray(data.slides) && data.slides.length === 5) {
+        setSlides(data.slides);
+      } else {
+        setSlides(EMPTY_SLIDES);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [article?.id, tab]);
+
+  if (!article) return null;
+
+  // AI 자동 생성
+  const handleAIGenerate = async () => {
+    if (!article?.content && !article?.summary) {
+      alert('기사 내용이 없습니다.');
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      const res = await fetch('/api/cardnews-ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: article.title,
+          content: article.content || article.summary,
+        }),
+      });
+      const data = await res.json();
+      if (data.slides) {
+        setSlides(prev => prev.map(s => {
+          const ai = data.slides.find(a => a.order === s.order);
+          return ai ? { ...s, title: ai.title || '', text: ai.text || '' } : s;
+        }));
+      } else {
+        alert(`AI 요약 생성 실패: ${data.error || '알 수 없는 오류'}`);
+      }
+    } catch (err) {
+      console.error('AI generate error:', err);
+      alert('AI 요약 생성 중 오류가 발생했습니다.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Supabase 저장 (upsert)
+  const handleSave = async () => {
+    if (!article?.id) return;
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('cardnews')
+        .upsert({
+          article_id: article.id,
+          title: slides[0].title || article.title,
+          type: isSquare ? '1:1' : '9:16',
+          slides: slides,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'article_id,type' });
+      if (error) throw error;
+      alert('카드뉴스가 저장되었습니다! 기사 페이지에 반영됩니다.');
+    } catch (err) {
+      console.error('save error:', err);
+      alert(`저장 실패: ${err.message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Storage 이미지 업로드
+  const handleImageUpload = async (file, slideOrder) => {
+    try {
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const fileName = `${article.id}_${tab}_slide${slideOrder}_${Date.now()}.${ext}`;
+
+      const { error } = await supabase.storage
+        .from('cardnews-images')
+        .upload(fileName, file, { upsert: true });
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from('cardnews-images')
+        .getPublicUrl(fileName);
+
+      setSlides(prev => prev.map(s =>
+        s.order === slideOrder ? { ...s, image_url: urlData.publicUrl } : s
+      ));
+    } catch (err) {
+      console.error('upload error:', err);
+      alert(`이미지 업로드 실패: ${err.message}`);
+    }
+  };
 
   const tabBtnStyle = (active) => ({
-    flex: 1, padding: '10px 8px', fontSize: 12, fontWeight: 700,
+    flex: 1, padding: '10px 8px', fontSize: 13, fontWeight: 700,
     fontFamily: SANS, cursor: 'pointer', lineHeight: 1.35,
     background: active ? NAVY : '#f0f0f0',
     color: active ? '#fff' : '#888',
     border: 'none', borderRadius: 8,
-  })
+  });
+
+  const current = slides.find(s => s.order === activeSlide) || slides[0];
 
   return (
     <div onClick={onClose} style={{
@@ -263,9 +276,9 @@ function CardNewsModal({ article, onClose }) {
       zIndex: 1000, padding: 20,
     }}>
       <div onClick={e => e.stopPropagation()} style={{
-        background: '#fff', maxWidth: 460, width: '100%',
-        maxHeight: '85vh', overflowY: 'auto',
-        borderRadius: 12, padding: 24, boxSizing: 'border-box',
+        background: '#fff', maxWidth: 520, width: '100%',
+        maxHeight: '90vh', overflowY: 'auto',
+        borderRadius: 12, padding: 20, boxSizing: 'border-box',
         position: 'relative',
       }}>
         <button onClick={onClose} aria-label="닫기" style={{
@@ -276,39 +289,114 @@ function CardNewsModal({ article, onClose }) {
 
         <h2 style={{
           fontFamily: SERIF, fontSize: 20, fontWeight: 700,
-          color: NAVY, margin: '0 0 16px 0', textAlign: 'center',
+          color: NAVY, margin: '0 0 14px 0', textAlign: 'center',
         }}>
-          📱 카드뉴스 & 스토리/릴스 만들기
+          📱 카드뉴스 만들기 (5장)
         </h2>
 
-        <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-          <button onClick={() => setTab('square')} style={tabBtnStyle(isSquare)}>📱 카드뉴스 1:1<br/>(이음미디어용)</button>
-          <button onClick={() => setTab('story')} style={tabBtnStyle(!isSquare)}>📖 스토리/릴스 9:16<br/>(인스타·숏폼용)</button>
+        {/* 타입 탭 */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+          <button onClick={() => setTab('square')} style={tabBtnStyle(isSquare)}>📱 1:1 이음용</button>
+          <button onClick={() => setTab('story')} style={tabBtnStyle(!isSquare)}>📖 9:16 인스타용</button>
         </div>
 
-        <div style={{ fontSize: 14, color: '#888', marginBottom: 12, textAlign: 'center' }}>
-          {isSquare ? '이음미디어 기사 하단 + 인스타 피드용' : '인스타 스토리 + 릴스 + 유튜브쇼츠 + 틱톡용'}
+        {/* AI 자동 생성 버튼 */}
+        <button
+          onClick={handleAIGenerate}
+          disabled={isGenerating}
+          className="w-full py-3 mb-4 bg-violet-600 text-white font-bold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50"
+        >
+          {isGenerating ? (
+            <><span className="animate-spin">⏳</span> AI 요약 생성 중...</>
+          ) : (
+            <><span>🤖</span> AI 카드뉴스 초안 생성</>
+          )}
+        </button>
+
+        {/* 슬라이드 탭 (5장) */}
+        <div className="flex gap-1 mb-3">
+          {slides.map(s => (
+            <button
+              key={s.order}
+              onClick={() => setActiveSlide(s.order)}
+              className={`flex-1 py-2 text-xs font-bold rounded ${
+                activeSlide === s.order
+                  ? 'bg-[#0d2d52] text-white'
+                  : 'bg-neutral-100 text-neutral-600'
+              }`}
+            >
+              {SLIDE_TAB_LABEL(s.order)}
+            </button>
+          ))}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, marginBottom: 20 }}>
-          {isSquare
-            ? <SquareCards article={article} dateShort={dateShort} />
-            : <StoryCards article={article} />}
+        {/* 현재 슬라이드 편집 */}
+        <div className="space-y-3 mb-2">
+          {/* 이미지 업로드 */}
+          <div className="border-2 border-dashed border-neutral-300 rounded-lg p-3 text-center">
+            {current.image_url ? (
+              <img
+                src={current.image_url}
+                alt={`슬라이드 ${current.order}`}
+                className="w-full aspect-square object-cover rounded-lg mb-2"
+              />
+            ) : (
+              <div className="aspect-square bg-neutral-100 flex items-center justify-center text-neutral-400 mb-2 rounded-lg text-sm">
+                이미지 없음
+              </div>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={e => e.target.files[0] && handleImageUpload(e.target.files[0], current.order)}
+              className="text-xs w-full"
+            />
+          </div>
+
+          {/* 제목 (마무리 제외) */}
+          {current.type !== 'ending' && (
+            <input
+              value={current.title}
+              onChange={e => setSlides(prev => prev.map(p =>
+                p.order === current.order ? { ...p, title: e.target.value } : p
+              ))}
+              placeholder={current.type === 'cover' ? '표지 제목 (15자 이내)' : '핵심 제목 (10자 이내)'}
+              className="w-full border border-neutral-300 rounded-lg px-3 py-2 text-sm"
+              maxLength={current.type === 'cover' ? 15 : 10}
+            />
+          )}
+
+          {/* 내용 (표지 제외) */}
+          {current.type !== 'cover' && (
+            <textarea
+              value={current.text}
+              onChange={e => setSlides(prev => prev.map(p =>
+                p.order === current.order ? { ...p, text: e.target.value } : p
+              ))}
+              placeholder={current.type === 'ending' ? '마무리 메시지 (30자 이내)' : '핵심 내용 (40자 이내)'}
+              className="w-full border border-neutral-300 rounded-lg px-3 py-2 text-sm h-20 resize-none"
+              maxLength={current.type === 'ending' ? 30 : 40}
+            />
+          )}
+
+          <div className="text-right text-xs text-neutral-500">
+            {current.type === 'cover' && `${current.title.length}/15`}
+            {current.type === 'main' && `제목 ${current.title.length}/10 · 내용 ${current.text.length}/40`}
+            {current.type === 'ending' && `${current.text.length}/30`}
+          </div>
         </div>
 
-        <button onClick={() => alert(isSquare
-          ? '이음미디어 카드뉴스(1:1) 저장 기능은 추후 업데이트됩니다.\n현재는 화면 캡처를 이용해주세요.'
-          : '인스타 스토리/릴스용(9:16) 저장 기능은 추후 업데이트됩니다.\n현재는 화면 캡처를 이용해주세요.'
-        )} style={{
-          width: '100%', height: 48, fontSize: 16, fontWeight: 700,
-          background: isSquare ? NAVY : RED, color: '#fff',
-          border: 'none', borderRadius: 8, cursor: 'pointer', fontFamily: SANS,
-        }}>
-          {isSquare ? '💾 카드뉴스 저장 (1:1)' : '💾 스토리/릴스용 저장 (9:16)'}
+        {/* 저장 버튼 */}
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="w-full py-3 mt-4 bg-[#0d2d52] text-white font-bold rounded-lg disabled:opacity-50"
+        >
+          {isSaving ? '저장 중...' : '💾 저장하고 기사에 반영'}
         </button>
       </div>
     </div>
-  )
+  );
 }
 
 export default function AdminDashboard() {
