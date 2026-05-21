@@ -121,11 +121,17 @@ export default function Header() {
             </>
           ) : (
             <>
-              <span style={{
+              <Link to="/mypage" style={{
                 color: "#c9a84c",
                 fontSize: 13,
-                padding: "5px 8px"
-              }}>안녕하세요, {profile?.nickname || "회원"}님</span>
+                padding: "5px 8px",
+                textDecoration: "none",
+                cursor: "pointer",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.textDecoration = "underline" }}
+              onMouseLeave={e => { e.currentTarget.style.textDecoration = "none" }}>
+                안녕하세요, {profile?.nickname || "회원"}님 ▾
+              </Link>
               <button onClick={handleLogout} style={{
                 color: "#c9a84c",
                 background: "transparent",
@@ -283,6 +289,20 @@ export default function Header() {
                 >✍️ 기사 쓰기</Link>
               )}
 
+              {isLoggedIn && (
+                <Link
+                  to="/mypage"
+                  onClick={closeMenu}
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    minHeight: 52, padding: "10px 16px", marginBottom: 10,
+                    color: "#c9a84c", border: "1px solid #c9a84c",
+                    fontSize: 19, fontWeight: 600, textDecoration: "none",
+                    borderRadius: 4,
+                  }}
+                >📋 마이페이지</Link>
+              )}
+
               <Link
                 to="/advertise"
                 onClick={closeMenu}
@@ -322,13 +342,19 @@ export default function Header() {
                 </>
               ) : (
                 <>
-                  <div style={{
-                    color: "#c9a84c", fontSize: 17,
-                    padding: "12px 16px", marginBottom: 6,
-                    textAlign: "center",
-                  }}>
-                    안녕하세요, {profile?.nickname || "회원"}님
-                  </div>
+                  <Link
+                    to="/mypage"
+                    onClick={closeMenu}
+                    style={{
+                      display: "block",
+                      color: "#c9a84c", fontSize: 17,
+                      padding: "12px 16px", marginBottom: 6,
+                      textAlign: "center",
+                      textDecoration: "none",
+                    }}
+                  >
+                    안녕하세요, {profile?.nickname || "회원"}님 ▾
+                  </Link>
                   <button
                     onClick={handleLogout}
                     style={{

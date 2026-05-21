@@ -19,6 +19,7 @@ import Subscribe from './pages/Subscribe'
 import About from './pages/About'
 import Privacy from './pages/Privacy'
 import ArticleEditor from './pages/ArticleEditor'
+import MyPage from './pages/MyPage'
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
             <Route path="/write" element={
               <ProtectedRoute requiredRole="writer"><ArticleEditor /></ProtectedRoute>
             } />
+            <Route path="/mypage" element={<MyPage />} />
           </Routes>
         </main>
         <Footer />
