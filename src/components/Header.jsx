@@ -312,15 +312,11 @@ export default function Header() {
                     to="/mypage"
                     onClick={closeMenu}
                     style={{
-                      display: "inline-flex", alignItems: "center", justifyContent: "center",
-                      color: "#c9a84c",
-                      border: "2px solid #c9a84c",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      minHeight: 52, padding: "10px 16px", marginBottom: 10,
+                      color: "#c9a84c", border: "1px solid #c9a84c",
+                      fontSize: 19, fontWeight: 600, textDecoration: "none",
                       borderRadius: 4,
-                      fontSize: 17, fontWeight: 500,
-                      padding: "10px 18px",
-                      marginBottom: 6,
-                      alignSelf: "center",
-                      textDecoration: "none",
                     }}
                   >
                     {profile?.nickname || "회원"} {roleLabel}
