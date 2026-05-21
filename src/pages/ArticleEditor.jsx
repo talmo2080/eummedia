@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -286,6 +286,8 @@ export default function ArticleEditor() {
   const [imageAlt, setImageAlt] = useState('')
   const [videoUrl, setVideoUrl] = useState('')
   const [content, setContent] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef(null)
 
   // 시민기자 수동 체크 7개 (자동 7개는 derive, editorReview 1개는 편집장 전용)
   const [manualChecks, setManualChecks] = useState({
@@ -489,8 +491,61 @@ export default function ArticleEditor() {
   }
   const removeTag = (t) => setTags(tags.filter(x => x !== t))
 
-  const handleFileSelect = () => {
-    alert('이미지 업로드는 Supabase Storage 연동 후 사용 가능합니다. 현재는 URL을 직접 입력해주세요.')
+  // 파일 선택 버튼 클릭 → 숨겨진 input 트리거
+  const openFilePicker = () => {
+    if (uploading) return
+    fileInputRef.current?.click()
+  }
+
+  // 실제 업로드 — Supabase Storage `article-images` 버킷 (사용자 폴더 user.id/...)
+  // 원본 그대로 저장 (변형 X), 10MB 안전장치
+  const handleFileSelect = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!user) { alert('로그인이 필요합니다.'); return }
+
+    // 1. 확장자 체크 (이미지만)
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드 가능합니다.')
+      e.target.value = ''
+      return
+    }
+
+    // 2. 용량 체크 (10MB)
+    const MAX_SIZE = 10 * 1024 * 1024
+    if (file.size > MAX_SIZE) {
+      alert(`이미지가 너무 큽니다 (${(file.size/1024/1024).toFixed(1)}MB).\n원본 품질 유지를 위해 10MB 이하로 부탁드립니다.\n휴대폰 사진은 일반적으로 3-5MB입니다.`)
+      e.target.value = ''
+      return
+    }
+
+    // 3. 업로드 (원본 그대로)
+    setUploading(true)
+    try {
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
+      const path = `${user.id}/${Date.now()}.${ext}`
+
+      const { error } = await supabase.storage
+        .from('article-images')
+        .upload(path, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type,
+        })
+      if (error) throw error
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('article-images')
+        .getPublicUrl(path)
+
+      setThumbnailUrl(publicUrl)
+    } catch (err) {
+      console.error('upload error:', err)
+      alert(`업로드 실패: ${err.message || '알 수 없는 오류'}`)
+    } finally {
+      setUploading(false)
+      e.target.value = ''  // 같은 파일 다시 선택 가능
+    }
   }
 
   // slug 생성 — crypto.randomUUID()는 secure context(HTTPS/localhost) 전용 → LAN HTTP에서 throw
@@ -879,18 +934,60 @@ export default function ArticleEditor() {
             {/* 6. 대표 이미지 */}
             <div style={card}>
               <label style={lbl}>대표 이미지</label>
+
+              {/* 안내 문구 */}
+              <div style={{
+                background: '#f5f9ff', border: `1px solid ${BLUE}`, borderRadius: 8,
+                padding: '12px 14px', marginBottom: 14,
+                fontSize: 15, lineHeight: 1.6, color: '#333',
+              }}>
+                📷 휴대폰 사진을 그대로 올려주세요 (10MB 이하).<br/>
+                원본 품질을 유지합니다.
+              </div>
+
+              {/* 미리보기 */}
+              {thumbnailUrl && (
+                <div style={{ marginBottom: 14 }}>
+                  <img src={thumbnailUrl} alt="대표 이미지 미리보기"
+                    style={{
+                      width: '100%', maxHeight: 320, objectFit: 'cover',
+                      borderRadius: 8, border: '1px solid #ddd',
+                      display: 'block',
+                    }}
+                    onError={e => { e.currentTarget.style.display = 'none' }}
+                  />
+                </div>
+              )}
+
+              {/* URL 직접 입력 (기존) */}
               <input style={inp({ marginBottom: 12 })}
                 value={thumbnailUrl} onChange={e => setThumbnailUrl(e.target.value)}
                 placeholder="이미지 URL을 입력하세요 (https://...)" />
-              <button type="button" onClick={handleFileSelect}
+
+              {/* 숨겨진 file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                style={{ display: 'none' }}
+              />
+
+              {/* 큰 파일 선택 버튼 (70대+ 페르소나 대응) */}
+              <button type="button" onClick={openFilePicker} disabled={uploading}
                 style={{
-                  width: '100%', height: 48, fontSize: 17, fontWeight: 600,
-                  background: '#fff', color: NAVY,
-                  border: `1px solid ${NAVY}`, borderRadius: 8,
-                  cursor: 'pointer', fontFamily: SANS, marginBottom: 12,
+                  width: '100%', minHeight: 60, fontSize: 19, fontWeight: 700,
+                  background: uploading ? '#f0f0f0' : '#fff',
+                  color: uploading ? '#888' : NAVY,
+                  border: `2px solid ${uploading ? '#ccc' : NAVY}`, borderRadius: 8,
+                  cursor: uploading ? 'wait' : 'pointer',
+                  fontFamily: SANS, marginBottom: 12,
                 }}>
-                📁 파일 선택
+                {uploading
+                  ? '⏳ 업로드 중...'
+                  : (thumbnailUrl ? '🔄 다시 선택' : '📁 사진 직접 올리기')}
               </button>
+
               <input style={inp()}
                 value={imageAlt} onChange={e => setImageAlt(e.target.value)}
                 placeholder="사진 설명 — 예: 고양시 닥터리부트 두피케어 체험" />
