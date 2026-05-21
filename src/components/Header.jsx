@@ -269,20 +269,6 @@ export default function Header() {
                 letterSpacing: 2, marginBottom: 10, paddingLeft: 4,
               }}>활동</div>
 
-              {isLoggedIn && (
-                <Link
-                  to="/mypage"
-                  onClick={closeMenu}
-                  style={{
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    minHeight: 52, padding: "10px 16px", marginBottom: 10,
-                    color: "#c9a84c", border: "1px solid #c9a84c",
-                    fontSize: 19, fontWeight: 600, textDecoration: "none",
-                    borderRadius: 4,
-                  }}
-                >📋 마이페이지</Link>
-              )}
-
               <Link
                 to="/advertise"
                 onClick={closeMenu}
