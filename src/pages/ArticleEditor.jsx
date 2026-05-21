@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -16,6 +16,17 @@ const CHANNELS = [
   '이음매거진', '이음피플', '이음로컬',
   '이음에듀', '이음트렌드', '이음보이스', '이음뷰',
 ]
+
+// channel_id (UUID) → 한글 채널명 역매핑 — 이어쓰기 시 사용
+const ID_TO_CHANNEL = {
+  'd8306e54-ca06-4929-8d27-8419c3ffe838': '이음매거진',
+  '0208677a-f569-4dc4-be76-6d9cb50272ca': '이음피플',
+  'e4eef54f-edd2-4511-90ea-256ebfca1613': '이음로컬',
+  'de1c5c18-ae09-4c2b-8525-ef02d6e17ec6': '이음에듀',
+  'e41c0a6c-88dd-4098-b948-a7d64f4379c1': '이음트렌드',
+  '18b19e3f-0053-4038-9c25-18de51c60bac': '이음보이스',
+  'a9eb95f1-3ef9-4596-b53a-938523239367': '이음뷰',
+}
 
 const CHANNEL_ID_MAP = {
   '이음매거진': 'd8306e54-ca06-4929-8d27-8419c3ffe838',
@@ -223,6 +234,11 @@ function CheckItem({ item, onToggle, showRedHighlight }) {
             {item.desc}
           </div>
         )}
+        {item.action && (
+          <div onClick={(e) => e.stopPropagation()}>
+            {item.action}
+          </div>
+        )}
       </div>
     </li>
   )
@@ -254,6 +270,8 @@ function InfoRow({ label, value, last }) {
 export default function ArticleEditor() {
   const navigate = useNavigate()
   const { user, profile } = useAuth()
+  const [searchParams] = useSearchParams()
+  const editId = searchParams.get('id')   // 이어쓰기 모드 — /write?id=xxx
   const [viewMode, setViewMode] = useState('edit')
   const [savedAt, setSavedAt] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -281,8 +299,123 @@ export default function ArticleEditor() {
   })
   const toggleManual = (key) => setManualChecks(c => ({ ...c, [key]: !c[key] }))
 
+  // 맞춤법 검사 — Anthropic API 직접 호출 (Claude Haiku)
+  // ⚠️ 보안 위험: API 키가 클라 번들에 노출 (VITE_ANTHROPIC_API_KEY)
+  // ⚠️ CORS 위험: Anthropic API는 브라우저 직접 호출 차단할 수 있음 (필요 시 dangerouslyAllowBrowser)
+  const handleSpellCheck = async () => {
+    if (isSpellChecking) return
+    if (!content.trim()) {
+      alert('본문을 먼저 입력해주세요.')
+      return
+    }
+    const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY
+    if (!apiKey) {
+      alert('맞춤법 검사 키가 설정되지 않았습니다. (관리자에게 문의)')
+      return
+    }
+    setIsSpellChecking(true)
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 15000)
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 300,
+          messages: [{
+            role: 'user',
+            content: `다음 글의 맞춤법과 오탈자를 검사해주세요.
+오류가 없으면 "이상 없음"만,
+오류가 있으면 번호 목록으로 수정 제안 3건 이내만 출력하세요.
+
+글: ${content.slice(0, 800)}`,
+          }],
+        }),
+        signal: controller.signal,
+      })
+      if (!response.ok) {
+        const errBody = await response.text()
+        alert(`맞춤법 검사 실패 (${response.status}):\n${errBody.slice(0, 400)}`)
+        return
+      }
+      const data = await response.json()
+      const result = data?.content?.[0]?.text || ''
+      if (!result) {
+        alert('맞춤법 검사 응답 형식 오류')
+        return
+      }
+      if (result.includes('이상 없음')) {
+        alert('✅ 맞춤법 이상 없습니다')
+      } else {
+        alert(`⚠️ 맞춤법 수정 제안:\n${result}\n\n확인 후 수정해보세요`)
+      }
+      // 검사를 한 것 자체로 5번 spelling = true 처리
+      setManualChecks(c => ({ ...c, spelling: true }))
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        alert('맞춤법 검사 시간 초과 (15초). 다시 시도해주세요.')
+      } else {
+        alert(`맞춤법 검사 중 오류: ${err.message || '알 수 없는 오류'}`)
+      }
+    } finally {
+      clearTimeout(timer)
+      setIsSpellChecking(false)
+    }
+  }
+
+  // 이어쓰기 모드: /write?id=xxx 진입 시 기존 draft fetch + 폼 복원
+  useEffect(() => {
+    if (!editId || !user) return
+    let cancelled = false
+    ;(async () => {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .eq('id', editId)
+        .eq('author_id', user.id)
+        .maybeSingle()
+      if (cancelled) return
+      if (error || !data) {
+        alert('해당 기사를 불러올 수 없습니다.')
+        navigate('/mypage')
+        return
+      }
+      setTitle(data.title || '')
+      setChannel(ID_TO_CHANNEL[data.channel_id] || '')
+      setContent(data.content || '')
+      setSummary(data.summary || '')
+      setTags(Array.isArray(data.tags) ? data.tags : [])
+      setThumbnailUrl(data.thumbnail_url || '')
+      setImageAlt(data.image_alt || '')
+      setVideoUrl(data.video_url || '')
+      setReporter(data.author_name || '')
+      // citizen_checks JSONB에서 수동 7개만 복원 (자동 7개는 derive)
+      if (data.citizen_checks && typeof data.citizen_checks === 'object') {
+        const manualKeys = ['leadParagraph', 'spelling', 'titleKeyword', 'fact', 'source', 'kakao', 'instagram']
+        const restored = {}
+        manualKeys.forEach(k => { if (data.citizen_checks[k]) restored[k] = true })
+        setManualChecks(prev => ({ ...prev, ...restored }))
+      }
+    })()
+    return () => { cancelled = true }
+  }, [editId, user, navigate])
+
   const [showRedHighlight, setShowRedHighlight] = useState(false)
   const [showGuide, setShowGuide] = useState(false)
+  const [isSpellChecking, setIsSpellChecking] = useState(false)
+
+  // tags 안전 처리 — array/string 둘 다 대응 (fix: 빈 문자열 제외 + trim)
+  const validTagsCount = Array.isArray(tags)
+    ? tags.filter(t => typeof t === 'string' && t.trim()).length
+    : (typeof tags === 'string'
+        ? tags.split(',').map(t => t.trim()).filter(Boolean).length
+        : 0)
 
   // 탭1 입력값 기반 자동 체크 7개 derive (편집국장 영역 1개 제외 = 시민기자 14개 중 7개)
   // 보안: 아무 키나 눌러도 자동 체크되지 않게 길이 기준 강화
@@ -291,7 +424,7 @@ export default function ArticleEditor() {
     thumbnail:      !!thumbnailUrl.trim(),
     contentLength:  content.length >= 500,
     channelCorrect: !!channel.trim(),
-    tags:           tags.length >= 3,
+    tags:           validTagsCount >= 3,
     summary:        summary.length >= 20,
     alt:            imageAlt.length >= 5,
   }
@@ -304,7 +437,25 @@ export default function ArticleEditor() {
     { label: '2. 두괄식 첫 문단 작성',              mkey: 'leadParagraph',  desc: CHECK_DESC.leadParagraph,  isAuto: false, done: allChecks.leadParagraph },
     { label: '3. 대표 이미지(썸네일) 설정',         mkey: 'thumbnail',      desc: CHECK_DESC.thumbnail,      isAuto: true,  done: allChecks.thumbnail },
     { label: '4. 본문 분량 확보 (500자 이상)',      mkey: 'contentLength',  desc: CHECK_DESC.contentLength,  isAuto: true,  done: allChecks.contentLength },
-    { label: '5. 맞춤법 및 오탈자 최종 검사',       mkey: 'spelling',       desc: CHECK_DESC.spelling,       isAuto: false, done: allChecks.spelling },
+    { label: '5. 맞춤법 및 오탈자 최종 검사',       mkey: 'spelling',       desc: CHECK_DESC.spelling,       isAuto: false, done: allChecks.spelling,
+      action: (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); handleSpellCheck() }}
+          disabled={isSpellChecking}
+          style={{
+            fontSize: 13, fontWeight: 700,
+            padding: '8px 14px', marginTop: 10,
+            background: isSpellChecking ? '#999' : '#1c4f8a', color: '#fff',
+            border: 'none', borderRadius: 6,
+            cursor: isSpellChecking ? 'not-allowed' : 'pointer',
+            fontFamily: SANS,
+          }}
+        >
+          {isSpellChecking ? '⏳ 검사 중...' : '🔍 검사하기'}
+        </button>
+      )
+    },
   ]
   const stage2 = [
     { label: '6. 카테고리(채널)의 정확한 선택 [SEO]',  mkey: 'channelCorrect', desc: CHECK_DESC.channelCorrect, isAuto: true,  done: allChecks.channelCorrect },
@@ -323,7 +474,9 @@ export default function ArticleEditor() {
   const allItems = [...stage1, ...stage2, ...stage3]
   const totalDone = allItems.filter(i => i.done).length
   const stage2Done = stage2.filter(i => i.done).length
-  const canSubmit = totalDone >= 11   // 시민기자 14개 중 11 이상 (편집장이 나머지 채움)
+  // 통과 기준: 자동 항목 7개 중 4개 이상 충족 (제목/본문/채널/태그/요약/썸네일/alt)
+  const autoCheckedCount = Object.values(autoChecks).filter(Boolean).length
+  const canSubmit = autoCheckedCount >= 4
   const canDraft = !!title.trim()      // 임시저장은 제목만 있으면 가능
 
   const handleTagKey = (e) => {
@@ -340,11 +493,15 @@ export default function ArticleEditor() {
     alert('이미지 업로드는 Supabase Storage 연동 후 사용 가능합니다. 현재는 URL을 직접 입력해주세요.')
   }
 
+  // slug 생성 — crypto.randomUUID()는 secure context(HTTPS/localhost) 전용 → LAN HTTP에서 throw
+  // Math.random 기반 fallback (안전)
+  const generateSlug = () => `article-${Math.random().toString(36).slice(2, 10)}`
+
   const buildPayload = (status) => ({
     channel_id: CHANNEL_ID_MAP[channel] || null,
     author_id: user.id,
     title: title.trim(),
-    slug: `article-${crypto.randomUUID().slice(0, 8)}`,
+    slug: generateSlug(),
     summary: summary.trim() || null,
     content: content || null,
     status,
@@ -363,12 +520,24 @@ export default function ArticleEditor() {
     if (!title.trim()) { alert('제목을 입력해주세요.'); return }
     if (!user) { alert('로그인이 필요합니다.'); return }
     setSubmitting(true)
-    const { error } = await supabase.from('articles').insert(buildPayload('draft'))
-    setSubmitting(false)
-    if (error) { alert(`임시저장 실패: ${error.message}`); return }
-    setSavedAt(formatNow())
-    setViewMode('draftSuccess')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    try {
+      const payload = buildPayload('draft')
+      const { error } = editId
+        ? await supabase.from('articles')
+            .update({ ...payload, updated_at: new Date().toISOString() })
+            .eq('id', editId)
+            .eq('author_id', user.id)
+        : await supabase.from('articles').insert(payload)
+      if (error) { alert(`임시저장 실패: ${error.message}`); return }
+      setSavedAt(formatNow())
+      setViewMode('draftSuccess')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch (err) {
+      console.error('[handleDraft] catch:', err)
+      alert(`임시저장 중 오류: ${err?.message || err}`)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const handleSubmit = async () => {
@@ -379,16 +548,28 @@ export default function ArticleEditor() {
       setShowRedHighlight(true)
       setActiveTab(2)
       window.scrollTo({ top: 0, behavior: 'smooth' })
-      alert(`체크리스트가 ${totalDone}/14 입니다.\n11개 이상 채우면 편집국장에게 전달할 수 있어요.\n(나머지는 편집국장이 검토하며 채웁니다)`)
+      alert(`자동 항목 ${autoCheckedCount}/7 채워졌습니다.\n자동 항목 4개 이상이 완료되면 편집국장에게 전달할 수 있어요.\n(나머지는 편집국장이 검토하며 채웁니다)`)
       return
     }
     setSubmitting(true)
-    const { error } = await supabase.from('articles').insert(buildPayload('submitted'))
-    setSubmitting(false)
-    if (error) { alert(`편집국장 전송 실패: ${error.message}`); return }
-    setSavedAt(formatNow())
-    setViewMode('submitSuccess')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    try {
+      const payload = buildPayload('submitted')
+      const { error } = editId
+        ? await supabase.from('articles')
+            .update({ ...payload, updated_at: new Date().toISOString() })
+            .eq('id', editId)
+            .eq('author_id', user.id)
+        : await supabase.from('articles').insert(payload)
+      if (error) { alert(`편집국장 전송 실패: ${error.message}`); return }
+      setSavedAt(formatNow())
+      setViewMode('submitSuccess')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch (err) {
+      console.error('[handleSubmit] catch:', err)
+      alert(`편집국장 전송 중 오류: ${err?.message || err}`)
+    } finally {
+      setSubmitting(false)
+    }
   }
   const resetForm = () => {
     setChannel(''); setTitle(''); setReporter(''); setTagInput(''); setTags([])
@@ -583,6 +764,17 @@ export default function ArticleEditor() {
       {/* 탭 콘텐츠 */}
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px 80px' }}>
 
+        {/* 이어쓰기 안내 배너 */}
+        {editId && (
+          <div style={{
+            background: '#fffbeb', borderLeft: '4px solid #f59e0b',
+            padding: '12px 16px', marginBottom: 16, borderRadius: 8,
+            fontSize: 15, color: '#92400e',
+          }}>
+            💾 임시저장한 기사를 이어서 작성합니다.
+          </div>
+        )}
+
         {/* ━━ 탭 1: 기사 작성 ━━ */}
         {activeTab === 1 && (
           <div>
@@ -774,7 +966,7 @@ export default function ArticleEditor() {
               </h1>
               <p style={{ fontSize: 16, color: '#3a3a3a', lineHeight: 1.8, margin: 0 }}>
                 시민기자가 채울 14가지(자동 7 + 수동 7).<br />
-                <strong>11개 이상</strong> 채우면 편집국장에게 전달할 수 있어요.<br />
+                <strong>자동 항목 4개 이상</strong>이 완료되면 편집국장에게 전달할 수 있어요.<br />
                 나머지는 편집국장이 검토하면서 마저 채웁니다.
               </p>
             </div>

@@ -55,13 +55,11 @@ export default function MyPage() {
     setArticles(prev => prev.filter(a => a.id !== id));
   };
 
-  // 이어쓰기 (다음 commit에서 정식 구현)
-  const handleResume = () => {
-    alert('이어쓰기 기능은 곧 추가됩니다.');
-  };
+  // 이어쓰기 — /write?id=xxx 진입 (ArticleEditor에서 fetchDraft + UPDATE 분기)
 
   if (!user) return null;
 
+  const canWrite = profile?.role === 'writer' || profile?.role === 'admin';
   const nickname = profile?.nickname || user.email || '회원';
   const initial = nickname.charAt(0).toUpperCase();
   const joinedDate = profile?.created_at
@@ -91,6 +89,21 @@ export default function MyPage() {
           </div>
         </div>
       </section>
+
+      {/* 1.5. 새 기사 쓰기 CTA (writer/admin만) */}
+      {canWrite && (
+        <Link
+          to="/write"
+          className="block bg-[#0d2d52] hover:bg-[#1a4070] text-white rounded-lg px-6 py-5 mb-6 text-center transition no-underline"
+          style={{ textDecoration: 'none' }}
+        >
+          <div className="text-3xl mb-2">✍️</div>
+          <div className="font-serif font-bold text-xl">새 기사 쓰기</div>
+          <div className="text-sm opacity-80 mt-1">
+            시민기자로서 이야기를 세상에 전하세요
+          </div>
+        </Link>
+      )}
 
       {/* 2. 활동 통계 */}
       <section className="mb-6">
@@ -147,7 +160,6 @@ export default function MyPage() {
                 key={a.id}
                 article={a}
                 onDelete={handleDelete}
-                onResume={handleResume}
               />
             ))}
           </ul>
@@ -194,7 +206,7 @@ function FilterButton({ active, onClick, label }) {
   );
 }
 
-function ArticleCard({ article, onDelete, onResume }) {
+function ArticleCard({ article, onDelete }) {
   const statusInfo = {
     draft:     { label: '💾 임시저장', color: 'bg-neutral-100 text-neutral-700' },
     submitted: { label: '🔴 검토대기', color: 'bg-red-50 text-red-700' },
@@ -248,12 +260,12 @@ function ArticleCard({ article, onDelete, onResume }) {
       <div className="flex gap-2 mt-3 flex-wrap">
         {article.status === 'draft' && (
           <>
-            <button
-              onClick={onResume}
-              className="px-3 py-2 bg-[#0d2d52] text-white text-sm rounded font-bold"
+            <Link
+              to={`/write?id=${article.id}`}
+              className="px-3 py-2 bg-[#0d2d52] text-white text-sm rounded font-bold inline-block"
             >
               ✍️ 이어서 작성
-            </button>
+            </Link>
             <button
               onClick={() => onDelete(article.id)}
               className="px-3 py-2 bg-red-100 text-red-700 text-sm rounded"
@@ -268,12 +280,12 @@ function ArticleCard({ article, onDelete, onResume }) {
           </span>
         )}
         {article.status === 'rejected' && (
-          <button
-            onClick={onResume}
-            className="px-3 py-2 bg-orange-500 text-white text-sm rounded font-bold"
+          <Link
+            to={`/write?id=${article.id}`}
+            className="px-3 py-2 bg-orange-500 text-white text-sm rounded font-bold inline-block"
           >
             ✍️ 수정해서 다시 제출
-          </button>
+          </Link>
         )}
         {article.status === 'published' && article.slug && (
           <Link

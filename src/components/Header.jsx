@@ -18,7 +18,6 @@ export default function Header() {
   const navigate = useNavigate();
   const isLoggedIn = !!user;
   const role = profile?.role;
-  const canWrite = role === "writer" || role === "admin";
   const isAdmin = role === "admin";
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
@@ -88,17 +87,6 @@ export default function Header() {
             fontSize: 13,
             padding: "5px 8px"
           }}>광고문의</Link>
-          {canWrite && (
-            <Link to="/write" style={{
-              background: "#1c4f8a",
-              color: "#fff",
-              textDecoration: "none",
-              fontSize: 13,
-              fontWeight: 700,
-              padding: "5px 14px",
-              borderRadius: 4
-            }}>✍️ 기사 쓰기</Link>
-          )}
           {!isLoggedIn ? (
             <>
               <Link to="/login" style={{
@@ -274,20 +262,6 @@ export default function Header() {
                 fontSize: 13, fontWeight: 700,
                 letterSpacing: 2, marginBottom: 10, paddingLeft: 4,
               }}>활동</div>
-
-              {canWrite && (
-                <Link
-                  to="/write"
-                  onClick={closeMenu}
-                  style={{
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    minHeight: 52, padding: "10px 16px", marginBottom: 10,
-                    background: "#1c4f8a", color: "#fff",
-                    fontSize: 19, fontWeight: 700, textDecoration: "none",
-                    borderRadius: 4,
-                  }}
-                >✍️ 기사 쓰기</Link>
-              )}
 
               {isLoggedIn && (
                 <Link
