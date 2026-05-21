@@ -168,24 +168,35 @@ function ProgressBar({ label, current, max, color }) {
   )
 }
 
-function CheckItem({ item, onToggle }) {
+function CheckItem({ item, onToggle, showRedHighlight }) {
   const done = item.done
+  const isAuto = item.isAuto
+  // 자동 항목: 잠금(클릭 불가) + 옅은 녹색 배경
+  // 수동 항목: 클릭 가능 + done이면 녹색, 아니면 흰색
+  // 빨간 강조: showRedHighlight && !done (자동/수동 무관 — 미충족 모두 강조)
+  const bgColor = done ? '#eef7f2' : (showRedHighlight ? '#fff5f5' : '#fff')
+  const borderColor = showRedHighlight && !done
+    ? '#e74c3c'
+    : (done ? '#c4e4d2' : '#e5e5e5')
+  const borderLeftWidth = showRedHighlight && !done ? 4 : 1
   return (
     <li
-      onClick={() => onToggle(item.mkey)}
+      onClick={() => !isAuto && onToggle(item.mkey)}
       style={{
         display: 'flex', alignItems: 'flex-start', gap: 14,
         padding: '18px 20px', marginBottom: 10,
         borderRadius: 10,
-        background: done ? '#eef7f2' : '#fff',
-        border: `1px solid ${done ? '#c4e4d2' : '#e5e5e5'}`,
-        cursor: 'pointer',
+        background: bgColor,
+        border: `1px solid ${borderColor}`,
+        borderLeft: `${borderLeftWidth}px solid ${borderColor}`,
+        cursor: isAuto ? 'default' : 'pointer',
         transition: 'all 0.15s',
         minHeight: 64, boxSizing: 'border-box',
+        opacity: isAuto && !done ? 0.85 : 1,
       }}>
       <span style={{
         flexShrink: 0, width: 24, height: 24,
-        border: `2px solid ${done ? GREEN : '#bbb'}`,
+        border: `2px solid ${done ? GREEN : (showRedHighlight && !done ? '#e74c3c' : '#bbb')}`,
         background: done ? GREEN : '#fff',
         color: '#fff', fontSize: 16, lineHeight: '20px',
         textAlign: 'center', borderRadius: 4, marginTop: 2,
@@ -195,9 +206,17 @@ function CheckItem({ item, onToggle }) {
       <div style={{ flex: 1 }}>
         <div style={{
           fontSize: 18, fontWeight: 600,
-          color: done ? GREEN : '#1a1a1a', lineHeight: 1.5,
+          color: done ? GREEN : (showRedHighlight && !done ? '#c0392b' : '#1a1a1a'),
+          lineHeight: 1.5,
+          display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
         }}>
           {item.label}
+          {isAuto && (
+            <span style={{
+              fontSize: 11, fontWeight: 700, color: '#666',
+              background: '#e8eef5', padding: '2px 8px', borderRadius: 12,
+            }}>🔒 자동 체크</span>
+          )}
         </div>
         {item.desc && (
           <div style={{ fontSize: 15, color: '#666', marginTop: 6, lineHeight: 1.6 }}>
@@ -250,51 +269,62 @@ export default function ArticleEditor() {
   const [videoUrl, setVideoUrl] = useState('')
   const [content, setContent] = useState('')
 
+  // 시민기자 수동 체크 7개 (자동 7개는 derive, editorReview 1개는 편집장 전용)
   const [manualChecks, setManualChecks] = useState({
-    titleClear: false,
     leadParagraph: false,
-    thumbnail: false,
-    contentLength: false,
     spelling: false,
-    channelCorrect: false,
-    tags: false,
     titleKeyword: false,
-    summary: false,
-    alt: false,
     fact: false,
     source: false,
     kakao: false,
     instagram: false,
-    editorReview: false,
   })
   const toggleManual = (key) => setManualChecks(c => ({ ...c, [key]: !c[key] }))
 
+  const [showRedHighlight, setShowRedHighlight] = useState(false)
+  const [showGuide, setShowGuide] = useState(false)
+
+  // 탭1 입력값 기반 자동 체크 7개 derive (편집국장 영역 1개 제외 = 시민기자 14개 중 7개)
+  // 보안: 아무 키나 눌러도 자동 체크되지 않게 길이 기준 강화
+  const autoChecks = {
+    titleClear:     title.length >= 10 && title.length <= 30,
+    thumbnail:      !!thumbnailUrl.trim(),
+    contentLength:  content.length >= 500,
+    channelCorrect: !!channel.trim(),
+    tags:           tags.length >= 3,
+    summary:        summary.length >= 20,
+    alt:            imageAlt.length >= 5,
+  }
+  // 시민기자 14개 합산 — 자동 7 + 수동 7
+  const allChecks = { ...autoChecks, ...manualChecks }
+
+  // 시민기자 14개 (15번 editorReview는 편집장 전용 — 별도 분리)
   const stage1 = [
-    { label: '1. 제목의 명확성 (30자 이내)', done: manualChecks.titleClear, mkey: 'titleClear', desc: CHECK_DESC.titleClear },
-    { label: '2. 두괄식 첫 문단 작성', done: manualChecks.leadParagraph, mkey: 'leadParagraph', desc: CHECK_DESC.leadParagraph },
-    { label: '3. 대표 이미지(썸네일) 설정', done: manualChecks.thumbnail, mkey: 'thumbnail', desc: CHECK_DESC.thumbnail },
-    { label: '4. 본문 분량 확보 (500자 이상)', done: manualChecks.contentLength, mkey: 'contentLength', desc: CHECK_DESC.contentLength },
-    { label: '5. 맞춤법 및 오탈자 최종 검사', done: manualChecks.spelling, mkey: 'spelling', desc: CHECK_DESC.spelling },
+    { label: '1. 제목의 명확성 (30자 이내)',        mkey: 'titleClear',     desc: CHECK_DESC.titleClear,     isAuto: true,  done: allChecks.titleClear },
+    { label: '2. 두괄식 첫 문단 작성',              mkey: 'leadParagraph',  desc: CHECK_DESC.leadParagraph,  isAuto: false, done: allChecks.leadParagraph },
+    { label: '3. 대표 이미지(썸네일) 설정',         mkey: 'thumbnail',      desc: CHECK_DESC.thumbnail,      isAuto: true,  done: allChecks.thumbnail },
+    { label: '4. 본문 분량 확보 (500자 이상)',      mkey: 'contentLength',  desc: CHECK_DESC.contentLength,  isAuto: true,  done: allChecks.contentLength },
+    { label: '5. 맞춤법 및 오탈자 최종 검사',       mkey: 'spelling',       desc: CHECK_DESC.spelling,       isAuto: false, done: allChecks.spelling },
   ]
   const stage2 = [
-    { label: '6. 카테고리(채널)의 정확한 선택 [SEO]', done: manualChecks.channelCorrect, mkey: 'channelCorrect', desc: CHECK_DESC.channelCorrect },
-    { label: '7. 태그(키워드) 3개 이상 입력 [SEO]', done: manualChecks.tags, mkey: 'tags', desc: CHECK_DESC.tags },
-    { label: '8. 제목 내 핵심 키워드 전면 배치 [AI]', done: manualChecks.titleKeyword, mkey: 'titleKeyword', desc: CHECK_DESC.titleKeyword },
-    { label: '9. 메타 설명(기사 한 줄 요약) 입력 [AI]', done: manualChecks.summary, mkey: 'summary', desc: CHECK_DESC.summary },
-    { label: '10. 이미지 대체 텍스트(alt 태그) 입력 [SEO]', done: manualChecks.alt, mkey: 'alt', desc: CHECK_DESC.alt },
+    { label: '6. 카테고리(채널)의 정확한 선택 [SEO]',  mkey: 'channelCorrect', desc: CHECK_DESC.channelCorrect, isAuto: true,  done: allChecks.channelCorrect },
+    { label: '7. 태그(키워드) 3개 이상 입력 [SEO]',    mkey: 'tags',           desc: CHECK_DESC.tags,           isAuto: true,  done: allChecks.tags },
+    { label: '8. 제목 내 핵심 키워드 전면 배치 [AI]',  mkey: 'titleKeyword',   desc: CHECK_DESC.titleKeyword,   isAuto: false, done: allChecks.titleKeyword },
+    { label: '9. 메타 설명(기사 한 줄 요약) 입력 [AI]',mkey: 'summary',        desc: CHECK_DESC.summary,        isAuto: true,  done: allChecks.summary },
+    { label: '10. 이미지 대체 텍스트(alt 태그) 입력 [SEO]', mkey: 'alt',        desc: CHECK_DESC.alt,            isAuto: true,  done: allChecks.alt },
   ]
   const stage3 = [
-    { label: '11. 사실 관계(Fact) 최종 교차 검증', done: manualChecks.fact, mkey: 'fact', desc: CHECK_DESC.fact },
-    { label: '12. 취재원 이름 및 직함 확인', done: manualChecks.source, mkey: 'source', desc: CHECK_DESC.source },
-    { label: '13. 카카오톡 공유용 단문 메시지 준비', done: manualChecks.kakao, mkey: 'kakao', desc: CHECK_DESC.kakao },
-    { label: '14. 인스타그램 홍보용 해시태그 세팅', done: manualChecks.instagram, mkey: 'instagram', desc: CHECK_DESC.instagram },
-    { label: '15. 편집국장 최종 승인 완료', done: manualChecks.editorReview, mkey: 'editorReview', desc: CHECK_DESC.editorReview },
+    { label: '11. 사실 관계(Fact) 최종 교차 검증',  mkey: 'fact',      desc: CHECK_DESC.fact,      isAuto: false, done: allChecks.fact },
+    { label: '12. 취재원 이름 및 직함 확인',        mkey: 'source',    desc: CHECK_DESC.source,    isAuto: false, done: allChecks.source },
+    { label: '13. 카카오톡 공유용 단문 메시지 준비',mkey: 'kakao',     desc: CHECK_DESC.kakao,     isAuto: false, done: allChecks.kakao },
+    { label: '14. 인스타그램 홍보용 해시태그 세팅',  mkey: 'instagram', desc: CHECK_DESC.instagram, isAuto: false, done: allChecks.instagram },
   ]
 
   const allItems = [...stage1, ...stage2, ...stage3]
   const totalDone = allItems.filter(i => i.done).length
   const stage2Done = stage2.filter(i => i.done).length
-  const allComplete = totalDone === 15
+  const canSubmit = totalDone >= 11   // 시민기자 14개 중 11 이상 (편집장이 나머지 채움)
+  const canDraft = !!title.trim()      // 임시저장은 제목만 있으면 가능
 
   const handleTagKey = (e) => {
     if (e.key === 'Enter' && tagInput.trim()) {
@@ -323,6 +353,9 @@ export default function ArticleEditor() {
     video_url: videoUrl.trim() || null,
     author_name: (reporter || profile?.nickname || '').trim() || null,
     image_alt: imageAlt.trim() || null,
+    // 시민기자 체크 — submitted 시 14개 결과 + 점수 저장 (draft 시도 무해)
+    citizen_checks: allChecks,
+    citizen_complete: totalDone,
   })
 
   const handleDraft = async () => {
@@ -340,9 +373,15 @@ export default function ArticleEditor() {
 
   const handleSubmit = async () => {
     if (submitting) return
-    if (!allComplete) { alert('체크리스트를 모두 완료해주세요!'); return }
     if (!user) { alert('로그인이 필요합니다.'); return }
     if (!CHANNEL_ID_MAP[channel]) { alert('채널을 선택해주세요.'); return }
+    if (!canSubmit) {
+      setShowRedHighlight(true)
+      setActiveTab(2)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      alert(`체크리스트가 ${totalDone}/14 입니다.\n11개 이상 채우면 편집국장에게 전달할 수 있어요.\n(나머지는 편집국장이 검토하며 채웁니다)`)
+      return
+    }
     setSubmitting(true)
     const { error } = await supabase.from('articles').insert(buildPayload('submitted'))
     setSubmitting(false)
@@ -355,10 +394,10 @@ export default function ArticleEditor() {
     setChannel(''); setTitle(''); setReporter(''); setTagInput(''); setTags([])
     setSummary(''); setThumbnailUrl(''); setImageAlt(''); setVideoUrl(''); setContent('')
     setManualChecks({
-      titleClear: false, leadParagraph: false, thumbnail: false, contentLength: false, spelling: false,
-      channelCorrect: false, tags: false, titleKeyword: false, summary: false, alt: false,
-      fact: false, source: false, kakao: false, instagram: false, editorReview: false,
+      leadParagraph: false, spelling: false, titleKeyword: false,
+      fact: false, source: false, kakao: false, instagram: false,
     })
+    setShowRedHighlight(false)
     setActiveTab(1)
     setViewMode('edit')
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -376,7 +415,6 @@ export default function ArticleEditor() {
   const TABS = [
     { num: 1, icon: '✍️', label: '기사 작성' },
     { num: 2, icon: '✅', label: '발행 체크리스트' },
-    { num: 3, icon: '📖', label: '글쓰기 가이드' },
   ]
 
   // ━━ 임시저장 완료 화면 ━━
@@ -406,7 +444,7 @@ export default function ArticleEditor() {
             <InfoRow label="기사 제목" value={title || '(제목 없음)'} />
             <InfoRow label="채널" value={channel || '(미선택)'} />
             <InfoRow label="저장 시각" value={savedAt} />
-            <InfoRow label="완성도" value={`${totalDone}/15 체크 완료`} last />
+            <InfoRow label="완성도" value={`${totalDone}/14 체크 완료`} last />
           </div>
 
           <p style={{ fontSize: 18, color: '#888', margin: '0 0 32px 0', lineHeight: 1.6 }}>
@@ -462,7 +500,7 @@ export default function ArticleEditor() {
             <InfoRow label="채널" value={channel} />
             <InfoRow label="기자 이름" value={reporter} />
             <InfoRow label="전달 시각" value={savedAt} />
-            <InfoRow label="체크리스트" value="15/15 ✅ 완료" last />
+            <InfoRow label="시민기자 체크" value={`${totalDone}/14 ✅ 완료`} last />
           </div>
 
           <div style={{
@@ -537,7 +575,7 @@ export default function ArticleEditor() {
           maxWidth: 1000, margin: '0 auto',
           padding: '16px 24px', display: 'flex', gap: 32, flexWrap: 'wrap',
         }}>
-          <ProgressBar label="기사 완성도" current={totalDone} max={15} color={NAVY} />
+          <ProgressBar label="기사 완성도" current={totalDone} max={14} color={NAVY} />
           <ProgressBar label="검색 노출 최적화" current={stage2Done} max={5} color={BLUE} />
         </div>
       </div>
@@ -698,24 +736,26 @@ export default function ArticleEditor() {
 
             {/* 9. 하단 버튼 */}
             <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
-              <button onClick={handleDraft} style={{
+              <button onClick={handleDraft} disabled={!canDraft} style={{
                 flex: 1, height: 56, fontSize: 18, fontWeight: 700,
-                background: '#888', color: '#fff',
+                background: canDraft ? '#555' : '#ccc',
+                color: canDraft ? '#fff' : '#888',
                 border: 'none', borderRadius: 8,
-                cursor: 'pointer', fontFamily: SANS,
+                cursor: canDraft ? 'pointer' : 'not-allowed',
+                fontFamily: SANS,
               }}>
                 💾 임시저장
               </button>
               <button onClick={handleSubmit}
                 style={{
                   flex: 2, height: 56, fontSize: 18, fontWeight: 700,
-                  background: allComplete ? NAVY : '#ccc',
-                  color: allComplete ? '#fff' : '#888',
+                  background: canSubmit ? NAVY : '#ccc',
+                  color: canSubmit ? '#fff' : '#888',
                   border: 'none', borderRadius: 8,
-                  cursor: allComplete ? 'pointer' : 'not-allowed',
+                  cursor: canSubmit ? 'pointer' : 'not-allowed',
                   fontFamily: SANS,
                 }}>
-                📩 편집국장에게 보내기 ({totalDone}/15)
+                📩 편집국장에게 보내기 ({totalDone}/14)
               </button>
             </div>
           </div>
@@ -733,8 +773,9 @@ export default function ArticleEditor() {
                 🚀 노출깡패 기사 발행 체크리스트
               </h1>
               <p style={{ fontSize: 16, color: '#3a3a3a', lineHeight: 1.8, margin: 0 }}>
-                아무리 좋은 기사도 검색 로봇과 AI가 읽지 못하면 묻힙니다.<br />
-                3단계 15가지를 체크하면 포털과 AI 검색 최상단에 노출됩니다.
+                시민기자가 채울 14가지(자동 7 + 수동 7).<br />
+                <strong>11개 이상</strong> 채우면 편집국장에게 전달할 수 있어요.<br />
+                나머지는 편집국장이 검토하면서 마저 채웁니다.
               </p>
             </div>
 
@@ -747,7 +788,7 @@ export default function ArticleEditor() {
                 🟦 1단계 기사 기본 구조
               </h2>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {stage1.map((it, i) => <CheckItem key={i} item={it} onToggle={toggleManual} />)}
+                {stage1.map((it, i) => <CheckItem key={i} item={it} onToggle={toggleManual} showRedHighlight={showRedHighlight} />)}
               </ul>
             </div>
 
@@ -760,7 +801,7 @@ export default function ArticleEditor() {
                 🟩 2단계 AI·검색 최적화
               </h2>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {stage2.map((it, i) => <CheckItem key={i} item={it} onToggle={toggleManual} />)}
+                {stage2.map((it, i) => <CheckItem key={i} item={it} onToggle={toggleManual} showRedHighlight={showRedHighlight} />)}
               </ul>
             </div>
 
@@ -773,7 +814,7 @@ export default function ArticleEditor() {
                 🟥 3단계 최종 발행 준비
               </h2>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {stage3.map((it, i) => <CheckItem key={i} item={it} onToggle={toggleManual} />)}
+                {stage3.map((it, i) => <CheckItem key={i} item={it} onToggle={toggleManual} showRedHighlight={showRedHighlight} />)}
               </ul>
             </div>
 
@@ -820,58 +861,71 @@ export default function ArticleEditor() {
             {/* 하단 서명 영역 */}
             <div style={{
               fontSize: 18, color: '#555',
-              padding: '24px 0 40px',
+              padding: '24px 0 24px',
               borderTop: '1px solid #e0e0e0',
               marginTop: 16,
             }}>
               인터뷰 이음미디어 에디터: _______________
             </div>
-          </div>
-        )}
 
-        {/* ━━ 탭 3: 글쓰기 가이드 ━━ */}
-        {activeTab === 3 && (
-          <div>
-            <div style={{ textAlign: 'center', marginBottom: 32 }}>
-              <h1 style={{
-                fontFamily: SERIF, fontSize: 26, fontWeight: 700,
-                color: NAVY, margin: '0 0 10px 0', lineHeight: 1.4,
-              }}>
-                노출 잘 되는 기사 쓰는 법
-              </h1>
-              <p style={{ fontSize: 18, color: '#666', margin: 0, lineHeight: 1.6 }}>
-                이 4가지만 지키면 구글·네이버·카카오에서 찾아옵니다
-              </p>
-            </div>
+            {/* ━━ 글쓰기 가이드 — 탭2 하단 토글로 통합 (기존 탭3 → 접기/펼치기) ━━ */}
+            <button
+              type="button"
+              onClick={() => setShowGuide(s => !s)}
+              style={{
+                width: '100%', padding: '16px 20px', marginTop: 16, marginBottom: 12,
+                background: '#fff', border: `2px solid ${NAVY}`, borderRadius: 10,
+                color: NAVY, fontSize: 18, fontWeight: 700, fontFamily: SANS,
+                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              }}
+            >
+              📖 글쓰기 가이드 {showGuide ? '접기 ▲' : '보기 ▼'}
+            </button>
 
-            {GUIDE_CARDS.map((g, i) => (
-              <div key={i} style={{
-                background: g.bg,
-                borderLeft: `4px solid ${g.border}`,
-                borderRadius: 12,
-                padding: '24px 28px', marginBottom: 20,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-              }}>
-                <h3 style={{
-                  fontFamily: SERIF, fontSize: 20, fontWeight: 700,
-                  color: NAVY, margin: '0 0 14px 0', lineHeight: 1.4,
+            {showGuide && (
+              <div style={{ marginTop: 4 }}>
+                <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                  <h2 style={{
+                    fontFamily: SERIF, fontSize: 22, fontWeight: 700,
+                    color: NAVY, margin: '0 0 8px 0', lineHeight: 1.4,
+                  }}>
+                    노출 잘 되는 기사 쓰는 법
+                  </h2>
+                  <p style={{ fontSize: 16, color: '#666', margin: 0, lineHeight: 1.6 }}>
+                    이 4가지만 지키면 구글·네이버·카카오에서 찾아옵니다
+                  </p>
+                </div>
+
+                {GUIDE_CARDS.map((g, i) => (
+                  <div key={i} style={{
+                    background: g.bg,
+                    borderLeft: `4px solid ${g.border}`,
+                    borderRadius: 12,
+                    padding: '24px 28px', marginBottom: 20,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                  }}>
+                    <h3 style={{
+                      fontFamily: SERIF, fontSize: 20, fontWeight: 700,
+                      color: NAVY, margin: '0 0 14px 0', lineHeight: 1.4,
+                    }}>
+                      {g.icon} {g.title}
+                    </h3>
+                    <div style={{ fontSize: 17, color: '#1a1a1a', lineHeight: 1.85 }}>
+                      {g.body}
+                    </div>
+                  </div>
+                ))}
+
+                <div style={{
+                  background: NAVY, color: '#fff',
+                  borderRadius: 12, padding: 24, marginTop: 12,
+                  textAlign: 'center', fontSize: 17, lineHeight: 1.85,
                 }}>
-                  {g.icon} {g.title}
-                </h3>
-                <div style={{ fontSize: 17, color: '#1a1a1a', lineHeight: 1.85 }}>
-                  {g.body}
+                  💡 좋은 기사 한 편이 이음미디어를 알립니다.<br />
+                  시민기자님의 글이 세상을 잇습니다. 🌿
                 </div>
               </div>
-            ))}
-
-            <div style={{
-              background: NAVY, color: '#fff',
-              borderRadius: 12, padding: 24, marginTop: 32,
-              textAlign: 'center', fontSize: 17, lineHeight: 1.85,
-            }}>
-              💡 좋은 기사 한 편이 이음미디어를 알립니다.<br />
-              시민기자님의 글이 세상을 잇습니다. 🌿
-            </div>
+            )}
           </div>
         )}
       </div>
