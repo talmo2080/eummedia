@@ -418,15 +418,15 @@ export default function ArticleEditor() {
         : 0)
 
   // 탭1 입력값 기반 자동 체크 7개 derive (편집국장 영역 1개 제외 = 시민기자 14개 중 7개)
-  // 보안: 아무 키나 눌러도 자동 체크되지 않게 길이 기준 강화
+  // 보안: 아무 키나 눌러도 자동 체크되지 않게 길이 기준 강화 + 명시적 boolean 변환
   const autoChecks = {
-    titleClear:     title.length >= 10 && title.length <= 30,
-    thumbnail:      !!thumbnailUrl.trim(),
-    contentLength:  content.length >= 500,
-    channelCorrect: !!channel.trim(),
+    titleClear:     typeof title === 'string' && title.length >= 10 && title.length <= 30,
+    thumbnail:      typeof thumbnailUrl === 'string' && thumbnailUrl.trim().length > 0,
+    contentLength:  typeof content === 'string' && content.length >= 500,
+    channelCorrect: typeof channel === 'string' && channel.trim().length > 0,
     tags:           validTagsCount >= 3,
-    summary:        summary.length >= 20,
-    alt:            imageAlt.length >= 5,
+    summary:        typeof summary === 'string' && summary.length >= 20,
+    alt:            typeof imageAlt === 'string' && imageAlt.length >= 5,
   }
   // 시민기자 14개 합산 — 자동 7 + 수동 7
   const allChecks = { ...autoChecks, ...manualChecks }

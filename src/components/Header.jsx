@@ -19,6 +19,7 @@ export default function Header() {
   const isLoggedIn = !!user;
   const role = profile?.role;
   const isAdmin = role === "admin";
+  const roleLabel = role === "admin" ? "편집국장" : role === "writer" ? "기자" : "독자";
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
 
@@ -109,16 +110,21 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Link to="/mypage" style={{
-                color: "#c9a84c",
-                fontSize: 13,
-                padding: "5px 8px",
-                textDecoration: "none",
-                cursor: "pointer",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.textDecoration = "underline" }}
-              onMouseLeave={e => { e.currentTarget.style.textDecoration = "none" }}>
-                안녕하세요, {profile?.nickname || "회원"}님 ▾
+              <Link
+                to="/mypage"
+                className="inline-flex items-center hover:bg-yellow-500/10 transition"
+                style={{
+                  color: "#c9a84c",
+                  border: "2px solid #c9a84c",
+                  borderRadius: 4,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  padding: "6px 14px",
+                  textDecoration: "none",
+                  cursor: "pointer",
+                }}
+              >
+                {profile?.nickname || "회원"} {roleLabel}
               </Link>
               <button onClick={handleLogout} style={{
                 color: "#c9a84c",
@@ -320,14 +326,18 @@ export default function Header() {
                     to="/mypage"
                     onClick={closeMenu}
                     style={{
-                      display: "block",
-                      color: "#c9a84c", fontSize: 17,
-                      padding: "12px 16px", marginBottom: 6,
-                      textAlign: "center",
+                      display: "inline-flex", alignItems: "center", justifyContent: "center",
+                      color: "#c9a84c",
+                      border: "2px solid #c9a84c",
+                      borderRadius: 4,
+                      fontSize: 17, fontWeight: 500,
+                      padding: "10px 18px",
+                      marginBottom: 6,
+                      alignSelf: "center",
                       textDecoration: "none",
                     }}
                   >
-                    안녕하세요, {profile?.nickname || "회원"}님 ▾
+                    {profile?.nickname || "회원"} {roleLabel}
                   </Link>
                   <button
                     onClick={handleLogout}

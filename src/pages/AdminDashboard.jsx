@@ -129,6 +129,149 @@ function StatCard({ label, value, color }) {
   )
 }
 
+// ━━━━━━━━━━━ PreviewModal — 검토대기 기사 전문 미리보기 ━━━━━━━━━━━
+function PreviewModal({ article, onClose }) {
+  useEffect(() => {
+    if (!article) return
+    const onKey = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev
+    }
+  }, [article, onClose])
+
+  if (!article) return null
+
+  return (
+    <div
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)',
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
+        zIndex: 1100, padding: '40px 20px', overflowY: 'auto',
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: '#fff', maxWidth: 800, width: '100%',
+          borderRadius: 12, padding: '32px 28px', boxSizing: 'border-box',
+          position: 'relative',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+        }}
+      >
+        <button
+          onClick={onClose}
+          aria-label="닫기"
+          style={{
+            position: 'absolute', top: 12, right: 12,
+            width: 40, height: 40, border: 'none', background: 'transparent',
+            fontSize: 24, cursor: 'pointer', color: '#666', lineHeight: 1,
+          }}
+        >✕</button>
+
+        {/* 미리보기 표시 + 채널 배지 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
+          <span style={{
+            background: '#fffbeb', color: '#92400e',
+            border: '1px solid #f59e0b',
+            fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 12,
+          }}>👁 미리보기</span>
+          {article.channels?.name && (
+            <span style={{
+              background: '#eef3fa', color: NAVY, fontWeight: 700,
+              fontSize: 13, padding: '4px 12px', borderRadius: 12,
+            }}>{article.channels.name}</span>
+          )}
+        </div>
+
+        {/* 제목 */}
+        <h1 style={{
+          fontFamily: SERIF, fontSize: 28, fontWeight: 700,
+          color: '#0d2d52', lineHeight: 1.4,
+          margin: '0 0 14px 0', paddingRight: 40,
+        }}>
+          {article.title}
+        </h1>
+
+        {/* 요약 */}
+        {article.summary && (
+          <div style={{
+            fontFamily: SERIF, fontSize: 16, color: '#5a5a5a',
+            lineHeight: 1.7, fontStyle: 'italic',
+            borderLeft: '3px solid #1c4f8a', paddingLeft: 14,
+            marginBottom: 18,
+          }}>
+            {article.summary}
+          </div>
+        )}
+
+        {/* 기자 + 작성일 */}
+        <div style={{
+          fontSize: 14, color: '#666',
+          paddingBottom: 14, marginBottom: 18,
+          borderBottom: '1px solid #e5e5e5',
+        }}>
+          기자 <strong style={{ color: '#1a1a1a' }}>{article.author_name || '-'}</strong>
+          {' · '}
+          작성일 {formatDateTime(article.created_at)}
+          {article.citizen_complete > 0 && (
+            <span style={{ marginLeft: 10, color: '#888' }}>· 시민기자 체크 {article.citizen_complete}/14</span>
+          )}
+        </div>
+
+        {/* 대표 이미지 */}
+        {article.thumbnail_url && (
+          <div style={{ marginBottom: 20 }}>
+            <img
+              src={article.thumbnail_url}
+              alt={article.image_alt || article.title}
+              style={{
+                width: '100%', maxHeight: 400, objectFit: 'cover',
+                borderRadius: 4, display: 'block',
+              }}
+            />
+            {article.image_alt && (
+              <div style={{ fontSize: 12, color: '#999', textAlign: 'center', marginTop: 6, fontStyle: 'italic' }}>
+                {article.image_alt}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 본문 */}
+        <div style={{
+          fontSize: 16, lineHeight: 1.9, color: '#222',
+          marginBottom: 24, whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+        }}>
+          {article.content || '(본문 없음)'}
+        </div>
+
+        {/* 태그 */}
+        {Array.isArray(article.tags) && article.tags.length > 0 && (
+          <div style={{
+            display: 'flex', flexWrap: 'wrap', gap: 8,
+            paddingTop: 16, borderTop: '1px solid #e5e5e5',
+          }}>
+            {article.tags.map(tag => (
+              <span key={tag} style={{
+                fontSize: 12, color: '#1c4f8a',
+                border: '1px solid #1c4f8a', padding: '4px 10px',
+                borderRadius: 4,
+              }}>#{tag}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ━━━━━━━━━━━ CardNewsModal — 5장 데이터 기반 (commit 48) ━━━━━━━━━━━
 // 구조: 표지1 + 핵심3 + 마무리1
 // AI 자동 요약 (Vercel /api/cardnews-ai → Claude sonnet-4-5)
@@ -427,6 +570,7 @@ export default function AdminDashboard() {
   const [approvedId, setApprovedId] = useState(null)
   const [approvedUserId, setApprovedUserId] = useState(null)
   const [modalArticle, setModalArticle] = useState(null)
+  const [previewArticle, setPreviewArticle] = useState(null)
 
   useEffect(() => {
     (async () => {
@@ -730,7 +874,7 @@ export default function AdminDashboard() {
                         <>
                           <button onClick={() => approveArticle(a.id)} style={btnStyle(GREEN)}>✅ 승인·발행</button>
                           <button onClick={() => startReject(a.id)} style={btnStyle(ORANGE)}>❌ 반려</button>
-                          <button onClick={() => alert(`미리보기: ${a.title}`)} style={btnStyle('#666', true)}>👁 미리보기</button>
+                          <button onClick={() => setPreviewArticle(a)} style={btnStyle('#666', true)}>👁 미리보기</button>
                         </>
                       )}
                       {a.status === 'published' && (
@@ -748,7 +892,7 @@ export default function AdminDashboard() {
                       {a.status === 'rejected' && (
                         <>
                           <button onClick={() => reReview(a.id)} style={btnStyle(BLUE)}>🔄 재검토</button>
-                          <button onClick={() => alert(`미리보기: ${a.title}`)} style={btnStyle('#666', true)}>👁 미리보기</button>
+                          <button onClick={() => setPreviewArticle(a)} style={btnStyle('#666', true)}>👁 미리보기</button>
                         </>
                       )}
                     </div>
@@ -1073,6 +1217,7 @@ export default function AdminDashboard() {
       </div>
 
       <CardNewsModal article={modalArticle} onClose={() => setModalArticle(null)} />
+      <PreviewModal article={previewArticle} onClose={() => setPreviewArticle(null)} />
     </div>
   )
 }
