@@ -9,6 +9,7 @@ const ORANGE = '#c45c0a'
 const GOLD = '#c9a84c'
 const SERIF = "'Noto Serif KR', serif"
 const SANS = "'Noto Sans KR', sans-serif"
+const PAGE_SIZE = 15
 
 function formatDateTime(iso) {
   if (!iso) return ''
@@ -571,6 +572,7 @@ export default function AdminDashboard() {
   const [approvedUserId, setApprovedUserId] = useState(null)
   const [modalArticle, setModalArticle] = useState(null)
   const [previewArticle, setPreviewArticle] = useState(null)
+  const [visibleArticleCount, setVisibleArticleCount] = useState(PAGE_SIZE)
 
   useEffect(() => {
     (async () => {
@@ -603,6 +605,17 @@ export default function AdminDashboard() {
   const filteredUsers = userFilter === 'all'
     ? users
     : users.filter(u => getUserStatus(u) === userFilter)
+
+  // 필터 변경 시 페이지네이션 초기화 (render 중 state 조정 — React 19 권장 패턴)
+  const [prevArticleFilter, setPrevArticleFilter] = useState(articleFilter)
+  if (articleFilter !== prevArticleFilter) {
+    setPrevArticleFilter(articleFilter)
+    setVisibleArticleCount(PAGE_SIZE)
+  }
+
+  const visibleArticles = filteredArticles.slice(0, visibleArticleCount)
+  const hasMoreArticles = filteredArticles.length > visibleArticleCount
+  const remainingArticles = filteredArticles.length - visibleArticleCount
 
   const approveArticle = async (id) => {
     const nowIso = new Date().toISOString()
@@ -777,7 +790,7 @@ export default function AdminDashboard() {
                 해당 상태의 기사가 없습니다.
               </div>
             )}
-            {filteredArticles.map(a => {
+            {visibleArticles.map(a => {
               const sb = ARTICLE_STATUS_LABELS[a.status] || { label: a.status, color: '#888', bg: '#f0f0f0' }
               const showApprovedBanner = approvedId === a.id && a.status === 'published'
               const isRejecting = rejectingId === a.id
@@ -900,6 +913,21 @@ export default function AdminDashboard() {
                 </div>
               )
             })}
+            {hasMoreArticles && (
+              <button
+                type="button"
+                onClick={() => setVisibleArticleCount(c => c + PAGE_SIZE)}
+                style={{
+                  width: '100%', padding: '12px 16px', marginTop: 12,
+                  background: '#fff', color: NAVY,
+                  border: `1px solid ${NAVY}`, borderRadius: 8,
+                  fontFamily: SANS, fontSize: 16, fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                ⬇ 더보기 ({remainingArticles})
+              </button>
+            )}
           </div>
         )}
 

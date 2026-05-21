@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
+const PAGE_SIZE = 15;
+
 // 시민기자 마이페이지 — 1단계 UI (이어쓰기는 별도 commit)
 export default function MyPage() {
   const { user, profile } = useAuth();
@@ -10,6 +12,7 @@ export default function MyPage() {
   const [articles, setArticles] = useState([]);
   const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   // 비로그인 시 로그인 페이지로 리다이렉트
   useEffect(() => {
@@ -46,6 +49,17 @@ export default function MyPage() {
   const totalLikes = articles.reduce((sum, a) => sum + (a.like_count || 0), 0);
 
   const filteredArticles = filter === 'all' ? articles : articles.filter(a => a.status === filter);
+
+  // 필터 변경 시 페이지네이션 초기화 (render 중 state 조정 — React 19 권장 패턴)
+  const [prevFilter, setPrevFilter] = useState(filter);
+  if (filter !== prevFilter) {
+    setPrevFilter(filter);
+    setVisibleCount(PAGE_SIZE);
+  }
+
+  const visibleArticles = filteredArticles.slice(0, visibleCount);
+  const hasMore = filteredArticles.length > visibleCount;
+  const remaining = filteredArticles.length - visibleCount;
 
   // 임시저장 삭제
   const handleDelete = async (id) => {
@@ -154,15 +168,26 @@ export default function MyPage() {
             )}
           </div>
         ) : (
-          <ul className="space-y-3">
-            {filteredArticles.map(a => (
-              <ArticleCard
-                key={a.id}
-                article={a}
-                onDelete={handleDelete}
-              />
-            ))}
-          </ul>
+          <>
+            <ul className="space-y-3">
+              {visibleArticles.map(a => (
+                <ArticleCard
+                  key={a.id}
+                  article={a}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </ul>
+            {hasMore && (
+              <button
+                type="button"
+                onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+                className="w-full py-3 mt-4 bg-white text-[#0d2d52] border border-[#0d2d52] rounded-lg font-bold hover:bg-neutral-50 transition"
+              >
+                ⬇ 더보기 ({remaining})
+              </button>
+            )}
+          </>
         )}
       </section>
     </div>

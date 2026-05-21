@@ -223,9 +223,10 @@ export default function Home() {
       )}
 
       {/* ━━━━━━━━━━━ 모바일·태블릿 신문형 (lg 미만) ━━━━━━━━━━━ */}
+      {/* 순서: 메인 헤드라인 → 채널 진입 → 광고 → 서브톱 → 카드뉴스 → 최신 기사 */}
       <div className="lg:hidden">
 
-        {/* ① HERO 톱 1개 */}
+        {/* ① HERO 톱 1개 — 메인 헤드라인 */}
         {heroArticle && (
           <Link to={"/article/" + heroArticle.slug}
             className="block px-4 pt-5 pb-5 mb-5 border-b border-neutral-200">
@@ -250,7 +251,49 @@ export default function Home() {
           </Link>
         )}
 
-        {/* ② 서브 톱 2개 */}
+        {/* ② 7채널 가로 스크롤 칩 — 채널 진입 */}
+        <div className="px-4 mb-5">
+          <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+            {NAV_CHANNELS.map(ch => (
+              <Link
+                key={ch.slug}
+                to={`/channel/${ch.slug}`}
+                className={`flex-shrink-0 px-4 py-2 rounded-full ${CHANNEL_COLORS[ch.color]} text-[12px] font-bold`}
+              >
+                {ch.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* ③ 광고 — 데스크탑 사이드바와 동일 컨텐츠의 모바일 카드 */}
+        <div className="px-4 mb-7">
+          <div className="text-[10px] text-neutral-500 tracking-widest mb-2">광고</div>
+          <a href="https://naver.me/GWeDuL23" target="_blank" rel="noopener noreferrer"
+             className="block bg-white border border-neutral-200 rounded-sm overflow-hidden no-underline">
+            <div className="h-[120px] flex items-center justify-center"
+                 style={{ background: "linear-gradient(135deg,#0d2d52,#1c4f8a)" }}>
+              <div className="text-center text-white px-3">
+                <div className="text-[26px] mb-1">💆</div>
+                <div className="text-[14px] font-bold">닥터리부트 두피관리센터</div>
+              </div>
+            </div>
+            <div className="p-4">
+              <div className="text-[15px] font-bold text-[#0d2d52] mb-1 leading-snug">
+                고객의 마지막 희망이 되고픈
+              </div>
+              <div className="text-[12px] text-neutral-600 leading-relaxed mb-3">
+                정세연 원장 · 두피전문가 27년<br />
+                일산 · 브레인트레이너 · SMP디자인전문가
+              </div>
+              <div className="w-full bg-[#0d2d52] text-white text-center py-3 text-[14px] font-bold rounded-sm">
+                예약 · 문의 →
+              </div>
+            </div>
+          </a>
+        </div>
+
+        {/* ④ 서브 톱 2개 */}
         {articles.length >= 2 && (
           <div className="grid grid-cols-2 gap-3 px-4 pb-5 mb-6 border-b border-neutral-200">
             {articles.slice(0, 2).map(a => (
@@ -272,7 +315,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* ③ 카드뉴스 모음 (편집 3 + 광고 1) */}
+        {/* ⑤ 카드뉴스 모음 (편집 3 + 광고 1) */}
         <div className="px-4 mb-7">
           <div className="flex items-end justify-between border-b-2 border-neutral-900 pb-2 mb-3">
             <h2 className="font-serif font-bold text-[18px]">📱 카드뉴스 모음</h2>
@@ -302,7 +345,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ④ 최신 기사 (신문형 리스트 5건) */}
+        {/* ⑥ 최신 기사 (신문형 리스트 5건) */}
         <div className="px-4 mb-7">
           <div className="flex items-end justify-between border-b-2 border-neutral-900 pb-2 mb-3">
             <h2 className="font-serif font-bold text-[18px]">📰 최신 기사</h2>
@@ -333,21 +376,6 @@ export default function Home() {
               </li>
             ))}
           </ul>
-        </div>
-
-        {/* ⑤ 7채널 가로 스크롤 칩 */}
-        <div className="px-4 mb-7">
-          <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
-            {NAV_CHANNELS.map(ch => (
-              <Link
-                key={ch.slug}
-                to={`/channel/${ch.slug}`}
-                className={`flex-shrink-0 px-4 py-2 rounded-full ${CHANNEL_COLORS[ch.color]} text-[12px] font-bold`}
-              >
-                {ch.name}
-              </Link>
-            ))}
-          </div>
         </div>
 
         {/* TODO: commit 44+ 에서 채널별 미니 섹션 추가 (세연님 Q4=c 차후) */}
