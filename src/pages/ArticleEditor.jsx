@@ -942,7 +942,9 @@ export default function ArticleEditor() {
                 fontSize: 15, lineHeight: 1.6, color: '#333',
               }}>
                 📷 휴대폰 사진을 그대로 올려주세요 (10MB 이하).<br/>
-                원본 품질을 유지합니다.
+                원본 품질을 유지합니다.<br/><br/>
+                💡 권장 사이즈: 16:9 가로형 (예: 1200×675)<br/>
+                휴대폰 가로 촬영 사진이 가장 잘 어울려요.
               </div>
 
               {/* 미리보기 */}
