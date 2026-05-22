@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
 
 const NAVY = '#0d2d52'
 const BLUE = '#1c4f8a'
@@ -561,6 +562,8 @@ function CardNewsModal({ article, onClose }) {
 }
 
 export default function AdminDashboard() {
+  const { profile } = useAuth()
+  const canAct = profile?.role === 'admin'   // 발행/반려/승인/정지/카드뉴스 등 모든 액션
   const [activeTab, setActiveTab] = useState(1)
   const [articles, setArticles] = useState([])
   const [users, setUsers] = useState([])
@@ -861,14 +864,16 @@ export default function AdminDashboard() {
                         onChange={e => setRejectReason(e.target.value)}
                         placeholder="시민기자에게 전달할 수정 요청 내용을 입력하세요" />
                       <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-                        <button onClick={() => confirmReject(a.id)}
-                          style={{
-                            padding: '10px 20px', fontSize: 15, fontWeight: 700,
-                            background: ORANGE, color: '#fff', border: 'none', borderRadius: 8,
-                            cursor: 'pointer', fontFamily: SANS,
-                          }}>
-                          반려 확인
-                        </button>
+                        {canAct && (
+                          <button onClick={() => confirmReject(a.id)}
+                            style={{
+                              padding: '10px 20px', fontSize: 15, fontWeight: 700,
+                              background: ORANGE, color: '#fff', border: 'none', borderRadius: 8,
+                              cursor: 'pointer', fontFamily: SANS,
+                            }}>
+                            반려 확인
+                          </button>
+                        )}
                         <button onClick={cancelReject}
                           style={{
                             padding: '10px 20px', fontSize: 15, fontWeight: 600,
@@ -885,26 +890,28 @@ export default function AdminDashboard() {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                       {a.status === 'submitted' && (
                         <>
-                          <button onClick={() => approveArticle(a.id)} style={btnStyle(GREEN)}>✅ 승인·발행</button>
-                          <button onClick={() => startReject(a.id)} style={btnStyle(ORANGE)}>❌ 반려</button>
+                          {canAct && <button onClick={() => approveArticle(a.id)} style={btnStyle(GREEN)}>✅ 승인·발행</button>}
+                          {canAct && <button onClick={() => startReject(a.id)} style={btnStyle(ORANGE)}>❌ 반려</button>}
                           <button onClick={() => setPreviewArticle(a)} style={btnStyle('#666', true)}>👁 미리보기</button>
                         </>
                       )}
                       {a.status === 'published' && (
                         <>
-                          <button onClick={() => setModalArticle({
-                            ...a,
-                            thumb: a.thumbnail_url,
-                            channel: a.channels?.name || '',
-                            reporter: a.author_name || '',
-                            submittedAt: formatDateTime(a.created_at),
-                          })} style={btnStyle(NAVY)}>🖼 카드뉴스 만들기</button>
+                          {canAct && (
+                            <button onClick={() => setModalArticle({
+                              ...a,
+                              thumb: a.thumbnail_url,
+                              channel: a.channels?.name || '',
+                              reporter: a.author_name || '',
+                              submittedAt: formatDateTime(a.created_at),
+                            })} style={btnStyle(NAVY)}>🖼 카드뉴스 만들기</button>
+                          )}
                           <button onClick={() => alert(`기사 보기: ${a.title}`)} style={btnStyle('#666', true)}>👁 기사 보기</button>
                         </>
                       )}
                       {a.status === 'rejected' && (
                         <>
-                          <button onClick={() => reReview(a.id)} style={btnStyle(BLUE)}>🔄 재검토</button>
+                          {canAct && <button onClick={() => reReview(a.id)} style={btnStyle(BLUE)}>🔄 재검토</button>}
                           <button onClick={() => setPreviewArticle(a)} style={btnStyle('#666', true)}>👁 미리보기</button>
                         </>
                       )}
@@ -1057,7 +1064,7 @@ export default function AdminDashboard() {
                   </div>
 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                    {ustatus === 'pending' && (
+                    {ustatus === 'pending' && canAct && (
                       <>
                         <button onClick={() => approveUser(u.id)} style={btnStyle(GREEN)}>✅ 시민기자 승인</button>
                         <button onClick={() => rejectUser(u.id)} style={btnStyle(ORANGE)}>❌ 반려</button>
@@ -1065,12 +1072,12 @@ export default function AdminDashboard() {
                     )}
                     {ustatus === 'active' && (
                       <>
-                        <button onClick={() => renewUser(u.id)} style={btnStyle(BLUE)}>🔄 1년 갱신</button>
-                        <button onClick={() => suspendUser(u.id)} style={btnStyle(ORANGE)}>🚫 활동 정지</button>
+                        {canAct && <button onClick={() => renewUser(u.id)} style={btnStyle(BLUE)}>🔄 1년 갱신</button>}
+                        {canAct && <button onClick={() => suspendUser(u.id)} style={btnStyle(ORANGE)}>🚫 활동 정지</button>}
                         <button onClick={() => alert(`${u.nickname} 기자의 기사 목록으로 이동합니다.`)} style={btnStyle('#666', true)}>📋 기사 보기</button>
                       </>
                     )}
-                    {ustatus === 'suspended' && (
+                    {ustatus === 'suspended' && canAct && (
                       <button onClick={() => reactivateUser(u.id)} style={btnStyle(BLUE)}>🔄 재활성화</button>
                     )}
                   </div>

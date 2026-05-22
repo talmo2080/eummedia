@@ -18,8 +18,11 @@ export default function Header() {
   const navigate = useNavigate();
   const isLoggedIn = !!user;
   const role = profile?.role;
-  const isAdmin = role === "admin";
-  const roleLabel = role === "admin" ? "편집국장" : role === "writer" ? "기자" : "독자";
+  const canSeeAdmin = role === "admin" || role === "publisher";
+  const roleLabel =
+    role === "admin" ? "편집국장" :
+    role === "publisher" ? "발행인" :
+    role === "writer" ? "기자" : "독자";
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
 
@@ -138,7 +141,7 @@ export default function Header() {
               }}>로그아웃</button>
             </>
           )}
-          {isAdmin && (
+          {canSeeAdmin && (
             <Link to="/admin" style={{
               color: "#888",
               textDecoration: "none",
@@ -336,7 +339,7 @@ export default function Header() {
               )}
             </div>
 
-            {isAdmin && (
+            {canSeeAdmin && (
               <div>
                 <div style={{
                   color: "rgba(201,168,76,0.75)",

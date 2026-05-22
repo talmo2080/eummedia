@@ -73,7 +73,7 @@ export default function MyPage() {
 
   if (!user) return null;
 
-  const canWrite = profile?.role === 'writer' || profile?.role === 'admin';
+  const canWrite = profile?.role === 'writer' || profile?.role === 'admin' || profile?.role === 'publisher';
   const nickname = profile?.nickname || user.email || '회원';
   const initial = nickname.charAt(0).toUpperCase();
   const joinedDate = profile?.created_at
@@ -93,7 +93,11 @@ export default function MyPage() {
               {nickname}
             </h1>
             <p className="text-sm text-neutral-600 mt-1">
-              이음미디어 {profile?.role === 'admin' ? '편집국장' : profile?.role === 'writer' ? '시민기자' : '독자'}
+              이음미디어 {
+                profile?.role === 'admin' ? '편집국장' :
+                profile?.role === 'publisher' ? '발행인' :
+                profile?.role === 'writer' ? '시민기자' : '독자'
+              }
             </p>
             {joinedDate && (
               <p className="text-xs text-neutral-500 mt-1">

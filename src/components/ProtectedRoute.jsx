@@ -12,7 +12,17 @@ export default function ProtectedRoute({ children, requiredRole }) {
 
   if (!user) return <Navigate to="/login" replace />
 
-  if (requiredRole && profile?.role !== requiredRole && profile?.role !== 'admin') {
+  // admin / publisher 는 모든 requiredRole 통과
+  // writer 는 requiredRole === 'writer' 만 통과
+  // reader 는 차단
+  const role = profile?.role
+  const passes =
+    !requiredRole ||
+    role === requiredRole ||
+    role === 'admin' ||
+    (role === 'publisher' && (requiredRole === 'admin' || requiredRole === 'writer'))
+
+  if (!passes) {
     return (
       <div style={{
         maxWidth: '500px', margin: '80px auto', textAlign: 'center',
@@ -25,9 +35,9 @@ export default function ProtectedRoute({ children, requiredRole }) {
           접근 권한이 없습니다
         </h2>
         <p style={{ fontSize: '18px', color: '#666', marginBottom: '24px', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
-          {profile?.role === 'reader'
+          {role === 'reader'
             ? '편집국장 승인 후 기사를 작성할 수 있습니다.\n승인은 카카오톡으로 안내드립니다.'
-            : '이 페이지는 편집국장만 접근할 수 있습니다.'}
+            : '이 페이지는 편집국장·발행인만 접근할 수 있습니다.'}
         </p>
         <a href="/" style={{
           display: 'inline-block', padding: '14px 32px',
