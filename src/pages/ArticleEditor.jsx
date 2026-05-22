@@ -995,14 +995,17 @@ export default function ArticleEditor() {
                 placeholder="사진 설명 — 예: 고양시 닥터리부트 두피케어 체험" />
             </div>
 
-            {/* 7. 영상 URL */}
+            {/* 7. 영상 URL (선택) */}
             <div style={card}>
-              <label style={lbl}>영상 URL</label>
+              <label style={lbl}>
+                영상 URL <span style={{ color: '#888', fontWeight: 500, fontSize: 16 }}>(선택)</span>
+              </label>
               <input style={inp()}
                 value={videoUrl} onChange={e => setVideoUrl(e.target.value)}
-                placeholder="유튜브 또는 영상 링크를 붙여넣으세요" />
-              <div style={{ fontSize: 16, color: '#888', marginTop: 10, lineHeight: 1.6 }}>
-                유튜브 영상은 링크만 입력하시면 기사에 자동으로 표시됩니다
+                placeholder="예: https://www.youtube.com/watch?v=..." />
+              <div style={{ fontSize: 16, color: '#666', marginTop: 10, lineHeight: 1.7 }}>
+                영상이 있으면 <strong>YouTube 링크</strong>를 넣어주세요.<br />
+                사진만 있는 기사는 비워두셔도 됩니다.
               </div>
             </div>
 

@@ -14,6 +14,13 @@ function formatDate(iso) {
   return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
 }
 
+function getYouTubeEmbedUrl(url) {
+  if (!url || typeof url !== 'string') return null;
+  const re = /(?:youtube\.com\/watch\?(?:[^&]*&)*v=|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtu\.be\/)([A-Za-z0-9_-]{11})/;
+  const m = url.match(re);
+  return m ? `https://www.youtube.com/embed/${m[1]}` : null;
+}
+
 function splitIntoParagraphs(content) {
   if (!content) return [];
   const PROTECT = '';
@@ -226,7 +233,7 @@ export default function ArticleDetail() {
     (async () => {
       const { data, error: err } = await supabase
         .from('articles')
-        .select('slug, title, summary, content, thumbnail_url, published_at, channel_id, channels(name, slug, english_slug)')
+        .select('slug, title, summary, content, thumbnail_url, video_url, published_at, channel_id, channels(name, slug, english_slug)')
         .eq('slug', slug)
         .eq('status', 'published')
         .single();
@@ -297,6 +304,7 @@ export default function ArticleDetail() {
     thumbnail: article.thumbnail_url,
     published_at: formatDate(article.published_at),
     content: article.content,
+    video_url: article.video_url,
     author_name: "정세연 편집국장",
     author_bio: "닥터리부트 두피관리센터(일산) 원장 · 두피전문가 27년 · 이음미디어 편집국장",
     author_intro: "두피 전문가 27년 경력의 정세연 원장이자 이음미디어 편집국장입니다. 세상을 잇고 사람을 잇는 이야기를 발굴합니다.",
@@ -434,6 +442,37 @@ export default function ArticleDetail() {
             '세상과 당신을 잇는, 더 넓은 미디어의 시작입니다.'
           </div>
 
+          {/* 🎬 영상 임베드 — video_url + 유효한 YouTube일 때만 */}
+          {(() => {
+            const embedUrl = getYouTubeEmbedUrl(a.video_url);
+            if (!embedUrl) return null;
+            return (
+              <div style={{ margin: "32px 0" }}>
+                <div style={{ fontSize:"13px", fontWeight:"700", color:"#0d2d52", letterSpacing:"1px", marginBottom:"12px" }}>
+                  🎬 기사 영상
+                </div>
+                <div style={{
+                  position: "relative", width: "100%", paddingBottom: "56.25%",
+                  background: "#000", borderRadius: "8px", overflow: "hidden",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+                }}>
+                  <iframe
+                    src={embedUrl}
+                    title={a.title}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                    style={{
+                      position: "absolute", top: 0, left: 0,
+                      width: "100%", height: "100%", border: 0,
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })()}
+
           {/* 💬 댓글 — 광고 박스 위로 이동 (commit 44 섹션 순서 정정) */}
           <div id="comment-section" style={{ margin:"32px 0" }}>
             <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", borderBottom:"2px solid #0d2d52", paddingBottom:"10px", marginBottom:"20px" }}>댓글 {comments.length}개</div>
@@ -540,9 +579,9 @@ export default function ArticleDetail() {
           {/* 구분선 */}
           <div style={{ borderTop:"1px solid #e0e0e0", margin:"32px 0" }} />
 
-          {/* 🎬 영상 섹션 */}
+          {/* 📺 영상 갤러리 캐러셀 — placeholder (YouTube 연결 예정) */}
           <div style={{ marginTop:"32px" }}>
-            <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>🎬 영상</div>
+            <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>📺 영상 갤러리</div>
 
             <div style={{ position:"relative", width:"100%", aspectRatio:"16/9", borderRadius:"12px", overflow:"hidden", boxShadow:"0 4px 16px rgba(0,0,0,0.12)" }}>
               <img src={VIDEOS[videoIdx].thumb} alt={VIDEOS[videoIdx].title} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
