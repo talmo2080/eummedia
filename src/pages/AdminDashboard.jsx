@@ -317,26 +317,25 @@ const EMPTY_SLIDES = [
 
 const SLIDE_TAB_LABEL = (order) => order === 1 ? '표지' : order === 5 ? '마무리' : `핵심${order-1}`;
 
+// 카드뉴스 비율: 4:5 단일 (1080×1350 권장)
+const CARDNEWS_TYPE = '4:5';
+
 function CardNewsModal({ article, onClose }) {
-  const [tab, setTab] = useState('square');
   const [slides, setSlides] = useState(EMPTY_SLIDES);
   const [activeSlide, setActiveSlide] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const isSquare = tab === 'square';
-
-  // 모달 열릴 때 + 탭 변경 시 기존 cardnews fetch (재편집 지원)
+  // 모달 열릴 때 기존 cardnews fetch (재편집 지원)
   useEffect(() => {
     if (!article?.id) return;
     let cancelled = false;
     (async () => {
-      const dbType = tab === 'square' ? '1:1' : '9:16';
       const { data, error } = await supabase
         .from('cardnews')
         .select('slides')
         .eq('article_id', article.id)
-        .eq('type', dbType)
+        .eq('type', CARDNEWS_TYPE)
         .maybeSingle();
       if (cancelled) return;
       if (error) { console.error('cardnews fetch:', error); return; }
@@ -347,7 +346,7 @@ function CardNewsModal({ article, onClose }) {
       }
     })();
     return () => { cancelled = true; };
-  }, [article?.id, tab]);
+  }, [article?.id]);
 
   if (!article) return null;
 
@@ -411,7 +410,7 @@ function CardNewsModal({ article, onClose }) {
         .upsert({
           article_id: article.id,
           title: slides[0].title || article.title,
-          type: isSquare ? '1:1' : '9:16',
+          type: CARDNEWS_TYPE,
           slides: slides,
           updated_at: new Date().toISOString(),
         }, { onConflict: 'article_id,type' });
@@ -429,7 +428,7 @@ function CardNewsModal({ article, onClose }) {
   const handleImageUpload = async (file, slideOrder) => {
     try {
       const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-      const fileName = `${article.id}_${tab}_slide${slideOrder}_${Date.now()}.${ext}`;
+      const fileName = `${article.id}_4-5_slide${slideOrder}_${Date.now()}.${ext}`;
 
       const { error } = await supabase.storage
         .from('cardnews-images')
@@ -448,14 +447,6 @@ function CardNewsModal({ article, onClose }) {
       alert(`이미지 업로드 실패: ${err.message}`);
     }
   };
-
-  const tabBtnStyle = (active) => ({
-    flex: 1, padding: '10px 8px', fontSize: 13, fontWeight: 700,
-    fontFamily: SANS, cursor: 'pointer', lineHeight: 1.35,
-    background: active ? NAVY : '#f0f0f0',
-    color: active ? '#fff' : '#888',
-    border: 'none', borderRadius: 8,
-  });
 
   const current = slides.find(s => s.order === activeSlide) || slides[0];
 
@@ -479,15 +470,18 @@ function CardNewsModal({ article, onClose }) {
 
         <h2 style={{
           fontFamily: SERIF, fontSize: 20, fontWeight: 700,
-          color: NAVY, margin: '0 0 14px 0', textAlign: 'center',
+          color: NAVY, margin: '0 0 8px 0', textAlign: 'center',
         }}>
           📱 카드뉴스 만들기 (5장)
         </h2>
 
-        {/* 타입 탭 */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
-          <button onClick={() => setTab('square')} style={tabBtnStyle(isSquare)}>📱 1:1 이음용</button>
-          <button onClick={() => setTab('story')} style={tabBtnStyle(!isSquare)}>📖 9:16 인스타용</button>
+        {/* 비율 안내 */}
+        <div style={{
+          background: '#f5f9ff', border: `1px solid ${BLUE}`, borderRadius: 6,
+          padding: '8px 12px', marginBottom: 14, fontSize: 12, color: '#333',
+          textAlign: 'center', lineHeight: 1.6,
+        }}>
+          💡 권장 사이즈 <strong>4:5 (1080×1350)</strong> · 5장 (표지 + 핵심3 + 마무리)
         </div>
 
         {/* AI 자동 생성 버튼 */}
@@ -528,10 +522,10 @@ function CardNewsModal({ article, onClose }) {
               <img
                 src={current.image_url}
                 alt={`슬라이드 ${current.order}`}
-                className="w-full aspect-square object-cover rounded-lg mb-2"
+                className="w-full aspect-[4/5] object-cover rounded-lg mb-2"
               />
             ) : (
-              <div className="aspect-square bg-neutral-100 flex items-center justify-center text-neutral-400 mb-2 rounded-lg text-sm">
+              <div className="aspect-[4/5] bg-neutral-100 flex items-center justify-center text-neutral-400 mb-2 rounded-lg text-sm">
                 이미지 없음
               </div>
             )}
