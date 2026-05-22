@@ -61,15 +61,37 @@ export default function Signup() {
         options: { data: { name: form.name } },
       });
       if (signUpError) throw signUpError;
-      if (!data?.user) throw new Error("계정 생성에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      if (!data?.user) {
+        throw new Error("계정 생성에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      }
 
-      // 2. users 테이블 INSERT (role='reader' default 유지)
-      await supabase.from('users').insert({
+      // ★ session 안전장치 — Confirm email 켜진 환경에서는 session=null
+      //    이 상태로 후속 INSERT 시 RLS(authenticated) 차단 발생 → 폼 글 사라짐 방지
+      if (!data.session) {
+        setError(
+          "이메일 인증이 필요한 환경입니다.\n" +
+          "운영자에게 문의해주세요 (press@eummedia.kr).\n\n" +
+          "작성하신 신청서 내용은 그대로 보존됩니다."
+        );
+        return;
+      }
+
+      // 2. users 테이블 INSERT (role='reader' default 유지) — 에러 체크 추가
+      const { error: usersError } = await supabase.from('users').insert({
         id: data.user.id,
         nickname: form.name,
         email: form.email,
         role: 'reader',
       });
+      if (usersError) {
+        setError(
+          `회원 정보 저장에 실패했습니다.\n` +
+          `${usersError.message}\n\n` +
+          `작성하신 신청서 내용은 그대로 보존됩니다.\n` +
+          `잠시 후 [✍️ 시민기자 신청하기]를 다시 눌러주세요.`
+        );
+        return;
+      }
 
       // 3. writer_applications INSERT — 시민기자 지원서
       const { error: appError } = await supabase.from('writer_applications').insert({
@@ -83,15 +105,20 @@ export default function Signup() {
       });
       if (appError) {
         setError(
-          `계정은 생성되었으나 신청서 제출에 실패했습니다.\n` +
-          `로그인 후 다시 시도해주세요.\n(오류: ${appError.message})`
+          `신청서 제출에 실패했습니다.\n` +
+          `${appError.message}\n\n` +
+          `작성하신 신청서 내용은 그대로 보존됩니다.\n` +
+          `잠시 후 [✍️ 시민기자 신청하기]를 다시 눌러주세요.`
         );
         return;
       }
 
       setSuccess(true);
     } catch (err) {
-      setError(err?.message || "신청 처리 중 오류가 발생했습니다.");
+      setError(
+        (err?.message || "신청 처리 중 오류가 발생했습니다.") +
+        "\n\n작성하신 신청서 내용은 그대로 보존됩니다."
+      );
     } finally {
       setLoading(false);
     }
