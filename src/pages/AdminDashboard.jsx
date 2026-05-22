@@ -623,7 +623,7 @@ export default function AdminDashboard() {
     ;(async () => {
       const { data, error } = await supabase
         .from('writer_applications')
-        .select('*, users:user_id(id, email, nickname, role, is_active, press_no, valid_from, valid_until)')
+        .select('*, users!writer_applications_user_id_fkey(id, email, nickname, role, is_active, press_no, valid_from, valid_until)')
         .order('applied_at', { ascending: false })
       if (error) { console.error('applications fetch:', error); return }
       setApplications(data || [])
