@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
 
 const ROADMAP = [
   { step: 'STEP 01', icon: '🎤', name: '봉숭아학당', desc: '방송스피치 과정\n수강 및 수료', color: '#e8f0f8' },
@@ -39,23 +42,79 @@ const inp = {
 const lbl = { fontSize: 12, fontWeight: 700, color: '#3a3a3a', marginBottom: 6, display: 'block' }
 
 export default function CitizenReporter() {
+  const { user, profile } = useAuth()
   const [form, setForm] = useState({
-    name: '', phone: '', email: '', region: '',
-    qualify: '', motivation: '', experience: '', agree: false,
+    name: '', phone: '', region: '',
+    qualify: '봉숭아학당 수료자',
+    motive: '', experience: '', agree: false,
   })
-  const [stage, setStage] = useState('form')
+  const [stage, setStage] = useState('form')   // form / submitted
   const [openFaq, setOpenFaq] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [existingApp, setExistingApp] = useState(null)   // 본인 기존 신청서
+  const [checking, setChecking] = useState(true)
 
-  const handleSubmit = () => {
-    if (!form.name || !form.phone || !form.email || !form.qualify) {
-      alert('필수 항목(*)을 모두 입력해주세요.')
-      return
+  // 기존 신청서 조회 (중복 방지) — !user면 fetch 안 함, 화면 분기에서 !user 먼저 처리
+  useEffect(() => {
+    if (!user) return
+    let cancelled = false
+    ;(async () => {
+      const { data } = await supabase
+        .from('writer_applications')
+        .select('id, status, applied_at')
+        .eq('user_id', user.id)
+        .order('applied_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (cancelled) return
+      setExistingApp(data || null)
+      setChecking(false)
+    })()
+    return () => { cancelled = true }
+  }, [user])
+
+  // role 이미 writer/publisher/admin이면 신청 불필요
+  const alreadyActive = profile && (
+    profile.role === 'writer' ||
+    profile.role === 'publisher' ||
+    profile.role === 'admin'
+  )
+
+  const handleSubmit = async () => {
+    setError('')
+    if (!user) { setError('로그인 후 이용해주세요.'); return }
+    if (!form.name.trim() || !form.phone.trim() || !form.region.trim()) {
+      setError('이름·전화번호·지역은 필수 입력입니다.'); return
     }
-    if (!form.agree) { alert('개인정보 수집·이용에 동의해주세요.'); return }
-    const subject = `[시민기자 지원] ${form.name} — ${form.qualify}`
-    const body = `[시민기자 지원서]\n\n성함: ${form.name}\n연락처: ${form.phone}\n이메일: ${form.email}\n거주지역: ${form.region || '미입력'}\n지원자격: ${form.qualify}\n\n지원동기:\n${form.motivation || '미입력'}\n\n기사 작성 경험:\n${form.experience || '없음'}`
-    window.location.href = `mailto:press@eummedia.kr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    setStage('pending')
+    if (form.motive.trim().length < 50) {
+      setError('지원 동기는 최소 50자 이상 작성해주세요.'); return
+    }
+    if (!form.agree) {
+      setError('개인정보 수집·이용에 동의해주세요.'); return
+    }
+
+    setLoading(true)
+    try {
+      const { error: appError } = await supabase.from('writer_applications').insert({
+        user_id: user.id,
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        region: form.region.trim(),
+        qualify: form.qualify,
+        motive: form.motive.trim(),
+        experience: form.experience.trim() || null,
+      })
+      if (appError) {
+        setError(`신청서 제출 실패: ${appError.message}\n작성하신 내용은 그대로 보존됩니다.`)
+        return
+      }
+      setStage('submitted')
+    } catch (err) {
+      setError(`${err?.message || '신청 처리 중 오류가 발생했습니다.'}\n작성하신 내용은 그대로 보존됩니다.`)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -162,13 +221,107 @@ export default function CitizenReporter() {
           </div>
         </div>
 
-        {/* 지원 폼 */}
-        {stage === 'form' ? (
+        {/* 지원 폼 — 5가지 분기: 비로그인 / 로딩 / 이미 활동중 / 이미 신청함 / 폼 / 완료 */}
+        {!user ? (
+          /* 비로그인 안내 */
+          <div style={{ background: '#fff7ed', border: '1px solid #fdba74', padding: '40px 28px', textAlign: 'center' }}>
+            <div style={{ fontSize: 42, marginBottom: 12 }}>🔒</div>
+            <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 19, fontWeight: 700, color: '#9a3412', marginBottom: 10 }}>
+              로그인 후 신청 가능합니다
+            </div>
+            <div style={{ fontSize: 14, color: '#7c2d12', lineHeight: 1.8, marginBottom: 22 }}>
+              회원이 아니시면 회원가입과 동시에 시민기자 신청이 가능합니다.
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Link to="/login"
+                style={{ background: '#0d2d52', color: 'white', padding: '12px 28px', fontSize: 14, fontWeight: 700, textDecoration: 'none', display: 'inline-block', fontFamily: "'Noto Sans KR',sans-serif", minHeight: 48, boxSizing: 'border-box', lineHeight: 1.7 }}>
+                로그인
+              </Link>
+              <Link to="/signup"
+                style={{ background: '#c9a84c', color: '#0d2d52', padding: '12px 28px', fontSize: 14, fontWeight: 700, textDecoration: 'none', display: 'inline-block', fontFamily: "'Noto Sans KR',sans-serif", minHeight: 48, boxSizing: 'border-box', lineHeight: 1.7 }}>
+                회원가입+신청
+              </Link>
+            </div>
+          </div>
+        ) : checking ? (
+          /* 본인 기존 신청서 확인 중 */
+          <div style={{ padding: '40px', textAlign: 'center', color: '#888', fontSize: 14 }}>
+            확인 중...
+          </div>
+        ) : alreadyActive ? (
+          /* 이미 활동 중 (writer/publisher/admin) */
+          <div style={{ background: '#e8f7ee', border: '1px solid #27ae60', padding: '40px 28px', textAlign: 'center' }}>
+            <div style={{ fontSize: 42, marginBottom: 12 }}>✅</div>
+            <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 19, fontWeight: 700, color: '#1a7a3f', marginBottom: 10 }}>
+              이미 이음미디어 시민기자/발행인/편집국장으로 활동 중입니다
+            </div>
+            <div style={{ fontSize: 14, color: '#2a5a3a', lineHeight: 1.8, marginBottom: 22 }}>
+              별도 신청이 필요하지 않습니다.
+            </div>
+            <Link to="/mypage"
+              style={{ background: '#0d2d52', color: 'white', padding: '12px 28px', fontSize: 14, fontWeight: 700, textDecoration: 'none', display: 'inline-block', fontFamily: "'Noto Sans KR',sans-serif", minHeight: 48, boxSizing: 'border-box', lineHeight: 1.7 }}>
+              마이페이지로 가기
+            </Link>
+          </div>
+        ) : existingApp ? (
+          /* 이미 신청서 있음 — 상태별 안내 (중복 방지) */
+          <div style={{ background: '#eff6ff', border: '1px solid #93c5fd', padding: '40px 28px', textAlign: 'center' }}>
+            <div style={{ fontSize: 42, marginBottom: 12 }}>
+              {existingApp.status === 'pending' ? '📋' : existingApp.status === 'rejected' ? '📨' : 'ℹ️'}
+            </div>
+            <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 19, fontWeight: 700, color: '#0d2d52', marginBottom: 10 }}>
+              {existingApp.status === 'pending'
+                ? '이미 신청하셨습니다 — 검토 중입니다'
+                : existingApp.status === 'rejected'
+                  ? '이전 신청이 반려되었습니다'
+                  : `현재 신청 상태: ${existingApp.status}`}
+            </div>
+            <div style={{ fontSize: 14, color: '#1c4f8a', lineHeight: 1.8, marginBottom: 22 }}>
+              {existingApp.status === 'pending'
+                ? '편집국장이 검토 후 1-3일 이내에 연락드립니다.'
+                : existingApp.status === 'rejected'
+                  ? '문의: press@eummedia.kr'
+                  : ''}
+              {existingApp.applied_at && (
+                <><br /><span style={{ fontSize: 12, color: '#6b6b6b' }}>
+                  (신청일: {new Date(existingApp.applied_at).toLocaleDateString('ko-KR')})
+                </span></>
+              )}
+            </div>
+            <Link to="/mypage"
+              style={{ background: '#0d2d52', color: 'white', padding: '12px 28px', fontSize: 14, fontWeight: 700, textDecoration: 'none', display: 'inline-block', fontFamily: "'Noto Sans KR',sans-serif", minHeight: 48, boxSizing: 'border-box', lineHeight: 1.7 }}>
+              마이페이지로 가기
+            </Link>
+          </div>
+        ) : stage === 'submitted' ? (
+          /* 신청 완료 */
+          <div style={{ background: '#e8f7ee', border: '1px solid #27ae60', padding: '52px 32px', textAlign: 'center' }}>
+            <div style={{ fontSize: 52, marginBottom: 14 }}>✅</div>
+            <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 22, fontWeight: 700, color: '#1a7a3f', marginBottom: 10 }}>
+              시민기자 신청이 접수되었습니다!
+            </div>
+            <div style={{ fontSize: 14, color: '#2a5a3a', lineHeight: 1.85, marginBottom: 28 }}>
+              편집국장이 검토 후 <strong>1-3일 이내</strong>에 연락드립니다.<br />
+              마이페이지에서 신청 상태를 확인하실 수 있습니다.
+            </div>
+            <Link to="/mypage"
+              style={{ background: '#0d2d52', color: 'white', padding: '14px 32px', fontSize: 14, fontWeight: 700, textDecoration: 'none', display: 'inline-block', fontFamily: "'Noto Sans KR',sans-serif", minHeight: 48, boxSizing: 'border-box', lineHeight: 1.7 }}>
+              마이페이지로 가기
+            </Link>
+          </div>
+        ) : (
+          /* 폼 — 로그인 + 신청서 없음 */
           <div style={{ background: '#f7f8fa', border: '1px solid #e0e0e0', borderTop: '4px solid #0d2d52', padding: '32px' }}>
             <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 20, fontWeight: 700, color: '#0d2d52', marginBottom: 6 }}>시민기자 지원하기</div>
-            <div style={{ fontSize: 12, color: '#6b6b6b', marginBottom: 26, lineHeight: 1.6 }}>
-              지원서는 <strong>press@eummedia.kr</strong>로 전달됩니다. 검토 후 3일 내 연락드립니다.
+            <div style={{ fontSize: 12, color: '#6b6b6b', marginBottom: 22, lineHeight: 1.6 }}>
+              로그인된 계정({user.email})으로 신청합니다. 편집국장 검토 후 1-3일 이내 연락드립니다.
             </div>
+
+            {error && (
+              <div style={{ background: '#fee2e2', color: '#dc2626', padding: '12px 16px', borderRadius: 6, fontSize: 13, marginBottom: 16, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                {error}
+              </div>
+            )}
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
               <div>
@@ -181,38 +334,36 @@ export default function CitizenReporter() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
-              <div>
-                <label style={lbl}>이메일 <span style={{ color: '#e8432d' }}>*</span></label>
-                <input style={inp} placeholder="example@email.com" type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
-              </div>
-              <div>
-                <label style={lbl}>거주 지역</label>
-                <input style={inp} placeholder="예: 고양시 일산동구" value={form.region} onChange={e => setForm(f => ({ ...f, region: e.target.value }))} />
-              </div>
+            <div style={{ marginBottom: 14 }}>
+              <label style={lbl}>거주 지역 <span style={{ color: '#e8432d' }}>*</span></label>
+              <input style={inp} placeholder="예: 고양시 일산동구" value={form.region} onChange={e => setForm(f => ({ ...f, region: e.target.value }))} />
             </div>
 
             <div style={{ marginBottom: 14 }}>
-              <label style={lbl}>지원 자격 <span style={{ color: '#e8432d' }}>*</span></label>
+              <label style={lbl}>봉숭아학당 수료 여부 <span style={{ color: '#e8432d' }}>*</span></label>
               <select style={inp} value={form.qualify} onChange={e => setForm(f => ({ ...f, qualify: e.target.value }))}>
-                <option value="">해당하는 자격을 선택해주세요</option>
+                <option value="해당 없음">해당 없음</option>
+                <option value="재학중">재학중</option>
                 <option value="봉숭아학당 수료자">봉숭아학당 문화혁신학교 수료자</option>
                 <option value="이음평생교육원 수료자">이음평생교육원 시민기자 과정 수료자</option>
                 <option value="기자증 갱신">기존 시민기자증 갱신 신청</option>
-                <option value="기타">기타 (내용에 기재)</option>
+                <option value="기타">기타 (지원 동기에 기재)</option>
               </select>
             </div>
 
             <div style={{ marginBottom: 14 }}>
-              <label style={lbl}>지원 동기</label>
-              <textarea style={{ ...inp, height: 100, resize: 'none', lineHeight: 1.7 }}
-                placeholder="시민기자에 지원하는 동기와 관심 분야를 적어주세요."
-                value={form.motivation} onChange={e => setForm(f => ({ ...f, motivation: e.target.value }))} />
+              <label style={lbl}>지원 동기 (최소 50자) <span style={{ color: '#e8432d' }}>*</span></label>
+              <textarea style={{ ...inp, height: 110, resize: 'vertical', lineHeight: 1.7 }}
+                placeholder="왜 이음미디어 시민기자로 활동하고 싶으신가요? (50자 이상)"
+                value={form.motive} onChange={e => setForm(f => ({ ...f, motive: e.target.value }))} />
+              <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, marginTop: 4, color: form.motive.trim().length >= 50 ? '#1a6b3c' : '#888' }}>
+                {form.motive.trim().length}자{form.motive.trim().length < 50 ? ' (50자 이상 필요)' : ' ✓'}
+              </div>
             </div>
 
             <div style={{ marginBottom: 22 }}>
               <label style={lbl}>기사 작성 경험 (선택)</label>
-              <textarea style={{ ...inp, height: 80, resize: 'none', lineHeight: 1.7 }}
+              <textarea style={{ ...inp, height: 80, resize: 'vertical', lineHeight: 1.7 }}
                 placeholder="블로그, SNS, 기타 매체에 글을 쓴 경험이 있으면 적어주세요."
                 value={form.experience} onChange={e => setForm(f => ({ ...f, experience: e.target.value }))} />
             </div>
@@ -220,48 +371,13 @@ export default function CitizenReporter() {
             <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginBottom: 22 }}>
               <input type="checkbox" checked={form.agree} onChange={e => setForm(f => ({ ...f, agree: e.target.checked }))} style={{ marginTop: 3, flexShrink: 0 }} />
               <span style={{ fontSize: 12, color: '#555', lineHeight: 1.6 }}>
-                [필수] 개인정보(이름·연락처·이메일)를 시민기자 지원 심사 목적으로 수집·이용하는 것에 동의합니다. 수집된 정보는 심사 완료 후 파기됩니다.
+                [필수] 개인정보(이름·연락처)를 시민기자 지원 심사 목적으로 수집·이용하는 것에 동의합니다.
               </span>
             </label>
 
-            <button onClick={handleSubmit}
-              style={{ width: '100%', background: '#0d2d52', color: 'white', border: 'none', padding: 16, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif", letterSpacing: 0.5 }}>
-              ✍️ 시민기자 지원서 제출 → press@eummedia.kr
-            </button>
-          </div>
-        ) : stage === 'pending' ? (
-          <div style={{ background: '#fff7ed', border: '1px solid #fdba74', padding: '52px 32px', textAlign: 'center' }}>
-            <div style={{ fontSize: 52, marginBottom: 14 }}>✉️</div>
-            <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 22, fontWeight: 700, color: '#9a3412', marginBottom: 12 }}>메일 앱이 열렸어요</div>
-            <div style={{ fontSize: 14, color: '#7c2d12', lineHeight: 1.85, marginBottom: 24 }}>
-              <strong>press@eummedia.kr</strong>로 보낼 지원서가 자동 입력되었습니다.<br />
-              메일을 발송하신 뒤 아래 버튼을 눌러주세요.<br />
-              <span style={{ fontSize: 12, color: '#9a3412', display: 'inline-block', marginTop: 10 }}>
-                ※ 메일 앱이 열리지 않았다면 press@eummedia.kr로 직접 보내주셔도 됩니다.
-              </span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
-              <button onClick={() => setStage('submitted')}
-                style={{ background: '#0d2d52', color: 'white', border: 'none', padding: '16px 36px', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif", minWidth: 280 }}>
-                ✅ 메일을 발송했어요
-              </button>
-              <button onClick={() => setStage('form')}
-                style={{ background: 'transparent', color: '#6b6b6b', border: '1px solid #d0d0d0', padding: '12px 24px', fontSize: 13, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif", minWidth: 280 }}>
-                ← 폼으로 돌아가기
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div style={{ background: '#e8f7ee', border: '1px solid #27ae60', padding: '52px 32px', textAlign: 'center' }}>
-            <div style={{ fontSize: 52, marginBottom: 14 }}>✅</div>
-            <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 22, fontWeight: 700, color: '#1a7a3f', marginBottom: 10 }}>지원서가 접수되었습니다!</div>
-            <div style={{ fontSize: 13, color: '#2a5a3a', lineHeight: 1.8, marginBottom: 28 }}>
-              <strong>press@eummedia.kr</strong>로 전달되었습니다.<br />
-              검토 후 3일 내 편집국장이 직접 연락드립니다.
-            </div>
-            <button onClick={() => setStage('form')}
-              style={{ background: '#0d2d52', color: 'white', border: 'none', padding: '12px 32px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif" }}>
-              다시 지원하기
+            <button onClick={handleSubmit} disabled={loading}
+              style={{ width: '100%', background: loading ? '#999' : '#0d2d52', color: 'white', border: 'none', padding: 16, fontSize: 14, fontWeight: 700, cursor: loading ? 'wait' : 'pointer', fontFamily: "'Noto Sans KR',sans-serif", letterSpacing: 0.5 }}>
+              {loading ? '처리 중...' : '✍️ 시민기자 신청하기'}
             </button>
           </div>
         )}

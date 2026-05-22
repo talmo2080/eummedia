@@ -13,6 +13,7 @@ export default function MyPage() {
   const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [application, setApplication] = useState(null);  // 신청자 상태 카드용
 
   // 비로그인 시 로그인 페이지로 리다이렉트
   useEffect(() => {
@@ -32,6 +33,24 @@ export default function MyPage() {
       if (error) { console.error('[MyPage] articles fetch:', error); }
       setArticles(data || []);
       setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
+  // 신청자 상태 카드용 — writer_applications 본인 row (가장 최근 1건)
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('writer_applications')
+        .select('id, status, reject_reason, applied_at')
+        .eq('user_id', user.id)
+        .order('applied_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (cancelled) return;
+      setApplication(data || null);
     })();
     return () => { cancelled = true; };
   }, [user]);
@@ -107,6 +126,11 @@ export default function MyPage() {
           </div>
         </div>
       </section>
+
+      {/* 1.2 시민기자 신청자 상태 카드 — reader + 신청서 있을 때만 */}
+      {profile?.role === 'reader' && application && (
+        <ApplicationStatusCard app={application} />
+      )}
 
       {/* 1.5. 새 기사 쓰기 CTA (writer/admin만) */}
       {canWrite && (
@@ -199,6 +223,56 @@ export default function MyPage() {
 }
 
 // ━━━━━━━━━━━ 보조 컴포넌트 ━━━━━━━━━━━
+
+function ApplicationStatusCard({ app }) {
+  const dateStr = app.applied_at
+    ? new Date(app.applied_at).toLocaleDateString('ko-KR')
+    : '';
+
+  if (app.status === 'pending') {
+    return (
+      <section className="mb-6 rounded-lg p-5 border" style={{ background: '#eff6ff', borderColor: '#93c5fd' }}>
+        <div className="flex items-start gap-3">
+          <div className="text-3xl flex-shrink-0">📋</div>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-serif font-bold text-lg text-[#0d2d52] mb-1">
+              시민기자 신청 검토 중입니다
+            </h2>
+            <p className="text-sm text-neutral-700 leading-relaxed">
+              편집국장이 검토 후 1-3일 이내에 연락드립니다.
+              {dateStr && <span className="text-xs text-neutral-500 ml-2">(신청일: {dateStr})</span>}
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (app.status === 'rejected') {
+    return (
+      <section className="mb-6 rounded-lg p-5 border" style={{ background: '#fff7ed', borderColor: '#fdba74' }}>
+        <div className="flex items-start gap-3">
+          <div className="text-3xl flex-shrink-0">📨</div>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-serif font-bold text-lg text-[#9a3412] mb-2">
+              안내: 이번 신청은 반려되었습니다
+            </h2>
+            {app.reject_reason && (
+              <p className="text-sm text-neutral-800 leading-relaxed bg-white border border-orange-200 rounded p-3 mb-2 whitespace-pre-wrap">
+                <strong className="text-[#9a3412]">사유:</strong> {app.reject_reason}
+              </p>
+            )}
+            <p className="text-xs text-neutral-600">
+              문의: <a href="mailto:press@eummedia.kr" className="text-[#0d2d52] underline">press@eummedia.kr</a>
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return null;  // approved 등 다른 status는 표시 안 함
+}
 
 function StatCard({ label, value, color, note }) {
   const colors = {

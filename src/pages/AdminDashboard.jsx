@@ -43,10 +43,7 @@ function getExpiryStatus(validUntil) {
   return 'valid'
 }
 
-function getUserStatus(u) {
-  if (u.role === 'reader') return 'pending'
-  return u.is_active ? 'active' : 'suspended'
-}
+// getUserStatus 제거 — 새 시민기자 관리 탭은 writer_applications.status + users.is_active 직접 사용
 
 const ARTICLE_STATUS_LABELS = {
   submitted: { label: '검토대기', color: RED, bg: '#fef0ef' },
@@ -54,11 +51,7 @@ const ARTICLE_STATUS_LABELS = {
   published: { label: '발행됨', color: GREEN, bg: '#eef7f2' },
 }
 
-const USER_STATUS_LABELS = {
-  pending: { label: '승인대기', color: RED, bg: '#fef0ef' },
-  active: { label: '활동중', color: GREEN, bg: '#eef7f2' },
-  suspended: { label: '정지됨', color: '#888', bg: '#f0f0f0' },
-}
+// USER_STATUS_LABELS 제거 — 새 카드는 inline badge로 대체
 
 const CHANNEL_STATS = [
   { name: '이음매거진', count: 12 },
@@ -88,7 +81,7 @@ const USER_FILTERS = [
   { key: 'all', label: '전체' },
   { key: 'pending', label: '승인대기 🔴' },
   { key: 'active', label: '활동중' },
-  { key: 'suspended', label: '정지됨' },
+  { key: 'rejected', label: '반려됨' },
 ]
 
 const card = {
@@ -576,6 +569,9 @@ export default function AdminDashboard() {
   const [modalArticle, setModalArticle] = useState(null)
   const [previewArticle, setPreviewArticle] = useState(null)
   const [visibleArticleCount, setVisibleArticleCount] = useState(PAGE_SIZE)
+  const [applications, setApplications] = useState([])    // writer_applications + users LEFT JOIN
+  const [appRejectingId, setAppRejectingId] = useState(null)
+  const [appRejectReason, setAppRejectReason] = useState('')
 
   useEffect(() => {
     (async () => {
@@ -595,6 +591,14 @@ export default function AdminDashboard() {
       if (error) { console.error('users fetch:', error); return }
       setUsers(data || [])
     })()
+    ;(async () => {
+      const { data, error } = await supabase
+        .from('writer_applications')
+        .select('*, users:user_id(id, email, nickname, role, is_active, press_no, valid_from, valid_until)')
+        .order('applied_at', { ascending: false })
+      if (error) { console.error('applications fetch:', error); return }
+      setApplications(data || [])
+    })()
   }, [])
 
   const switchTab = (n) => {
@@ -605,9 +609,7 @@ export default function AdminDashboard() {
   const filteredArticles = articleFilter === 'all'
     ? articles
     : articles.filter(a => a.status === articleFilter)
-  const filteredUsers = userFilter === 'all'
-    ? users
-    : users.filter(u => getUserStatus(u) === userFilter)
+  // filteredUsers 제거 — 새 시민기자 관리 탭은 entries (writer_applications + legacy) 사용
 
   // 필터 변경 시 페이지네이션 초기화 (render 중 state 조정 — React 19 권장 패턴)
   const [prevArticleFilter, setPrevArticleFilter] = useState(articleFilter)
@@ -650,7 +652,11 @@ export default function AdminDashboard() {
     if (error) { alert(`재검토 실패: ${error.message}`); return }
     setArticles(articles.map(a => a.id === id ? { ...a, status: 'submitted', reject_reason: null } : a))
   }
-  const approveUser = async (id) => {
+  // approveUser 제거 — 기존 users 기반 승인은 새 approveApplication으로 대체
+
+  // ━━ writer_applications 기반 새 승인/반려 ━━
+  const approveApplication = async (app) => {
+    if (!app.user_id) { alert('연결된 계정 없음'); return }
     const today = new Date()
     const oneYearLater = new Date(today)
     oneYearLater.setFullYear(today.getFullYear() + 1)
@@ -660,26 +666,59 @@ export default function AdminDashboard() {
     const nextNo = `${yy}-${String(activeCount + 1).padStart(3, '0')}`
     const validFromIso = isoDate(today)
     const validUntilIso = isoDate(oneYearLater)
+    const nowIso = new Date().toISOString()
 
-    const { error } = await supabase
-      .from('users')
-      .update({
-        role: 'writer',
-        is_active: true,
-        press_no: nextNo,
-        valid_from: validFromIso,
-        valid_until: validUntilIso,
-      })
-      .eq('id', id)
-    if (error) { alert(`승인 실패: ${error.message}`); return }
-
-    setUsers(users.map(u => u.id === id ? {
-      ...u, role: 'writer', is_active: true,
+    // 1) users 업데이트 (role/press_no 등)
+    const { error: e1 } = await supabase.from('users').update({
+      role: 'writer',
+      is_active: true,
       press_no: nextNo,
       valid_from: validFromIso,
       valid_until: validUntilIso,
+    }).eq('id', app.user_id)
+    if (e1) { alert(`승인 실패 (users): ${e1.message}`); return }
+
+    // 2) writer_applications 업데이트
+    const { error: e2 } = await supabase.from('writer_applications').update({
+      status: 'approved',
+      processed_at: nowIso,
+      processed_by: profile?.id || null,
+    }).eq('id', app.id)
+    if (e2) { alert(`승인 실패 (application): ${e2.message}`); return }
+
+    // 3) 로컬 state 동기화
+    setUsers(users.map(u => u.id === app.user_id ? {
+      ...u, role: 'writer', is_active: true,
+      press_no: nextNo, valid_from: validFromIso, valid_until: validUntilIso,
     } : u))
-    setApprovedUserId(id)
+    setApplications(applications.map(a => a.id === app.id ? {
+      ...a, status: 'approved', processed_at: nowIso, processed_by: profile?.id || null,
+      users: { ...a.users, role: 'writer', is_active: true,
+        press_no: nextNo, valid_from: validFromIso, valid_until: validUntilIso },
+    } : a))
+    setApprovedUserId(app.user_id)
+  }
+
+  const startAppReject = (id) => { setAppRejectingId(id); setAppRejectReason('') }
+  const cancelAppReject = () => { setAppRejectingId(null); setAppRejectReason('') }
+  const confirmAppReject = async (app) => {
+    const reason = appRejectReason.trim() || null
+    if (!reason) { alert('반려 사유를 입력해주세요.'); return }
+    const nowIso = new Date().toISOString()
+
+    const { error } = await supabase.from('writer_applications').update({
+      status: 'rejected',
+      reject_reason: reason,
+      processed_at: nowIso,
+      processed_by: profile?.id || null,
+    }).eq('id', app.id)
+    if (error) { alert(`반려 실패: ${error.message}`); return }
+
+    setApplications(applications.map(a => a.id === app.id ? {
+      ...a, status: 'rejected', reject_reason: reason,
+      processed_at: nowIso, processed_by: profile?.id || null,
+    } : a))
+    setAppRejectingId(null); setAppRejectReason('')
   }
   const renewUser = async (id) => {
     const user = users.find(u => u.id === id)
@@ -698,15 +737,8 @@ export default function AdminDashboard() {
     setUsers(users.map(u => u.id === id ? { ...u, valid_until: newIso } : u))
     alert('자격이 1년 갱신됐습니다!')
   }
-  const rejectUser = async (id) => {
-    const { error } = await supabase
-      .from('users')
-      .update({ is_active: false })
-      .eq('id', id)
-    if (error) { alert(`반려 실패: ${error.message}`); return }
-    setUsers(users.map(u => u.id === id ? { ...u, is_active: false } : u))
-    alert('반려됐습니다.')
-  }
+  // rejectUser 제거 — 새 confirmAppReject(writer_applications 기반)로 대체
+
   const suspendUser = async (id) => {
     const { error } = await supabase
       .from('users')
@@ -938,8 +970,37 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* ━━ 탭 2: 시민기자 관리 ━━ */}
-        {activeTab === 2 && (
+        {/* ━━ 탭 2: 시민기자 관리 (writer_applications 중심 + legacy writer 옵션 iii) ━━ */}
+        {activeTab === 2 && (() => {
+          // 통합 entries: applications + (신청서 없는 legacy writer)
+          // publisher/admin은 시민기자 관리 대상 아님 → 제외
+          const appUserIds = new Set(applications.map(a => a.user_id).filter(Boolean))
+          const legacyWriters = users.filter(u => u.role === 'writer' && !appUserIds.has(u.id))
+          const entries = [
+            ...applications.map(app => ({ kind: 'app', app, user: app.users || null })),
+            ...legacyWriters.map(u => ({ kind: 'legacy', app: null, user: u })),
+          ]
+          const filteredEntries = entries.filter(e => {
+            if (userFilter === 'all') return true
+            if (userFilter === 'pending') return e.kind === 'app' && e.app.status === 'pending'
+            if (userFilter === 'active') {
+              if (e.kind === 'legacy') return e.user?.is_active
+              return e.app.status === 'approved' && e.user?.is_active
+            }
+            if (userFilter === 'rejected') return e.kind === 'app' && e.app.status === 'rejected'
+            return true
+          })
+          // 정렬: pending이 위 → applied_at 내림차순
+          filteredEntries.sort((a, b) => {
+            const sa = a.kind === 'app' && a.app.status === 'pending' ? 0 : 1
+            const sb = b.kind === 'app' && b.app.status === 'pending' ? 0 : 1
+            if (sa !== sb) return sa - sb
+            const ta = a.kind === 'app' ? new Date(a.app.applied_at).getTime() : new Date(a.user?.created_at || 0).getTime()
+            const tb = b.kind === 'app' ? new Date(b.app.applied_at).getTime() : new Date(b.user?.created_at || 0).getTime()
+            return tb - ta
+          })
+
+          return (
           <div>
             <h1 style={{
               fontFamily: SERIF, fontSize: 24, fontWeight: 700,
@@ -968,23 +1029,33 @@ export default function AdminDashboard() {
               })}
             </div>
 
-            {filteredUsers.length === 0 && (
+            {filteredEntries.length === 0 && (
               <div style={{ ...card, textAlign: 'center', color: '#888', fontSize: 18, padding: 40 }}>
-                해당 상태의 시민기자가 없습니다.
+                해당 상태의 시민기자/신청자가 없습니다.
               </div>
             )}
-            {filteredUsers.map(u => {
-              const ustatus = getUserStatus(u)
-              const sb = USER_STATUS_LABELS[ustatus] || { label: ustatus, color: '#888', bg: '#f0f0f0' }
-              const showApprovedBanner = approvedUserId === u.id && ustatus === 'active'
-              const expiryStatus = getExpiryStatus(u.valid_until)
+
+            {filteredEntries.map((e) => {
+              const app = e.app
+              const u = e.user
+              const isApp = e.kind === 'app'
+              const status = isApp ? app.status : 'approved'  // legacy = 활동중
+              const isRejecting = isApp && appRejectingId === app.id
+              const expiryStatus = u ? getExpiryStatus(u.valid_until) : 'valid'
               const expiryColor = expiryStatus === 'expired' ? RED : (expiryStatus === 'warning' ? ORANGE : '#3a3a3a')
-              const expiryLabel = expiryStatus === 'expired'
-                ? '🔴 자격 만료'
-                : (expiryStatus === 'warning' ? '⚠️ 갱신 필요' : '')
-              const agreed = !!u.press_no
+              const expiryLabel = expiryStatus === 'expired' ? '🔴 자격 만료' : (expiryStatus === 'warning' ? '⚠️ 갱신 필요' : '')
+
+              // 상태 배지
+              const badge = status === 'pending' ? { label: '🔴 승인대기', color: RED, bg: '#fef0ef' }
+                          : status === 'rejected' ? { label: '❌ 반려됨', color: ORANGE, bg: '#fff8f0' }
+                          : (u?.is_active === false ? { label: '🚫 정지됨', color: '#888', bg: '#f0f0f0' }
+                                                     : { label: '✅ 활동중', color: GREEN, bg: '#eef7f2' })
+
+              const showApprovedBanner = isApp && approvedUserId === app.user_id && status === 'approved' && u?.is_active
+
+              const key = isApp ? `app-${app.id}` : `legacy-${u.id}`
               return (
-                <div key={u.id} style={card}>
+                <div key={key} style={card}>
                   {showApprovedBanner && (
                     <div style={{
                       background: '#eef7f2', borderRadius: 8,
@@ -996,33 +1067,59 @@ export default function AdminDashboard() {
                     </div>
                   )}
 
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: 12,
-                    marginBottom: 10, flexWrap: 'wrap',
-                  }}>
+                  {/* 이름 + 상태 + 신청일 */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10, flexWrap: 'wrap' }}>
+                    <span style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: NAVY }}>
+                      {isApp ? (app.name || u?.nickname || '(이름 없음)') : (u.nickname || '(이름 없음)')}
+                    </span>
                     <span style={{
-                      fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: NAVY,
-                    }}>{u.nickname || '(이름 없음)'}</span>
-                    <span style={{
-                      background: sb.bg, color: sb.color, fontWeight: 700,
+                      background: badge.bg, color: badge.color, fontWeight: 700,
                       padding: '4px 10px', borderRadius: 12, fontSize: 13,
-                    }}>{sb.label}</span>
+                    }}>{badge.label}</span>
+                    {!isApp && (
+                      <span style={{ background: '#f0f0f0', color: '#666', padding: '3px 8px', borderRadius: 8, fontSize: 11 }}>
+                        신청서 없음 (legacy)
+                      </span>
+                    )}
                     <span style={{ color: '#888', fontSize: 13, marginLeft: 'auto' }}>
-                      신청일: {dbDateToShort(u.created_at)}
+                      {isApp
+                        ? `신청일: ${dbDateToShort(app.applied_at)}`
+                        : `가입일: ${dbDateToShort(u.created_at)}`}
                     </span>
                   </div>
 
-                  <div style={{ fontSize: 16, color: '#3a3a3a', lineHeight: 1.7, marginBottom: 12 }}>
-                    {u.bio}
-                  </div>
+                  {/* 신청서 정보 (writer_applications row 있을 때만) */}
+                  {isApp && (
+                    <div style={{ background: '#f7f8fa', borderRadius: 8, padding: '14px 16px', marginBottom: 12, fontSize: 14, lineHeight: 1.8, color: '#333' }}>
+                      <div><strong style={{ color: NAVY }}>📞 전화</strong> {app.phone || '(미입력)'}</div>
+                      <div><strong style={{ color: NAVY }}>📍 지역</strong> {app.region || '(미입력)'}</div>
+                      <div><strong style={{ color: NAVY }}>🎓 봉숭아학당</strong> {app.qualify || '(미입력)'}</div>
+                      {u?.email && <div><strong style={{ color: NAVY }}>📧 이메일</strong> {u.email}</div>}
+                      <div style={{ marginTop: 8 }}>
+                        <strong style={{ color: NAVY }}>✍️ 지원 동기</strong>
+                        <div style={{ whiteSpace: 'pre-wrap', marginTop: 4, padding: '8px 10px', background: '#fff', border: '1px solid #e0e0e0', borderRadius: 6 }}>
+                          {app.motive || '(미입력)'}
+                        </div>
+                      </div>
+                      {app.experience && (
+                        <div style={{ marginTop: 8 }}>
+                          <strong style={{ color: NAVY }}>💼 경험</strong>
+                          <div style={{ whiteSpace: 'pre-wrap', marginTop: 4, padding: '8px 10px', background: '#fff', border: '1px solid #e0e0e0', borderRadius: 6 }}>
+                            {app.experience}
+                          </div>
+                        </div>
+                      )}
+                      {app.status === 'rejected' && app.reject_reason && (
+                        <div style={{ marginTop: 8, padding: '8px 10px', background: '#fff8f0', border: '1px solid #fdba74', borderRadius: 6, color: '#9a3412' }}>
+                          <strong>반려 사유:</strong> {app.reject_reason}
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-                  {/* 기자증 영역 (활동중/정지됨만 표시) */}
-                  {u.press_no && (
-                    <div style={{
-                      background: '#f7f8fa', borderRadius: 8,
-                      padding: '12px 16px', marginBottom: 12,
-                      fontSize: 14, lineHeight: 1.85,
-                    }}>
+                  {/* 기자증 (press_no 있을 때) */}
+                  {u?.press_no && (
+                    <div style={{ background: '#f7f8fa', borderRadius: 8, padding: '12px 16px', marginBottom: 12, fontSize: 14, lineHeight: 1.85 }}>
                       <div style={{ color: '#666' }}>
                         기자증: <strong style={{ color: NAVY }}>이음미디어/No. {u.press_no}</strong>
                       </div>
@@ -1030,62 +1127,60 @@ export default function AdminDashboard() {
                         유효기간: {dbDateToShort(u.valid_from)} ~ {dbDateToShort(u.valid_until)}
                         {expiryLabel && <span style={{ marginLeft: 8 }}>{expiryLabel}</span>}
                       </div>
-                      <div style={{ color: agreed ? GREEN : ORANGE, fontWeight: 600 }}>
-                        {agreed ? '유의사항 동의 ✅' : '미동의 ⚠️'}
+                    </div>
+                  )}
+
+                  {/* 반려 사유 입력 모달 (응급) */}
+                  {isRejecting && (
+                    <div style={{ background: '#fff8f0', border: `1px solid ${ORANGE}`, borderRadius: 8, padding: 14, marginBottom: 12 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: ORANGE, marginBottom: 8 }}>반려 사유를 입력해주세요</div>
+                      <textarea
+                        style={{ width: '100%', height: 90, padding: 10, border: '1px solid #d0d0d0', borderRadius: 6, fontSize: 14, fontFamily: SANS, resize: 'none', boxSizing: 'border-box', lineHeight: 1.6 }}
+                        value={appRejectReason}
+                        onChange={ev => setAppRejectReason(ev.target.value)}
+                        placeholder="신청자에게 전달할 반려 사유를 입력하세요" />
+                      <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                        {canAct && (
+                          <button onClick={() => confirmAppReject(app)}
+                            style={{ padding: '8px 16px', fontSize: 14, fontWeight: 700, background: ORANGE, color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontFamily: SANS }}>
+                            반려 확인
+                          </button>
+                        )}
+                        <button onClick={cancelAppReject}
+                          style={{ padding: '8px 16px', fontSize: 14, fontWeight: 600, background: '#fff', color: '#666', border: '1px solid #d0d0d0', borderRadius: 6, cursor: 'pointer', fontFamily: SANS }}>
+                          취소
+                        </button>
                       </div>
                     </div>
                   )}
 
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
-                    <span style={{
-                      background: '#f0f0f0', borderRadius: 6, padding: '4px 10px',
-                      fontSize: 13, color: '#3a3a3a', fontWeight: 600,
-                    }}>
-                      작성 0건
-                    </span>
-                    <span style={{
-                      background: '#f0f0f0', borderRadius: 6, padding: '4px 10px',
-                      fontSize: 13, color: GREEN, fontWeight: 700,
-                    }}>
-                      발행 0건
-                    </span>
-                    <span style={{
-                      background: '#f0f0f0', borderRadius: 6, padding: '4px 10px',
-                      fontSize: 13, color: ORANGE, fontWeight: 700,
-                    }}>
-                      검토대기 0건
-                    </span>
-                    <span style={{
-                      background: '#f0f0f0', borderRadius: 6, padding: '4px 10px',
-                      fontSize: 13, color: RED, fontWeight: 700,
-                    }}>
-                      반려 0건
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                    {ustatus === 'pending' && canAct && (
-                      <>
-                        <button onClick={() => approveUser(u.id)} style={btnStyle(GREEN)}>✅ 시민기자 승인</button>
-                        <button onClick={() => rejectUser(u.id)} style={btnStyle(ORANGE)}>❌ 반려</button>
-                      </>
-                    )}
-                    {ustatus === 'active' && (
-                      <>
-                        {canAct && <button onClick={() => renewUser(u.id)} style={btnStyle(BLUE)}>🔄 1년 갱신</button>}
-                        {canAct && <button onClick={() => suspendUser(u.id)} style={btnStyle(ORANGE)}>🚫 활동 정지</button>}
-                        <button onClick={() => alert(`${u.nickname} 기자의 기사 목록으로 이동합니다.`)} style={btnStyle('#666', true)}>📋 기사 보기</button>
-                      </>
-                    )}
-                    {ustatus === 'suspended' && canAct && (
-                      <button onClick={() => reactivateUser(u.id)} style={btnStyle(BLUE)}>🔄 재활성화</button>
-                    )}
-                  </div>
+                  {/* 액션 버튼 */}
+                  {!isRejecting && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      {isApp && status === 'pending' && canAct && (
+                        <>
+                          <button onClick={() => approveApplication(app)} style={btnStyle(GREEN)}>✅ 시민기자 승인</button>
+                          <button onClick={() => startAppReject(app.id)} style={btnStyle(ORANGE)}>❌ 반려</button>
+                        </>
+                      )}
+                      {status === 'approved' && u?.is_active && (
+                        <>
+                          {canAct && <button onClick={() => renewUser(u.id)} style={btnStyle(BLUE)}>🔄 1년 갱신</button>}
+                          {canAct && <button onClick={() => suspendUser(u.id)} style={btnStyle(ORANGE)}>🚫 활동 정지</button>}
+                          <button onClick={() => alert(`${u.nickname} 기자의 기사 목록으로 이동합니다.`)} style={btnStyle('#666', true)}>📋 기사 보기</button>
+                        </>
+                      )}
+                      {status === 'approved' && u && !u.is_active && canAct && (
+                        <button onClick={() => reactivateUser(u.id)} style={btnStyle(BLUE)}>🔄 재활성화</button>
+                      )}
+                    </div>
+                  )}
                 </div>
               )
             })}
           </div>
-        )}
+          )
+        })()}
 
         {/* ━━ 탭 3: 통계 ━━ */}
         {activeTab === 3 && (
