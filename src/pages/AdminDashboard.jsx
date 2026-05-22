@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
+import { getYouTubeEmbedUrl } from '../lib/youtube'
 
 const NAVY = '#0d2d52'
 const BLUE = '#1c4f8a'
@@ -246,6 +247,40 @@ function PreviewModal({ article, onClose }) {
         }}>
           {article.content || '(본문 없음)'}
         </div>
+
+        {/* 🎬 기사 영상 — video_url + 유효한 YouTube일 때만 (ArticleDetail과 동일) */}
+        {(() => {
+          const embedUrl = getYouTubeEmbedUrl(article.video_url);
+          if (!embedUrl) return null;
+          return (
+            <div style={{ margin: '0 0 24px 0' }}>
+              <div style={{
+                fontSize: 13, fontWeight: 700, color: NAVY,
+                letterSpacing: 1, marginBottom: 10,
+              }}>
+                🎬 기사 영상
+              </div>
+              <div style={{
+                position: 'relative', width: '100%', paddingBottom: '56.25%',
+                background: '#000', borderRadius: 8, overflow: 'hidden',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+              }}>
+                <iframe
+                  src={embedUrl}
+                  title={article.title}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                  style={{
+                    position: 'absolute', top: 0, left: 0,
+                    width: '100%', height: '100%', border: 0,
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })()}
 
         {/* 태그 */}
         {Array.isArray(article.tags) && article.tags.length > 0 && (

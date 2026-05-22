@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { getChannelColorClasses } from "../lib/channelColors";
+import { getYouTubeEmbedUrl } from "../lib/youtube";
 
 const CC = {
   "이음매거진":"#0d2d52","이음뉴스":"#c0392b","이음에듀":"#1a6b3c",
@@ -12,13 +13,6 @@ const CC = {
 function formatDate(iso) {
   const d = new Date(iso);
   return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
-}
-
-function getYouTubeEmbedUrl(url) {
-  if (!url || typeof url !== 'string') return null;
-  const re = /(?:youtube\.com\/watch\?(?:[^&]*&)*v=|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtu\.be\/)([A-Za-z0-9_-]{11})/;
-  const m = url.match(re);
-  return m ? `https://www.youtube.com/embed/${m[1]}` : null;
 }
 
 function splitIntoParagraphs(content) {
