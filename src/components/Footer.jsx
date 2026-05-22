@@ -7,6 +7,7 @@ const QUICK_LINKS = [
   { to: '/report', label: '제보하기', icon: '🚨' },
   { to: '/subscribe', label: '구독신청', icon: '🔔' },
   { to: '/privacy', label: '개인정보처리방침', icon: '🔒' },
+  { to: '/youth', label: '청소년보호정책', icon: '🔒' },
 ]
 
 const GOLD = '#c9a84c'
