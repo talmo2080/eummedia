@@ -1,9 +1,23 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from "../lib/supabase";
 
-const channels = [
+// 시안(이음미디어_헤더제호시안.html .new) 정확 매핑
+const NAVY = "#0d2d52";
+const GOLD_SOFT = "#c9a84c";     // 활성 채널 하단선
+const IVORY = "#f4f2ea";          // 날짜 줄 배경
+const IVORY_BORDER = "#e3e0d5";   // 날짜 줄 하단 보더
+const INK = "#1a1a1a";
+const INK_SUB = "#3a3a3a";        // 슬로건
+const DATE_INK = "#444";          // 날짜
+const REG_INK = "#6b6b6b";        // 등록번호
+const RED = "#a8321f";            // 로고 빨강 포인트
+const CHANNEL_INACTIVE = "#dbe3ec";
+
+// 채널 네비 — "홈" 맨 앞 + 채널 7개
+const navItems = [
+  { name: "홈",        path: "/" },
   { name: "이음매거진", path: "/channel/magazine" },
   { name: "이음피플",   path: "/channel/people" },
   { name: "이음로컬",   path: "/channel/local" },
@@ -13,9 +27,17 @@ const channels = [
   { name: "이음보이스", path: "/channel/voice" },
 ];
 
+// 오늘 날짜 — YYYY년 M월 D일 요일 (한국어)
+function formatToday() {
+  return new Date().toLocaleDateString("ko-KR", {
+    year: "numeric", month: "long", day: "numeric", weekday: "long",
+  });
+}
+
 export default function Header() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const isLoggedIn = !!user;
   const role = profile?.role;
   const canSeeAdmin = role === "admin" || role === "publisher";
@@ -23,8 +45,10 @@ export default function Header() {
     role === "admin" ? "편집국장" :
     role === "publisher" ? "발행인" :
     role === "writer" ? "기자" : "독자";
+
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
+  const [today] = useState(formatToday);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -46,166 +70,185 @@ export default function Header() {
     navigate("/");
   }
 
+  // 활성 메뉴 판단 — pathname 정확 매칭
+  const isActive = (path) => location.pathname === path;
+
   return (
     <header style={{
-      backgroundColor: "#0d2d52",
-      color: "#fff",
+      backgroundColor: "#fff",
+      color: INK,
       fontFamily: "'Noto Sans KR', sans-serif",
       position: "sticky",
       top: 0,
       zIndex: 1000,
-      boxShadow: "0 2px 8px rgba(0,0,0,0.3)"
+      boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
     }}>
-      {/* 상단 로고 영역 */}
+      {/* ① 맨 위 날짜·등록번호 줄 (시안 .new-meta) */}
       <div style={{
-        maxWidth: 1200,
-        margin: "0 auto",
-        padding: "10px 20px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center"
-      }}>
-        {/* 로고 + 텍스트 */}
-        <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 12 }}>
-          <img src="/logo.png" alt="이음미디어 로고" style={{ height: 44, width: "auto", objectFit: "contain" }} />
-          <div>
-            <div style={{
-              fontSize: 24,
-              fontWeight: 800,
-              color: "#c9a84c",
-              fontFamily: "'Noto Serif KR', serif",
-              letterSpacing: 2,
-              lineHeight: 1.2
-            }}>이음미디어</div>
-            <div style={{ fontSize: 11, color: "#aac4e0" }}>
-              세상과 당신을 잇는 인터넷신문
-            </div>
-          </div>
-        </Link>
-
-        {/* 우측 버튼 — 데스크탑 (768px+) */}
-        <div className="hidden md:flex" style={{ gap: 12, alignItems: "center" }}>
-          <Link to="/advertise" style={{
-            color: "#c9a84c",
-            textDecoration: "none",
-            fontSize: 13,
-            padding: "5px 8px"
-          }}>광고문의</Link>
-          {!isLoggedIn ? (
-            <>
-              <Link to="/login" style={{
-                color: "#c9a84c",
-                textDecoration: "none",
-                fontSize: 13,
-                border: "1px solid #c9a84c",
-                padding: "5px 14px",
-                borderRadius: 4
-              }}>로그인</Link>
-              <Link to="/signup" style={{
-                backgroundColor: "#c9a84c",
-                color: "#0d2d52",
-                textDecoration: "none",
-                fontSize: 13,
-                fontWeight: 700,
-                padding: "5px 14px",
-                borderRadius: 4
-              }}>회원가입</Link>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/mypage"
-                className="inline-flex items-center hover:bg-yellow-500/10 transition"
-                style={{
-                  color: "#c9a84c",
-                  border: "2px solid #c9a84c",
-                  borderRadius: 4,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  padding: "6px 14px",
-                  textDecoration: "none",
-                  cursor: "pointer",
-                }}
-              >
-                {profile?.nickname || "회원"} {roleLabel}
-              </Link>
-              <button onClick={handleLogout} style={{
-                color: "#c9a84c",
-                background: "transparent",
-                cursor: "pointer",
-                fontSize: 13,
-                border: "1px solid #c9a84c",
-                padding: "5px 14px",
-                borderRadius: 4,
-                fontFamily: "'Noto Sans KR', sans-serif"
-              }}>로그아웃</button>
-            </>
-          )}
-          {canSeeAdmin && (
-            <Link to="/admin" style={{
-              color: "#888",
-              textDecoration: "none",
-              fontSize: 12,
-              padding: "5px 8px"
-            }}>⚙️ 관리자</Link>
-          )}
-        </div>
-
-        {/* 햄버거 버튼 — 모바일 (768px 미만) */}
-        <button
-          onClick={() => setMenuOpen(true)}
-          aria-label="메뉴 열기"
-          className="flex md:hidden items-center justify-center"
-          style={{
-            width: 52, height: 52,
-            background: "transparent", border: "none",
-            color: "#c9a84c", fontSize: 28,
-            cursor: "pointer", padding: 0,
-            fontFamily: "inherit",
-          }}
-        >☰</button>
-      </div>
-
-      {/* 채널 메뉴 — 데스크탑 (768px+) */}
-      <nav className="hidden md:block" style={{
-        backgroundColor: "#0a2240",
-        borderTop: "1px solid rgba(201,168,76,0.3)"
+        background: IVORY,
+        borderBottom: `1px solid ${IVORY_BORDER}`,
       }}>
         <div style={{
-          maxWidth: 1200,
-          margin: "0 auto",
+          maxWidth: 1200, margin: "0 auto",
+          padding: "9px 20px",
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+        }}>
+          <span style={{ fontSize: 11.5, color: DATE_INK, fontWeight: 700 }}>{today}</span>
+          <span style={{ fontSize: 10.5, color: REG_INK, fontWeight: 600 }}>등록 서울 아56526</span>
+        </div>
+      </div>
+
+      {/* ② 제호 본체 — 시안 .new-head (흰 배경 + 네이비 하단선 3px) */}
+      <div style={{
+        borderBottom: `3px solid ${NAVY}`,
+      }}>
+        <div style={{
+          maxWidth: 1200, margin: "0 auto",
+          padding: "15px 20px 13px",
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+        }}>
+          {/* 로고 + 제호 */}
+          <Link to="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 11 }}>
+            {/* 로고 박스 — 네이비 테두리 2.5px + 우하단 빨강 납작 막대 */}
+            <div style={{
+              position: "relative",
+              width: 44, height: 44,
+              border: `2.5px solid ${NAVY}`,
+              borderRadius: 3,
+              padding: 3, boxSizing: "border-box",
+              background: "#fff",
+              flexShrink: 0,
+            }}>
+              <img src="/logo.png" alt="이음미디어 로고"
+                style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
+              {/* 시안 ::after — 납작한 가로 막대 */}
+              <div style={{
+                position: "absolute",
+                right: 5, bottom: 5,
+                width: 9, height: 2.5,
+                background: RED,
+              }} />
+            </div>
+            <div>
+              <div style={{
+                fontFamily: "'Noto Sans KR', sans-serif",
+                fontSize: 27, fontWeight: 900,
+                color: NAVY,
+                letterSpacing: 0.5, lineHeight: 1,
+              }}>이음미디어</div>
+              <div style={{
+                fontSize: 11.5, color: INK_SUB, fontWeight: 700,
+                marginTop: 5, letterSpacing: 0.3,
+              }}>
+                세상과 당신을 잇는 인터넷신문
+              </div>
+            </div>
+          </Link>
+
+          {/* 우측 버튼 — 데스크탑 (768px+) */}
+          <div className="hidden md:flex" style={{ gap: 10, alignItems: "center" }}>
+            <Link to="/advertise" style={{
+              color: NAVY, textDecoration: "none",
+              fontSize: 13, fontWeight: 700,
+              padding: "6px 10px",
+            }}>광고문의</Link>
+            {!isLoggedIn ? (
+              <>
+                <Link to="/login" style={{
+                  color: NAVY, textDecoration: "none",
+                  fontSize: 13, fontWeight: 700,
+                  border: `1.5px solid ${NAVY}`,
+                  padding: "6px 14px", borderRadius: 4,
+                }}>로그인</Link>
+                <Link to="/signup" style={{
+                  background: NAVY, color: "#fff",
+                  textDecoration: "none",
+                  fontSize: 13, fontWeight: 800,
+                  padding: "7px 14px", borderRadius: 4,
+                }}>회원가입</Link>
+              </>
+            ) : (
+              <>
+                <Link to="/mypage" style={{
+                  color: NAVY, textDecoration: "none",
+                  border: `1.5px solid ${NAVY}`,
+                  borderRadius: 4,
+                  fontSize: 13, fontWeight: 700,
+                  padding: "6px 14px",
+                }}>
+                  {profile?.nickname || "회원"} {roleLabel}
+                </Link>
+                <button onClick={handleLogout} style={{
+                  color: NAVY, background: "transparent",
+                  cursor: "pointer",
+                  fontSize: 13, fontWeight: 700,
+                  border: `1.5px solid ${NAVY}`,
+                  padding: "6px 14px", borderRadius: 4,
+                  fontFamily: "'Noto Sans KR', sans-serif",
+                }}>로그아웃</button>
+              </>
+            )}
+            {canSeeAdmin && (
+              <Link to="/admin" style={{
+                color: INK_SUB, textDecoration: "none",
+                fontSize: 13, fontWeight: 700,
+                padding: "6px 8px",
+              }}>⚙️ 관리자</Link>
+            )}
+          </div>
+
+          {/* 햄버거 — 모바일 (768px 미만) */}
+          <button
+            onClick={() => setMenuOpen(true)}
+            aria-label="메뉴 열기"
+            className="flex md:hidden items-center justify-center"
+            style={{
+              width: 52, height: 52,
+              background: "transparent", border: "none",
+              color: NAVY, fontSize: 28, fontWeight: 700,
+              cursor: "pointer", padding: 0,
+              fontFamily: "inherit",
+            }}
+          >☰</button>
+        </div>
+      </div>
+
+      {/* ③ 채널 네비 — PC (네이비 배경, 활성 골드 하단선) */}
+      <nav className="hidden md:block" style={{
+        backgroundColor: NAVY,
+      }}>
+        <div style={{
+          maxWidth: 1200, margin: "0 auto",
           padding: "0 20px",
           display: "flex",
         }}>
-          {channels.map((ch) => (
-            <Link
-              key={ch.path}
-              to={ch.path}
-              style={{
-                color: "#e0e8f0",
-                textDecoration: "none",
-                fontSize: 14,
-                fontWeight: 500,
-                padding: "10px 18px",
-                display: "block",
-                borderBottom: "3px solid transparent",
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.color = "#c9a84c";
-                e.currentTarget.style.borderBottomColor = "#c9a84c";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.color = "#e0e8f0";
-                e.currentTarget.style.borderBottomColor = "transparent";
-              }}
-            >
-              {ch.name}
-            </Link>
-          ))}
+          {navItems.map((ch) => {
+            const active = isActive(ch.path);
+            return (
+              <Link
+                key={ch.path}
+                to={ch.path}
+                style={{
+                  color: active ? "#fff" : CHANNEL_INACTIVE,
+                  textDecoration: "none",
+                  fontSize: 13, fontWeight: active ? 800 : 700,
+                  padding: "12px 14px",
+                  display: "block",
+                  borderBottom: `3px solid ${active ? GOLD_SOFT : "transparent"}`,
+                  transition: "color 0.15s",
+                  whiteSpace: "nowrap",
+                }}
+                onMouseEnter={e => { if (!active) e.currentTarget.style.color = "#fff"; }}
+                onMouseLeave={e => { if (!active) e.currentTarget.style.color = CHANNEL_INACTIVE; }}
+              >
+                {ch.name}
+              </Link>
+            );
+          })}
         </div>
       </nav>
 
-      {/* 모바일 풀스크린 오버레이 (768px 미만 + menuOpen) */}
+      {/* 모바일 풀스크린 오버레이 */}
       {menuOpen && (
         <div
           onClick={closeMenu}
@@ -215,7 +258,7 @@ export default function Header() {
           className="md:hidden"
           style={{
             position: "fixed", inset: 0,
-            background: "#0a2240",
+            background: NAVY,
             zIndex: 2000,
             overflowY: "auto",
             padding: "16px 20px 32px",
@@ -226,7 +269,7 @@ export default function Header() {
             onClick={(e) => e.stopPropagation()}
             style={{ maxWidth: 480, margin: "0 auto" }}
           >
-            {/* 닫기 버튼 */}
+            {/* 닫기 */}
             <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
               <button
                 onClick={closeMenu}
@@ -234,40 +277,45 @@ export default function Header() {
                 style={{
                   width: 52, height: 52,
                   background: "transparent", border: "none",
-                  color: "#c9a84c", fontSize: 28,
+                  color: GOLD_SOFT, fontSize: 28,
                   cursor: "pointer", padding: 0,
                   fontFamily: "inherit",
                 }}
               >✕</button>
             </div>
 
-            {/* 채널 7개 */}
+            {/* 채널 8개 (홈 + 7) — 활성 골드 하단선 */}
             <div style={{ marginBottom: 28 }}>
               <div style={{
-                color: "rgba(201,168,76,0.75)",
+                color: GOLD_SOFT,
                 fontSize: 13, fontWeight: 700,
                 letterSpacing: 2, marginBottom: 10, paddingLeft: 4,
               }}>채널</div>
-              {channels.map((ch) => (
-                <Link
-                  key={ch.path}
-                  to={ch.path}
-                  onClick={closeMenu}
-                  style={{
-                    display: "flex", alignItems: "center",
-                    minHeight: 52, padding: "10px 16px",
-                    color: "#e0e8f0", textDecoration: "none",
-                    fontSize: 19, fontWeight: 600,
-                    borderBottom: "1px solid rgba(255,255,255,0.08)",
-                  }}
-                >{ch.name}</Link>
-              ))}
+              {navItems.map((ch) => {
+                const active = isActive(ch.path);
+                return (
+                  <Link
+                    key={ch.path}
+                    to={ch.path}
+                    onClick={closeMenu}
+                    style={{
+                      display: "flex", alignItems: "center",
+                      minHeight: 52, padding: "10px 16px",
+                      color: active ? "#fff" : CHANNEL_INACTIVE,
+                      textDecoration: "none",
+                      fontSize: 19, fontWeight: active ? 800 : 700,
+                      borderBottom: "1px solid rgba(255,255,255,0.08)",
+                      borderLeft: active ? `4px solid ${GOLD_SOFT}` : "4px solid transparent",
+                    }}
+                  >{ch.name}</Link>
+                );
+              })}
             </div>
 
-            {/* 활동 버튼 */}
+            {/* 활동 */}
             <div style={{ marginBottom: 28 }}>
               <div style={{
-                color: "rgba(201,168,76,0.75)",
+                color: GOLD_SOFT,
                 fontSize: 13, fontWeight: 700,
                 letterSpacing: 2, marginBottom: 10, paddingLeft: 4,
               }}>활동</div>
@@ -278,8 +326,8 @@ export default function Header() {
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "center",
                   minHeight: 52, padding: "10px 16px", marginBottom: 10,
-                  color: "#c9a84c", border: "1px solid #c9a84c",
-                  fontSize: 19, fontWeight: 600, textDecoration: "none",
+                  color: GOLD_SOFT, border: `1.5px solid ${GOLD_SOFT}`,
+                  fontSize: 19, fontWeight: 700, textDecoration: "none",
                   borderRadius: 4,
                 }}
               >📢 광고문의</Link>
@@ -292,8 +340,8 @@ export default function Header() {
                     style={{
                       display: "flex", alignItems: "center", justifyContent: "center",
                       minHeight: 52, padding: "10px 16px", marginBottom: 10,
-                      color: "#c9a84c", border: "1px solid #c9a84c",
-                      fontSize: 19, fontWeight: 600, textDecoration: "none",
+                      color: GOLD_SOFT, border: `1.5px solid ${GOLD_SOFT}`,
+                      fontSize: 19, fontWeight: 700, textDecoration: "none",
                       borderRadius: 4,
                     }}
                   >로그인</Link>
@@ -303,8 +351,8 @@ export default function Header() {
                     style={{
                       display: "flex", alignItems: "center", justifyContent: "center",
                       minHeight: 52, padding: "10px 16px",
-                      background: "#c9a84c", color: "#0d2d52",
-                      fontSize: 19, fontWeight: 700, textDecoration: "none",
+                      background: GOLD_SOFT, color: NAVY,
+                      fontSize: 19, fontWeight: 800, textDecoration: "none",
                       borderRadius: 4,
                     }}
                   >회원가입</Link>
@@ -317,8 +365,8 @@ export default function Header() {
                     style={{
                       display: "flex", alignItems: "center", justifyContent: "center",
                       minHeight: 52, padding: "10px 16px", marginBottom: 10,
-                      color: "#c9a84c", border: "1px solid #c9a84c",
-                      fontSize: 19, fontWeight: 600, textDecoration: "none",
+                      color: GOLD_SOFT, border: `1.5px solid ${GOLD_SOFT}`,
+                      fontSize: 19, fontWeight: 700, textDecoration: "none",
                       borderRadius: 4,
                     }}
                   >
@@ -328,9 +376,9 @@ export default function Header() {
                     onClick={handleLogout}
                     style={{
                       width: "100%", minHeight: 52, padding: "10px 16px",
-                      color: "#c9a84c", background: "transparent",
-                      border: "1px solid #c9a84c",
-                      fontSize: 19, fontWeight: 600, borderRadius: 4,
+                      color: GOLD_SOFT, background: "transparent",
+                      border: `1.5px solid ${GOLD_SOFT}`,
+                      fontSize: 19, fontWeight: 700, borderRadius: 4,
                       cursor: "pointer",
                       fontFamily: "'Noto Sans KR', sans-serif",
                     }}
@@ -342,7 +390,7 @@ export default function Header() {
             {canSeeAdmin && (
               <div>
                 <div style={{
-                  color: "rgba(201,168,76,0.75)",
+                  color: GOLD_SOFT,
                   fontSize: 13, fontWeight: 700,
                   letterSpacing: 2, marginBottom: 10, paddingLeft: 4,
                 }}>관리</div>
@@ -352,8 +400,8 @@ export default function Header() {
                   style={{
                     display: "flex", alignItems: "center", justifyContent: "center",
                     minHeight: 52, padding: "10px 16px",
-                    color: "#aaa", border: "1px solid #555",
-                    fontSize: 17, fontWeight: 600, textDecoration: "none",
+                    color: "#fff", border: `1.5px solid ${CHANNEL_INACTIVE}`,
+                    fontSize: 17, fontWeight: 700, textDecoration: "none",
                     borderRadius: 4,
                   }}
                 >⚙️ 관리자 페이지</Link>
