@@ -197,7 +197,7 @@ export default function ArticleDetail() {
     (async () => {
       const { data, error: err } = await supabase
         .from('articles')
-        .select('slug, title, summary, content, thumbnail_url, video_url, published_at, channel_id, channels(name, slug, english_slug)')
+        .select('id, slug, title, summary, content, thumbnail_url, video_url, published_at, channel_id, channels(name, slug, english_slug)')
         .eq('slug', slug)
         .eq('status', 'published')
         .single();
