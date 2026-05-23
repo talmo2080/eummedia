@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { getChannelColorClasses } from "../lib/channelColors";
 import { getYouTubeEmbedUrl } from "../lib/youtube";
+import VideoGallery from "../components/VideoGallery";
 
 const CC = {
   "이음매거진":"#0d2d52","이음뉴스":"#c0392b","이음에듀":"#1a6b3c",
@@ -33,12 +34,6 @@ const AUTHOR_ARTICLES = [
   { id:"a3", title:"고양시 일산, 미디어 리터러시 교육 현장", date:"2026.03.28" },
 ];
 
-const VIDEOS = [
-  { id:"v1", title:"이천도자기축제 현장 스케치", description:"도예와 차 문화, 공예에 관심 있는 시민이라면 놓치지 말아야 할 현장을 담았습니다.", duration:"3:24", thumb:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400&q=80" },
-  { id:"v2", title:"닥터리부트 두피 건강 비법", description:"두피전문가 27년의 노하우, 일상에서 바로 실천할 수 있는 두피 건강 5가지 습관을 알려드립니다.", duration:"5:12", thumb:"https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80" },
-  { id:"v3", title:"봉숭아학당 27기 수료식 현장", description:"문화혁신학교 봉숭아학당 27기 수료생들의 시민기자 도전기, 그 뜨거운 현장을 함께합니다.", duration:"4:08", thumb:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80" },
-];
-
 const CARDS = [
   { id:"c1", title:"두피 관리 5단계 완전 정복", thumb:"https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80" },
   { id:"c2", title:"이천도자기축제 하이라이트 10선", thumb:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400&q=80" },
@@ -50,16 +45,6 @@ const INIT_COMMENTS = [
   { id:2, name:"박철수", date:"2026.04.28", content:"장인 시연 영상도 있으면 좋겠어요!", likes:5 },
   { id:3, name:"이순희", date:"2026.04.29", content:"시민기자 이야기가 인상적이었어요.", likes:12 },
 ];
-
-function ArrowBtn({ onClick, dir }) {
-  const [h, setH] = useState(false);
-  return (
-    <button onClick={onClick} onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
-      style={{ width:"32px", height:"32px", borderRadius:"50%", background: h ? "#0d2d52" : "#fff", border:"2px solid " + (h ? "#0d2d52" : "#ddd"), color: h ? "#fff" : "#0d2d52", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:"18px", fontWeight:"900", transition:"all 0.2s", lineHeight:1 }}>
-      {dir === "prev" ? "‹" : "›"}
-    </button>
-  );
-}
 
 function CardThumb({ card }) {
   const [h, setH] = useState(false);
@@ -206,7 +191,7 @@ export default function ArticleDetail() {
   const [comments, setComments] = useState(INIT_COMMENTS);
   const [cName, setCName] = useState("");
   const [cText, setCText] = useState("");
-  const [videoIdx, setVideoIdx] = useState(0);
+  const [galleryVideos, setGalleryVideos] = useState([]);
   const [showAuthorMore, setShowAuthorMore] = useState(false);
 
   const onLike = () => { setLiked(p => !p); setLikeCount(p => liked ? p - 1 : p + 1); };
@@ -274,6 +259,26 @@ export default function ArticleDetail() {
     })();
     return () => { cancelled = true; };
   }, [channelId, slug]);
+
+  // 📺 영상 갤러리 — 현재 기사 제외, 영상 있는 published 기사 최신순
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error: err } = await supabase
+        .from('articles')
+        .select('slug, title, video_url, thumbnail_url, channels(name)')
+        .eq('status', 'published')
+        .not('video_url', 'is', null)
+        .neq('video_url', '')
+        .neq('slug', slug)
+        .order('published_at', { ascending: false })
+        .limit(6);
+      if (cancelled) return;
+      if (err) { console.error('[ArticleDetail VIDEOS] supabase error:', err); return; }
+      setGalleryVideos(data ?? []);
+    })();
+    return () => { cancelled = true; };
+  }, [slug]);
 
   if (error) {
     return (
@@ -573,34 +578,13 @@ export default function ArticleDetail() {
           {/* 구분선 */}
           <div style={{ borderTop:"1px solid #e0e0e0", margin:"32px 0" }} />
 
-          {/* 📺 영상 갤러리 캐러셀 — placeholder (YouTube 연결 예정) */}
-          <div style={{ marginTop:"32px" }}>
-            <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>📺 영상 갤러리</div>
-
-            <div style={{ position:"relative", width:"100%", aspectRatio:"16/9", borderRadius:"12px", overflow:"hidden", boxShadow:"0 4px 16px rgba(0,0,0,0.12)" }}>
-              <img src={VIDEOS[videoIdx].thumb} alt={VIDEOS[videoIdx].title} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
-              <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,0.35)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <div style={{ width:"64px", height:"64px", borderRadius:"50%", background:"rgba(255,255,255,0.9)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"24px" }}>▶</div>
-              </div>
-              <span style={{ position:"absolute", top:"12px", left:"12px", background:"#0d2d52", color:"white", fontSize:"11px", fontWeight:"700", padding:"4px 10px", borderRadius:"4px" }}>영상</span>
-              <span style={{ position:"absolute", bottom:"12px", right:"12px", background:"rgba(0,0,0,0.7)", color:"white", fontSize:"12px", padding:"3px 8px", borderRadius:"4px" }}>{VIDEOS[videoIdx].duration}</span>
+          {/* 📺 영상 갤러리 — 현재 기사 제외, 공용 컴포넌트 (0건 시 섹션 숨김) */}
+          {galleryVideos.length > 0 && (
+            <div style={{ marginTop:"32px" }}>
+              <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>📺 영상 갤러리</div>
+              <VideoGallery videos={galleryVideos} />
             </div>
-
-            <div style={{ padding:"12px 0" }}>
-              <div style={{ fontSize:"18px", fontWeight:"700", color:"#1c1917", lineHeight:"1.4", marginBottom:"8px" }}>{VIDEOS[videoIdx].title}</div>
-              {VIDEOS[videoIdx].description && (
-                <div style={{ fontSize:"16px", color:"#666", lineHeight:"1.7" }}>{VIDEOS[videoIdx].description}</div>
-              )}
-            </div>
-
-            {VIDEOS.length > 1 && (
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"16px", marginTop:"8px" }}>
-                <ArrowBtn onClick={() => setVideoIdx(p => (p - 1 + VIDEOS.length) % VIDEOS.length)} dir="prev" />
-                <span style={{ fontSize:"13px", color:"#9a9a9a" }}>{videoIdx + 1} / {VIDEOS.length}</span>
-                <ArrowBtn onClick={() => setVideoIdx(p => (p + 1) % VIDEOS.length)} dir="next" />
-              </div>
-            )}
-          </div>
+          )}
 
           {/* 관련 기사 — 같은 채널 다른 기사 (STEP 5-C, 5/15 사고 해소로 살아남) */}
           <div style={{ margin:"32px 0" }}>
