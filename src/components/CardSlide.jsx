@@ -33,7 +33,7 @@ export default function CardSlide({ slide, articleThumbnail, channelName }) {
     fontFamily: SANS,
   };
 
-  // ───────── 표지 ─────────
+  // ───────── 표지 (A안: 사진 또렷 + 아래 58% 그라데이션) ─────────
   if (type === 'cover') {
     return (
       <div style={{ ...base, background: NAVY }}>
@@ -42,19 +42,19 @@ export default function CardSlide({ slide, articleThumbnail, channelName }) {
             position: 'absolute', inset: 0,
             backgroundImage: `url('${bgImage}')`,
             backgroundSize: 'cover', backgroundPosition: 'center',
-            filter: 'grayscale(.4) brightness(.42)', opacity: .55,
           }} />
         )}
-        {/* 어둠 그라데이션 */}
+        {/* 아래쪽 58% 높이만 그라데이션 (위 투명 → 아래 짙은 네이비) */}
         <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(180deg, rgba(8,32,60,.2), rgba(8,32,60,.9))',
+          position: 'absolute', left: 0, right: 0, bottom: 0,
+          height: '58%',
+          background: 'linear-gradient(180deg, transparent, rgba(8,32,60,.93))',
         }} />
-        {/* 골드 큰 따옴표 deco */}
+        {/* 흰 반투명 큰 따옴표 deco — 밝은 사진 위에서도 보이게 */}
         <div style={{
           position: 'absolute', top: 30, right: 34, zIndex: 3,
-          fontFamily: SERIF, fontSize: 84, color: GOLD,
-          opacity: .45, lineHeight: .7,
+          fontFamily: SERIF, fontSize: 84, color: 'rgba(255,255,255,.6)',
+          lineHeight: .7,
         }}>&ldquo;</div>
         {/* 본문 */}
         <div style={{
