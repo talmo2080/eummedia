@@ -364,19 +364,22 @@ export default function Home() {
     return () => { cancelled = true; };
   }, []);
 
+  // 🔥 이번주 인기 기사 — view_count 우선, 동률 시 published_at 보조
+  // (view_count 카운팅 시작 전까지는 사실상 최신순으로 동작)
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const { data, error: queryError } = await supabase
         .from('articles')
-        .select('slug, title, thumbnail_url, channels(name)')
+        .select('slug, title, summary, thumbnail_url, author_name, published_at, channels(name)')
         .eq('status', 'published')
+        .order('view_count', { ascending: false })
         .order('published_at', { ascending: false })
-        .range(7, 11);
+        .limit(5);
       if (cancelled) return;
       if (queryError) {
         console.error('[POPULAR] supabase error:', queryError);
-        setError(prev => prev || '추천 기사를 불러오지 못했어요. 잠시 후 새로고침 해주세요.');
+        setError(prev => prev || '인기 기사를 불러오지 못했어요. 잠시 후 새로고침 해주세요.');
         return;
       }
       setPopular(data ?? []);
@@ -418,7 +421,7 @@ export default function Home() {
       )}
 
       {/* ━━━━━━━━━━━ 모바일·태블릿 신문형 (lg 미만) ━━━━━━━━━━━ */}
-      {/* 순서: 메인 헤드라인 → 채널 진입 → 광고 → 서브톱 → 카드뉴스 → 최신 기사 */}
+      {/* 순서: HERO → 최신 → 카드뉴스 → 인기 → 광고 → 주식 → 7채널 */}
       <div className="lg:hidden">
 
         {/* ① HERO 톱 1개 — 메인 헤드라인 */}
@@ -446,75 +449,38 @@ export default function Home() {
           </Link>
         )}
 
-        {/* ② 7채널 가로 스크롤 칩 — 채널 진입 */}
-        <div className="px-4 mb-5">
-          <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
-            {NAV_CHANNELS.map(ch => (
-              <Link
-                key={ch.slug}
-                to={`/channel/${ch.slug}`}
-                className={`flex-shrink-0 px-4 py-2 rounded-full ${CHANNEL_COLORS[ch.color]} text-[12px] font-bold`}
-              >
-                {ch.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* ③ 광고 — 데스크탑 사이드바와 동일 컨텐츠의 모바일 카드 */}
-        <div className="px-4 mb-7">
-          <div className="text-[10px] text-neutral-500 tracking-widest mb-2">광고</div>
-          <a href="https://naver.me/GWeDuL23" target="_blank" rel="noopener noreferrer"
-             className="block bg-white border border-neutral-200 rounded-sm overflow-hidden no-underline">
-            <div className="h-[120px] flex items-center justify-center"
-                 style={{ background: "linear-gradient(135deg,#0d2d52,#1c4f8a)" }}>
-              <div className="text-center text-white px-3">
-                <div className="text-[26px] mb-1">💆</div>
-                <div className="text-[14px] font-bold">닥터리부트 두피관리센터</div>
-              </div>
-            </div>
-            <div className="p-4">
-              <div className="text-[15px] font-bold text-[#0d2d52] mb-1 leading-snug">
-                고객의 마지막 희망이 되고픈
-              </div>
-              <div className="text-[12px] text-neutral-600 leading-relaxed mb-3">
-                정세연 원장 · 두피전문가 27년<br />
-                일산 · 브레인트레이너 · SMP디자인전문가
-              </div>
-              <div className="w-full bg-[#0d2d52] text-white text-center py-3 text-[14px] font-bold rounded-sm">
-                예약 · 문의 →
-              </div>
-            </div>
-          </a>
-        </div>
-
-        {/* ④ 서브 톱 2개 */}
+        {/* ② 📰 최신 기사 (박스형 2열) */}
         {articles.length >= 2 && (
-          <div className="grid grid-cols-2 gap-3 px-4 pb-5 mb-6 border-b border-neutral-200">
-            {articles.slice(0, 2).map(a => (
-              <Link key={a.slug} to={"/article/" + a.slug} className="block">
-                <div className="relative aspect-square overflow-hidden bg-neutral-100 rounded-sm mb-2">
-                  <img src={a.thumbnail_url} alt={a.title}
-                    className="w-full h-full object-cover" loading="lazy" />
-                  {a.channels?.name && (
-                    <span className="absolute top-2 left-2 bg-white/95 text-neutral-900 text-[10px] font-bold px-2 py-0.5 rounded">
-                      {a.channels.name}
-                    </span>
-                  )}
-                </div>
-                <h3 className="font-serif font-bold text-[14px] leading-snug line-clamp-2 text-neutral-900">
-                  {a.title}
-                </h3>
-              </Link>
-            ))}
+          <div className="px-4 mb-7">
+            <div className="flex items-end justify-between border-b-2 border-neutral-900 pb-2 mb-3">
+              <h2 className="font-serif font-bold text-[18px]">📰 최신 기사</h2>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {articles.slice(0, 2).map(a => (
+                <Link key={a.slug} to={"/article/" + a.slug} className="block">
+                  <div className="relative aspect-square overflow-hidden bg-neutral-100 rounded-sm mb-2">
+                    <img src={a.thumbnail_url} alt={a.title}
+                      className="w-full h-full object-cover" loading="lazy" />
+                    {a.channels?.name && (
+                      <span className="absolute top-2 left-2 bg-white/95 text-neutral-900 text-[10px] font-bold px-2 py-0.5 rounded">
+                        {a.channels.name}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="font-serif font-bold text-[14px] leading-snug line-clamp-2 text-neutral-900">
+                    {a.title}
+                  </h3>
+                </Link>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* ⑤ 카드뉴스 모음 — DB 실데이터, 4:5 비율, 클릭 시 슬라이드쇼 */}
+        {/* ③ 📱 카드뉴스 — DB 실데이터, 4:5 비율, 클릭 시 슬라이드쇼 */}
         {cardnewsList.length > 0 && (
           <div className="px-4 mb-7">
             <div className="flex items-end justify-between border-b-2 border-neutral-900 pb-2 mb-3">
-              <h2 className="font-serif font-bold text-[18px]">📱 카드뉴스 모음</h2>
+              <h2 className="font-serif font-bold text-[18px]">📱 카드뉴스</h2>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {cardnewsList.slice(0, 4).map(cn => {
@@ -547,40 +513,91 @@ export default function Home() {
           </div>
         )}
 
-        {/* ⑥ 최신 기사 (신문형 리스트 5건) */}
-        <div className="px-4 mb-7">
-          <div className="flex items-end justify-between border-b-2 border-neutral-900 pb-2 mb-3">
-            <h2 className="font-serif font-bold text-[18px]">📰 최신 기사</h2>
-            <Link to="/" className="text-[11px] text-neutral-500">더보기 →</Link>
+        {/* ④ 🔥 이번주 인기 기사 (88×88 리스트형, view_count 순) */}
+        {popular.length > 0 && (
+          <div className="px-4 mb-7">
+            <div className="flex items-end justify-between border-b-2 border-neutral-900 pb-2 mb-3">
+              <h2 className="font-serif font-bold text-[18px]">🔥 이번주 인기 기사</h2>
+            </div>
+            <ul className="divide-y divide-neutral-200">
+              {popular.map((p, i) => (
+                <li key={p.slug}>
+                  <Link to={"/article/" + p.slug} className="flex gap-3 py-3.5 active:bg-neutral-50">
+                    <span className="flex-shrink-0 w-7 text-center font-serif font-bold text-[18px] text-[#c9a84c] pt-1">
+                      {i + 1}
+                    </span>
+                    <div className="flex-shrink-0 w-[88px] h-[88px] overflow-hidden bg-neutral-100 rounded-sm">
+                      <img src={p.thumbnail_url} alt={p.title}
+                        className="w-full h-full object-cover" loading="lazy" />
+                    </div>
+                    <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                      <div>
+                        <h3 className="font-serif font-bold text-[15px] leading-snug line-clamp-2 mb-1 text-neutral-900">
+                          {p.title}
+                        </h3>
+                        {p.summary && (
+                          <p className="text-[12px] text-neutral-600 line-clamp-1">
+                            {p.summary}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-[10px] text-neutral-500 mt-1">
+                        {p.author_name ? `${p.author_name} · ` : ''}{formatDate(p.published_at)}
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="divide-y divide-neutral-200">
-            {articles.slice(2, 7).map(a => (
-              <li key={a.slug}>
-                <Link to={"/article/" + a.slug} className="flex gap-3 py-3.5 active:bg-neutral-50">
-                  <div className="flex-shrink-0 w-[88px] h-[88px] overflow-hidden bg-neutral-100 rounded-sm">
-                    <img src={a.thumbnail_url} alt={a.title}
-                      className="w-full h-full object-cover" loading="lazy" />
-                  </div>
-                  <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-                    <div>
-                      <h3 className="font-serif font-bold text-[15px] leading-snug line-clamp-2 mb-1 text-neutral-900">
-                        {a.title}
-                      </h3>
-                      <p className="text-[12px] text-neutral-600 line-clamp-1">
-                        {a.summary}
-                      </p>
-                    </div>
-                    <div className="text-[10px] text-neutral-500 mt-1">
-                      {a.author_name ? `${a.author_name} · ` : ''}{formatDate(a.published_at)}
-                    </div>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+        )}
+
+        {/* ⑤ 광고 — 데스크탑 사이드바와 동일 컨텐츠의 모바일 카드 */}
+        <div className="px-4 mb-7">
+          <div className="text-[10px] text-neutral-500 tracking-widest mb-2">광고</div>
+          <a href="https://naver.me/GWeDuL23" target="_blank" rel="noopener noreferrer"
+             className="block bg-white border border-neutral-200 rounded-sm overflow-hidden no-underline">
+            <div className="h-[120px] flex items-center justify-center"
+                 style={{ background: "linear-gradient(135deg,#0d2d52,#1c4f8a)" }}>
+              <div className="text-center text-white px-3">
+                <div className="text-[26px] mb-1">💆</div>
+                <div className="text-[14px] font-bold">닥터리부트 두피관리센터</div>
+              </div>
+            </div>
+            <div className="p-4">
+              <div className="text-[15px] font-bold text-[#0d2d52] mb-1 leading-snug">
+                고객의 마지막 희망이 되고픈
+              </div>
+              <div className="text-[12px] text-neutral-600 leading-relaxed mb-3">
+                정세연 원장 · 두피전문가 27년<br />
+                일산 · 브레인트레이너 · SMP디자인전문가
+              </div>
+              <div className="w-full bg-[#0d2d52] text-white text-center py-3 text-[14px] font-bold rounded-sm">
+                예약 · 문의 →
+              </div>
+            </div>
+          </a>
         </div>
 
-        {/* TODO: commit 44+ 에서 채널별 미니 섹션 추가 (세연님 Q4=c 차후) */}
+        {/* ⑥ 📊 주식 위젯 — PC 위젯 재사용 */}
+        <div className="px-4 mb-7">
+          <StockWidget />
+        </div>
+
+        {/* ⑦ 7채널 가로 스크롤 칩 — 채널 진입 */}
+        <div className="px-4 mb-7">
+          <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+            {NAV_CHANNELS.map(ch => (
+              <Link
+                key={ch.slug}
+                to={`/channel/${ch.slug}`}
+                className={`flex-shrink-0 px-4 py-2 rounded-full ${CHANNEL_COLORS[ch.color]} text-[12px] font-bold`}
+              >
+                {ch.name}
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* ━━━━━━━━━━━ 데스크탑 본문 (lg 이상) — 기존 그대로 ━━━━━━━━━━━ */}
@@ -619,7 +636,18 @@ export default function Home() {
             ))}
           </div>
 
-          {/* 기사 그리드 */}
+          {/* 📰 최신 기사 (박스형 2열) */}
+          <div style={{
+            display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
+            borderBottom: '2px solid #1a1a1a', paddingBottom: 8, marginBottom: 16,
+          }}>
+            <h2 style={{
+              fontFamily: 'serif', fontSize: 22, fontWeight: 700,
+              color: '#0d2d52', margin: 0,
+            }}>
+              📰 최신 기사
+            </h2>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap:"20px" }}>
             {articles.length > 0
               ? articles.map(a => (
@@ -660,7 +688,7 @@ export default function Home() {
                   fontFamily: 'serif', fontSize: 22, fontWeight: 700,
                   color: '#0d2d52', margin: 0,
                 }}>
-                  📱 카드뉴스 모음
+                  📱 카드뉴스
                 </h2>
               </div>
               <div className="grid grid-cols-3" style={{ gap: 16 }}>
@@ -743,7 +771,7 @@ export default function Home() {
           </div>
 
           <div style={{ background:"#fff", border:"1px solid #e0e0e0", padding:"16px" }}>
-            <div style={{ fontSize:"12px", fontWeight:"700", color:"#555", borderBottom:"2px solid #0d2d52", paddingBottom:"8px", marginBottom:"12px" }}>이번 주 추천 기사</div>
+            <div style={{ fontSize:"12px", fontWeight:"700", color:"#555", borderBottom:"2px solid #0d2d52", paddingBottom:"8px", marginBottom:"12px" }}>🔥 이번주 인기 기사</div>
             {popular.length > 0
               ? popular.map((p,i) => (
                   <Link key={p.slug} to={"/article/" + p.slug} style={{ display:"flex", gap:"10px", padding:"8px 0", borderBottom:"1px solid #f0f0f0", textDecoration:"none", alignItems:"center" }}>
