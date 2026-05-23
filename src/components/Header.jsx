@@ -213,15 +213,20 @@ export default function Header() {
         </div>
       </div>
 
-      {/* ③ 채널 네비 — PC (네이비 배경, 활성 골드 하단선) */}
-      <nav className="hidden md:block" style={{
+      {/* ③ 채널 네비 — PC·모바일 공통 (네이비 배경, 모바일은 가로 스크롤) */}
+      <nav style={{
         backgroundColor: NAVY,
       }}>
-        <div style={{
-          maxWidth: 1200, margin: "0 auto",
-          padding: "0 20px",
-          display: "flex",
-        }}>
+        <div
+          className="no-scrollbar"
+          style={{
+            maxWidth: 1200, margin: "0 auto",
+            padding: "0 20px",
+            display: "flex",
+            overflowX: "auto",
+            scrollbarWidth: "none",     // Firefox
+            msOverflowStyle: "none",    // IE/Edge
+          }}>
           {navItems.map((ch) => {
             const active = isActive(ch.path);
             return (
@@ -237,6 +242,7 @@ export default function Header() {
                   borderBottom: `3px solid ${active ? GOLD_SOFT : "transparent"}`,
                   transition: "color 0.15s",
                   whiteSpace: "nowrap",
+                  flexShrink: 0,
                 }}
                 onMouseEnter={e => { if (!active) e.currentTarget.style.color = "#fff"; }}
                 onMouseLeave={e => { if (!active) e.currentTarget.style.color = CHANNEL_INACTIVE; }}

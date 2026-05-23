@@ -3,3 +3,7 @@
 @theme {
   --font-serif: "Nanum Myeongjo", serif;
 }
+
+/* 가로 스크롤 영역 스크롤바 숨김 (헤더 채널 네비 등) */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
