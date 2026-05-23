@@ -77,24 +77,6 @@ const NAV_CHANNELS = [
   { slug: 'view',     name: '이음뷰',     color: 'slate' },
 ];
 
-// 채널명 → 모바일 칩 색상 매핑 (NAV_CHANNELS와 동일 키)
-const CHANNEL_NAME_TO_COLOR = {
-  '이음매거진': 'rose',
-  '이음로컬':   'emerald',
-  '이음에듀':   'sky',
-  '이음피플':   'amber',
-  '이음트렌드': 'violet',
-  '이음보이스': 'orange',
-  '이음뷰':     'slate',
-};
-
-// 카드뉴스 표지 이미지 — slides[0].image_url 없으면 article 대표이미지 fallback
-function getCardCoverImage(cn) {
-  const coverImg = cn?.slides?.[0]?.image_url;
-  if (coverImg) return coverImg;
-  return cn?.articles?.thumbnail_url || '';
-}
-
 function formatDate(iso) {
   const d = new Date(iso);
   return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
@@ -164,184 +146,10 @@ function StockWidget() {
   );
 }
 
-// 카드뉴스 슬라이드쇼 모달 — 5장 (표지 + 핵심3 + 마무리)
-// 키보드: ESC 닫기, ← → 슬라이드 이동. 오버레이/X 버튼으로 닫기.
-function CardNewsSlideshow({ cardnews, onClose }) {
-  const [idx, setIdx] = useState(0);
-  const total = cardnews?.slides?.length ?? 0;
-
-  useEffect(() => {
-    if (!cardnews) return;
-    const onKey = (e) => {
-      if (e.key === 'Escape') onClose();
-      else if (e.key === 'ArrowLeft') setIdx(i => Math.max(0, i - 1));
-      else if (e.key === 'ArrowRight') setIdx(i => Math.min(total - 1, i + 1));
-    };
-    window.addEventListener('keydown', onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [cardnews, total, onClose]);
-
-  if (!cardnews) return null;
-  const slide = cardnews.slides?.[idx];
-  if (!slide) return null;
-
-  const article = cardnews.articles;
-  const slideImg = slide.image_url || article?.thumbnail_url || '';
-  const isFirst = idx === 0;
-  const isLast = idx === total - 1;
-
-  return (
-    <div
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center',
-        zIndex: 1200, padding: 20, boxSizing: 'border-box',
-      }}>
-      {/* X 닫기 */}
-      <button onClick={onClose} aria-label="닫기"
-        style={{
-          position: 'absolute', top: 16, right: 16,
-          width: 44, height: 44, borderRadius: '50%',
-          background: 'rgba(255,255,255,0.15)', color: '#fff',
-          border: 'none', fontSize: 22, cursor: 'pointer', lineHeight: 1,
-          zIndex: 10,
-        }}>✕</button>
-
-      <div onClick={e => e.stopPropagation()}
-        style={{
-          width: '100%', maxWidth: 480,
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
-        }}>
-        {/* 카운터 */}
-        <div style={{
-          color: '#fff', fontSize: 13, opacity: 0.8, marginBottom: 10,
-          letterSpacing: 1, fontFamily: "'Noto Sans KR',sans-serif",
-        }}>
-          {idx + 1} / {total}
-        </div>
-
-        {/* 슬라이드 본체 (4:5) */}
-        <div style={{
-          position: 'relative', width: '100%', aspectRatio: '4 / 5',
-          background: '#1a1a1a', borderRadius: 8, overflow: 'hidden',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-        }}>
-          {slideImg
-            ? <img src={slideImg} alt={slide.title || cardnews.title}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            : <div style={{
-                width: '100%', height: '100%',
-                background: 'linear-gradient(135deg, #0d2d52, #1c4f8a)',
-              }} />
-          }
-          {/* 텍스트 오버레이 */}
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%)',
-            display: 'flex', flexDirection: 'column',
-            justifyContent: 'flex-end',
-            padding: '24px 28px',
-            color: '#fff',
-            fontFamily: "'Noto Sans KR',sans-serif",
-          }}>
-            {slide.title && (
-              <h3 style={{
-                fontFamily: 'serif',
-                fontSize: slide.type === 'cover' ? 28 : 22,
-                fontWeight: 700, lineHeight: 1.35, margin: '0 0 10px 0',
-                color: slide.type === 'cover' ? '#c9a84c' : '#fff',
-              }}>
-                {slide.title}
-              </h3>
-            )}
-            {slide.text && (
-              <p style={{
-                fontSize: 15, lineHeight: 1.7, margin: 0,
-                opacity: 0.95,
-              }}>
-                {slide.text}
-              </p>
-            )}
-            {/* 표지에 채널/기사 정보 노출 */}
-            {slide.type === 'cover' && article?.channels?.name && (
-              <div style={{
-                fontSize: 11, letterSpacing: 2, opacity: 0.7,
-                fontWeight: 700, marginBottom: 10,
-              }}>
-                {article.channels.name}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* 좌우 화살표 + 진행 인디케이터 */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          gap: 16, marginTop: 16,
-        }}>
-          <button onClick={() => setIdx(i => Math.max(0, i - 1))}
-            disabled={isFirst} aria-label="이전"
-            style={{
-              width: 44, height: 44, borderRadius: '50%',
-              background: isFirst ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.9)',
-              color: isFirst ? 'rgba(255,255,255,0.3)' : '#0d2d52',
-              border: 'none', fontSize: 20, fontWeight: 900,
-              cursor: isFirst ? 'not-allowed' : 'pointer', lineHeight: 1,
-            }}>‹</button>
-          <div style={{ display: 'flex', gap: 6 }}>
-            {Array.from({ length: total }).map((_, i) => (
-              <span key={i} style={{
-                width: i === idx ? 20 : 8, height: 8, borderRadius: 4,
-                background: i === idx ? '#c9a84c' : 'rgba(255,255,255,0.4)',
-                transition: 'all 0.2s',
-              }} />
-            ))}
-          </div>
-          <button onClick={() => setIdx(i => Math.min(total - 1, i + 1))}
-            disabled={isLast} aria-label="다음"
-            style={{
-              width: 44, height: 44, borderRadius: '50%',
-              background: isLast ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.9)',
-              color: isLast ? 'rgba(255,255,255,0.3)' : '#0d2d52',
-              border: 'none', fontSize: 20, fontWeight: 900,
-              cursor: isLast ? 'not-allowed' : 'pointer', lineHeight: 1,
-            }}>›</button>
-        </div>
-
-        {/* 기사 전문 보기 */}
-        {article?.slug && (
-          <Link to={"/article/" + article.slug} onClick={onClose}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              marginTop: 20, padding: '14px 28px',
-              background: '#c9a84c', color: '#1a1a1a',
-              fontFamily: "'Noto Sans KR',sans-serif",
-              fontSize: 15, fontWeight: 700, textDecoration: 'none',
-              borderRadius: 8,
-            }}>
-            📰 기사 전문 보기
-          </Link>
-        )}
-      </div>
-    </div>
-  );
-}
-
 export default function Home() {
   const [heroArticle, setHeroArticle] = useState(null);
   const [articles, setArticles] = useState([]);
   const [popular, setPopular] = useState([]);
-  const [cardnewsList, setCardnewsList] = useState([]);
-  const [activeCardnews, setActiveCardnews] = useState(null);
   const [videosList, setVideosList] = useState([]);
   const [error, setError] = useState(null);
 
@@ -385,26 +193,6 @@ export default function Home() {
         return;
       }
       setPopular(data ?? []);
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
-  // 카드뉴스 fetch — articles JOIN으로 채널명/slug 끌어옴
-  // type 필터 없음 (기존 1:1 1건 포함 모든 row 노출, 향후 4:5 단일화)
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const { data, error: queryError } = await supabase
-        .from('cardnews')
-        .select('id, title, slides, articles(id, slug, title, thumbnail_url, channels(name))')
-        .order('created_at', { ascending: false })
-        .limit(6);
-      if (cancelled) return;
-      if (queryError) {
-        console.error('[CARDNEWS] supabase error:', queryError);
-        return;
-      }
-      setCardnewsList(data ?? []);
     })();
     return () => { cancelled = true; };
   }, []);
@@ -500,44 +288,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* ③ 📱 카드뉴스 — DB 실데이터, 4:5 비율, 클릭 시 슬라이드쇼 */}
-        {cardnewsList.length > 0 && (
-          <div className="px-4 mb-7">
-            <div className="flex items-end justify-between border-b-2 border-neutral-900 pb-2 mb-3">
-              <h2 className="font-serif font-bold text-[18px]">📱 카드뉴스</h2>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {cardnewsList.slice(0, 4).map(cn => {
-                const ch = cn.articles?.channels?.name;
-                const colorKey = ch ? CHANNEL_NAME_TO_COLOR[ch] : null;
-                const coverImg = getCardCoverImage(cn);
-                return (
-                  <button key={cn.id} type="button"
-                    onClick={() => setActiveCardnews(cn)}
-                    className="block text-left w-full bg-transparent border-0 p-0 cursor-pointer">
-                    <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100 rounded-sm mb-2">
-                      {coverImg
-                        ? <img src={coverImg} alt={cn.title}
-                            className="w-full h-full object-cover" loading="lazy" />
-                        : <div className="w-full h-full flex items-center justify-center text-neutral-400 text-3xl">📰</div>
-                      }
-                      {ch && colorKey && (
-                        <span className={`absolute top-2 left-2 ${CHANNEL_COLORS[colorKey]} text-[10px] font-bold px-2 py-0.5 rounded`}>
-                          {ch}
-                        </span>
-                      )}
-                    </div>
-                    <h3 className="font-serif font-bold text-[14px] leading-snug line-clamp-2 text-neutral-900">
-                      {cn.title}
-                    </h3>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* ④ 📺 영상 갤러리 — video_url 있는 기사 (0건이면 섹션 숨김) */}
+        {/* ③ 📺 영상 갤러리 — video_url 있는 기사 (0건이면 섹션 숨김) */}
         {videosList.length > 0 && (
           <div className="px-4 mb-7">
             <div className="flex items-end justify-between border-b-2 border-neutral-900 pb-2 mb-3">
@@ -711,69 +462,7 @@ export default function Home() {
             }
           </div>
 
-          {/* 📱 카드뉴스 모음 — 데스크탑 (실데이터 4:5) */}
-          {cardnewsList.length > 0 && (
-            <div style={{ marginTop: 40 }}>
-              <div style={{
-                display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
-                borderBottom: '2px solid #1a1a1a', paddingBottom: 8, marginBottom: 16,
-              }}>
-                <h2 style={{
-                  fontFamily: 'serif', fontSize: 22, fontWeight: 700,
-                  color: '#0d2d52', margin: 0,
-                }}>
-                  📱 카드뉴스
-                </h2>
-              </div>
-              <div className="grid grid-cols-3" style={{ gap: 16 }}>
-                {cardnewsList.slice(0, 3).map(cn => {
-                  const ch = cn.articles?.channels?.name;
-                  const coverImg = getCardCoverImage(cn);
-                  return (
-                    <button key={cn.id} type="button"
-                      onClick={() => setActiveCardnews(cn)}
-                      style={{
-                        background: 'transparent', border: 0, padding: 0,
-                        cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
-                      }}>
-                      <div style={{
-                        position: 'relative', aspectRatio: '4 / 5',
-                        overflow: 'hidden', background: '#f0f0f0', borderRadius: 4,
-                        marginBottom: 10,
-                      }}>
-                        {coverImg
-                          ? <img src={coverImg} alt={cn.title}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                              loading="lazy" />
-                          : <div style={{
-                              width: '100%', height: '100%',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              color: '#bbb', fontSize: 40,
-                            }}>📰</div>
-                        }
-                        {ch && (
-                          <span style={{
-                            position: 'absolute', top: 10, left: 10,
-                            background: 'rgba(255,255,255,0.95)', color: '#1a1a1a',
-                            fontSize: 11, fontWeight: 700,
-                            padding: '3px 8px', borderRadius: 3,
-                          }}>{ch}</span>
-                        )}
-                      </div>
-                      <h3 style={{
-                        fontFamily: 'serif', fontSize: 15, fontWeight: 700,
-                        lineHeight: 1.45, color: '#1a1a1a', margin: 0,
-                        display: '-webkit-box', WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                      }}>{cn.title}</h3>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* 📺 영상 갤러리 — 데스크탑 (카드뉴스 다음, 주식 위젯 앞) */}
+          {/* 📺 영상 갤러리 — 데스크탑 (주식 위젯 앞) */}
           {videosList.length > 0 && (
             <div style={{ marginTop: 40 }}>
               <div style={{
@@ -862,12 +551,6 @@ export default function Home() {
         </aside>
       </div>
 
-      {/* 카드뉴스 슬라이드쇼 모달 — 카드 클릭 시 표시
-          key={cn.id}으로 매번 fresh 마운트 → idx 자동 초기화 */}
-      <CardNewsSlideshow
-        key={activeCardnews?.id ?? 'no-cardnews'}
-        cardnews={activeCardnews}
-        onClose={() => setActiveCardnews(null)} />
     </div>
   );
 }

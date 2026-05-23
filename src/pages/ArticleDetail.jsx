@@ -4,6 +4,8 @@ import { supabase } from "../lib/supabase";
 import { getChannelColorClasses } from "../lib/channelColors";
 import { getYouTubeEmbedUrl } from "../lib/youtube";
 import VideoGallery from "../components/VideoGallery";
+import CardNewsSlideshow from "../components/CardNewsSlideshow";
+import CardSlide from "../components/CardSlide";
 
 const CC = {
   "이음매거진":"#0d2d52","이음뉴스":"#c0392b","이음에듀":"#1a6b3c",
@@ -34,30 +36,11 @@ const AUTHOR_ARTICLES = [
   { id:"a3", title:"고양시 일산, 미디어 리터러시 교육 현장", date:"2026.03.28" },
 ];
 
-const CARDS = [
-  { id:"c1", title:"두피 관리 5단계 완전 정복", thumb:"https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80" },
-  { id:"c2", title:"이천도자기축제 하이라이트 10선", thumb:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400&q=80" },
-  { id:"c3", title:"시민기자 되는 법 A to Z", thumb:"https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&q=80" },
-];
-
 const INIT_COMMENTS = [
   { id:1, name:"김미선", date:"2026.04.28", content:"정말 생생한 취재네요! 😊", likes:8 },
   { id:2, name:"박철수", date:"2026.04.28", content:"장인 시연 영상도 있으면 좋겠어요!", likes:5 },
   { id:3, name:"이순희", date:"2026.04.29", content:"시민기자 이야기가 인상적이었어요.", likes:12 },
 ];
-
-function CardThumb({ card }) {
-  const [h, setH] = useState(false);
-  return (
-    <div onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
-      style={{ position:"relative", aspectRatio:"1/1", borderRadius:"12px", overflow:"hidden", cursor:"pointer", transition:"transform 0.2s", boxShadow:"0 2px 8px rgba(0,0,0,0.10)", transform: h ? "scale(1.03)" : "scale(1)" }}>
-      <img src={card.thumb} alt={card.title} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
-      <div style={{ position:"absolute", bottom:0, left:0, right:0, background:"linear-gradient(transparent, rgba(13,45,82,0.82))", padding:"24px 12px 12px" }}>
-        <div style={{ color:"#fff", fontSize:"16px", fontWeight:"700", lineHeight:"1.4" }}>{card.title}</div>
-      </div>
-    </div>
-  );
-}
 
 function StickyBtn({ onClick, title, bg, fg, active, activeColor, children }) {
   const [h, setH] = useState(false);
@@ -192,6 +175,8 @@ export default function ArticleDetail() {
   const [cName, setCName] = useState("");
   const [cText, setCText] = useState("");
   const [galleryVideos, setGalleryVideos] = useState([]);
+  const [cardnews, setCardnews] = useState(null);
+  const [showCardnewsModal, setShowCardnewsModal] = useState(false);
   const [showAuthorMore, setShowAuthorMore] = useState(false);
 
   const onLike = () => { setLiked(p => !p); setLikeCount(p => liked ? p - 1 : p + 1); };
@@ -279,6 +264,24 @@ export default function ArticleDetail() {
     })();
     return () => { cancelled = true; };
   }, [slug]);
+
+  // 📱 카드뉴스 — 현재 기사의 cardnews 1건 (있을 때만)
+  const articleId = article?.id;
+  useEffect(() => {
+    if (!articleId) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error: err } = await supabase
+        .from('cardnews')
+        .select('*')
+        .eq('article_id', articleId)
+        .maybeSingle();
+      if (cancelled) return;
+      if (err) { console.error('[ArticleDetail CARDNEWS] supabase error:', err); return; }
+      setCardnews(data);
+    })();
+    return () => { cancelled = true; };
+  }, [articleId]);
 
   if (error) {
     return (
@@ -565,16 +568,6 @@ export default function ArticleDetail() {
             </div>
           </div>
 
-          {/* 📱 카드뉴스 섹션 */}
-          <div style={{ marginBottom:"32px" }}>
-            <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #c0392b", paddingLeft:"12px", marginBottom:"8px" }}>📱 카드뉴스 (3가지 이야기)</div>
-            <div style={{ fontSize:"14px", color:"#888", marginBottom:"16px" }}>각 카드를 클릭해서 골라보세요 👆</div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3" style={{ gap:"12px" }}>
-              {CARDS.map(card => <CardThumb key={card.id} card={card} />)}
-            </div>
-          </div>
-
           {/* 구분선 */}
           <div style={{ borderTop:"1px solid #e0e0e0", margin:"32px 0" }} />
 
@@ -583,6 +576,30 @@ export default function ArticleDetail() {
             <div style={{ marginTop:"32px" }}>
               <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>📺 영상 갤러리</div>
               <VideoGallery videos={galleryVideos} />
+            </div>
+          )}
+
+          {/* 📱 카드뉴스 — 현재 기사의 cardnews 1건 (있을 때만, C안 표지 → 클릭 시 5장 슬라이드쇼) */}
+          {cardnews && Array.isArray(cardnews.slides) && cardnews.slides.length > 0 && (
+            <div style={{ marginTop:"32px" }}>
+              <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>📱 카드뉴스</div>
+              <button type="button"
+                onClick={() => setShowCardnewsModal(true)}
+                aria-label="카드뉴스 5장 슬라이드쇼 열기"
+                style={{
+                  background: 'transparent', border: 0, padding: 0,
+                  cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
+                  width: '100%', maxWidth: 420, display: 'block',
+                }}>
+                <CardSlide
+                  slide={cardnews.slides[0]}
+                  articleThumbnail={article.thumbnail_url}
+                  channelName={a.channel}
+                />
+              </button>
+              <div style={{ fontSize: 13, color: '#6b6b6b', marginTop: 10 }}>
+                클릭해서 5장 카드뉴스 전체 보기 →
+              </div>
             </div>
           )}
 
@@ -688,6 +705,16 @@ export default function ArticleDetail() {
         onKakao={onKakao} onFb={onFb}
         commentCount={comments.length}
       />
+
+      {/* 📱 카드뉴스 슬라이드쇼 모달 — 5장 C안 (CardSlide) */}
+      {showCardnewsModal && (
+        <CardNewsSlideshow
+          cardnews={cardnews}
+          onClose={() => setShowCardnewsModal(false)}
+          articleThumbnail={article.thumbnail_url}
+          channelName={a.channel}
+        />
+      )}
     </div>
   );
 }
