@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { getYouTubeEmbedUrl } from '../lib/youtube'
+import CardSlide from '../components/CardSlide'
 
 const NAVY = '#0d2d52'
 const BLUE = '#1c4f8a'
@@ -516,19 +517,20 @@ function CardNewsModal({ article, onClose }) {
 
         {/* 현재 슬라이드 편집 */}
         <div className="space-y-3 mb-2">
-          {/* 이미지 업로드 */}
-          <div className="border-2 border-dashed border-neutral-300 rounded-lg p-3 text-center">
-            {current.image_url ? (
-              <img
-                src={current.image_url}
-                alt={`슬라이드 ${current.order}`}
-                className="w-full aspect-[4/5] object-cover rounded-lg mb-2"
-              />
-            ) : (
-              <div className="aspect-[4/5] bg-neutral-100 flex items-center justify-center text-neutral-400 mb-2 rounded-lg text-sm">
-                이미지 없음
-              </div>
-            )}
+          {/* C안 실시간 미리보기 — 입력값 즉시 반영 */}
+          <CardSlide
+            slide={current}
+            articleThumbnail={article.thumbnail_url}
+            channelName={article.channels?.name}
+          />
+
+          {/* 이미지 업로드 (표지·엔딩에만 배경으로 사용됨) */}
+          <div className="border-2 border-dashed border-neutral-300 rounded-lg p-3 text-center mt-3">
+            <div className="text-xs text-neutral-500 mb-2 leading-relaxed">
+              {current.type === 'main'
+                ? '본문은 글이 주인공입니다 — 이미지 업로드 무관'
+                : '슬라이드 전용 이미지 (선택) — 비워두면 기사 대표이미지 사용'}
+            </div>
             <input
               type="file"
               accept="image/*"
