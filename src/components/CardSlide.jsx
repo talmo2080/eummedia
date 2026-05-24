@@ -36,43 +36,48 @@ export default function CardSlide({ slide, articleThumbnail, channelName, onArti
     fontFamily: SANS,
   };
 
-  // ───────── 표지 (A안: 사진 또렷 + 아래 58% 그라데이션) ─────────
-  // fluid typography: containerType inline-size + clamp(min, Xcqi, max)
-  //   · 기준 컨테이너 480px = "정상" 사이즈 (모달 표지)
-  //   · 1cqi = 1% of container inline size
-  //   · max는 480px 기준값 그대로, min은 91px 갤러리 카드에서도 읽히는 값
+  // ───────── 표지 (B안: 사진/글 분리 — 사진 위 글씨 0) ─────────
+  // 구조:
+  //   ┌────────────┐
+  //   │  사진 또렷   │ 위 65% — filter/opacity 없음, 글씨 없음
+  //   │ ░끝만 페이드░│ 사진 영역 아래 1/4만 짧은 네이비 페이드 (이음새)
+  //   ├────────────┤
+  //   │ 채널칩       │
+  //   │ 제목         │ 아래 35% — 네이비(#0d2d52) 단색 띠
+  //   │ 골드 라인    │     모든 글씨는 이 띠 안
+  //   └────────────┘
+  // fluid typography 그대로: containerType inline-size + clamp(min, Xcqi, max)
   if (type === 'cover') {
     return (
       <div style={{ ...base, background: NAVY, containerType: 'inline-size' }}>
-        {bgImage && (
+        {/* ① 사진 영역 (위 65%) — 또렷, 글씨 일절 없음 */}
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0,
+          height: '65%', overflow: 'hidden',
+          background: NAVY_DEEP, // bgImage 없을 때 placeholder
+        }}>
+          {bgImage && (
+            <div style={{
+              position: 'absolute', inset: 0,
+              backgroundImage: `url('${bgImage}')`,
+              backgroundSize: 'cover', backgroundPosition: 'center',
+            }} />
+          )}
+          {/* 사진 끝부분만 짧은 페이드 (이음새, 사진 안 가림) */}
           <div style={{
-            position: 'absolute', inset: 0,
-            backgroundImage: `url('${bgImage}')`,
-            backgroundSize: 'cover', backgroundPosition: 'center',
+            position: 'absolute', left: 0, right: 0, bottom: 0,
+            height: '28%',
+            background: 'linear-gradient(180deg, transparent, rgba(13,45,82,.85))',
           }} />
-        )}
-        {/* 아래쪽 58% 높이만 그라데이션 (위 투명 → 아래 짙은 네이비) */}
+        </div>
+
+        {/* ② 글 영역 (아래 35%) — 네이비 단색 띠, 모든 글씨 여기 */}
         <div style={{
           position: 'absolute', left: 0, right: 0, bottom: 0,
-          height: '58%',
-          background: 'linear-gradient(180deg, transparent, rgba(8,32,60,.93))',
-        }} />
-        {/* 흰 반투명 큰 따옴표 deco — 밝은 사진 위에서도 보이게 */}
-        <div style={{
-          position: 'absolute',
-          top: 'clamp(8px, 6.25cqi, 30px)',
-          right: 'clamp(10px, 7.08cqi, 34px)',
-          zIndex: 3,
-          fontFamily: SERIF,
-          fontSize: 'clamp(28px, 17.5cqi, 84px)',
-          color: 'rgba(255,255,255,.6)',
-          lineHeight: .7,
-        }}>&ldquo;</div>
-        {/* 본문 */}
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 2,
-          padding: 'clamp(12px, 9.17cqi, 44px) clamp(10px, 7.92cqi, 38px)',
-          display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+          height: '35%', background: NAVY, zIndex: 2,
+          padding: 'clamp(10px, 6.67cqi, 32px) clamp(10px, 7.92cqi, 38px)',
+          display: 'flex', flexDirection: 'column', justifyContent: 'center',
+          boxSizing: 'border-box',
         }}>
           {channelName && (
             <span style={{
@@ -83,25 +88,25 @@ export default function CardSlide({ slide, articleThumbnail, channelName, onArti
               color: NAVY, background: GOLD,
               padding: 'clamp(2px, 1.04cqi, 5px) clamp(6px, 2.92cqi, 14px)',
               borderRadius: 'clamp(2px, 0.83cqi, 4px)',
-              marginBottom: 'clamp(6px, 3.75cqi, 18px)',
+              marginBottom: 'clamp(6px, 2.5cqi, 12px)',
             }}>{channelName}</span>
           )}
           <div style={{
             fontFamily: SERIF, fontWeight: 800, color: '#fff',
-            fontSize: 'clamp(11px, 7.92cqi, 38px)',
-            lineHeight: 1.34,
+            fontSize: 'clamp(11px, 7.5cqi, 36px)',
+            lineHeight: 1.32,
             whiteSpace: 'pre-wrap', wordBreak: 'keep-all',
           }}>{title}</div>
           <div style={{
             width: 'clamp(20px, 10.42cqi, 50px)',
             height: 'clamp(2px, 0.83cqi, 4px)',
             background: GOLD,
-            margin: 'clamp(8px, 4.17cqi, 20px) 0 clamp(6px, 2.92cqi, 14px)',
+            margin: 'clamp(6px, 3.13cqi, 15px) 0 clamp(4px, 2.08cqi, 10px)',
           }} />
           {text && (
             <div style={{
               color: GOLD_SOFT,
-              fontSize: 'clamp(8.5px, 2.92cqi, 14px)',
+              fontSize: 'clamp(8.5px, 2.71cqi, 13px)',
               letterSpacing: 'clamp(0.15px, 0.1cqi, 0.5px)',
               whiteSpace: 'pre-wrap', wordBreak: 'keep-all',
             }}>{text}</div>
