@@ -153,6 +153,12 @@ export default function Home() {
   const [videosList, setVideosList] = useState([]);
   const [error, setError] = useState(null);
 
+  // 모바일 더보기 상태 (lg:hidden 분기 전용 — 데스크탑 무영향)
+  const [showAllLatest, setShowAllLatest] = useState(false);
+  const [showAllPopular, setShowAllPopular] = useState(false);
+  const LATEST_INITIAL = 2;
+  const POPULAR_INITIAL = 5;
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -176,6 +182,7 @@ export default function Home() {
 
   // 🔥 이번주 인기 기사 — view_count 우선, 동률 시 published_at 보조
   // (view_count 카운팅 시작 전까지는 사실상 최신순으로 동작)
+  // limit 10: 모바일은 5건 노출 + 더보기로 10건. 데스크탑 사이드바는 .slice(0,5)
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -185,7 +192,7 @@ export default function Home() {
         .eq('status', 'published')
         .order('view_count', { ascending: false })
         .order('published_at', { ascending: false })
-        .limit(5);
+        .limit(10);
       if (cancelled) return;
       if (queryError) {
         console.error('[POPULAR] supabase error:', queryError);
@@ -261,32 +268,44 @@ export default function Home() {
           </Link>
         )}
 
-        {/* ② 📰 최신 기사 (박스형 2열) */}
-        {articles.length >= 2 && (
-          <div className="px-4 mb-7">
-            <div className="flex items-end justify-between border-b-2 border-neutral-900 pb-2 mb-3">
-              <h2 className="font-serif font-bold text-[18px]">📰 최신 기사</h2>
+        {/* ② 📰 최신 기사 (박스형 2열, 모바일) — 더보기로 2↔6 펼침 */}
+        {articles.length >= 2 && (() => {
+          const visible = showAllLatest ? articles : articles.slice(0, LATEST_INITIAL);
+          const remaining = articles.length - LATEST_INITIAL;
+          const showMoreBtn = !showAllLatest && remaining > 0;
+          return (
+            <div className="px-4 mb-7">
+              <div className="flex items-end justify-between border-b-2 border-neutral-900 pb-2 mb-3">
+                <h2 className="font-serif font-bold text-[18px]">📰 최신 기사</h2>
+                {showMoreBtn && (
+                  <button type="button" onClick={() => setShowAllLatest(true)}
+                    className="text-[12px] font-bold text-[#0d2d52] pb-0.5"
+                    style={{ fontFamily: "'Noto Sans KR',sans-serif" }}>
+                    더보기 ({remaining}) →
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {visible.map(a => (
+                  <Link key={a.slug} to={"/article/" + a.slug} className="block">
+                    <div className="relative aspect-square overflow-hidden bg-neutral-100 rounded-sm mb-2">
+                      <img src={a.thumbnail_url} alt={a.title}
+                        className="w-full h-full object-cover" loading="lazy" />
+                      {a.channels?.name && (
+                        <span className="absolute top-2 left-2 bg-white/95 text-neutral-900 text-[10px] font-bold px-2 py-0.5 rounded">
+                          {a.channels.name}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="font-serif font-bold text-[14px] leading-snug line-clamp-2 text-neutral-900">
+                      {a.title}
+                    </h3>
+                  </Link>
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              {articles.slice(0, 2).map(a => (
-                <Link key={a.slug} to={"/article/" + a.slug} className="block">
-                  <div className="relative aspect-square overflow-hidden bg-neutral-100 rounded-sm mb-2">
-                    <img src={a.thumbnail_url} alt={a.title}
-                      className="w-full h-full object-cover" loading="lazy" />
-                    {a.channels?.name && (
-                      <span className="absolute top-2 left-2 bg-white/95 text-neutral-900 text-[10px] font-bold px-2 py-0.5 rounded">
-                        {a.channels.name}
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="font-serif font-bold text-[14px] leading-snug line-clamp-2 text-neutral-900">
-                    {a.title}
-                  </h3>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* ③ 📺 영상 갤러리 — video_url 있는 기사 (0건이면 섹션 숨김) */}
         {videosList.length > 0 && (
@@ -298,44 +317,56 @@ export default function Home() {
           </div>
         )}
 
-        {/* ⑤ 🔥 이번주 인기 기사 (88×88 리스트형, view_count 순) */}
-        {popular.length > 0 && (
-          <div className="px-4 mb-7">
-            <div className="flex items-end justify-between border-b-2 border-neutral-900 pb-2 mb-3">
-              <h2 className="font-serif font-bold text-[18px]">🔥 이번주 인기 기사</h2>
+        {/* ⑤ 🔥 이번주 인기 기사 (88×88 리스트형, 모바일) — 더보기로 5↔10 펼침 */}
+        {popular.length > 0 && (() => {
+          const visible = showAllPopular ? popular : popular.slice(0, POPULAR_INITIAL);
+          const remaining = popular.length - POPULAR_INITIAL;
+          const showMoreBtn = !showAllPopular && remaining > 0;
+          return (
+            <div className="px-4 mb-7">
+              <div className="flex items-end justify-between border-b-2 border-neutral-900 pb-2 mb-3">
+                <h2 className="font-serif font-bold text-[18px]">🔥 이번주 인기 기사</h2>
+                {showMoreBtn && (
+                  <button type="button" onClick={() => setShowAllPopular(true)}
+                    className="text-[12px] font-bold text-[#0d2d52] pb-0.5"
+                    style={{ fontFamily: "'Noto Sans KR',sans-serif" }}>
+                    더보기 ({remaining}) →
+                  </button>
+                )}
+              </div>
+              <ul className="divide-y divide-neutral-200">
+                {visible.map((p, i) => (
+                  <li key={p.slug}>
+                    <Link to={"/article/" + p.slug} className="flex gap-3 py-3.5 active:bg-neutral-50">
+                      <span className="flex-shrink-0 w-7 text-center font-serif font-bold text-[18px] text-[#c9a84c] pt-1">
+                        {i + 1}
+                      </span>
+                      <div className="flex-shrink-0 w-[88px] h-[88px] overflow-hidden bg-neutral-100 rounded-sm">
+                        <img src={p.thumbnail_url} alt={p.title}
+                          className="w-full h-full object-cover" loading="lazy" />
+                      </div>
+                      <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                        <div>
+                          <h3 className="font-serif font-bold text-[15px] leading-snug line-clamp-2 mb-1 text-neutral-900">
+                            {p.title}
+                          </h3>
+                          {p.summary && (
+                            <p className="text-[12px] text-neutral-600 line-clamp-1">
+                              {p.summary}
+                            </p>
+                          )}
+                        </div>
+                        <div className="text-[10px] text-neutral-500 mt-1">
+                          {p.author_name ? `${p.author_name} · ` : ''}{formatDate(p.published_at)}
+                        </div>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="divide-y divide-neutral-200">
-              {popular.map((p, i) => (
-                <li key={p.slug}>
-                  <Link to={"/article/" + p.slug} className="flex gap-3 py-3.5 active:bg-neutral-50">
-                    <span className="flex-shrink-0 w-7 text-center font-serif font-bold text-[18px] text-[#c9a84c] pt-1">
-                      {i + 1}
-                    </span>
-                    <div className="flex-shrink-0 w-[88px] h-[88px] overflow-hidden bg-neutral-100 rounded-sm">
-                      <img src={p.thumbnail_url} alt={p.title}
-                        className="w-full h-full object-cover" loading="lazy" />
-                    </div>
-                    <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-                      <div>
-                        <h3 className="font-serif font-bold text-[15px] leading-snug line-clamp-2 mb-1 text-neutral-900">
-                          {p.title}
-                        </h3>
-                        {p.summary && (
-                          <p className="text-[12px] text-neutral-600 line-clamp-1">
-                            {p.summary}
-                          </p>
-                        )}
-                      </div>
-                      <div className="text-[10px] text-neutral-500 mt-1">
-                        {p.author_name ? `${p.author_name} · ` : ''}{formatDate(p.published_at)}
-                      </div>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+          );
+        })()}
 
         {/* ⑤ 광고 — 데스크탑 사이드바와 동일 컨텐츠의 모바일 카드 */}
         <div className="px-4 mb-7">
@@ -514,7 +545,7 @@ export default function Home() {
           <div style={{ background:"#fff", border:"1px solid #e0e0e0", padding:"16px" }}>
             <div style={{ fontSize:"12px", fontWeight:"700", color:"#555", borderBottom:"2px solid #0d2d52", paddingBottom:"8px", marginBottom:"12px" }}>🔥 이번주 인기 기사</div>
             {popular.length > 0
-              ? popular.map((p,i) => (
+              ? popular.slice(0, 5).map((p,i) => (
                   <Link key={p.slug} to={"/article/" + p.slug} style={{ display:"flex", gap:"10px", padding:"8px 0", borderBottom:"1px solid #f0f0f0", textDecoration:"none", alignItems:"center" }}>
                     <span style={{ fontSize:"13px", fontWeight:"700", color:"#c9a84c", width:"16px", flexShrink:0 }}>{i+1}</span>
                     <img src={p.thumbnail_url} alt={p.title} style={{ width:"52px", height:"40px", objectFit:"cover", borderRadius:"2px", flexShrink:0 }} />
