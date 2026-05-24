@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import { useAuth } from "../contexts/AuthContext";
 import { getChannelColorClasses } from "../lib/channelColors";
 import { getYouTubeEmbedUrl } from "../lib/youtube";
 import VideoGallery from "../components/VideoGallery";
@@ -36,11 +37,7 @@ const AUTHOR_ARTICLES = [
   { id:"a3", title:"고양시 일산, 미디어 리터러시 교육 현장", date:"2026.03.28" },
 ];
 
-const INIT_COMMENTS = [
-  { id:1, name:"김미선", date:"2026.04.28", content:"정말 생생한 취재네요! 😊", likes:8 },
-  { id:2, name:"박철수", date:"2026.04.28", content:"장인 시연 영상도 있으면 좋겠어요!", likes:5 },
-  { id:3, name:"이순희", date:"2026.04.29", content:"시민기자 이야기가 인상적이었어요.", likes:12 },
-];
+// (INIT_COMMENTS MOCK 제거됨 — supabase comments 테이블에서 실시간 fetch)
 
 function StickyBtn({ onClick, title, bg, fg, active, activeColor, children }) {
   const [h, setH] = useState(false);
@@ -158,6 +155,7 @@ function BottomReactionBar({ liked, likeCount, onLike, onCopy, copied, onKakao, 
 
 export default function ArticleDetail() {
   const { slug } = useParams();
+  const { user, profile } = useAuth();
   const [article, setArticle] = useState(null);
   const [error, setError] = useState(null);
   const [popular, setPopular] = useState([]);
@@ -165,9 +163,9 @@ export default function ArticleDetail() {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [copied, setCopied] = useState(false);
-  const [comments, setComments] = useState(INIT_COMMENTS);
-  const [cName, setCName] = useState("");
+  const [comments, setComments] = useState([]);
   const [cText, setCText] = useState("");
+  const [posting, setPosting] = useState(false);
   const [galleryVideos, setGalleryVideos] = useState([]);
   const [cardnewsList, setCardnewsList] = useState([]);
   const [openCardnews, setOpenCardnews] = useState(null);
@@ -207,10 +205,46 @@ export default function ArticleDetail() {
   };
   const onKakao = () => alert("카카오 공유: SDK 연동 후 사용 가능합니다.");
   const onFb = () => window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(window.location.href), "_blank");
-  const onComment = () => {
-    if (!cName.trim() || !cText.trim()) return;
-    setComments(p => [...p, { id: Date.now(), name: cName, date: "2026.05.01", content: cText, likes: 0 }]);
-    setCName(""); setCText("");
+  // 댓글 fetch 헬퍼 — articleId 기준으로 다시 불러오기
+  const fetchComments = async (articleId) => {
+    if (!articleId) return;
+    const { data, error: err } = await supabase
+      .from('comments')
+      .select('id, content, like_count, is_deleted, created_at, parent_id, author:users!author_id(nickname)')
+      .eq('article_id', articleId)
+      .eq('is_deleted', false)
+      .order('created_at', { ascending: true });
+    if (err) { console.error('[ArticleDetail COMMENTS] fetch error:', err); return; }
+    setComments(data ?? []);
+  };
+
+  const onComment = async () => {
+    if (!user) {
+      alert('댓글은 로그인 후 작성할 수 있습니다.');
+      return;
+    }
+    if (!cText.trim()) return;
+    if (!article?.id) return;
+    setPosting(true);
+    try {
+      const { error: err } = await supabase.from('comments').insert({
+        article_id: article.id,
+        author_id: user.id,
+        content: cText.trim(),
+        parent_id: null,
+        like_count: 0,
+        is_deleted: false,
+      });
+      if (err) {
+        console.error('[ArticleDetail COMMENTS] insert error:', err);
+        alert(`댓글 등록 실패: ${err.message}`);
+        return;
+      }
+      setCText("");
+      await fetchComments(article.id);
+    } finally {
+      setPosting(false);
+    }
   };
 
   useEffect(() => {
@@ -291,6 +325,25 @@ export default function ArticleDetail() {
     })();
     return () => { cancelled = true; };
   }, [slug]);
+
+  // 💬 댓글 fetch — 기사 로드 후 articleId 기준 (is_deleted=false)
+  const articleId = article?.id;
+  useEffect(() => {
+    if (!articleId) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error: err } = await supabase
+        .from('comments')
+        .select('id, content, like_count, is_deleted, created_at, parent_id, author:users!author_id(nickname)')
+        .eq('article_id', articleId)
+        .eq('is_deleted', false)
+        .order('created_at', { ascending: true });
+      if (cancelled) return;
+      if (err) { console.error('[ArticleDetail COMMENTS] fetch error:', err); return; }
+      setComments(data ?? []);
+    })();
+    return () => { cancelled = true; };
+  }, [articleId]);
 
   // 📱 카드뉴스 — 다른 기사의 cardnews 여러 건 (영상 갤러리 동일 패턴)
   //   · 현재 기사 제외(neq slug), published만, 최신순, 최대 9건
@@ -514,28 +567,56 @@ export default function ArticleDetail() {
           {/* 💬 댓글 — 광고 박스 위로 이동 (commit 44 섹션 순서 정정) */}
           <div id="comment-section" style={{ margin:"32px 0" }}>
             <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", borderBottom:"2px solid #0d2d52", paddingBottom:"10px", marginBottom:"20px" }}>댓글 {comments.length}개</div>
-            <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px", marginBottom:"20px" }}>
-              <input value={cName} onChange={e => setCName(e.target.value)} placeholder="이름" style={{ width:"100%", border:"1px solid #d0d0d0", padding:"8px 12px", fontSize:"12px", fontFamily:"inherit", marginBottom:"8px", outline:"none", boxSizing:"border-box" }} />
-              <textarea value={cText} onChange={e => setCText(e.target.value)} placeholder="의견을 남겨주세요..." rows={3} style={{ width:"100%", border:"1px solid #d0d0d0", padding:"10px 12px", fontSize:"13px", fontFamily:"inherit", resize:"none", outline:"none", boxSizing:"border-box", marginBottom:"8px" }} />
-              <div style={{ display:"flex", justifyContent:"flex-end" }}>
-                <button onClick={onComment} style={{ background:"#0d2d52", color:"white", border:"none", padding:"8px 20px", fontSize:"12px", fontWeight:"700", cursor:"pointer", fontFamily:"inherit" }}>댓글 등록</button>
-              </div>
-            </div>
-            {comments.map(c => (
-              <div key={c.id} style={{ padding:"16px 0", borderBottom:"1px solid #f0f0f0" }}>
-                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"8px" }}>
-                  <div style={{ display:"flex", gap:"10px", alignItems:"center" }}>
-                    <div style={{ width:"32px", height:"32px", borderRadius:"50%", background:"#e0e0e0", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"14px", fontWeight:"700", color:"#555" }}>{c.name.slice(0, 1)}</div>
-                    <div>
-                      <div style={{ fontSize:"12px", fontWeight:"700" }}>{c.name}</div>
-                      <div style={{ fontSize:"10px", color:"#9a9a9a" }}>{c.date}</div>
-                    </div>
-                  </div>
-                  <button style={{ fontSize:"11px", color:"#9a9a9a", background:"none", border:"none", cursor:"pointer" }}>👍 {c.likes}</button>
+            {/* 입력 폼 — 로그인 시 / 비로그인 시 분기 */}
+            {user ? (
+              <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px", marginBottom:"20px" }}>
+                <div style={{ fontSize:"12px", color:"#6b6b6b", marginBottom:"8px" }}>
+                  <strong style={{ color:"#0d2d52" }}>{profile?.nickname || user.email}</strong>님으로 작성
                 </div>
-                <div style={{ fontSize:"13px", color:"#3a3a3a", lineHeight:"1.7", paddingLeft:"42px" }}>{c.content}</div>
+                <textarea value={cText} onChange={e => setCText(e.target.value)} placeholder="의견을 남겨주세요..." rows={3} style={{ width:"100%", border:"1px solid #d0d0d0", padding:"10px 12px", fontSize:"13px", fontFamily:"inherit", resize:"none", outline:"none", boxSizing:"border-box", marginBottom:"8px" }} />
+                <div style={{ display:"flex", justifyContent:"flex-end" }}>
+                  <button onClick={onComment} disabled={posting || !cText.trim()}
+                    style={{ background: posting || !cText.trim() ? "#9a9a9a" : "#0d2d52", color:"white", border:"none", padding:"8px 20px", fontSize:"12px", fontWeight:"700", cursor: posting || !cText.trim() ? "not-allowed" : "pointer", fontFamily:"inherit" }}>
+                    {posting ? "등록 중..." : "댓글 등록"}
+                  </button>
+                </div>
               </div>
-            ))}
+            ) : (
+              <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px", marginBottom:"20px", textAlign:"center" }}>
+                <div style={{ fontSize:"13px", color:"#6b6b6b", marginBottom:"10px" }}>
+                  💬 댓글은 로그인 후 작성할 수 있습니다.
+                </div>
+                <Link to="/login" style={{ display:"inline-block", background:"#0d2d52", color:"white", padding:"8px 20px", fontSize:"12px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit" }}>
+                  로그인하기
+                </Link>
+              </div>
+            )}
+
+            {comments.length === 0 && (
+              <div style={{ padding:"24px 0", textAlign:"center", color:"#9a9a9a", fontSize:"13px" }}>
+                아직 댓글이 없습니다. 첫 댓글을 남겨주세요.
+              </div>
+            )}
+            {comments.map(c => {
+              const nickname = c.author?.nickname || '익명';
+              const initial = nickname.charAt(0);
+              const date = c.created_at ? formatDate(c.created_at) : '';
+              return (
+                <div key={c.id} style={{ padding:"16px 0", borderBottom:"1px solid #f0f0f0" }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"8px" }}>
+                    <div style={{ display:"flex", gap:"10px", alignItems:"center" }}>
+                      <div style={{ width:"32px", height:"32px", borderRadius:"50%", background:"#e0e0e0", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"14px", fontWeight:"700", color:"#555" }}>{initial}</div>
+                      <div>
+                        <div style={{ fontSize:"12px", fontWeight:"700" }}>{nickname}</div>
+                        <div style={{ fontSize:"10px", color:"#9a9a9a" }}>{date}</div>
+                      </div>
+                    </div>
+                    <div style={{ fontSize:"11px", color:"#9a9a9a" }}>👍 {c.like_count ?? 0}</div>
+                  </div>
+                  <div style={{ fontSize:"13px", color:"#3a3a3a", lineHeight:"1.7", paddingLeft:"42px", whiteSpace:"pre-wrap" }}>{c.content}</div>
+                </div>
+              );
+            })}
           </div>
 
           {/* 태그 */}
