@@ -19,40 +19,7 @@ const CHANNELS = [
   { slug:"voice",    name:"이음보이스", icon:"🎙️" },
 ];
 
-const STOCKS = {
-  전체: [
-    { name:"삼성전자",  code:"005930", price:"73,400", change:"+1,200", pct:"+1.66%", up:true },
-    { name:"SK하이닉스", code:"000660", price:"192,500", change:"+3,500", pct:"+1.85%", up:true },
-    { name:"NAVER",     code:"035420", price:"198,000", change:"-2,000", pct:"-1.00%", up:false },
-    { name:"카카오",     code:"035720", price:"41,200",  change:"+400",   pct:"+0.98%", up:true },
-    { name:"현대차",     code:"005380", price:"224,000", change:"-1,500", pct:"-0.67%", up:false },
-    { name:"LG에너지솔루션", code:"373220", price:"312,000", change:"+5,000", pct:"+1.63%", up:true },
-  ],
-  코스피: [
-    { name:"삼성전자",  code:"005930", price:"73,400", change:"+1,200", pct:"+1.66%", up:true },
-    { name:"SK하이닉스", code:"000660", price:"192,500", change:"+3,500", pct:"+1.85%", up:true },
-    { name:"현대차",     code:"005380", price:"224,000", change:"-1,500", pct:"-0.67%", up:false },
-    { name:"LG에너지솔루션", code:"373220", price:"312,000", change:"+5,000", pct:"+1.63%", up:true },
-    { name:"POSCO홀딩스", code:"005490", price:"334,000", change:"+2,000", pct:"+0.60%", up:true },
-    { name:"셀트리온",   code:"068270", price:"158,000", change:"-1,200", pct:"-0.75%", up:false },
-  ],
-  코스닥: [
-    { name:"에코프로비엠", code:"247540", price:"198,500", change:"+4,500", pct:"+2.32%", up:true },
-    { name:"셀트리온헬스케어", code:"091990", price:"68,200", change:"-800", pct:"-1.16%", up:false },
-    { name:"카카오게임즈", code:"293490", price:"18,350", change:"+250", pct:"+1.38%", up:true },
-    { name:"HLB",        code:"028300", price:"87,400",  change:"+1,200", pct:"+1.39%", up:true },
-    { name:"펄어비스",   code:"263750", price:"32,150",  change:"-350",   pct:"-1.08%", up:false },
-    { name:"크래프톤",   code:"259960", price:"312,000", change:"+3,500", pct:"+1.13%", up:true },
-  ],
-  ETF: [
-    { name:"KODEX 200",       code:"069500", price:"37,125", change:"+325", pct:"+0.88%", up:true },
-    { name:"KODEX 코스닥150", code:"229200", price:"12,845", change:"+185", pct:"+1.46%", up:true },
-    { name:"KODEX 인버스",    code:"114800", price:"4,320",  change:"-45",  pct:"-1.03%", up:false },
-    { name:"TIGER 미국S&P500", code:"360750", price:"18,250", change:"+220", pct:"+1.22%", up:true },
-    { name:"KODEX 반도체",    code:"091160", price:"42,350", change:"+850", pct:"+2.05%", up:true },
-    { name:"TIGER 차이나전기차", code:"371460", price:"9,870", change:"-120", pct:"-1.20%", up:false },
-  ],
-};
+// STOCKS MOCK 제거됨 — /api/stocks (Vercel serverless)에서 공공데이터포털 실시간 종가 fetch
 
 // ━━━━━━━━━━━ 모바일 신문형 (lg 미만) 상수 ━━━━━━━━━━━
 // Tailwind JIT 호환 — 클래스 문자열 그대로 박아둠
@@ -82,64 +49,152 @@ function formatDate(iso) {
   return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
 }
 
+// 빈 블록용 안내 — 컴포넌트 바깥에 정의 (react-hooks/static-components 규칙)
+function PrepMsg({ label }) {
+  return (
+    <div style={{ padding:"18px 8px", textAlign:"center", color:"#9a9a9a", fontSize:"12px", background:"#fafbfc", borderRadius:6 }}>
+      📡 {label} 데이터 준비 중 (API 활성화 대기)
+    </div>
+  );
+}
+
+// 증시 위젯 — 지수·종목·ETF 3블록 통합 (공공데이터 API 3종)
+// 각 블록은 데이터 0건이면 "데이터 준비 중" 안내 (키 활성화 대기 등)
 function StockWidget() {
-  const tabs = ["전체","코스피","코스닥","ETF"];
-  const [activeTab, setActiveTab] = useState("전체");
-  const stocks = STOCKS[activeTab];
+  const [data, setData] = useState({ indices: [], stocks: [], etfs: [], basDt: '' });
+  const [loading, setLoading] = useState(true);
+  const [errMsg, setErrMsg] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/stocks');
+        const j = await res.json();
+        if (cancelled) return;
+        if (!res.ok) {
+          setErrMsg(j?.error || '시세를 불러올 수 없습니다');
+          return;
+        }
+        setData({
+          indices: Array.isArray(j.indices) ? j.indices : [],
+          stocks: Array.isArray(j.stocks) ? j.stocks : [],
+          etfs: Array.isArray(j.etfs) ? j.etfs : [],
+          basDt: j.basDt || '',
+        });
+      } catch (e) {
+        if (cancelled) return;
+        console.error('[StockWidget] fetch error:', e);
+        setErrMsg('시세를 불러올 수 없습니다');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const colorUp = '#e74c3c', colorDown = '#1c7ed6';
+  const c = s => s.up ? colorUp : colorDown;
+  const bg = s => s.up ? '#fff0f0' : '#f0f4ff';
+
   return (
     <div style={{ background:"#fff", border:"1px solid #e0e0e0", borderTop:"3px solid #0d2d52", marginTop:"40px" }}>
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 20px 0" }}>
+      {/* 헤더 */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 20px 12px", borderBottom:"1px solid #e0e0e0" }}>
         <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
           <span style={{ fontSize:"16px" }}>📈</span>
-          <span style={{ fontSize:"14px", fontWeight:"700", color:"#0d2d52" }}>주식 현황</span>
-          <span style={{ fontSize:"11px", color:"#9a9a9a", marginLeft:"4px" }}>실시간 시세</span>
+          <span style={{ fontSize:"14px", fontWeight:"700", color:"#0d2d52" }}>증시 현황</span>
+          <span style={{ fontSize:"11px", color:"#9a9a9a", marginLeft:"4px" }}>
+            {data.basDt ? `${data.basDt} 종가 기준` : (loading ? '불러오는 중...' : '')}
+          </span>
         </div>
-        <a href="#" style={{ fontSize:"11px", color:"#1c4f8a", textDecoration:"none" }}>더보기 →</a>
+        <a href="https://finance.naver.com" target="_blank" rel="noopener noreferrer"
+          style={{ fontSize:"11px", color:"#1c4f8a", textDecoration:"none" }}>
+          더보기 →
+        </a>
       </div>
-      <div style={{ display:"flex", borderBottom:"1px solid #e0e0e0", padding:"0 20px", marginTop:"12px" }}>
-        {tabs.map(tab => (
-          <button key={tab} onClick={() => setActiveTab(tab)}
-            style={{ padding:"8px 16px", fontSize:"12px", fontWeight: tab === activeTab ? "700" : "400",
-              color: tab === activeTab ? "#0d2d52" : "#9a9a9a", background:"none", border:"none",
-              borderBottom: tab === activeTab ? "2px solid #0d2d52" : "2px solid transparent",
-              cursor:"pointer", fontFamily:"inherit", marginBottom:"-1px" }}>
-            {tab}
-          </button>
-        ))}
-      </div>
-      <div style={{ padding:"0 20px 16px" }}>
-        <table style={{ width:"100%", borderCollapse:"collapse", fontSize:"12px" }}>
-          <thead>
-            <tr style={{ borderBottom:"1px solid #f0f0f0" }}>
-              <th style={{ padding:"10px 8px 8px", textAlign:"left", color:"#9a9a9a", fontWeight:"500" }}>종목명</th>
-              <th style={{ padding:"10px 8px 8px", textAlign:"right", color:"#9a9a9a", fontWeight:"500" }}>현재가</th>
-              <th style={{ padding:"10px 8px 8px", textAlign:"right", color:"#9a9a9a", fontWeight:"500" }}>전일대비</th>
-              <th style={{ padding:"10px 8px 8px", textAlign:"right", color:"#9a9a9a", fontWeight:"500" }}>등락률</th>
-            </tr>
-          </thead>
-          <tbody>
-            {stocks.map(s => (
-              <tr key={s.code} style={{ borderBottom:"1px solid #f7f7f7" }}
-                onMouseEnter={e => e.currentTarget.style.background="#f7f9fc"}
-                onMouseLeave={e => e.currentTarget.style.background="transparent"}>
-                <td style={{ padding:"10px 8px" }}>
-                  <div style={{ fontWeight:"600", color:"#1a1a1a" }}>{s.name}</div>
-                  <div style={{ fontSize:"10px", color:"#bbb", marginTop:"1px" }}>{s.code}</div>
-                </td>
-                <td style={{ padding:"10px 8px", textAlign:"right", fontWeight:"600" }}>{s.price}</td>
-                <td style={{ padding:"10px 8px", textAlign:"right", color: s.up ? "#e74c3c" : "#1c7ed6", fontWeight:"500" }}>{s.change}</td>
-                <td style={{ padding:"10px 8px", textAlign:"right" }}>
-                  <span style={{ display:"inline-block", padding:"2px 8px", borderRadius:"3px", fontSize:"11px", fontWeight:"700",
-                    background: s.up ? "#fff0f0" : "#f0f4ff", color: s.up ? "#e74c3c" : "#1c7ed6" }}>
-                    {s.pct}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div style={{ fontSize:"10px", color:"#bbb", textAlign:"right", marginTop:"8px" }}>
-          ※ 데이터는 샘플입니다. 실제 연동 후 업데이트 예정
+
+      <div style={{ padding:"16px 20px" }}>
+        {loading ? (
+          <div style={{ padding:"32px 8px", textAlign:"center", color:"#9a9a9a", fontSize:"12px" }}>
+            불러오는 중...
+          </div>
+        ) : errMsg ? (
+          <div style={{ padding:"32px 8px", textAlign:"center", color:"#c0392b", fontSize:"12px" }}>
+            {errMsg}
+          </div>
+        ) : (
+          <>
+            {/* ① 지수 (큰 글씨 강조) */}
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ fontSize:11, fontWeight:700, color:"#0d2d52", letterSpacing:1, marginBottom:8 }}>📈 지수</div>
+              {data.indices.length === 0 ? <PrepMsg label="지수" /> : (
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+                  {data.indices.map(i => (
+                    <div key={i.name} style={{ border:"1px solid #eee", padding:"12px 14px", borderRadius:6, background:"#fafbfc" }}>
+                      <div style={{ fontSize:11, fontWeight:700, color:"#666", marginBottom:4 }}>{i.name}</div>
+                      <div style={{ fontSize:20, fontWeight:800, color:"#1a1a1a", lineHeight:1.1, marginBottom:4 }}>{i.value}</div>
+                      <div style={{ display:"flex", justifyContent:"space-between", fontSize:11 }}>
+                        <span style={{ color: c(i), fontWeight:600 }}>{i.change}</span>
+                        <span style={{ color: c(i), background: bg(i), padding:"1px 7px", borderRadius:3, fontWeight:700 }}>{i.pct}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ② 주요 종목 */}
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ fontSize:11, fontWeight:700, color:"#0d2d52", letterSpacing:1, marginBottom:8 }}>📊 주요 종목</div>
+              {data.stocks.length === 0 ? <PrepMsg label="종목" /> : (
+                <table style={{ width:"100%", borderCollapse:"collapse", fontSize:"12px" }}>
+                  <tbody>
+                    {data.stocks.map(s => (
+                      <tr key={s.code} style={{ borderBottom:"1px solid #f7f7f7" }}>
+                        <td style={{ padding:"8px 8px" }}>
+                          <div style={{ fontWeight:"600", color:"#1a1a1a" }}>{s.name}</div>
+                          <div style={{ fontSize:"10px", color:"#bbb", marginTop:"1px" }}>{s.code}</div>
+                        </td>
+                        <td style={{ padding:"8px 8px", textAlign:"right", fontWeight:"600" }}>{s.price}</td>
+                        <td style={{ padding:"8px 8px", textAlign:"right", color: c(s), fontWeight:"500" }}>{s.change}</td>
+                        <td style={{ padding:"8px 8px", textAlign:"right" }}>
+                          <span style={{ display:"inline-block", padding:"2px 8px", borderRadius:3, fontSize:11, fontWeight:700,
+                            background: bg(s), color: c(s) }}>{s.pct}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {/* ③ ETF */}
+            <div>
+              <div style={{ fontSize:11, fontWeight:700, color:"#0d2d52", letterSpacing:1, marginBottom:8 }}>💹 ETF</div>
+              {data.etfs.length === 0 ? <PrepMsg label="ETF" /> : (
+                <table style={{ width:"100%", borderCollapse:"collapse", fontSize:"12px" }}>
+                  <tbody>
+                    {data.etfs.map(e => (
+                      <tr key={e.name} style={{ borderBottom:"1px solid #f7f7f7" }}>
+                        <td style={{ padding:"8px 8px", fontWeight:"600", color:"#1a1a1a" }}>{e.name}</td>
+                        <td style={{ padding:"8px 8px", textAlign:"right", fontWeight:"600" }}>{e.price}</td>
+                        <td style={{ padding:"8px 8px", textAlign:"right", color: c(e), fontWeight:"500" }}>{e.change}</td>
+                        <td style={{ padding:"8px 8px", textAlign:"right" }}>
+                          <span style={{ display:"inline-block", padding:"2px 8px", borderRadius:3, fontSize:11, fontWeight:700,
+                            background: bg(e), color: c(e) }}>{e.pct}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </>
+        )}
+
+        <div style={{ fontSize:"10px", color:"#bbb", textAlign:"right", marginTop:"12px", lineHeight:1.6 }}>
+          ※ 한국거래소 발표 종가입니다. 실시간 시세가 아니며, 영업일 기준 1일 후 갱신됩니다.
         </div>
       </div>
     </div>
