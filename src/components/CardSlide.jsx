@@ -37,9 +37,13 @@ export default function CardSlide({ slide, articleThumbnail, channelName, onArti
   };
 
   // ───────── 표지 (A안: 사진 또렷 + 아래 58% 그라데이션) ─────────
+  // fluid typography: containerType inline-size + clamp(min, Xcqi, max)
+  //   · 기준 컨테이너 480px = "정상" 사이즈 (모달 표지)
+  //   · 1cqi = 1% of container inline size
+  //   · max는 480px 기준값 그대로, min은 91px 갤러리 카드에서도 읽히는 값
   if (type === 'cover') {
     return (
-      <div style={{ ...base, background: NAVY }}>
+      <div style={{ ...base, background: NAVY, containerType: 'inline-size' }}>
         {bgImage && (
           <div style={{
             position: 'absolute', inset: 0,
@@ -55,33 +59,50 @@ export default function CardSlide({ slide, articleThumbnail, channelName, onArti
         }} />
         {/* 흰 반투명 큰 따옴표 deco — 밝은 사진 위에서도 보이게 */}
         <div style={{
-          position: 'absolute', top: 30, right: 34, zIndex: 3,
-          fontFamily: SERIF, fontSize: 84, color: 'rgba(255,255,255,.6)',
+          position: 'absolute',
+          top: 'clamp(8px, 6.25cqi, 30px)',
+          right: 'clamp(10px, 7.08cqi, 34px)',
+          zIndex: 3,
+          fontFamily: SERIF,
+          fontSize: 'clamp(28px, 17.5cqi, 84px)',
+          color: 'rgba(255,255,255,.6)',
           lineHeight: .7,
         }}>&ldquo;</div>
         {/* 본문 */}
         <div style={{
           position: 'absolute', inset: 0, zIndex: 2,
-          padding: '44px 38px',
+          padding: 'clamp(12px, 9.17cqi, 44px) clamp(10px, 7.92cqi, 38px)',
           display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
         }}>
           {channelName && (
             <span style={{
               alignSelf: 'flex-start',
-              fontSize: 12, fontWeight: 700, letterSpacing: 1,
+              fontSize: 'clamp(8.5px, 2.5cqi, 12px)',
+              fontWeight: 700,
+              letterSpacing: 'clamp(0.3px, 0.21cqi, 1px)',
               color: NAVY, background: GOLD,
-              padding: '5px 14px', borderRadius: 4, marginBottom: 18,
+              padding: 'clamp(2px, 1.04cqi, 5px) clamp(6px, 2.92cqi, 14px)',
+              borderRadius: 'clamp(2px, 0.83cqi, 4px)',
+              marginBottom: 'clamp(6px, 3.75cqi, 18px)',
             }}>{channelName}</span>
           )}
           <div style={{
             fontFamily: SERIF, fontWeight: 800, color: '#fff',
-            fontSize: 38, lineHeight: 1.34,
+            fontSize: 'clamp(11px, 7.92cqi, 38px)',
+            lineHeight: 1.34,
             whiteSpace: 'pre-wrap', wordBreak: 'keep-all',
           }}>{title}</div>
-          <div style={{ width: 50, height: 4, background: GOLD, margin: '20px 0 14px' }} />
+          <div style={{
+            width: 'clamp(20px, 10.42cqi, 50px)',
+            height: 'clamp(2px, 0.83cqi, 4px)',
+            background: GOLD,
+            margin: 'clamp(8px, 4.17cqi, 20px) 0 clamp(6px, 2.92cqi, 14px)',
+          }} />
           {text && (
             <div style={{
-              color: GOLD_SOFT, fontSize: 14, letterSpacing: .5,
+              color: GOLD_SOFT,
+              fontSize: 'clamp(8.5px, 2.92cqi, 14px)',
+              letterSpacing: 'clamp(0.15px, 0.1cqi, 0.5px)',
               whiteSpace: 'pre-wrap', wordBreak: 'keep-all',
             }}>{text}</div>
           )}
