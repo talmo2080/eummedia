@@ -73,11 +73,10 @@ function StickyBtn({ onClick, title, bg, fg, active, activeColor, children }) {
   );
 }
 
-function StickyReactionBar({ liked, likeCount, onLike, bookmarked, onBookmark, onCopy, copied, onKakao, onFb, commentCount }) {
+function StickyReactionBar({ liked, likeCount, onLike, onCopy, copied, onKakao, onFb, commentCount }) {
   const buttons = [
     { icon: liked ? "❤️" : "🤍", label: likeCount, onClick: onLike, title: "좋아요", active: liked, activeColor: "#e74c3c" },
     { icon: "💬", label: commentCount, onClick: () => document.getElementById("comment-section")?.scrollIntoView({ behavior: "smooth" }), title: "댓글" },
-    { icon: bookmarked ? "🔖" : "📌", label: bookmarked ? "저장됨" : "저장", onClick: onBookmark, title: "저장", active: bookmarked, activeColor: "#c9a84c" },
     { type: "divider" },
     { icon: "K", label: "카톡", onClick: onKakao, title: "카카오 공유", bg: "#FEE500", fg: "#3C1E1E", iconStyle: { fontSize: "13px", fontWeight: "900" } },
     { icon: "f", label: "FB", onClick: onFb, title: "페이스북 공유", bg: "#1877F2", fg: "white", iconStyle: { fontSize: "13px", fontWeight: "900" } },
@@ -99,11 +98,10 @@ function StickyReactionBar({ liked, likeCount, onLike, bookmarked, onBookmark, o
   );
 }
 
-function BottomReactionBar({ liked, likeCount, onLike, bookmarked, onBookmark, onCopy, copied, onKakao, onFb, commentCount }) {
+function BottomReactionBar({ liked, likeCount, onLike, onCopy, copied, onKakao, onFb, commentCount }) {
   const items = [
     { icon: liked ? "❤️" : "🤍", label: likeCount, onClick: onLike, title: "좋아요", active: liked, activeColor: "#e74c3c" },
     { icon: "💬", label: commentCount, onClick: () => document.getElementById("comment-section")?.scrollIntoView({ behavior: "smooth" }), title: "댓글" },
-    { icon: bookmarked ? "🔖" : "📌", label: bookmarked ? "저장됨" : "저장", onClick: onBookmark, title: "저장", active: bookmarked, activeColor: "#c9a84c" },
     { icon: "K", label: "카톡", onClick: onKakao, title: "카카오 공유", bg: "#FEE500", fg: "#3C1E1E", isBrand: true },
     { icon: "f", label: "FB", onClick: onFb, title: "페이스북 공유", bg: "#1877F2", fg: "white", isBrand: true },
     { icon: copied ? "✅" : "🔗", label: copied ? "복사됨" : "링크", onClick: onCopy, title: "링크 복사" },
@@ -115,14 +113,11 @@ function BottomReactionBar({ liked, likeCount, onLike, bookmarked, onBookmark, o
       role="toolbar"
       aria-label="기사 반응"
       style={{
-        position: "fixed", bottom: 0, left: 0, right: 0,
         background: "#fff",
-        borderTop: "1px solid #e0e0e0",
-        boxShadow: "0 -2px 8px rgba(0,0,0,0.08)",
-        zIndex: 1000,
-        paddingTop: 8,
-        paddingBottom: "calc(8px + env(safe-area-inset-bottom, 0px))",
-        paddingLeft: 8, paddingRight: 8,
+        border: "1px solid #e0e0e0",
+        borderRadius: 8,
+        margin: "24px 0 8px",
+        padding: 8,
         justifyContent: "space-around", alignItems: "center",
         gap: 4,
       }}
@@ -168,8 +163,7 @@ export default function ArticleDetail() {
   const [popular, setPopular] = useState([]);
   const [related, setRelated] = useState([]);
   const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(47);
-  const [bookmarked, setBookmarked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   const [copied, setCopied] = useState(false);
   const [comments, setComments] = useState(INIT_COMMENTS);
   const [cName, setCName] = useState("");
@@ -179,8 +173,35 @@ export default function ArticleDetail() {
   const [openCardnews, setOpenCardnews] = useState(null);
   const [showAuthorMore, setShowAuthorMore] = useState(false);
 
-  const onLike = () => { setLiked(p => !p); setLikeCount(p => liked ? p - 1 : p + 1); };
-  const onBookmark = () => setBookmarked(p => !p);
+  const onLike = async () => {
+    // localStorage 좋아요 기록 토글 (slug 기준)
+    let likedSlugs = [];
+    try { likedSlugs = JSON.parse(localStorage.getItem('eum-liked-articles') || '[]'); } catch { /* ignore */ }
+    if (!Array.isArray(likedSlugs)) likedSlugs = [];
+    const alreadyLiked = likedSlugs.includes(slug);
+    const delta = alreadyLiked ? -1 : 1;
+    // Optimistic UI
+    setLiked(!alreadyLiked);
+    setLikeCount(p => Math.max(0, p + delta));
+    // RPC 호출 — articles.like_count atomic 증감
+    const { data: newCount, error: rpcErr } = await supabase
+      .rpc('increment_like_count', { p_slug: slug, p_delta: delta });
+    if (rpcErr) {
+      console.error('[ArticleDetail LIKE] rpc error:', rpcErr);
+      // 실패 시 UI 롤백
+      setLiked(alreadyLiked);
+      setLikeCount(p => Math.max(0, p - delta));
+      return;
+    }
+    // DB 응답값으로 동기화 (race 보정)
+    if (typeof newCount === 'number') setLikeCount(newCount);
+    // localStorage 갱신
+    const next = alreadyLiked
+      ? likedSlugs.filter(s => s !== slug)
+      : [...likedSlugs, slug];
+    try { localStorage.setItem('eum-liked-articles', JSON.stringify(next)); } catch { /* ignore */ }
+  };
+
   const onCopy = async () => {
     try { await navigator.clipboard.writeText(window.location.href); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* clipboard 미지원 시 무시 */ }
   };
@@ -197,13 +218,19 @@ export default function ArticleDetail() {
     (async () => {
       const { data, error: err } = await supabase
         .from('articles')
-        .select('id, slug, title, summary, content, thumbnail_url, video_url, published_at, channel_id, channels(name, slug, english_slug)')
+        .select('id, slug, title, summary, content, thumbnail_url, video_url, published_at, channel_id, like_count, channels(name, slug, english_slug)')
         .eq('slug', slug)
         .eq('status', 'published')
         .single();
       if (cancelled) return;
       if (err) { setError('기사를 불러오지 못했습니다.'); return; }
       setArticle(data);
+      setLikeCount(data?.like_count ?? 0);
+      // localStorage에서 좋아요 상태 복원
+      try {
+        const liked = JSON.parse(localStorage.getItem('eum-liked-articles') || '[]');
+        setLiked(Array.isArray(liked) && liked.includes(slug));
+      } catch { /* parse 실패 무시 */ }
     })();
     return () => { cancelled = true; };
   }, [slug]);
@@ -340,7 +367,6 @@ export default function ArticleDetail() {
         <div className="hidden lg:block" style={{ alignSelf: "stretch" }}>
           <StickyReactionBar
             liked={liked} likeCount={likeCount} onLike={onLike}
-            bookmarked={bookmarked} onBookmark={onBookmark}
             onCopy={onCopy} copied={copied}
             onKakao={onKakao} onFb={onFb}
             commentCount={comments.length}
@@ -348,7 +374,7 @@ export default function ArticleDetail() {
         </div>
 
         {/* 기사 본문 */}
-        <main className="pb-24 lg:pb-0">
+        <main>
 
           {/* ━━━━━━━━━━━ 헤더 영역 — 데스크탑 (lg 이상, 기존) ━━━━━━━━━━━ */}
           <div className="hidden lg:block">
@@ -476,6 +502,14 @@ export default function ArticleDetail() {
               </div>
             );
           })()}
+
+          {/* 모바일 반응 바 — 본문 끝 inline 1회 (lg:hidden, 스크롤 따라다니지 않음) */}
+          <BottomReactionBar
+            liked={liked} likeCount={likeCount} onLike={onLike}
+            onCopy={onCopy} copied={copied}
+            onKakao={onKakao} onFb={onFb}
+            commentCount={comments.length}
+          />
 
           {/* 💬 댓글 — 광고 박스 위로 이동 (commit 44 섹션 순서 정정) */}
           <div id="comment-section" style={{ margin:"32px 0" }}>
@@ -686,14 +720,7 @@ export default function ArticleDetail() {
         </aside>
       </div>
 
-      {/* 모바일·태블릿(<1024px) 하단 고정 반응 바 */}
-      <BottomReactionBar
-        liked={liked} likeCount={likeCount} onLike={onLike}
-        bookmarked={bookmarked} onBookmark={onBookmark}
-        onCopy={onCopy} copied={copied}
-        onKakao={onKakao} onFb={onFb}
-        commentCount={comments.length}
-      />
+      {/* BottomReactionBar는 본문 끝(main 내부)에 직접 마운트됨 — 여기엔 없음 */}
 
       {/* 📱 카드뉴스 슬라이드쇼 모달 — 선택된 카드뉴스 5장 (C안 CardSlide)
           articleSlug 명시: 엔딩 "전체 기사 보기 →" 클릭 시 그 기사로 이동 */}
