@@ -5,6 +5,9 @@
 //   slide: { order, type, title, text, image_url }
 //   articleThumbnail: 표지·엔딩 배경 fallback (slide.image_url 비어있을 때)
 //   channelName: 표지·본문 chip에 노출 (옵셔널)
+//   onArticleClick: 엔딩 "전체 기사 보기 →" 클릭 핸들러 (옵셔널)
+//     · 넘기면 골드 박스가 button으로 활성 (클릭 시 호출)
+//     · 안 넘기면 기존처럼 div(데코)로만 렌더
 
 const NAVY = '#0d2d52';
 const NAVY_DEEP = '#08203c';
@@ -16,7 +19,7 @@ const SANS = "'Noto Sans KR', sans-serif";
 
 const TOTAL = 5;
 
-export default function CardSlide({ slide, articleThumbnail, channelName }) {
+export default function CardSlide({ slide, articleThumbnail, channelName, onArticleClick }) {
   if (!slide) return null;
   const { order, type, title = '', text = '', image_url } = slide;
 
@@ -114,12 +117,23 @@ export default function CardSlide({ slide, articleThumbnail, channelName }) {
             fontSize: 26, lineHeight: 1.5,
             whiteSpace: 'pre-wrap', wordBreak: 'keep-all',
           }}>{text || '더 깊은 이야기가\n기다리고 있습니다'}</div>
-          <div style={{
-            display: 'inline-block', background: GOLD, color: NAVY,
-            fontWeight: 900, fontSize: 16,
-            padding: '15px 32px', borderRadius: 7,
-            margin: '24px 0 22px',
-          }}>전체 기사 보기 →</div>
+          {onArticleClick ? (
+            <button type="button" onClick={onArticleClick}
+              style={{
+                display: 'inline-block', background: GOLD, color: NAVY,
+                fontWeight: 900, fontSize: 16,
+                padding: '15px 32px', borderRadius: 7,
+                margin: '24px 0 22px',
+                border: 0, cursor: 'pointer', fontFamily: 'inherit',
+              }}>전체 기사 보기 →</button>
+          ) : (
+            <div style={{
+              display: 'inline-block', background: GOLD, color: NAVY,
+              fontWeight: 900, fontSize: 16,
+              padding: '15px 32px', borderRadius: 7,
+              margin: '24px 0 22px',
+            }}>전체 기사 보기 →</div>
+          )}
           <div style={{
             fontFamily: SERIF, fontWeight: 800,
             color: '#fff', fontSize: 19, letterSpacing: 1,

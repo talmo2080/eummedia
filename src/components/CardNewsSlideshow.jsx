@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import CardSlide from "./CardSlide";
 
 // 카드뉴스 슬라이드쇼 모달 — 5장 (C안 CardSlide 사용)
@@ -10,10 +10,14 @@ import CardSlide from "./CardSlide";
 //   onClose: 닫기 콜백
 //   articleThumbnail: 표지/엔딩 배경 fallback (옵셔널, cardnews.articles 없을 때)
 //   channelName: 표지 chip (옵셔널)
+//   articleSlug: 엔딩 슬라이드 "전체 기사 보기 →" 클릭 시 이동할 slug (옵셔널)
+//     · 우선순위: prop articleSlug > cardnews.articles.slug
+//     · 있으면 엔딩 버튼 활성, 없으면 데코 div
 //
-// 호출 측 (ArticleDetail 등)에서 articleThumbnail/channelName을 명시적으로 넘기면
-// cardnews에 articles JOIN 없어도 OK.
-export default function CardNewsSlideshow({ cardnews, onClose, articleThumbnail, channelName }) {
+// 호출 측 (ArticleDetail 등)에서 articleThumbnail/channelName/articleSlug를 명시적으로
+// 넘기면 cardnews에 articles JOIN 없어도 OK.
+export default function CardNewsSlideshow({ cardnews, onClose, articleThumbnail, channelName, articleSlug }) {
+  const navigate = useNavigate();
   const [idx, setIdx] = useState(0);
   const total = cardnews?.slides?.length ?? 0;
 
@@ -38,11 +42,16 @@ export default function CardNewsSlideshow({ cardnews, onClose, articleThumbnail,
   if (!slide) return null;
 
   const article = cardnews.articles;
-  const articleSlug = article?.slug;
+  const linkSlug = articleSlug ?? article?.slug;
   const thumb = articleThumbnail ?? article?.thumbnail_url;
   const chName = channelName ?? article?.channels?.name;
   const isFirst = idx === 0;
   const isLast = idx === total - 1;
+
+  // 엔딩 슬라이드 "전체 기사 보기 →" 클릭 핸들러 (slug 있을 때만)
+  const onArticleClick = linkSlug
+    ? () => { onClose(); navigate(`/article/${linkSlug}`); }
+    : undefined;
 
   return (
     <div
@@ -84,6 +93,7 @@ export default function CardNewsSlideshow({ cardnews, onClose, articleThumbnail,
             slide={slide}
             articleThumbnail={thumb}
             channelName={chName}
+            onArticleClick={slide.type === 'ending' ? onArticleClick : undefined}
           />
         </div>
 
@@ -121,21 +131,8 @@ export default function CardNewsSlideshow({ cardnews, onClose, articleThumbnail,
             }}>›</button>
         </div>
 
-        {/* 기사 전문 보기 — articleSlug 있을 때만
-            (ArticleDetail에서 호출 시엔 cardnews.articles JOIN 안 하므로 자동 숨김) */}
-        {articleSlug && (
-          <Link to={"/article/" + articleSlug} onClick={onClose}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              marginTop: 20, padding: '14px 28px',
-              background: '#c9a84c', color: '#1a1a1a',
-              fontFamily: "'Noto Sans KR',sans-serif",
-              fontSize: 15, fontWeight: 700, textDecoration: 'none',
-              borderRadius: 8,
-            }}>
-            📰 기사 전문 보기
-          </Link>
-        )}
+        {/* 기사 전문 보기는 이제 엔딩 슬라이드(C안) 내부 "전체 기사 보기 →"
+            버튼이 담당. 모달 외부 별도 Link는 중복 제거됨. */}
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import { getChannelColorClasses } from "../lib/channelColors";
 import { getYouTubeEmbedUrl } from "../lib/youtube";
 import VideoGallery from "../components/VideoGallery";
 import CardNewsSlideshow from "../components/CardNewsSlideshow";
-import CardSlide from "../components/CardSlide";
+import CardNewsGallery from "../components/CardNewsGallery";
 
 const CC = {
   "이음매거진":"#0d2d52","이음뉴스":"#c0392b","이음에듀":"#1a6b3c",
@@ -175,8 +175,8 @@ export default function ArticleDetail() {
   const [cName, setCName] = useState("");
   const [cText, setCText] = useState("");
   const [galleryVideos, setGalleryVideos] = useState([]);
-  const [cardnews, setCardnews] = useState(null);
-  const [showCardnewsModal, setShowCardnewsModal] = useState(false);
+  const [cardnewsList, setCardnewsList] = useState([]);
+  const [openCardnews, setOpenCardnews] = useState(null);
   const [showAuthorMore, setShowAuthorMore] = useState(false);
 
   const onLike = () => { setLiked(p => !p); setLikeCount(p => liked ? p - 1 : p + 1); };
@@ -265,23 +265,25 @@ export default function ArticleDetail() {
     return () => { cancelled = true; };
   }, [slug]);
 
-  // 📱 카드뉴스 — 현재 기사의 cardnews 1건 (있을 때만)
-  const articleId = article?.id;
+  // 📱 카드뉴스 — 다른 기사의 cardnews 여러 건 (영상 갤러리 동일 패턴)
+  //   · 현재 기사 제외(neq slug), published만, 최신순, 최대 9건
+  //   · 갤러리: 모바일 2 / PC 3 노출 + 더보기로 최대 9건
   useEffect(() => {
-    if (!articleId) return;
     let cancelled = false;
     (async () => {
       const { data, error: err } = await supabase
         .from('cardnews')
-        .select('*')
-        .eq('article_id', articleId)
-        .maybeSingle();
+        .select('id, slides, articles!inner(slug, title, thumbnail_url, status, channels(name))')
+        .eq('articles.status', 'published')
+        .neq('articles.slug', slug)
+        .order('created_at', { ascending: false })
+        .limit(9);
       if (cancelled) return;
       if (err) { console.error('[ArticleDetail CARDNEWS] supabase error:', err); return; }
-      setCardnews(data);
+      setCardnewsList(data ?? []);
     })();
     return () => { cancelled = true; };
-  }, [articleId]);
+  }, [slug]);
 
   if (error) {
     return (
@@ -579,27 +581,14 @@ export default function ArticleDetail() {
             </div>
           )}
 
-          {/* 📱 카드뉴스 — 현재 기사의 cardnews 1건 (있을 때만, C안 표지 → 클릭 시 5장 슬라이드쇼) */}
-          {cardnews && Array.isArray(cardnews.slides) && cardnews.slides.length > 0 && (
+          {/* 📱 카드뉴스 — 다른 기사 카드뉴스 갤러리 (모바일 2 / PC 3 + 더보기)
+              · 0건이면 섹션 숨김
+              · 카드 클릭 → 해당 카드뉴스의 5장 슬라이드쇼
+              · 엔딩 슬라이드 "전체 기사 보기 →" → 그 기사로 이동 */}
+          {cardnewsList.length > 0 && (
             <div style={{ marginTop:"32px" }}>
               <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>📱 카드뉴스</div>
-              <button type="button"
-                onClick={() => setShowCardnewsModal(true)}
-                aria-label="카드뉴스 5장 슬라이드쇼 열기"
-                style={{
-                  background: 'transparent', border: 0, padding: 0,
-                  cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
-                  width: '100%', maxWidth: 420, display: 'block',
-                }}>
-                <CardSlide
-                  slide={cardnews.slides[0]}
-                  articleThumbnail={article.thumbnail_url}
-                  channelName={a.channel}
-                />
-              </button>
-              <div style={{ fontSize: 13, color: '#6b6b6b', marginTop: 10 }}>
-                클릭해서 5장 카드뉴스 전체 보기 →
-              </div>
+              <CardNewsGallery key={slug} items={cardnewsList} onOpen={setOpenCardnews} />
             </div>
           )}
 
@@ -706,13 +695,15 @@ export default function ArticleDetail() {
         commentCount={comments.length}
       />
 
-      {/* 📱 카드뉴스 슬라이드쇼 모달 — 5장 C안 (CardSlide) */}
-      {showCardnewsModal && (
+      {/* 📱 카드뉴스 슬라이드쇼 모달 — 선택된 카드뉴스 5장 (C안 CardSlide)
+          articleSlug 명시: 엔딩 "전체 기사 보기 →" 클릭 시 그 기사로 이동 */}
+      {openCardnews && (
         <CardNewsSlideshow
-          cardnews={cardnews}
-          onClose={() => setShowCardnewsModal(false)}
-          articleThumbnail={article.thumbnail_url}
-          channelName={a.channel}
+          cardnews={openCardnews}
+          onClose={() => setOpenCardnews(null)}
+          articleThumbnail={openCardnews.articles?.thumbnail_url}
+          channelName={openCardnews.articles?.channels?.name}
+          articleSlug={openCardnews.articles?.slug}
         />
       )}
     </div>
