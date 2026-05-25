@@ -1,4 +1,6 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
+import puppeteerDefault from 'puppeteer';
 import { preview } from 'vite';
 import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
@@ -7,7 +9,6 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(__dirname, '../dist');
-const BASE_URL = 'http://localhost:4173';
 
 // Supabase — 환경변수에서 읽기
 const supabase = createClient(
@@ -39,9 +40,9 @@ async function getUrls() {
   return [...staticUrls, ...articleUrls, ...channelUrls];
 }
 
-async function savePage(browser, url) {
+async function savePage(browser, url, baseUrl) {
   const page = await browser.newPage();
-  await page.goto(`${BASE_URL}${url}`, { waitUntil: 'networkidle2', timeout: 30000 });
+  await page.goto(`${baseUrl}${url}`, { waitUntil: 'networkidle2', timeout: 30000 });
   const html = await page.content();
 
   const filePath = url === '/'
@@ -57,24 +58,36 @@ async function savePage(browser, url) {
 async function main() {
   // vite preview 서버 프로그래밍 방식 시작
   const server = await preview({
-    preview: { port: 4173, strictPort: true },
+    preview: { port: 4173, strictPort: false },
   });
+  const actualPort = server.config.preview.port;
+  const resolvedBase = `http://localhost:${actualPort}`;
 
-  const urls = await getUrls();
-  console.log(`\n📄 총 ${urls.length}페이지 prerender 시작\n`);
+  let browser;
+  try {
+    const urls = await getUrls();
+    console.log(`\n📄 총 ${urls.length}페이지 prerender 시작\n`);
 
-  const browser = await puppeteer.launch({
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
+    const isVercel = process.env.VERCEL === '1';
+    browser = await puppeteer.launch({
+      args: isVercel
+        ? chromium.args
+        : ['--no-sandbox', '--disable-setuid-sandbox'],
+      executablePath: isVercel
+        ? await chromium.executablePath()
+        : await puppeteerDefault.executablePath(),
+      headless: isVercel ? chromium.headless : true,
+    });
 
-  for (let i = 0; i < urls.length; i += 5) {
-    const batch = urls.slice(i, i + 5);
-    await Promise.all(batch.map(url => savePage(browser, url)));
+    for (let i = 0; i < urls.length; i += 5) {
+      const batch = urls.slice(i, i + 5);
+      await Promise.all(batch.map(url => savePage(browser, url, resolvedBase)));
+    }
+    console.log('\n🎉 prerender 완료!');
+  } finally {
+    if (browser) await browser.close();
+    server.httpServer.close();
   }
-
-  await browser.close();
-  server.httpServer.close();
-  console.log('\n🎉 prerender 완료!');
 }
 
 main().catch(console.error);
