@@ -203,7 +203,27 @@ export default function ArticleDetail() {
   const onCopy = async () => {
     try { await navigator.clipboard.writeText(window.location.href); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* clipboard 미지원 시 무시 */ }
   };
-  const onKakao = () => alert("카카오 공유: SDK 연동 후 사용 가능합니다.");
+  const onKakao = () => {
+    if (typeof window.Kakao === 'undefined') {
+      alert('카카오 SDK가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+    if (!window.Kakao.isInitialized()) {
+      window.Kakao.init(import.meta.env.VITE_KAKAO_JS_KEY);
+    }
+    window.Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: article.title,
+        description: article.summary || '',
+        imageUrl: article.thumbnail_url || 'https://eummedia.kr/og-image.png',
+        link: {
+          mobileWebUrl: window.location.href,
+          webUrl: window.location.href,
+        },
+      },
+    });
+  };
   const onFb = () => window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(window.location.href), "_blank");
   // 댓글 fetch 헬퍼 — articleId 기준으로 다시 불러오기
   const fetchComments = async (articleId) => {
