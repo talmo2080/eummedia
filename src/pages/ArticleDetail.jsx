@@ -500,11 +500,11 @@ export default function ArticleDetail() {
             </div>
           </div>
 
-          {/* 대표 이미지 — 모바일 4/3 비율(잘림 최소화), 데스크탑 380px 고정 cover 유지 */}
+          {/* 대표 이미지 — 모바일 16/9 비율(사진 규격 일치 → 잘림 없음), 데스크탑 380px 고정 cover 유지 */}
           <img
             src={a.thumbnail}
             alt={a.title}
-            className="w-full aspect-[4/3] h-auto object-cover lg:aspect-auto lg:h-[380px]"
+            className="w-full aspect-[16/9] h-auto object-cover lg:aspect-auto lg:h-[380px]"
             style={{ borderRadius:"4px", marginBottom:"10px", display:"block" }}
           />
           <div style={{ fontSize:"11px", color:"#9a9a9a", textAlign:"center", marginBottom:"32px", fontStyle:"italic" }}>{a.channel} / 이음미디어</div>
