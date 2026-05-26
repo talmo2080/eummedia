@@ -500,8 +500,13 @@ export default function ArticleDetail() {
             </div>
           </div>
 
-          {/* 대표 이미지 */}
-          <img src={a.thumbnail} alt={a.title} style={{ width:"100%", height:"380px", objectFit:"cover", borderRadius:"4px", marginBottom:"10px", display:"block" }} />
+          {/* 대표 이미지 — 모바일 4/3 비율(잘림 최소화), 데스크탑 380px 고정 cover 유지 */}
+          <img
+            src={a.thumbnail}
+            alt={a.title}
+            className="w-full aspect-[4/3] h-auto object-cover lg:aspect-auto lg:h-[380px]"
+            style={{ borderRadius:"4px", marginBottom:"10px", display:"block" }}
+          />
           <div style={{ fontSize:"11px", color:"#9a9a9a", textAlign:"center", marginBottom:"32px", fontStyle:"italic" }}>{a.channel} / 이음미디어</div>
 
           {/* 본문 — 평문 + 원문 보기 (스테이지 1) — 모바일 16/1.8, 데스크탑 17/2.0 */}
