@@ -272,7 +272,7 @@ export default function ArticleDetail() {
     (async () => {
       const { data, error: err } = await supabase
         .from('articles')
-        .select('id, slug, title, summary, content, thumbnail_url, video_url, published_at, channel_id, like_count, channels(name, slug, english_slug)')
+        .select('id, slug, title, summary, content, thumbnail_url, video_url, published_at, channel_id, like_count, external_url, inline_ad_image, inline_ad_link, inline_ad_title, inline_ad_subtitle, channels(name, slug, english_slug)')
         .eq('slug', slug)
         .eq('status', 'published')
         .single();
@@ -417,7 +417,6 @@ export default function ArticleDetail() {
     read_time: 5,
   };
   const color = CC[a.channel] || "#0d2d52";
-  const externalUrl = `https://eummagazine.com/${article.channels?.slug?.split('-').pop()}/?idx=${article.slug}&bmode=view`;
 
   return (
     <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#fff", color:"#1a1a1a", minHeight:"100vh" }}>
@@ -514,14 +513,26 @@ export default function ArticleDetail() {
             {splitIntoParagraphs(a.content).flatMap((para, i, arr) => {
               const midIdx = Math.floor((arr.length - 1) / 2);
               const items = [<p key={"p-"+i} style={{ margin:"0 0 1em 0" }}>{para}</p>];
-              if (i === midIdx) {
+              // 본문 중간 배너 — inline_ad_title 있을 때만 삽입 (이미지 유무에 따라 자동 분기)
+              if (i === midIdx && article.inline_ad_title) {
+                const hasImage = !!article.inline_ad_image;
                 items.push(
-                  <a key={"midad-"+i} href="https://naver.me/GWeDuL23" target="_blank" rel="noopener noreferrer"
+                  <a key={"midad-"+i} href={article.inline_ad_link || '#'} target="_blank" rel="noopener noreferrer"
                     style={{ display:"flex", alignItems:"center", gap:"16px", width:"100%", minHeight:"80px", padding:"16px 20px", margin:"32px 0", background:"#f7f8fa", border:"1px solid #e0e0e0", borderLeft:"4px solid #1c4f8a", textDecoration:"none", color:"inherit", fontFamily:"'Noto Sans KR', sans-serif" }}>
-                    <div style={{ fontSize:"10px", color:"#9a9a9a", letterSpacing:"1px", fontWeight:"700", flexShrink:0, paddingRight:"16px", borderRight:"1px solid #e0e0e0" }}>SPONSORED</div>
+                    {hasImage ? (
+                      <img src={article.inline_ad_image} alt={article.inline_ad_title}
+                        style={{ width:"80px", height:"80px", objectFit:"cover", borderRadius:"4px", flexShrink:0 }} />
+                    ) : (
+                      <div style={{ fontSize:"10px", color:"#9a9a9a", letterSpacing:"1px", fontWeight:"700", flexShrink:0, paddingRight:"16px", borderRight:"1px solid #e0e0e0" }}>SPONSORED</div>
+                    )}
                     <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", marginBottom:"4px" }}>닥터리부트 두피관리센터</div>
-                      <div style={{ fontFamily:"serif", fontSize:"13px", color:"#5a5a5a", fontStyle:"italic", lineHeight:"1.5" }}>"고객의 마지막 희망이 되고픈 두피전문가"</div>
+                      {hasImage && (
+                        <div style={{ fontSize:"10px", color:"#9a9a9a", letterSpacing:"1px", fontWeight:"700", marginBottom:"4px" }}>SPONSORED</div>
+                      )}
+                      <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", marginBottom:"4px" }}>{article.inline_ad_title}</div>
+                      {article.inline_ad_subtitle && (
+                        <div style={{ fontFamily:"serif", fontSize:"13px", color:"#5a5a5a", fontStyle:"italic", lineHeight:"1.5" }}>{article.inline_ad_subtitle}</div>
+                      )}
                     </div>
                     <div style={{ fontSize:"20px", color:"#0d2d52", flexShrink:0 }}>→</div>
                   </a>
@@ -531,12 +542,14 @@ export default function ArticleDetail() {
             })}
           </div>
           <div style={{ borderTop:"2px solid #bbb", margin:"24px 0" }} />
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"24px" }}>
-            <a href={externalUrl} target="_blank" rel="noopener noreferrer"
-               style={{ display:"inline-block", background:"#0d2d52", color:"white", padding:"14px 28px", fontSize:"15px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit" }}>
-              원문 보기 →
-            </a>
-            <div style={{ textAlign:"right" }}>
+          <div style={{ display:"flex", justifyContent: article.external_url ? "space-between" : "center", alignItems:"flex-start", marginBottom:"24px" }}>
+            {article.external_url && (
+              <a href={article.external_url} target="_blank" rel="noopener noreferrer"
+                 style={{ display:"inline-block", background:"#0d2d52", color:"white", padding:"14px 28px", fontSize:"15px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit" }}>
+                원문 보기 →
+              </a>
+            )}
+            <div style={{ textAlign: article.external_url ? "right" : "center" }}>
               <div style={{ fontSize:"13px", color:"#555", marginBottom:"4px" }}>
                 정세연 편집국장 | press@eummedia.kr
               </div>

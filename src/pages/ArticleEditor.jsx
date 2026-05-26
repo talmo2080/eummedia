@@ -282,10 +282,15 @@ export default function ArticleEditor() {
   const [tagInput, setTagInput] = useState('')
   const [tags, setTags] = useState([])
   const [summary, setSummary] = useState('')
+  const [externalUrl, setExternalUrl] = useState('')
   const [thumbnailUrl, setThumbnailUrl] = useState('')
   const [imageAlt, setImageAlt] = useState('')
   const [videoUrl, setVideoUrl] = useState('')
   const [content, setContent] = useState('')
+  const [inlineAdImage, setInlineAdImage] = useState('')
+  const [inlineAdLink, setInlineAdLink] = useState('')
+  const [inlineAdTitle, setInlineAdTitle] = useState('')
+  const [inlineAdSubtitle, setInlineAdSubtitle] = useState('')
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef(null)
 
@@ -397,6 +402,11 @@ export default function ArticleEditor() {
       setImageAlt(data.image_alt || '')
       setVideoUrl(data.video_url || '')
       setReporter(data.author_name || '')
+      setExternalUrl(data.external_url || '')
+      setInlineAdImage(data.inline_ad_image || '')
+      setInlineAdLink(data.inline_ad_link || '')
+      setInlineAdTitle(data.inline_ad_title || '')
+      setInlineAdSubtitle(data.inline_ad_subtitle || '')
       // citizen_checks JSONB에서 수동 7개만 복원 (자동 7개는 derive)
       if (data.citizen_checks && typeof data.citizen_checks === 'object') {
         const manualKeys = ['leadParagraph', 'spelling', 'titleKeyword', 'fact', 'source', 'kakao', 'instagram']
@@ -565,6 +575,11 @@ export default function ArticleEditor() {
     video_url: videoUrl.trim() || null,
     author_name: (reporter || profile?.nickname || '').trim() || null,
     image_alt: imageAlt.trim() || null,
+    external_url: externalUrl.trim() || null,
+    inline_ad_image: inlineAdImage.trim() || null,
+    inline_ad_link: inlineAdLink.trim() || null,
+    inline_ad_title: inlineAdTitle.trim() || null,
+    inline_ad_subtitle: inlineAdSubtitle.trim() || null,
     // 시민기자 체크 — submitted 시 14개 결과 + 점수 저장 (draft 시도 무해)
     citizen_checks: allChecks,
     citizen_complete: totalDone,
@@ -629,6 +644,7 @@ export default function ArticleEditor() {
   const resetForm = () => {
     setChannel(''); setTitle(''); setReporter(''); setTagInput(''); setTags([])
     setSummary(''); setThumbnailUrl(''); setImageAlt(''); setVideoUrl(''); setContent('')
+    setExternalUrl(''); setInlineAdImage(''); setInlineAdLink(''); setInlineAdTitle(''); setInlineAdSubtitle('')
     setManualChecks({
       leadParagraph: false, spelling: false, titleKeyword: false,
       fact: false, source: false, kakao: false, instagram: false,
@@ -931,7 +947,21 @@ export default function ArticleEditor() {
               </div>
             </div>
 
-            {/* 6. 대표 이미지 */}
+            {/* 6. 원문 URL (선택) — 옛 이음매거진 등 외부 원본 글이 있을 때만 입력 */}
+            <div style={card}>
+              <label style={lbl}>
+                원문 URL <span style={{ color: '#888', fontWeight: 500, fontSize: 16 }}>(선택)</span>
+              </label>
+              <input style={inp()}
+                value={externalUrl} onChange={e => setExternalUrl(e.target.value)}
+                placeholder="예: https://eummagazine.com/..." />
+              <div style={{ fontSize: 16, color: '#666', marginTop: 10, lineHeight: 1.7 }}>
+                옛 이음매거진 등 외부에 원본 글이 있을 때만 입력해 주세요.<br />
+                비워두면 기사 페이지에 '원문 보기' 버튼이 표시되지 않습니다.
+              </div>
+            </div>
+
+            {/* 7. 대표 이미지 */}
             <div style={card}>
               <label style={lbl}>대표 이미지</label>
 
@@ -1028,7 +1058,47 @@ export default function ArticleEditor() {
               </div>
             </div>
 
-            {/* 9. 하단 버튼 */}
+            {/* 9. 본문 중간 배너 (선택) — 광고/협찬. 제목 있으면 배너 표시, 이미지 있으면 이미지형 자동 분기 */}
+            <div style={card}>
+              <label style={lbl}>
+                본문 중간 배너 <span style={{ color: '#888', fontWeight: 500, fontSize: 16 }}>(선택)</span>
+              </label>
+              <div style={{ fontSize: 16, color: '#666', marginBottom: 14, lineHeight: 1.7 }}>
+                기사 본문 중간에 표시될 광고/협찬 카드입니다.<br />
+                <strong>제목</strong>이 있어야 표시되며, <strong>이미지 URL</strong>이 있으면 이미지형 배너로 자동 분기됩니다.<br />
+                전부 비워두면 배너가 표시되지 않습니다.
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+                <label style={lbl}>배너 이미지 URL</label>
+                <input style={inp()}
+                  value={inlineAdImage} onChange={e => setInlineAdImage(e.target.value)}
+                  placeholder="https://... (비워두면 텍스트형 배너)" />
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+                <label style={lbl}>클릭 시 이동 링크</label>
+                <input style={inp()}
+                  value={inlineAdLink} onChange={e => setInlineAdLink(e.target.value)}
+                  placeholder="https://..." />
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+                <label style={lbl}>배너 제목</label>
+                <input style={inp()}
+                  value={inlineAdTitle} onChange={e => setInlineAdTitle(e.target.value)}
+                  placeholder="예: 닥터리부트 두피관리센터" />
+              </div>
+
+              <div>
+                <label style={lbl}>배너 부제</label>
+                <input style={inp()}
+                  value={inlineAdSubtitle} onChange={e => setInlineAdSubtitle(e.target.value)}
+                  placeholder='예: "고객의 마지막 희망이 되고픈 두피전문가"' />
+              </div>
+            </div>
+
+            {/* 10. 하단 버튼 */}
             <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
               <button onClick={handleDraft} disabled={!canDraft} style={{
                 flex: 1, height: 56, fontSize: 18, fontWeight: 700,
