@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { getYouTubeEmbedUrl } from '../lib/youtube'
@@ -1047,6 +1048,11 @@ export default function AdminDashboard() {
                             <button onClick={() => deleteCardnews(a)} style={btnStyle(RED, true)}>
                               🗑 카드뉴스 삭제
                             </button>
+                          )}
+                          {canAct && (
+                            <Link to={`/write?id=${a.id}`} style={{ ...btnStyle(BLUE), textDecoration: 'none', display: 'inline-block' }}>
+                              ✏️ 편집
+                            </Link>
                           )}
                           <button onClick={() => alert(`기사 보기: ${a.title}`)} style={btnStyle('#666', true)}>👁 기사 보기</button>
                         </>

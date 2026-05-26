@@ -292,7 +292,11 @@ export default function ArticleEditor() {
   const [inlineAdTitle, setInlineAdTitle] = useState('')
   const [inlineAdSubtitle, setInlineAdSubtitle] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [originalStatus, setOriginalStatus] = useState(null)
   const fileInputRef = useRef(null)
+
+  // admin/publisher만 다른 기자 글 fetch + 발행본 그대로 저장 가능
+  const isAdminOrPublisher = profile?.role === 'admin' || profile?.role === 'publisher'
 
   // 시민기자 수동 체크 7개 (자동 7개는 derive, editorReview 1개는 편집장 전용)
   const [manualChecks, setManualChecks] = useState({
@@ -376,17 +380,20 @@ export default function ArticleEditor() {
     }
   }
 
-  // 이어쓰기 모드: /write?id=xxx 진입 시 기존 draft fetch + 폼 복원
+  // 이어쓰기 모드: /write?id=xxx 진입 시 기존 기사 fetch + 폼 복원
+  //   · 시민기자(writer): 본인 글만 (author_id 필터)
+  //   · 편집국장/발행인(admin/publisher): 모든 기사 (author_id 필터 제거)
+  //   · profile 로드 전엔 fetch 보류 — admin이 author_id 필터로 잘못 막히는 것 방지
   useEffect(() => {
-    if (!editId || !user) return
+    if (!editId || !user || !profile) return
     let cancelled = false
     ;(async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from('articles')
         .select('*')
         .eq('id', editId)
-        .eq('author_id', user.id)
-        .maybeSingle()
+      if (!isAdminOrPublisher) q = q.eq('author_id', user.id)
+      const { data, error } = await q.maybeSingle()
       if (cancelled) return
       if (error || !data) {
         alert('해당 기사를 불러올 수 없습니다.')
@@ -407,6 +414,7 @@ export default function ArticleEditor() {
       setInlineAdLink(data.inline_ad_link || '')
       setInlineAdTitle(data.inline_ad_title || '')
       setInlineAdSubtitle(data.inline_ad_subtitle || '')
+      setOriginalStatus(data.status || null)
       // citizen_checks JSONB에서 수동 7개만 복원 (자동 7개는 derive)
       if (data.citizen_checks && typeof data.citizen_checks === 'object') {
         const manualKeys = ['leadParagraph', 'spelling', 'titleKeyword', 'fact', 'source', 'kakao', 'instagram']
@@ -416,7 +424,7 @@ export default function ArticleEditor() {
       }
     })()
     return () => { cancelled = true }
-  }, [editId, user, navigate])
+  }, [editId, user, profile, isAdminOrPublisher, navigate])
 
   const [showRedHighlight, setShowRedHighlight] = useState(false)
   const [showGuide, setShowGuide] = useState(false)
@@ -562,28 +570,35 @@ export default function ArticleEditor() {
   // Math.random 기반 fallback (안전)
   const generateSlug = () => `article-${Math.random().toString(36).slice(2, 10)}`
 
-  const buildPayload = (status) => ({
-    channel_id: CHANNEL_ID_MAP[channel] || null,
-    author_id: user.id,
-    title: title.trim(),
-    slug: generateSlug(),
-    summary: summary.trim() || null,
-    content: content || null,
-    status,
-    thumbnail_url: thumbnailUrl.trim() || null,
-    tags: tags.length > 0 ? tags : null,
-    video_url: videoUrl.trim() || null,
-    author_name: (reporter || profile?.nickname || '').trim() || null,
-    image_alt: imageAlt.trim() || null,
-    external_url: externalUrl.trim() || null,
-    inline_ad_image: inlineAdImage.trim() || null,
-    inline_ad_link: inlineAdLink.trim() || null,
-    inline_ad_title: inlineAdTitle.trim() || null,
-    inline_ad_subtitle: inlineAdSubtitle.trim() || null,
-    // 시민기자 체크 — submitted 시 14개 결과 + 점수 저장 (draft 시도 무해)
-    citizen_checks: allChecks,
-    citizen_complete: totalDone,
-  })
+  const buildPayload = (status) => {
+    const payload = {
+      channel_id: CHANNEL_ID_MAP[channel] || null,
+      title: title.trim(),
+      summary: summary.trim() || null,
+      content: content || null,
+      status,
+      thumbnail_url: thumbnailUrl.trim() || null,
+      tags: tags.length > 0 ? tags : null,
+      video_url: videoUrl.trim() || null,
+      author_name: (reporter || profile?.nickname || '').trim() || null,
+      image_alt: imageAlt.trim() || null,
+      external_url: externalUrl.trim() || null,
+      inline_ad_image: inlineAdImage.trim() || null,
+      inline_ad_link: inlineAdLink.trim() || null,
+      inline_ad_title: inlineAdTitle.trim() || null,
+      inline_ad_subtitle: inlineAdSubtitle.trim() || null,
+      // 시민기자 체크 — submitted 시 14개 결과 + 점수 저장 (draft 시도 무해)
+      citizen_checks: allChecks,
+      citizen_complete: totalDone,
+    }
+    // 신규 작성 시에만 author_id + slug 설정.
+    // editId 모드(기존 수정)면 둘 다 미포함 → DB의 기존 값 보존 (원래 기자·URL 유지).
+    if (!editId) {
+      payload.author_id = user.id
+      payload.slug = generateSlug()
+    }
+    return payload
+  }
 
   const handleDraft = async () => {
     if (submitting) return
@@ -592,12 +607,16 @@ export default function ArticleEditor() {
     setSubmitting(true)
     try {
       const payload = buildPayload('draft')
-      const { error } = editId
-        ? await supabase.from('articles')
-            .update({ ...payload, updated_at: new Date().toISOString() })
-            .eq('id', editId)
-            .eq('author_id', user.id)
-        : await supabase.from('articles').insert(payload)
+      let error
+      if (editId) {
+        let q = supabase.from('articles')
+          .update({ ...payload, updated_at: new Date().toISOString() })
+          .eq('id', editId)
+        if (!isAdminOrPublisher) q = q.eq('author_id', user.id)
+        ;({ error } = await q)
+      } else {
+        ;({ error } = await supabase.from('articles').insert(payload))
+      }
       if (error) { alert(`임시저장 실패: ${error.message}`); return }
       setSavedAt(formatNow())
       setViewMode('draftSuccess')
@@ -624,12 +643,16 @@ export default function ArticleEditor() {
     setSubmitting(true)
     try {
       const payload = buildPayload('submitted')
-      const { error } = editId
-        ? await supabase.from('articles')
-            .update({ ...payload, updated_at: new Date().toISOString() })
-            .eq('id', editId)
-            .eq('author_id', user.id)
-        : await supabase.from('articles').insert(payload)
+      let error
+      if (editId) {
+        let q = supabase.from('articles')
+          .update({ ...payload, updated_at: new Date().toISOString() })
+          .eq('id', editId)
+        if (!isAdminOrPublisher) q = q.eq('author_id', user.id)
+        ;({ error } = await q)
+      } else {
+        ;({ error } = await supabase.from('articles').insert(payload))
+      }
       if (error) { alert(`편집국장 전송 실패: ${error.message}`); return }
       setSavedAt(formatNow())
       setViewMode('submitSuccess')
@@ -641,10 +664,37 @@ export default function ArticleEditor() {
       setSubmitting(false)
     }
   }
+
+  // ━━ 발행본 그대로 저장 (편집국장/발행인 전용 — 발행 기사 수정) ━━
+  // status='published' 유지, published_at·slug·author_id 모두 보존, updated_at만 갱신
+  const handlePublishUpdate = async () => {
+    if (submitting) return
+    if (!user || !editId) return
+    setSubmitting(true)
+    try {
+      const payload = buildPayload('published')
+      let q = supabase.from('articles')
+        .update({ ...payload, updated_at: new Date().toISOString() })
+        .eq('id', editId)
+      if (!isAdminOrPublisher) q = q.eq('author_id', user.id)
+      const { error } = await q
+      if (error) { alert(`발행본 저장 실패: ${error.message}`); return }
+      setSavedAt(formatNow())
+      setViewMode('publishUpdateSuccess')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch (err) {
+      console.error('[handlePublishUpdate] catch:', err)
+      alert(`발행본 저장 중 오류: ${err?.message || err}`)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   const resetForm = () => {
     setChannel(''); setTitle(''); setReporter(''); setTagInput(''); setTags([])
     setSummary(''); setThumbnailUrl(''); setImageAlt(''); setVideoUrl(''); setContent('')
     setExternalUrl(''); setInlineAdImage(''); setInlineAdLink(''); setInlineAdTitle(''); setInlineAdSubtitle('')
+    setOriginalStatus(null)
     setManualChecks({
       leadParagraph: false, spelling: false, titleKeyword: false,
       fact: false, source: false, kakao: false, instagram: false,
@@ -785,6 +835,56 @@ export default function ArticleEditor() {
               cursor: 'pointer', fontFamily: SANS,
             }}>
               🏠 홈으로 가기
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ━━ 발행본 저장 완료 화면 (편집국장 전용) ━━
+  if (viewMode === 'publishUpdateSuccess') {
+    return (
+      <div style={{ background: '#f9f8f6', minHeight: '100vh', padding: '80px 24px', fontFamily: SANS }}>
+        <div style={{
+          maxWidth: 600, margin: '0 auto', background: '#fff',
+          borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+          padding: '48px', textAlign: 'center', boxSizing: 'border-box',
+        }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>📰</div>
+          <h1 style={{
+            fontFamily: SERIF, fontSize: 26, fontWeight: 700,
+            color: NAVY, margin: '0 0 10px 0', lineHeight: 1.4,
+          }}>
+            발행본이 즉시 반영되었습니다
+          </h1>
+          <p style={{ fontSize: 18, color: '#666', margin: '0 0 32px 0', lineHeight: 1.6 }}>
+            발행 시간(published_at)·URL(slug)·작성자(author)는 그대로 유지되었습니다.
+          </p>
+
+          <div style={{
+            background: '#eef3fa', borderRadius: 12,
+            padding: 24, marginBottom: 24, textAlign: 'left',
+          }}>
+            <InfoRow label="기사 제목" value={title} />
+            <InfoRow label="채널" value={channel} />
+            <InfoRow label="저장 시각" value={savedAt} last />
+          </div>
+
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button onClick={continueEditing} style={{
+              flex: 1, height: 52, fontSize: 18, fontWeight: 700,
+              background: NAVY, color: '#fff', border: 'none', borderRadius: 8,
+              cursor: 'pointer', fontFamily: SANS,
+            }}>
+              ✍️ 더 수정하기
+            </button>
+            <button onClick={() => navigate('/admin')} style={{
+              flex: 1, height: 52, fontSize: 18, fontWeight: 700,
+              background: '#fff', color: NAVY, border: `1px solid ${NAVY}`, borderRadius: 8,
+              cursor: 'pointer', fontFamily: SANS,
+            }}>
+              🏠 관리자로 가기
             </button>
           </div>
         </div>
@@ -1098,7 +1198,7 @@ export default function ArticleEditor() {
               </div>
             </div>
 
-            {/* 10. 하단 버튼 */}
+            {/* 10. 하단 버튼 — 발행본 수정 모드(편집국장)인지에 따라 액션 버튼 분기 */}
             <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
               <button onClick={handleDraft} disabled={!canDraft} style={{
                 flex: 1, height: 56, fontSize: 18, fontWeight: 700,
@@ -1110,17 +1210,31 @@ export default function ArticleEditor() {
               }}>
                 💾 임시저장
               </button>
-              <button onClick={handleSubmit}
-                style={{
-                  flex: 2, height: 56, fontSize: 18, fontWeight: 700,
-                  background: canSubmit ? NAVY : '#ccc',
-                  color: canSubmit ? '#fff' : '#888',
-                  border: 'none', borderRadius: 8,
-                  cursor: canSubmit ? 'pointer' : 'not-allowed',
-                  fontFamily: SANS,
-                }}>
-                📩 편집국장에게 보내기 ({totalDone}/14)
-              </button>
+              {editId && isAdminOrPublisher && originalStatus === 'published' ? (
+                <button onClick={handlePublishUpdate} disabled={submitting}
+                  style={{
+                    flex: 2, height: 56, fontSize: 18, fontWeight: 700,
+                    background: submitting ? '#ccc' : NAVY,
+                    color: submitting ? '#888' : '#fff',
+                    border: 'none', borderRadius: 8,
+                    cursor: submitting ? 'not-allowed' : 'pointer',
+                    fontFamily: SANS,
+                  }}>
+                  📰 발행본으로 저장
+                </button>
+              ) : (
+                <button onClick={handleSubmit}
+                  style={{
+                    flex: 2, height: 56, fontSize: 18, fontWeight: 700,
+                    background: canSubmit ? NAVY : '#ccc',
+                    color: canSubmit ? '#fff' : '#888',
+                    border: 'none', borderRadius: 8,
+                    cursor: canSubmit ? 'pointer' : 'not-allowed',
+                    fontFamily: SANS,
+                  }}>
+                  📩 편집국장에게 보내기 ({totalDone}/14)
+                </button>
+              )}
             </div>
           </div>
         )}
