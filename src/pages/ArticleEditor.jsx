@@ -292,8 +292,10 @@ export default function ArticleEditor() {
   const [inlineAdTitle, setInlineAdTitle] = useState('')
   const [inlineAdSubtitle, setInlineAdSubtitle] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [bannerUploading, setBannerUploading] = useState(false)
   const [originalStatus, setOriginalStatus] = useState(null)
   const fileInputRef = useRef(null)
+  const bannerFileInputRef = useRef(null)
   const contentRef = useRef(null)
 
   // admin/publisher만 다른 기자 글 fetch + 발행본 그대로 저장 가능
@@ -602,6 +604,58 @@ export default function ArticleEditor() {
     } finally {
       setUploading(false)
       e.target.value = ''  // 같은 파일 다시 선택 가능
+    }
+  }
+
+  // 배너 이미지 파일 선택 버튼 클릭
+  const openBannerFilePicker = () => {
+    if (bannerUploading) return
+    bannerFileInputRef.current?.click()
+  }
+
+  // 배너 이미지 업로드 — Supabase Storage article-images 버킷, banner- 접두사로 대표이미지와 구분
+  const handleBannerFileSelect = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!user) { alert('로그인이 필요합니다.'); return }
+
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드 가능합니다.')
+      e.target.value = ''
+      return
+    }
+    const MAX_SIZE = 10 * 1024 * 1024
+    if (file.size > MAX_SIZE) {
+      alert(`이미지가 너무 큽니다 (${(file.size/1024/1024).toFixed(1)}MB).\n10MB 이하로 부탁드립니다.`)
+      e.target.value = ''
+      return
+    }
+
+    setBannerUploading(true)
+    try {
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
+      const path = `${user.id}/banner-${Date.now()}.${ext}`
+
+      const { error } = await supabase.storage
+        .from('article-images')
+        .upload(path, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type,
+        })
+      if (error) throw error
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('article-images')
+        .getPublicUrl(path)
+
+      setInlineAdImage(publicUrl)
+    } catch (err) {
+      console.error('banner upload error:', err)
+      alert(`업로드 실패: ${err.message || '알 수 없는 오류'}`)
+    } finally {
+      setBannerUploading(false)
+      e.target.value = ''
     }
   }
 
@@ -1233,10 +1287,51 @@ export default function ArticleEditor() {
               </div>
 
               <div style={{ marginBottom: 14 }}>
-                <label style={lbl}>배너 이미지 URL</label>
-                <input style={inp()}
-                  value={inlineAdImage} onChange={e => setInlineAdImage(e.target.value)}
-                  placeholder="https://... (비워두면 텍스트형 배너)" />
+                <label style={lbl}>배너 이미지</label>
+                {/* 안내문 — 70대+ 페르소나 대응 */}
+                <div style={{
+                  background: '#f5f9ff', border: `1px solid ${BLUE}`, borderRadius: 8,
+                  padding: '12px 14px', marginBottom: 14,
+                  fontSize: 15, lineHeight: 1.6, color: '#333',
+                }}>
+                  💡 권장 사이즈: 가로형 (예: 800×120 픽셀)<br />
+                  비워두면 텍스트형 배너로 자동 표시됩니다.
+                </div>
+                {/* 미리보기 (URL 또는 업로드된 이미지) */}
+                {inlineAdImage && (
+                  <div style={{ marginBottom: 14 }}>
+                    <img src={inlineAdImage} alt="배너 미리보기"
+                      style={{
+                        width: '100%', maxHeight: 120, objectFit: 'cover',
+                        borderRadius: 8, border: '1px solid #ddd',
+                        display: 'block',
+                      }}
+                      onError={e => { e.currentTarget.style.display = 'none' }}
+                    />
+                  </div>
+                )}
+                {/* 숨겨진 file input */}
+                <input
+                  ref={bannerFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleBannerFileSelect}
+                  style={{ display: 'none' }}
+                />
+                {/* 큰 파일 선택 버튼 (70대+ 페르소나 대응) */}
+                <button type="button" onClick={openBannerFilePicker} disabled={bannerUploading}
+                  style={{
+                    width: '100%', minHeight: 60, fontSize: 19, fontWeight: 700,
+                    background: bannerUploading ? '#f0f0f0' : '#fff',
+                    color: bannerUploading ? '#888' : NAVY,
+                    border: `2px solid ${bannerUploading ? '#ccc' : NAVY}`, borderRadius: 8,
+                    cursor: bannerUploading ? 'wait' : 'pointer',
+                    fontFamily: SANS,
+                  }}>
+                  {bannerUploading
+                    ? '⏳ 업로드 중...'
+                    : (inlineAdImage ? '🔄 다시 선택' : '📁 사진 직접 올리기')}
+                </button>
               </div>
 
               <div style={{ marginBottom: 14 }}>

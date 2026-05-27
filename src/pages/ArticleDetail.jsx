@@ -453,7 +453,7 @@ export default function ArticleDetail() {
     author_name: "정세연 편집국장",
     author_bio: "닥터리부트 두피관리센터(일산) 원장 · 두피전문가 27년 · 이음미디어 편집국장",
     author_intro: "두피 전문가 27년 경력의 정세연 원장이자 이음미디어 편집국장입니다. 세상을 잇고 사람을 잇는 이야기를 발굴합니다.",
-    tags: ["이음매거진","문화","전시"],
+    tags: Array.isArray(article.tags) ? article.tags : [],
     views: 1284,
     read_time: 5,
   };
