@@ -313,7 +313,7 @@ export default function ArticleDetail() {
     (async () => {
       const { data, error: err } = await supabase
         .from('articles')
-        .select('id, slug, title, summary, content, thumbnail_url, video_url, published_at, channel_id, like_count, external_url, inline_ad_image, inline_ad_link, inline_ad_title, inline_ad_subtitle, channels(name, slug, english_slug)')
+        .select('id, slug, title, summary, content, thumbnail_url, video_url, published_at, channel_id, like_count, tags, external_url, inline_ad_image, inline_ad_link, inline_ad_title, inline_ad_subtitle, channels(name, slug, english_slug)')
         .eq('slug', slug)
         .eq('status', 'published')
         .single();
@@ -561,27 +561,45 @@ export default function ArticleDetail() {
               // 본문 중간 배너 — inline_ad_title 있을 때만 삽입 (이미지 유무에 따라 자동 분기)
               if (i === midIdx && article.inline_ad_title) {
                 const hasImage = !!article.inline_ad_image;
-                items.push(
-                  <a key={"midad-"+i} href={article.inline_ad_link || '#'} target="_blank" rel="noopener noreferrer"
-                    style={{ display:"flex", alignItems:"center", gap:"16px", width:"100%", minHeight:"80px", padding:"16px 20px", margin:"32px 0", background:"#f7f8fa", border:"1px solid #e0e0e0", borderLeft:"4px solid #1c4f8a", textDecoration:"none", color:"inherit", fontFamily:"'Noto Sans KR', sans-serif" }}>
-                    {hasImage ? (
+                if (hasImage) {
+                  // 이미지형 — 이미지가 카드 본체(원본 비율, 잘림 없음). SPONSORED 라벨 위 + 제목/부제 아래
+                  items.push(
+                    <a key={"midad-"+i} href={article.inline_ad_link || '#'} target="_blank" rel="noopener noreferrer"
+                      style={{ display:"block", width:"100%", margin:"32px 0",
+                               background:"#f7f8fa", border:"1px solid #e0e0e0",
+                               borderLeft:"4px solid #1c4f8a", overflow:"hidden",
+                               textDecoration:"none", color:"inherit",
+                               fontFamily:"'Noto Sans KR', sans-serif" }}>
+                      <div style={{ padding:"10px 16px 8px", fontSize:"10px", color:"#9a9a9a", letterSpacing:"1px", fontWeight:"700", borderBottom:"1px solid #e8e8e8" }}>SPONSORED</div>
                       <img src={article.inline_ad_image} alt={article.inline_ad_title}
-                        style={{ width:"80px", height:"80px", objectFit:"cover", borderRadius:"4px", flexShrink:0 }} />
-                    ) : (
+                        style={{ width:"100%", height:"auto", display:"block" }} />
+                      <div style={{ display:"flex", alignItems:"center", gap:"12px", padding:"14px 16px" }}>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", marginBottom: article.inline_ad_subtitle ? "4px" : 0 }}>{article.inline_ad_title}</div>
+                          {article.inline_ad_subtitle && (
+                            <div style={{ fontFamily:"serif", fontSize:"13px", color:"#5a5a5a", fontStyle:"italic", lineHeight:"1.5" }}>{article.inline_ad_subtitle}</div>
+                          )}
+                        </div>
+                        <div style={{ fontSize:"20px", color:"#0d2d52", flexShrink:0 }}>→</div>
+                      </div>
+                    </a>
+                  );
+                } else {
+                  // 텍스트형 — 좌측 SPONSORED 세로 라벨 + 우측 제목/부제 (기존 디자인 유지)
+                  items.push(
+                    <a key={"midad-"+i} href={article.inline_ad_link || '#'} target="_blank" rel="noopener noreferrer"
+                      style={{ display:"flex", alignItems:"center", gap:"16px", width:"100%", minHeight:"80px", padding:"16px 20px", margin:"32px 0", background:"#f7f8fa", border:"1px solid #e0e0e0", borderLeft:"4px solid #1c4f8a", textDecoration:"none", color:"inherit", fontFamily:"'Noto Sans KR', sans-serif" }}>
                       <div style={{ fontSize:"10px", color:"#9a9a9a", letterSpacing:"1px", fontWeight:"700", flexShrink:0, paddingRight:"16px", borderRight:"1px solid #e0e0e0" }}>SPONSORED</div>
-                    )}
-                    <div style={{ flex:1, minWidth:0 }}>
-                      {hasImage && (
-                        <div style={{ fontSize:"10px", color:"#9a9a9a", letterSpacing:"1px", fontWeight:"700", marginBottom:"4px" }}>SPONSORED</div>
-                      )}
-                      <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", marginBottom:"4px" }}>{article.inline_ad_title}</div>
-                      {article.inline_ad_subtitle && (
-                        <div style={{ fontFamily:"serif", fontSize:"13px", color:"#5a5a5a", fontStyle:"italic", lineHeight:"1.5" }}>{article.inline_ad_subtitle}</div>
-                      )}
-                    </div>
-                    <div style={{ fontSize:"20px", color:"#0d2d52", flexShrink:0 }}>→</div>
-                  </a>
-                );
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", marginBottom:"4px" }}>{article.inline_ad_title}</div>
+                        {article.inline_ad_subtitle && (
+                          <div style={{ fontFamily:"serif", fontSize:"13px", color:"#5a5a5a", fontStyle:"italic", lineHeight:"1.5" }}>{article.inline_ad_subtitle}</div>
+                        )}
+                      </div>
+                      <div style={{ fontSize:"20px", color:"#0d2d52", flexShrink:0 }}>→</div>
+                    </a>
+                  );
+                }
               }
               return items;
             })}
