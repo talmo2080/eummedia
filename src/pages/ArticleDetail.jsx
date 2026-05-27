@@ -762,7 +762,22 @@ export default function ArticleDetail() {
             </div>
           </div>
 
-          {/* 광고 박스 — 정세연 본인 광고 (광고 샘플 역할) — 태그·기자란 뒤로 이동 (commit 44) */}
+          {/* 📱 카드뉴스 — 다른 기사 카드뉴스 갤러리 (모바일 2 / PC 3 + 더보기)
+              · 0건이면 섹션 숨김
+              · 카드 클릭 → 해당 카드뉴스의 5장 슬라이드쇼
+              · 엔딩 슬라이드 "전체 기사 보기 →" → 그 기사로 이동
+              · 순서: 기자란 → 카드뉴스 → 광고박스 → 영상갤러리 (commit 52) */}
+          {cardnewsList.length > 0 && (
+            <div style={{ marginTop:"32px" }}>
+              <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>📱 카드뉴스</div>
+              <CardNewsGallery key={slug} items={cardnewsList} onOpen={setOpenCardnews} />
+            </div>
+          )}
+
+          {/* 구분선 */}
+          <div style={{ borderTop:"1px solid #e0e0e0", margin:"32px 0" }} />
+
+          {/* 광고 박스 — 정세연 본인 광고 (광고 샘플 역할) — 카드뉴스 뒤로 이동 (commit 52) */}
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", borderLeft:"4px solid #1c4f8a", padding:"24px 24px 16px", margin:"32px 0" }}>
             <div style={{ fontSize:"10px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
             <div style={{ fontFamily:"serif", fontSize:"17px", fontWeight:"700", color:"#0d2d52", lineHeight:"1.5", marginBottom:"8px", fontStyle:"italic" }}>
@@ -786,25 +801,11 @@ export default function ArticleDetail() {
             </div>
           </div>
 
-          {/* 구분선 */}
-          <div style={{ borderTop:"1px solid #e0e0e0", margin:"32px 0" }} />
-
           {/* 📺 영상 갤러리 — 현재 기사 제외, 공용 컴포넌트 (0건 시 섹션 숨김) */}
           {galleryVideos.length > 0 && (
             <div style={{ marginTop:"32px" }}>
               <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>📺 영상 갤러리</div>
               <VideoGallery videos={galleryVideos} />
-            </div>
-          )}
-
-          {/* 📱 카드뉴스 — 다른 기사 카드뉴스 갤러리 (모바일 2 / PC 3 + 더보기)
-              · 0건이면 섹션 숨김
-              · 카드 클릭 → 해당 카드뉴스의 5장 슬라이드쇼
-              · 엔딩 슬라이드 "전체 기사 보기 →" → 그 기사로 이동 */}
-          {cardnewsList.length > 0 && (
-            <div style={{ marginTop:"32px" }}>
-              <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>📱 카드뉴스</div>
-              <CardNewsGallery key={slug} items={cardnewsList} onOpen={setOpenCardnews} />
             </div>
           )}
 
