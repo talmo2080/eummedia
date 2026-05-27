@@ -530,13 +530,21 @@ export default function ArticleEditor() {
   const canSubmit = autoCheckedCount >= 4
   const canDraft = !!title.trim()      // 임시저장은 제목만 있으면 가능
 
+  // 태그 등록 헬퍼 — Enter + onBlur + 저장 시 백업 흡수에서 공용 사용
+  const commitTagInput = () => {
+    const t = tagInput.trim().replace(/^#/, '')
+    if (!t) { setTagInput(''); return }
+    if (!tags.includes(t)) setTags([...tags, t])
+    setTagInput('')
+  }
   const handleTagKey = (e) => {
-    if (e.key === 'Enter' && tagInput.trim()) {
+    if (e.key === 'Enter') {
       e.preventDefault()
-      const t = tagInput.trim().replace(/^#/, '')
-      if (t && !tags.includes(t)) setTags([...tags, t])
-      setTagInput('')
+      commitTagInput()
     }
+  }
+  const handleTagBlur = () => {
+    commitTagInput()
   }
   const removeTag = (t) => setTags(tags.filter(x => x !== t))
 
@@ -602,6 +610,10 @@ export default function ArticleEditor() {
   const generateSlug = () => `article-${Math.random().toString(36).slice(2, 10)}`
 
   const buildPayload = (status) => {
+    // 저장 직전 백업 — tagInput에 미등록 텍스트가 남아 있으면 tags에 흡수
+    // (Enter도 안 누르고 input blur 이벤트도 못 받았을 때 마지막 안전망)
+    const pending = tagInput.trim().replace(/^#/, '')
+    const mergedTags = pending && !tags.includes(pending) ? [...tags, pending] : tags
     const payload = {
       channel_id: CHANNEL_ID_MAP[channel] || null,
       title: title.trim(),
@@ -609,7 +621,7 @@ export default function ArticleEditor() {
       content: content || null,
       status,
       thumbnail_url: thumbnailUrl.trim() || null,
-      tags: tags.length > 0 ? tags : null,
+      tags: mergedTags.length > 0 ? mergedTags : null,
       video_url: videoUrl.trim() || null,
       author_name: (reporter || profile?.nickname || '').trim() || null,
       image_alt: imageAlt.trim() || null,
@@ -1038,6 +1050,7 @@ export default function ArticleEditor() {
               <input style={inp({ height: 52 })}
                 value={tagInput} onChange={e => setTagInput(e.target.value)}
                 onKeyDown={handleTagKey}
+                onBlur={handleTagBlur}
                 placeholder="입력 후 Enter — 예: 고양시, 두피케어" />
               <div style={{
                 fontSize: 18, fontWeight: 600,
