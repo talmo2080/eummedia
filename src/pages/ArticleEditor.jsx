@@ -294,9 +294,40 @@ export default function ArticleEditor() {
   const [uploading, setUploading] = useState(false)
   const [originalStatus, setOriginalStatus] = useState(null)
   const fileInputRef = useRef(null)
+  const contentRef = useRef(null)
 
   // admin/publisher만 다른 기자 글 fetch + 발행본 그대로 저장 가능
   const isAdminOrPublisher = profile?.role === 'admin' || profile?.role === 'publisher'
+
+  // 서식 5종 — 커서 위치에 태그 삽입 (선택 텍스트 있으면 감싸기, 없으면 기본 텍스트 자동 선택)
+  const FORMAT_ACTIONS = [
+    { label: '굵게',     icon: 'B',  title: '굵게 — 선택 텍스트 강조 (**텍스트**)',          before: '**',        after: '**',         defaultText: '굵게' },
+    { label: '소제목',   icon: 'H',  title: '소제목 — 단락 머리 (## 소제목)',                before: '\n## ',     after: '\n',         defaultText: '소제목' },
+    { label: '인용구',   icon: '"',  title: '인용구 — 출처·인터뷰 ([quote]...[/quote])',     before: '\n[quote]', after: '[/quote]\n', defaultText: '인용 내용' },
+    { label: '강조박스', icon: '★', title: '강조박스 — 포인트 ([box]...[/box])',            before: '\n[box]',   after: '[/box]\n',   defaultText: '강조할 내용' },
+    { label: '정보박스', icon: 'ℹ', title: '정보박스 — 보조 정보 ([info]...[/info])',       before: '\n[info]',  after: '[/info]\n',  defaultText: '정보 내용' },
+  ]
+
+  const insertOrWrap = (before, after, defaultText) => {
+    const ta = contentRef.current
+    if (!ta) return
+    const start = ta.selectionStart
+    const end = ta.selectionEnd
+    const selected = content.slice(start, end)
+    const inner = selected || defaultText
+    const snippet = before + inner + after
+    const newContent = content.slice(0, start) + snippet + content.slice(end)
+    setContent(newContent)
+    // 커서 위치 갱신: 선택 텍스트가 있었으면 끝으로, 없었으면 defaultText 자동 선택
+    setTimeout(() => {
+      ta.focus()
+      if (!selected) {
+        ta.setSelectionRange(start + before.length, start + before.length + defaultText.length)
+      } else {
+        ta.setSelectionRange(start + snippet.length, start + snippet.length)
+      }
+    }, 0)
+  }
 
   // 시민기자 수동 체크 7개 (자동 7개는 derive, editorReview 1개는 편집장 전용)
   const [manualChecks, setManualChecks] = useState({
@@ -1144,11 +1175,30 @@ export default function ArticleEditor() {
               <label style={lbl}>
                 본문 <span style={{ color: RED }}>*</span>
               </label>
-              <textarea style={inp({
+              {/* 서식 툴바 — 70대+ 친화 큰 버튼 (44px 이상). 선택 텍스트 있으면 감싸기, 없으면 기본 텍스트 자동 선택 */}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+                {FORMAT_ACTIONS.map(action => (
+                  <button key={action.label} type="button"
+                    onClick={() => insertOrWrap(action.before, action.after, action.defaultText)}
+                    title={action.title}
+                    style={{
+                      minWidth: 44, minHeight: 44, padding: '8px 14px',
+                      background: '#fff', color: NAVY,
+                      border: `1.5px solid ${NAVY}`, borderRadius: 6,
+                      fontSize: 16, fontWeight: 700,
+                      cursor: 'pointer', fontFamily: SANS,
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                    }}>
+                    <span style={{ fontSize: 18, fontWeight: 900, lineHeight: 1 }}>{action.icon}</span>
+                    <span>{action.label}</span>
+                  </button>
+                ))}
+              </div>
+              <textarea ref={contentRef} style={inp({
                 height: 600, resize: 'vertical', lineHeight: 1.9,
               })}
                 value={content} onChange={e => setContent(e.target.value)}
-                placeholder="기사 본문을 입력하세요 (500자 이상 권장)" />
+                placeholder={'기사 본문을 입력하세요 (500자 이상 권장)\n\n서식: **굵게** / ## 소제목 / [quote]인용[/quote] / [box]강조[/box] / [info]정보[/info] / --- 구분선'} />
               <div style={{
                 textAlign: 'right', fontSize: 18, fontWeight: 700,
                 color: content.length >= 500 ? GREEN : RED, marginTop: 8,

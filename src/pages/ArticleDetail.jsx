@@ -29,6 +29,47 @@ function splitIntoParagraphs(content) {
   return parts.map(p => p.replace(new RegExp(PROTECT, 'g'), '.') + '.');
 }
 
+// HTML escape (XSS 방지) — 본문은 textarea 입력값이라 escape 후 커스텀 태그만 HTML로 변환
+function escapeHtml(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// 단락 텍스트 → HTML 변환 (커스텀 태그 5종 + 굵게 + 구분선)
+function paragraphToHtml(p) {
+  const text = String(p ?? '').trim();
+  if (!text) return '';
+  if (/^---+$/.test(text)) {
+    return '<hr style="border:none;border-top:1px solid #ddd;margin:28px 0;" />';
+  }
+  let m = text.match(/^\[quote\]([\s\S]*)\[\/quote\]$/);
+  if (m) {
+    const inner = escapeHtml(m[1]).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    return `<blockquote style="border-left:3px solid #c9a84c;margin:20px 0;padding:16px 20px;background:#fafaf7;color:#555;font-style:italic;font-size:1.05rem;">${inner}</blockquote>`;
+  }
+  m = text.match(/^\[box\]([\s\S]*)\[\/box\]$/);
+  if (m) {
+    const inner = escapeHtml(m[1]).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    return `<div style="background:#fdf6ec;border:1px solid #e8c98a;border-radius:8px;padding:16px 20px;margin:20px 0;">${inner}</div>`;
+  }
+  m = text.match(/^\[info\]([\s\S]*)\[\/info\]$/);
+  if (m) {
+    const inner = escapeHtml(m[1]).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    return `<div style="background:#f0f5ff;border:1px solid #93b4e8;border-left:4px solid #0d2d52;border-radius:8px;padding:16px 20px;margin:20px 0;">${inner}</div>`;
+  }
+  m = text.match(/^##\s+(.+)$/);
+  if (m) {
+    const inner = escapeHtml(m[1]).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    return `<h3 style="font-size:1.2rem;font-weight:700;border-left:4px solid #0d2d52;padding-left:12px;margin:24px 0 12px;">${inner}</h3>`;
+  }
+  const escaped = escapeHtml(text).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  return `<p style="margin:0 0 1em 0;">${escaped}</p>`;
+}
+
 const socialIconStyle = { fontSize: "24px", textDecoration: "none", lineHeight: 1 };
 
 const AUTHOR_ARTICLES = [
@@ -510,9 +551,13 @@ export default function ArticleDetail() {
 
           {/* 본문 — 평문 + 원문 보기 (스테이지 1) — 모바일 16/1.8, 데스크탑 17/2.0 */}
           <div className="text-[16px] leading-[1.8] lg:text-[17px] lg:leading-[2.0] text-neutral-800" style={{ fontFamily:"'Noto Sans KR', sans-serif", marginBottom:"24px" }}>
-            {splitIntoParagraphs(a.content).flatMap((para, i, arr) => {
+            {((a.content && a.content.includes('\n'))
+              ? a.content.split(/\n+/).map(p => p.trim()).filter(Boolean)
+              : splitIntoParagraphs(a.content)
+            ).flatMap((para, i, arr) => {
               const midIdx = Math.floor((arr.length - 1) / 2);
-              const items = [<p key={"p-"+i} style={{ margin:"0 0 1em 0" }}>{para}</p>];
+              const html = paragraphToHtml(para);
+              const items = [<div key={"p-"+i} dangerouslySetInnerHTML={{ __html: html }} />];
               // 본문 중간 배너 — inline_ad_title 있을 때만 삽입 (이미지 유무에 따라 자동 분기)
               if (i === midIdx && article.inline_ad_title) {
                 const hasImage = !!article.inline_ad_image;

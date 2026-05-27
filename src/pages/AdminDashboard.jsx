@@ -843,6 +843,52 @@ export default function AdminDashboard() {
     }
   }
 
+  // 발행 기사 삭제 — 2단계 confirm + cardnews/comments 선삭제 + thumbnail Storage 정리
+  const deleteArticle = async (article) => {
+    if (!window.confirm(`이 기사를 삭제하시겠습니까?\n\n[${article.title}]`)) return
+    if (!window.confirm('삭제된 기사는 복구할 수 없습니다.\n계속하시겠습니까?')) return
+    try {
+      // ① FK 의존성 선삭제 (cardnews + comments) — cascade 미설정 대비
+      await supabase.from('cardnews').delete().eq('article_id', article.id)
+      await supabase.from('comments').delete().eq('article_id', article.id)
+
+      // ② articles row 삭제
+      const { error: delErr } = await supabase
+        .from('articles').delete().eq('id', article.id)
+      if (delErr) {
+        alert(`기사 삭제 실패: ${delErr.message}`)
+        console.error('deleteArticle error:', delErr)
+        return
+      }
+
+      // ③ thumbnail Storage 파일 정리 (Supabase Storage URL일 때만)
+      let storagePath = null
+      if (article.thumbnail_url) {
+        const m = article.thumbnail_url.match(/\/storage\/v1\/object\/public\/article-images\/(.+)$/)
+        if (m) storagePath = m[1]
+      }
+      if (storagePath) {
+        const { error: stErr } = await supabase.storage
+          .from('article-images').remove([storagePath])
+        if (stErr) console.warn('Storage 파일 삭제 실패 (무시):', stErr.message)
+      }
+
+      // ④ state 갱신 — articles 목록에서 제거
+      setArticles(prev => prev.filter(a => a.id !== article.id))
+      // cardnewsSet에서도 제거
+      setCardnewsSet(prev => {
+        const next = new Set(prev)
+        next.delete(article.id)
+        return next
+      })
+
+      alert(`기사가 삭제되었습니다.${storagePath ? '\n(Storage 파일도 함께 정리)' : ''}`)
+    } catch (err) {
+      alert(`기사 삭제 중 오류: ${err.message}`)
+      console.error('deleteArticle error:', err)
+    }
+  }
+
   const suspendUser = async (id) => {
     const { error } = await supabase
       .from('users')
@@ -1054,7 +1100,15 @@ export default function AdminDashboard() {
                               ✏️ 편집
                             </Link>
                           )}
-                          <button onClick={() => alert(`기사 보기: ${a.title}`)} style={btnStyle('#666', true)}>👁 기사 보기</button>
+                          {canAct && (
+                            <button onClick={() => deleteArticle(a)} style={btnStyle(RED, true)}>
+                              🗑 삭제
+                            </button>
+                          )}
+                          <a href={`/article/${a.slug}`} target="_blank" rel="noopener noreferrer"
+                             style={{ ...btnStyle('#666', true), textDecoration: 'none', display: 'inline-block' }}>
+                            👁 기사 보기
+                          </a>
                         </>
                       )}
                       {a.status === 'rejected' && (
