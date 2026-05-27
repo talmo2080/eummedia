@@ -211,6 +211,10 @@ export default function ArticleDetail() {
   const [cardnewsList, setCardnewsList] = useState([]);
   const [openCardnews, setOpenCardnews] = useState(null);
   const [showAuthorMore, setShowAuthorMore] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editText, setEditText] = useState("");
+
+  const isAdmin = profile?.role === 'admin';
 
   const onLike = async () => {
     // localStorage 좋아요 기록 토글 (slug 기준)
@@ -271,12 +275,45 @@ export default function ArticleDetail() {
     if (!articleId) return;
     const { data, error: err } = await supabase
       .from('comments')
-      .select('id, content, like_count, is_deleted, created_at, parent_id, author:users!author_id(nickname)')
+      .select('id, content, author_id, like_count, is_deleted, created_at, updated_at, parent_id, author:users!author_id(nickname)')
       .eq('article_id', articleId)
       .eq('is_deleted', false)
       .order('created_at', { ascending: true });
     if (err) { console.error('[ArticleDetail COMMENTS] fetch error:', err); return; }
     setComments(data ?? []);
+  };
+
+  // 댓글 수정 — 본인만 (RLS comments_update_author 자동 보호)
+  const startEditComment = (c) => {
+    setEditingCommentId(c.id);
+    setEditText(c.content);
+  };
+  const cancelEditComment = () => {
+    setEditingCommentId(null);
+    setEditText("");
+  };
+  const saveEditComment = async (commentId) => {
+    if (!editText.trim()) { alert('내용을 입력해주세요.'); return; }
+    const { error: err } = await supabase
+      .from('comments')
+      .update({ content: editText.trim() })
+      .eq('id', commentId);
+    if (err) { alert(`댓글 수정 실패: ${err.message}`); return; }
+    setEditingCommentId(null);
+    setEditText("");
+    if (article?.id) await fetchComments(article.id);
+  };
+
+  // 댓글 삭제 — 본인 OR admin (soft delete: is_deleted=true).
+  // RLS comments_admin_all로 admin UPDATE 허용, comments_delete_author_or_admin은 hard delete용.
+  const deleteComment = async (commentId) => {
+    if (!window.confirm('댓글을 삭제하시겠습니까?')) return;
+    const { error: err } = await supabase
+      .from('comments')
+      .update({ is_deleted: true })
+      .eq('id', commentId);
+    if (err) { alert(`댓글 삭제 실패: ${err.message}`); return; }
+    if (article?.id) await fetchComments(article.id);
   };
 
   const onComment = async () => {
@@ -395,7 +432,7 @@ export default function ArticleDetail() {
     (async () => {
       const { data, error: err } = await supabase
         .from('comments')
-        .select('id, content, like_count, is_deleted, created_at, parent_id, author:users!author_id(nickname)')
+        .select('id, content, author_id, like_count, is_deleted, created_at, updated_at, parent_id, author:users!author_id(nickname)')
         .eq('article_id', articleId)
         .eq('is_deleted', false)
         .order('created_at', { ascending: true });
@@ -702,6 +739,12 @@ export default function ArticleDetail() {
               const nickname = c.author?.nickname || '익명';
               const initial = nickname.charAt(0);
               const date = c.created_at ? formatDate(c.created_at) : '';
+              const isOwn = !!user && c.author_id === user.id;
+              const canEdit = isOwn;
+              const canDelete = isOwn || isAdmin;
+              const isEditing = editingCommentId === c.id;
+              const wasEdited = c.updated_at && c.created_at &&
+                new Date(c.updated_at).getTime() - new Date(c.created_at).getTime() > 1000;
               return (
                 <div key={c.id} style={{ padding:"16px 0", borderBottom:"1px solid #f0f0f0" }}>
                   <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"8px" }}>
@@ -709,12 +752,50 @@ export default function ArticleDetail() {
                       <div style={{ width:"32px", height:"32px", borderRadius:"50%", background:"#e0e0e0", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"14px", fontWeight:"700", color:"#555" }}>{initial}</div>
                       <div>
                         <div style={{ fontSize:"12px", fontWeight:"700" }}>{nickname}</div>
-                        <div style={{ fontSize:"10px", color:"#9a9a9a" }}>{date}</div>
+                        <div style={{ fontSize:"10px", color:"#9a9a9a" }}>
+                          {date}
+                          {wasEdited && <span style={{ marginLeft:"6px", color:"#bbb" }}>(수정됨)</span>}
+                        </div>
                       </div>
                     </div>
                     <div style={{ fontSize:"11px", color:"#9a9a9a" }}>👍 {c.like_count ?? 0}</div>
                   </div>
-                  <div style={{ fontSize:"13px", color:"#3a3a3a", lineHeight:"1.7", paddingLeft:"42px", whiteSpace:"pre-wrap" }}>{c.content}</div>
+                  {isEditing ? (
+                    <div style={{ paddingLeft:"42px" }}>
+                      <textarea value={editText} onChange={e => setEditText(e.target.value)} rows={3}
+                        style={{ width:"100%", border:"1px solid #d0d0d0", padding:"10px 12px", fontSize:"13px", fontFamily:"inherit", resize:"none", outline:"none", boxSizing:"border-box", marginBottom:"8px", lineHeight:"1.6" }} />
+                      <div style={{ display:"flex", gap:"8px", justifyContent:"flex-end" }}>
+                        <button onClick={cancelEditComment}
+                          style={{ background:"#fff", color:"#666", border:"1px solid #d0d0d0", padding:"6px 14px", fontSize:"13px", fontWeight:"600", cursor:"pointer", fontFamily:"inherit", borderRadius:"4px" }}>
+                          취소
+                        </button>
+                        <button onClick={() => saveEditComment(c.id)}
+                          style={{ background:"#0d2d52", color:"white", border:"none", padding:"6px 14px", fontSize:"13px", fontWeight:"700", cursor:"pointer", fontFamily:"inherit", borderRadius:"4px" }}>
+                          저장
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ fontSize:"13px", color:"#3a3a3a", lineHeight:"1.7", paddingLeft:"42px", whiteSpace:"pre-wrap" }}>{c.content}</div>
+                      {(canEdit || canDelete) && (
+                        <div style={{ display:"flex", gap:"6px", justifyContent:"flex-end", marginTop:"8px", paddingLeft:"42px" }}>
+                          {canEdit && (
+                            <button onClick={() => startEditComment(c)}
+                              style={{ background:"transparent", color:"#1c4f8a", border:"1px solid #1c4f8a", padding:"4px 10px", fontSize:"12px", fontWeight:"600", cursor:"pointer", fontFamily:"inherit", borderRadius:"4px" }}>
+                              ✏️ 수정
+                            </button>
+                          )}
+                          {canDelete && (
+                            <button onClick={() => deleteComment(c.id)}
+                              style={{ background:"transparent", color:"#c0392b", border:"1px solid #c0392b", padding:"4px 10px", fontSize:"12px", fontWeight:"600", cursor:"pointer", fontFamily:"inherit", borderRadius:"4px" }}>
+                              🗑 삭제
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               );
             })}
