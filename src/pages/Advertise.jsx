@@ -2,19 +2,72 @@ import { useState } from 'react'
 
 const AD_PACKAGES = [
   {
-    step: 'STEP 1', name: '기사 + 카드뉴스', price: '150,000', icon: '🃏',
-    features: ['협찬 기사 작성 (이음미디어 게시)', '카드뉴스 5장 제작', 'SNS 배포용 이미지', '구글·네이버 SEO', 'AI 검색 최적화'],
-    color: '#1c4f8a', featured: false,
+    step: 'QUICK · 단타',
+    name: '첫이음',
+    sub: '가볍게 첫 연결, 빠르게 노출을 시작하다',
+    price: '100,000',
+    period: '15일 노출 기준',
+    icon: '🔗',
+    features: [
+      '기사 하단 박스 광고 노출',
+      '전체 기사 하단 15일 고정',
+      '로고·캐치프라이즈·버튼 구성',
+      '클릭 시 광고주 사이트 이동',
+    ],
+    color: '#5c8aa8',
+    recommended: false,
   },
   {
-    step: 'STEP 2', name: '스토리 협찬 기사', price: '250,000', icon: '📰',
-    features: ['광고주 스토리 기사', '기사 내 배너 삽입', '구글·네이버 SEO', 'ChatGPT·Perplexity 노출'],
-    color: '#e8432d', featured: true,
+    step: 'STEP 1',
+    name: '작은이음',
+    sub: '기사 한 편으로, 브랜드 이야기를 잇다',
+    price: '150,000',
+    period: '1회 기준',
+    icon: '🌱',
+    features: [
+      '협찬 기사 작성 (이음미디어 게시)',
+      '카드뉴스 5장 제작',
+      '기사 내 배너 삽입',
+      'SNS 배포용 이미지',
+      '홈 메인 + 기사 하단 노출',
+    ],
+    color: '#1c4f8a',
+    recommended: false,
   },
   {
-    step: 'STEP 3', name: '풀패키지', price: '550,000', icon: '🚀',
-    features: ['기사 + 카드뉴스', '영상 콘텐츠 포함', '전 채널 동시 노출', '1개월 상단 고정'],
-    color: '#0d2d52', featured: false,
+    step: 'STEP 2',
+    name: '깊은이음',
+    sub: '스토리로 독자 마음에 깊이 잇다',
+    price: '250,000',
+    period: '1회 기준',
+    icon: '🌊',
+    features: [
+      '광고주 스토리 협찬 기사',
+      '카드뉴스 5장 제작',
+      '기사 내 배너 삽입',
+      'SNS 배포용 이미지',
+      'ChatGPT·Perplexity 노출',
+    ],
+    color: '#e8432d',
+    recommended: true,
+  },
+  {
+    step: 'STEP 3',
+    name: '큰이음',
+    sub: '전 채널로 잇는, 브랜드 풀노출 패키지',
+    price: '550,000',
+    period: '1회 기준',
+    icon: '🚀',
+    features: [
+      '광고주 스토리 협찬 기사',
+      '카드뉴스 5장 제작',
+      '기사 내 배너 삽입',
+      '영상 콘텐츠 포함',
+      '사이드바 박스 광고',
+      '전 채널 1개월 상단 고정',
+    ],
+    color: '#0d2d52',
+    recommended: false,
   },
 ]
 
@@ -247,24 +300,50 @@ export default function Advertise() {
           <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 22, fontWeight: 700, color: '#0d2d52', marginBottom: 6 }}>3단계 광고 패키지</div>
           <div style={{ fontSize: 13, color: '#6b6b6b' }}>광고주 이야기를 기사로 작성해 AI·검색엔진에 동시 노출합니다</div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6" style={{ marginBottom: 36 }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" style={{ marginBottom: 36 }}>
           {AD_PACKAGES.map(pkg => (
             <div key={pkg.step}
               onClick={() => { setSelectedPkg(pkg.step); setForm(f => ({ ...f, package: pkg.step })) }}
               style={{ border: `1px solid ${selectedPkg === pkg.step ? pkg.color : '#e0e0e0'}`, borderTop: `4px solid ${pkg.color}`, padding: '24px 20px', cursor: 'pointer', position: 'relative', background: selectedPkg === pkg.step ? '#f7f9ff' : 'white', transition: 'all 0.2s', boxShadow: selectedPkg === pkg.step ? `0 4px 16px rgba(0,0,0,0.08)` : 'none' }}>
-              {pkg.featured && <div style={{ position: 'absolute', top: -1, right: 16, background: '#e8432d', color: 'white', fontSize: 10, fontWeight: 700, padding: '3px 10px' }}>추천</div>}
+              {pkg.recommended && <div style={{ position: 'absolute', top: -1, right: 16, background: '#e8432d', color: 'white', fontSize: 10, fontWeight: 700, padding: '3px 10px' }}>추천</div>}
+
+              {/* 헤더: step 라벨 + 이모지 + 이름 + 부제 */}
               <div style={{ fontSize: 10, color: pkg.color, fontWeight: 700, letterSpacing: 1.5, marginBottom: 8 }}>{pkg.step}</div>
-              <div style={{ fontSize: 28, marginBottom: 10 }}>{pkg.icon}</div>
-              <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 16, fontWeight: 700, color: '#0d2d52', marginBottom: 6 }}>{pkg.name}</div>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>{pkg.icon}</div>
+              <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 18, fontWeight: 700, color: '#0d2d52', marginBottom: 4 }}>{pkg.name}</div>
+              {pkg.sub && (
+                <div style={{ fontSize: 11, color: '#888', fontStyle: 'italic', lineHeight: 1.5, marginBottom: 12 }}>{pkg.sub}</div>
+              )}
+
+              {/* 구분선 */}
+              <div style={{ borderTop: '1px dashed #e0e0e0', margin: '12px 0' }} />
+
+              {/* 가격 + 기간 */}
               <div style={{ fontSize: 22, fontWeight: 700, color: pkg.color, marginBottom: 2 }}>₩{pkg.price}</div>
-              <div style={{ fontSize: 11, color: '#9a9a9a', marginBottom: 16 }}>1회 기준</div>
-              <ul style={{ listStyle: 'none', padding: 0, marginBottom: 16 }}>
+              <div style={{ fontSize: 11, color: '#9a9a9a', marginBottom: 14 }}>{pkg.period || '1회 기준'}</div>
+
+              {/* 기능 목록 */}
+              <ul style={{ listStyle: 'none', padding: 0, marginBottom: 14 }}>
                 {pkg.features.map(f => (
                   <li key={f} style={{ fontSize: 12, color: '#555', padding: '5px 0', borderBottom: '1px solid #f5f5f5', display: 'flex', gap: 8 }}>
                     <span style={{ color: pkg.color, fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
                   </li>
                 ))}
               </ul>
+
+              {/* SEO 뱃지 3종 — 추천 카드는 네이비 배경+골드 글자 */}
+              <div style={{ display: 'flex', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
+                {['구글 SEO', '네이버 SEO', 'AI 검색'].map(b => (
+                  <span key={b} style={{
+                    fontSize: 10, fontWeight: 700, padding: '3px 8px',
+                    border: `1px solid ${pkg.recommended ? '#c9a84c' : '#b9c8db'}`,
+                    borderRadius: 4,
+                    background: pkg.recommended ? '#0d2d52' : '#eaf1f9',
+                    color: pkg.recommended ? '#f0c060' : '#0d2d52',
+                  }}>{b}</span>
+                ))}
+              </div>
+
               <div style={{ textAlign: 'center', padding: '10px', background: selectedPkg === pkg.step ? pkg.color : '#f5f5f5', color: selectedPkg === pkg.step ? 'white' : '#888', fontSize: 12, fontWeight: 700, transition: 'all 0.2s' }}>
                 {selectedPkg === pkg.step ? '✅ 선택됨' : '선택하기'}
               </div>
@@ -337,9 +416,10 @@ export default function Advertise() {
             <div style={{ marginBottom: 14 }}>
               <label style={lbl}>광고 상품 선택</label>
               <select style={inp} value={form.package} onChange={e => { setForm(f => ({ ...f, package: e.target.value })); setSelectedPkg(e.target.value) }}>
-                <option value="STEP 1">STEP 1 — 카드뉴스 (150,000원)</option>
-                <option value="STEP 2">STEP 2 — 스토리 협찬 기사 (250,000원)</option>
-                <option value="STEP 3">STEP 3 — 풀패키지 (550,000원)</option>
+                <option value="QUICK · 단타">첫이음 (100,000원 / 15일)</option>
+                <option value="STEP 1">작은이음 (150,000원)</option>
+                <option value="STEP 2">깊은이음 (250,000원) — 추천</option>
+                <option value="STEP 3">큰이음 (550,000원)</option>
                 <option value="미정">미정 / 상담 후 결정</option>
               </select>
             </div>
