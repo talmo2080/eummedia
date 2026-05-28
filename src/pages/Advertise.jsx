@@ -32,36 +32,42 @@ const inp = {
 }
 const lbl = { fontSize: 12, fontWeight: 700, color: '#3a3a3a', marginBottom: 6, display: 'block' }
 
-const CARD_NEWS = [
+// 광고가 실제로 어떻게 보이는지 — 5종 노출 예시 (public/ad-samples/ 이미지)
+const AD_SAMPLES = [
   {
-    bg: 'linear-gradient(135deg, #0d2d52, #1c4f8a)',
-    text: 'white',
-    title: '27년, 두피가 말해준 것들',
-    sub: '닥터리부트 정세연 원장의 27년 통찰',
+    label: '기사 중간 배너',
+    spec: '800 × 120 px',
+    desc: '기사 본문 사이에 자연스럽게 삽입\n독자가 기사를 읽다가 자연스럽게 만나는 광고',
+    images: ['/ad-samples/banner-sbiz24.png', '/ad-samples/banner-gallery.png'],
+    maxWidth: 420,
   },
   {
-    bg: '#f5f5f5',
-    text: '#0d2d52',
-    title: '혹시 이런 고민?',
-    items: ['빠지는 머리카락', '가려운 두피', '예민한 모근'],
+    label: '사이드바',
+    spec: '우측 고정 노출',
+    desc: '기사 읽는 동안 항상 오른쪽에 고정\n로고 + 캐치프라이즈 + 예약 버튼 구성',
+    images: ['/ad-samples/ad-sidebar.png'],
+    maxWidth: 280,
   },
   {
-    bg: 'linear-gradient(135deg, #0d2d52, #1c4f8a)',
-    text: 'white',
-    title: '"두피는 거짓말을 안 합니다"',
-    sub: '— 정세연 원장',
+    label: '본문 하단 박스',
+    spec: '전폭 카드',
+    desc: '기사 아래 카드뉴스 다음에 위치\n큰 면적으로 브랜드 메시지 전달',
+    images: ['/ad-samples/ad-box.png'],
+    maxWidth: 700,
   },
   {
-    bg: 'white',
-    text: '#0d2d52',
-    title: '마이크로커런트 3단계',
-    items: ['1. 진단', '2. 케어', '3. 회복'],
+    label: '영상 갤러리',
+    spec: '유튜브 영상 노출',
+    desc: '이음보이스 채널 영상 갤러리에 노출\n영상 콘텐츠로 브랜드 스토리 전달',
+    images: ['/ad-samples/ad-video.png'],
+    maxWidth: 500,
   },
   {
-    bg: 'linear-gradient(135deg, #0d2d52 0%, #000 100%)',
-    text: 'white',
-    title: '지금 바로 상담',
-    sub: '예약·문의 → 정세연 원장 직접',
+    label: '카드뉴스',
+    spec: '슬라이드 5장',
+    desc: '4:5 비율 세로형 카드 5장 제작\n홈 메인 + 기사 하단 동시 노출',
+    images: ['/ad-samples/ad-cardnews.png'],
+    maxWidth: 320,
   },
 ]
 
@@ -72,7 +78,6 @@ export default function Advertise() {
   const [selectedPkg, setSelectedPkg] = useState('STEP 2')
   const [stage, setStage] = useState('form')
   const [openFaq, setOpenFaq] = useState(null)
-  const [currentSlide, setCurrentSlide] = useState(0)
 
   const handleSubmit = () => {
     if (!form.company || !form.name || !form.phone || !form.email) {
@@ -163,37 +168,57 @@ export default function Advertise() {
         </div>
       </div>
 
-      {/* ── 카드뉴스 미니 캐러셀 5장 ── */}
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '52px 24px 0' }}>
-        <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <div style={{ fontSize: 10, color: '#1c4f8a', fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>CARD NEWS SAMPLE</div>
-          <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 20, fontWeight: 700, color: '#0d2d52' }}>카드뉴스 미리보기 (5장)</div>
-          <div style={{ fontSize: 12, color: '#6b6b6b', marginTop: 6 }}>광고주 스토리를 시각 카드로 — SNS 배포용</div>
-        </div>
-        <div style={{ position: 'relative', overflow: 'hidden', border: '1px solid #e0e0e0' }}>
-          <div style={{ display: 'flex', transition: 'transform 0.4s ease', transform: `translateX(-${currentSlide * 100}%)` }}>
-            {CARD_NEWS.map((card, i) => (
-              <div key={i} style={{ flex: '0 0 100%', minHeight: 360, background: card.bg, color: card.text, padding: '36px 28px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', boxSizing: 'border-box' }}>
-                <div style={{ fontSize: 10, opacity: 0.6, letterSpacing: 2, marginBottom: 14 }}>{i+1} / 5</div>
-                <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 24, fontWeight: 700, lineHeight: 1.5, marginBottom: 16 }}>{card.title}</div>
-                {card.sub && <div style={{ fontSize: 13, opacity: 0.85, lineHeight: 1.8 }}>{card.sub}</div>}
-                {card.items && (
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 14, lineHeight: 2 }}>
-                    {card.items.map((it, j) => <li key={j}>{it}</li>)}
-                  </ul>
-                )}
-              </div>
-            ))}
+      {/* ── 광고 5종 실제 노출 예시 ── */}
+      <div style={{ background: '#f8f7f4', padding: '52px 0', marginTop: 0 }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ textAlign: 'center', marginBottom: 36 }}>
+            <div style={{ fontSize: 10, color: '#1c4f8a', fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>WHERE &amp; HOW</div>
+            <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 22, fontWeight: 700, color: '#0d2d52' }}>
+              📍 광고가 실제로 이렇게 보입니다
+            </div>
+            <div style={{ fontSize: 13, color: '#6b6b6b', marginTop: 6 }}>이음미디어 독자가 보는 그대로입니다</div>
           </div>
-          <button onClick={() => setCurrentSlide(s => Math.max(0, s-1))} disabled={currentSlide === 0}
-            style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,0.85)', cursor: currentSlide === 0 ? 'not-allowed' : 'pointer', fontSize: 20, fontWeight: 700, color: '#0d2d52', opacity: currentSlide === 0 ? 0.4 : 1, lineHeight: 1 }} aria-label="이전 카드">‹</button>
-          <button onClick={() => setCurrentSlide(s => Math.min(4, s+1))} disabled={currentSlide === 4}
-            style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,0.85)', cursor: currentSlide === 4 ? 'not-allowed' : 'pointer', fontSize: 20, fontWeight: 700, color: '#0d2d52', opacity: currentSlide === 4 ? 0.4 : 1, lineHeight: 1 }} aria-label="다음 카드">›</button>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, paddingTop: 14 }}>
-          {[0,1,2,3,4].map(i => (
-            <button key={i} onClick={() => setCurrentSlide(i)}
-              style={{ width: 9, height: 9, borderRadius: '50%', border: 'none', cursor: 'pointer', background: currentSlide === i ? '#0d2d52' : '#d0d0d0', padding: 0 }} aria-label={`슬라이드 ${i+1}`} />
+
+          {AD_SAMPLES.map((sample, idx) => (
+            <div key={idx} style={{
+              background: 'white', border: '1px solid #e0e0e0',
+              padding: '24px', marginBottom: 20,
+            }}>
+              {/* 라벨 배지 + spec */}
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10, flexWrap: 'wrap' }}>
+                <span style={{
+                  background: '#0d2d52', color: 'white',
+                  fontSize: 11, fontWeight: 700, padding: '4px 12px', letterSpacing: 0.5,
+                }}>[ {sample.label} ]</span>
+                <span style={{ fontSize: 12, color: '#888', fontWeight: 600 }}>{sample.spec}</span>
+              </div>
+
+              {/* 설명 */}
+              <div style={{ fontSize: 13, color: '#555', lineHeight: 1.7, marginBottom: 18, whiteSpace: 'pre-line' }}>
+                {sample.desc}
+              </div>
+
+              {/* 예시 이미지 1~2개 */}
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'flex-start' }}>
+                {sample.images.map((src, i) => (
+                  <div key={i} style={{
+                    maxWidth: sample.maxWidth, width: '100%',
+                    border: '1px solid #d0d0d0',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                    padding: 4, background: '#fafaf7',
+                  }}>
+                    <img src={src} alt={`${sample.label} 예시 ${i+1}`}
+                      style={{ width: '100%', height: 'auto', display: 'block' }}
+                      onError={e => { e.currentTarget.style.display = 'none' }} />
+                  </div>
+                ))}
+              </div>
+
+              {/* 워터마크 — 실제 화면 예시 */}
+              <div style={{ fontSize: 10, color: '#bbb', textAlign: 'right', marginTop: 12, fontStyle: 'italic' }}>
+                ※ 실제 화면 예시
+              </div>
+            </div>
           ))}
         </div>
       </div>
