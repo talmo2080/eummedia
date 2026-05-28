@@ -295,7 +295,7 @@ export default function Home() {
       )}
 
       {/* ━━━━━━━━━━━ 모바일·태블릿 신문형 (lg 미만) ━━━━━━━━━━━ */}
-      {/* 순서: HERO → 최신 → 카드뉴스 → 인기 → 광고 → 주식 → 7채널 */}
+      {/* 순서: HERO → 최신 → 카드뉴스 → 인기 → 광고 → 7채널 → 주식 */}
       <div className="lg:hidden">
 
         {/* ① HERO 톱 1개 — 메인 헤드라인 */}
@@ -450,12 +450,7 @@ export default function Home() {
           </a>
         </div>
 
-        {/* ⑥ 📊 주식 위젯 — PC 위젯 재사용 */}
-        <div className="px-4 mb-7">
-          <StockWidget />
-        </div>
-
-        {/* ⑦ 7채널 가로 스크롤 칩 — 채널 진입 */}
+        {/* ⑥ 7채널 가로 스크롤 칩 — 채널 진입 */}
         <div className="px-4 mb-7">
           <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
             {NAV_CHANNELS.map(ch => (
@@ -468,6 +463,11 @@ export default function Home() {
               </Link>
             ))}
           </div>
+        </div>
+
+        {/* ⑦ 📊 주식 위젯 — PC 위젯 재사용 */}
+        <div className="px-4 mb-7">
+          <StockWidget />
         </div>
       </div>
 
