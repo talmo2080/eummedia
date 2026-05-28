@@ -148,7 +148,7 @@ export default function CitizenReporter() {
             <div style={{ fontSize: 13, color: '#6b6b6b' }}>봉숭아학당에서 시작해서 이음미디어 공식 시민기자증까지 — 함께 걸어가요.</div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 0 }}>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {ROADMAP.map((s, i) => (
               <div key={i} style={{ textAlign: 'center', padding: '0 10px', position: 'relative' }}>
                 {i < 4 && <div style={{ position: 'absolute', right: -12, top: 24, fontSize: 18, color: '#c0c8d4' }}>→</div>}
@@ -188,7 +188,7 @@ export default function CitizenReporter() {
           <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 18, fontWeight: 700, color: '#0d2d52', marginBottom: 20, paddingBottom: 10, borderBottom: '2px solid #0d2d52' }}>
             시민기자 지원 자격
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {QUALIFICATIONS.map(q => (
               <div key={q.title} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '16px', background: '#f7f8fa', border: '1px solid #e8e8e8' }}>
                 <div style={{ fontSize: 22, flexShrink: 0 }}>{q.icon}</div>
@@ -323,7 +323,7 @@ export default function CitizenReporter() {
               </div>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ marginBottom: 14 }}>
               <div>
                 <label style={lbl}>성함 <span style={{ color: '#e8432d' }}>*</span></label>
                 <input style={inp} placeholder="홍길동" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />

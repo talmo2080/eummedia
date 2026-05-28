@@ -70,7 +70,7 @@ export default function Report() {
             <div style={{ fontSize: 10, color: '#1c4f8a', fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>REPORT CATEGORY</div>
             <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 20, fontWeight: 700, color: '#0d2d52' }}>어떤 이야기를 제보하고 싶으신가요?</div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {REPORT_TYPES.map(type => (
               <div key={type.title}
                 onClick={() => { setSelectedType(type.title); setForm(f => ({ ...f, type: type.title })) }}
@@ -134,7 +134,7 @@ export default function Report() {
               취재 후 추가 확인이 필요한 경우 연락처가 있으면 더 빠르게 진행됩니다.
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginBottom: 22 }}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4" style={{ marginBottom: 22 }}>
               <div>
                 <label style={lbl}>성함 (선택)</label>
                 <input style={inp} placeholder="익명 가능" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
@@ -185,11 +185,13 @@ export default function Report() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
               <button onClick={() => setStage('submitted')}
-                style={{ background: '#1c4f8a', color: 'white', border: 'none', padding: '16px 36px', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif", minWidth: 280 }}>
+                className="w-full md:w-auto"
+                style={{ background: '#1c4f8a', color: 'white', border: 'none', padding: '16px 36px', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif" }}>
                 ✅ 메일을 발송했어요
               </button>
               <button onClick={() => setStage('form')}
-                style={{ background: 'transparent', color: '#6b6b6b', border: '1px solid #d0d0d0', padding: '12px 24px', fontSize: 13, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif", minWidth: 280 }}>
+                className="w-full md:w-auto"
+                style={{ background: 'transparent', color: '#6b6b6b', border: '1px solid #d0d0d0', padding: '12px 24px', fontSize: 13, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif" }}>
                 ← 폼으로 돌아가기
               </button>
             </div>

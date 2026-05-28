@@ -120,8 +120,9 @@ export default function Subscribe() {
               textDecoration: 'none', fontFamily: SANS,
               border: 'none', cursor: 'pointer',
               boxShadow: '0 6px 20px rgba(0,0,0,0.25)',
-              minWidth: 320, letterSpacing: -0.3,
+              letterSpacing: -0.3,
             }}
+            className="w-full md:w-auto"
           >
             <span style={{ fontSize: 24 }}>💬</span>
             <span>카카오톡 채널 추가하기</span>
@@ -283,8 +284,8 @@ export default function Subscribe() {
                 padding: '18px 40px', fontSize: 16, fontWeight: 700,
                 textDecoration: 'none', fontFamily: SANS,
                 boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
-                minWidth: 280,
               }}
+              className="w-full md:w-auto"
             >
               <span style={{ fontSize: 22 }}>💬</span>
               <span>지금 카카오톡 채널 추가하기</span>

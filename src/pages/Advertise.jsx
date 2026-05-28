@@ -119,7 +119,7 @@ export default function Advertise() {
             <div style={{ fontSize: 10, color: '#1c4f8a', fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>HOW IT WORKS</div>
             <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 22, fontWeight: 700, color: '#0d2d52' }}>광고 기사 제작 과정</div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 0 }}>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {[
               { icon: '📞', title: '문의 접수', desc: '광고 상품 선택 후 문의 폼 제출' },
               { icon: '🤝', title: '미팅·인터뷰', desc: '편집국장과 상담 후 내용 확정' },
@@ -230,7 +230,7 @@ export default function Advertise() {
           <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 22, fontWeight: 700, color: '#0d2d52', marginBottom: 6 }}>3단계 광고 패키지</div>
           <div style={{ fontSize: 13, color: '#6b6b6b' }}>광고주 이야기를 기사로 작성해 AI·검색엔진에 동시 노출합니다</div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 20, marginBottom: 36 }}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6" style={{ marginBottom: 36 }}>
           {AD_PACKAGES.map(pkg => (
             <div key={pkg.step}
               onClick={() => { setSelectedPkg(pkg.step); setForm(f => ({ ...f, package: pkg.step })) }}
@@ -271,7 +271,7 @@ export default function Advertise() {
 
       {/* ── 독자 통계 ── */}
       <div style={{ background: '#0d2d52', color: 'white', padding: '36px 0' }}>
-        <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)' }}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4" style={{ maxWidth: 960, margin: '0 auto', padding: '0 24px' }}>
           {[
             { num: '39건', label: '발행 기사' },
             { num: '7개', label: '콘텐츠 채널' },
@@ -295,7 +295,7 @@ export default function Advertise() {
               문의 내용은 <strong>press@eummedia.kr</strong>로 전달됩니다. 24시간 내 편집국장이 직접 연락드립니다.
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ marginBottom: 14 }}>
               <div>
                 <label style={lbl}>회사명·브랜드명 <span style={{ color: '#e8432d' }}>*</span></label>
                 <input style={inp} placeholder="예: 닥터리부트 두피관리센터" value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} />
@@ -306,7 +306,7 @@ export default function Advertise() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ marginBottom: 14 }}>
               <div>
                 <label style={lbl}>연락처 <span style={{ color: '#e8432d' }}>*</span></label>
                 <input style={inp} placeholder="010-0000-0000" type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
@@ -379,11 +379,13 @@ export default function Advertise() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
               <button onClick={() => setStage('submitted')}
-                style={{ background: '#0d2d52', color: 'white', border: 'none', padding: '16px 36px', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif", minWidth: 280 }}>
+                className="w-full md:w-auto"
+                style={{ background: '#0d2d52', color: 'white', border: 'none', padding: '16px 36px', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif" }}>
                 ✅ 메일을 발송했어요
               </button>
               <button onClick={() => setStage('form')}
-                style={{ background: 'transparent', color: '#6b6b6b', border: '1px solid #d0d0d0', padding: '12px 24px', fontSize: 13, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif", minWidth: 280 }}>
+                className="w-full md:w-auto"
+                style={{ background: 'transparent', color: '#6b6b6b', border: '1px solid #d0d0d0', padding: '12px 24px', fontSize: 13, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif" }}>
                 ← 폼으로 돌아가기
               </button>
             </div>
