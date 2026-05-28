@@ -2,8 +2,8 @@ import { useState } from 'react'
 
 const AD_PACKAGES = [
   {
-    step: 'STEP 1', name: '카드뉴스', price: '150,000', icon: '🃏',
-    features: ['카드뉴스 5장 제작', 'SNS 배포용 이미지', '이음미디어 게시', 'AI 검색 최적화'],
+    step: 'STEP 1', name: '기사 + 카드뉴스', price: '150,000', icon: '🃏',
+    features: ['협찬 기사 작성 (이음미디어 게시)', '카드뉴스 5장 제작', 'SNS 배포용 이미지', '구글·네이버 SEO', 'AI 검색 최적화'],
     color: '#1c4f8a', featured: false,
   },
   {
@@ -68,6 +68,8 @@ const AD_SAMPLES = [
     desc: '4:5 비율 세로형 카드 5장 제작\n홈 메인 + 기사 하단 동시 노출',
     images: ['/ad-samples/ad-cardnews.png'],
     maxWidth: 320,
+    link: 'https://www.eummedia.kr/article/article-d13pwd9w',
+    linkLabel: '원문 보기 →',
   },
 ]
 
@@ -213,6 +215,21 @@ export default function Advertise() {
                   </div>
                 ))}
               </div>
+
+              {/* 원문 보기 버튼 (link 있는 카드만, 예: 카드뉴스) */}
+              {sample.link && (
+                <div style={{ textAlign: 'center', marginTop: 16 }}>
+                  <a href={sample.link} target="_blank" rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-block', padding: '8px 18px',
+                      fontSize: 13, fontWeight: 700, color: '#0d2d52',
+                      border: '1.5px solid #0d2d52', borderRadius: 4,
+                      textDecoration: 'none', fontFamily: "'Noto Sans KR',sans-serif",
+                    }}>
+                    {sample.linkLabel || '원문 보기 →'}
+                  </a>
+                </div>
+              )}
 
               {/* 워터마크 — 실제 화면 예시 */}
               <div style={{ fontSize: 10, color: '#bbb', textAlign: 'right', marginTop: 12, fontStyle: 'italic' }}>
