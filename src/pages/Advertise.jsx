@@ -148,22 +148,22 @@ export default function Advertise() {
         </div>
         <div style={{ border: '1px solid #e0e0e0', borderTop: '3px solid #1c4f8a', overflow: 'hidden' }}>
           <div style={{ background: '#f0f0f0', padding: '8px 16px', fontSize: 11, color: '#888', display: 'flex', justifyContent: 'space-between' }}>
-            <span>eummedia.kr/article/1234</span><span>[협찬]</span>
+            <span>eummedia.kr/article/article-d13pwd9w</span><span>[협찬]</span>
           </div>
           <div style={{ padding: '24px' }}>
-            <div style={{ fontSize: 10, color: '#1c4f8a', fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8 }}>이음로컬</div>
+            <div style={{ fontSize: 10, color: '#1c4f8a', fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8 }}>이음트렌드</div>
             <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 18, fontWeight: 700, color: '#0d2d52', marginBottom: 8, lineHeight: 1.5 }}>
-              "27년 경력 두피 전문가가 말하는 탈모의 진짜 원인"
+              한국서화연구소 창립전 &lsquo;서화동원&rsquo; — 글과 그림은 한 뿌리
             </div>
             <div style={{ fontSize: 13, color: '#555', lineHeight: 1.8, marginBottom: 14 }}>
-              일산 닥터리부트 두피관리센터 정세연 원장은 "탈모는 단순히 유전이 아니라 두피 환경의 문제"라고 강조한다. 27년간 수천 명의 두피를 관리해온 그가 말하는 탈모 예방법은...
+              2026년 6월 3일부터 7일까지 서울 57th 갤러리에서 열리는 한국서화연구소 창립전. &lsquo;글과 그림은 하나의 뿌리에서 시작된다&rsquo;는 서화동원의 정신을 6인의 작가가 펼친다.
             </div>
             <div style={{ background: 'linear-gradient(90deg,#eef4fb,#ddeaf8)', padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: '4px solid #1c4f8a', marginBottom: 6 }}>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#0d2d52' }}>닥터리부트 두피관리센터</div>
-                <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>일산 | 두피·탈모 전문 27년 · 031-000-0000</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#0d2d52' }}>57th 갤러리 · 한국서화연구소</div>
+                <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>서울 종로구 율곡로3길 17</div>
               </div>
-              <button style={{ background: '#0d2d52', color: 'white', border: 'none', padding: '8px 16px', fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: "'Noto Sans KR',sans-serif" }}>상담 예약</button>
+              <a href="https://www.eummedia.kr/article/article-d13pwd9w" target="_blank" rel="noopener noreferrer" style={{ background: '#0d2d52', color: 'white', border: 'none', padding: '8px 16px', fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: "'Noto Sans KR',sans-serif", textDecoration: 'none', display: 'inline-block' }}>전시 보러가기</a>
             </div>
             <div style={{ fontSize: 9, color: '#bbb', textAlign: 'right' }}>※ 본 기사는 광고주의 협찬으로 제작되었습니다</div>
           </div>
