@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 
-const KAKAO_URL = 'http://pf.kakao.com/_xmVHxen'
+const KAKAO_CHANNEL_URL = 'http://pf.kakao.com/_DxnesX'
+const KAKAO_URL = 'http://pf.kakao.com/_DxnesX/friend'
 
 const CHANNELS = [
   { name: '이음매거진', tagline: '시대를 읽는 깊이 있는 기획' },
@@ -128,7 +129,7 @@ export default function Subscribe() {
             <span>카카오톡 채널 추가하기</span>
           </a>
           <div style={{ marginTop: 16, fontSize: 13, opacity: 0.7 }}>
-            ※ 클릭하면 카카오톡 앱이 열립니다 ({KAKAO_URL})
+            ※ 클릭하면 카카오톡 앱이 열립니다 ({KAKAO_CHANNEL_URL})
           </div>
         </div>
       </section>

@@ -629,7 +629,7 @@ export default function Home() {
               이<span style={{ color:"#f0a882" }}>음</span>미디어 구독
             </div>
             <div style={{ color:"rgba(255,255,255,0.6)", fontSize:"12px", lineHeight:"1.7", marginBottom:"16px" }}>새 기사 발행 시<br />카카오톡으로 바로 알림!</div>
-            <a href="http://pf.kakao.com/_xmVHxen" target="_blank" rel="noopener noreferrer"
+            <a href="http://pf.kakao.com/_DxnesX/friend" target="_blank" rel="noopener noreferrer"
                style={{ display:"block", textAlign:"center", width:"100%", boxSizing:"border-box", background:"#FEE500", color:"#3C1E1E", padding:"12px", fontSize:"13px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit" }}>
               💬 카카오 채널 구독 (무료)
             </a>
