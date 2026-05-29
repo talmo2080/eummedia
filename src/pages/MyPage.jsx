@@ -92,7 +92,8 @@ export default function MyPage() {
 
   if (!user) return null;
 
-  const canWrite = profile?.role === 'writer' || profile?.role === 'admin' || profile?.role === 'publisher';
+  // "새 기사 쓰기" CTA는 writer 전용 (admin/publisher는 /admin에서 진행)
+  const isWriter = profile?.role === 'writer';
   const nickname = profile?.nickname || user.email || '회원';
   const initial = nickname.charAt(0).toUpperCase();
   const joinedDate = profile?.created_at
@@ -170,8 +171,8 @@ export default function MyPage() {
         </Link>
       )}
 
-      {/* 1.5. 새 기사 쓰기 CTA (writer/admin만) */}
-      {canWrite && (
+      {/* 1.5. 새 기사 쓰기 CTA — writer 전용 (admin/publisher는 /admin에서 진행) */}
+      {isWriter && (
         <Link
           to="/write"
           className="block bg-[#0d2d52] hover:bg-[#1a4070] text-white rounded-lg px-6 py-5 mb-6 text-center transition no-underline"
@@ -227,10 +228,14 @@ export default function MyPage() {
             {filter === 'all' ? (
               <>
                 아직 작성한 기사가 없습니다.
-                <br />
-                <Link to="/write" className="text-blue-600 underline mt-2 inline-block">
-                  ✍️ 첫 기사 작성하기 →
-                </Link>
+                {isWriter && (
+                  <>
+                    <br />
+                    <Link to="/write" className="text-blue-600 underline mt-2 inline-block">
+                      ✍️ 첫 기사 작성하기 →
+                    </Link>
+                  </>
+                )}
               </>
             ) : (
               `${getStatusLabel(filter)} 기사가 없습니다.`

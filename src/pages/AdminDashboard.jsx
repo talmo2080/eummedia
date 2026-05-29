@@ -943,12 +943,32 @@ export default function AdminDashboard() {
         {/* ━━ 탭 1: 기사 관리 ━━ */}
         {activeTab === 1 && (
           <div>
-            <h1 style={{
-              fontFamily: SERIF, fontSize: 24, fontWeight: 700,
-              color: NAVY, margin: '0 0 20px 0', lineHeight: 1.4,
+            <div style={{
+              display: 'flex', flexWrap: 'wrap', alignItems: 'center',
+              justifyContent: 'space-between', gap: 12,
+              margin: '0 0 20px 0',
             }}>
-              📰 기사 관리
-            </h1>
+              <h1 style={{
+                fontFamily: SERIF, fontSize: 24, fontWeight: 700,
+                color: NAVY, margin: 0, lineHeight: 1.4,
+              }}>
+                📰 기사 관리
+              </h1>
+              <Link to="/write" style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                background: NAVY, color: '#fff',
+                border: `2px solid ${GOLD}`,
+                padding: '12px 22px', borderRadius: 8,
+                fontSize: 15, fontWeight: 700,
+                textDecoration: 'none', fontFamily: SANS,
+                boxShadow: '0 2px 8px rgba(13,45,82,0.18)',
+                transition: 'transform 0.15s, box-shadow 0.15s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(13,45,82,0.28)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(13,45,82,0.18)' }}>
+                <span>✏️</span><span>새 기사 쓰기</span>
+              </Link>
+            </div>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
               {ARTICLE_FILTERS.map(f => {
