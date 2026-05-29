@@ -45,6 +45,8 @@ export default function Header() {
     role === "admin" ? "편집국장" :
     role === "publisher" ? "발행인" :
     role === "writer" ? "기자" : "독자";
+  // 닉네임 버튼 목적지 — admin은 /admin, 그 외(writer/reader/publisher)는 /mypage
+  const myPageTarget = role === "admin" ? "/admin" : "/mypage";
 
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
@@ -169,7 +171,7 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Link to="/mypage" style={{
+                <Link to={myPageTarget} style={{
                   color: NAVY, textDecoration: "none",
                   border: `1.5px solid ${NAVY}`,
                   borderRadius: 4,
@@ -366,7 +368,7 @@ export default function Header() {
               ) : (
                 <>
                   <Link
-                    to="/mypage"
+                    to={myPageTarget}
                     onClick={closeMenu}
                     style={{
                       display: "flex", alignItems: "center", justifyContent: "center",

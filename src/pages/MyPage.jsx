@@ -132,6 +132,44 @@ export default function MyPage() {
         <ApplicationStatusCard app={application} />
       )}
 
+      {/* 1.3 reader 전용 — 구독 정보 카드 */}
+      {profile?.role === 'reader' && (
+        <section className="bg-white border border-neutral-200 rounded-lg p-6 mb-6">
+          <h2 className="font-serif font-bold text-xl mb-4 text-neutral-900">
+            📋 구독 정보
+          </h2>
+          <dl className="text-sm">
+            <div className="flex py-2 border-b border-neutral-100">
+              <dt className="w-20 text-neutral-500 font-semibold flex-shrink-0">닉네임</dt>
+              <dd className="text-neutral-900 truncate">{profile?.nickname || '—'}</dd>
+            </div>
+            <div className="flex py-2 border-b border-neutral-100">
+              <dt className="w-20 text-neutral-500 font-semibold flex-shrink-0">이메일</dt>
+              <dd className="text-neutral-900 truncate">{user.email}</dd>
+            </div>
+            <div className="flex py-2">
+              <dt className="w-20 text-neutral-500 font-semibold flex-shrink-0">가입일</dt>
+              <dd className="text-neutral-900">{joinedDate || '—'}</dd>
+            </div>
+          </dl>
+        </section>
+      )}
+
+      {/* 1.4 reader 전용 — 시민기자 신청 CTA (신청 안 한 reader만) */}
+      {profile?.role === 'reader' && !application && (
+        <Link
+          to="/citizen-reporter"
+          className="block bg-[#c9a84c] hover:bg-[#b89844] text-[#0d2d52] rounded-lg px-6 py-5 mb-6 text-center transition no-underline"
+          style={{ textDecoration: 'none' }}
+        >
+          <div className="text-3xl mb-2">✍️</div>
+          <div className="font-serif font-bold text-xl">시민기자 신청하기</div>
+          <div className="text-sm opacity-85 mt-1">
+            이음미디어 시민기자로 활동해 보세요
+          </div>
+        </Link>
+      )}
+
       {/* 1.5. 새 기사 쓰기 CTA (writer/admin만) */}
       {canWrite && (
         <Link
@@ -147,7 +185,8 @@ export default function MyPage() {
         </Link>
       )}
 
-      {/* 2. 활동 통계 */}
+      {/* 2. 활동 통계 — reader 숨김 (writer/admin/publisher만 노출) */}
+      {profile?.role !== 'reader' && (
       <section className="mb-6">
         <h2 className="font-serif font-bold text-xl mb-3 text-neutral-900">
           📊 내 활동
@@ -163,8 +202,10 @@ export default function MyPage() {
           <StatCard label="총 좋아요" value={totalLikes > 0 ? totalLikes.toLocaleString() : '—'} color="pink" note={totalLikes === 0 ? '집계 준비 중' : undefined} />
         </div>
       </section>
+      )}
 
-      {/* 3. 내 기사 목록 */}
+      {/* 3. 내 기사 목록 — reader 숨김 */}
+      {profile?.role !== 'reader' && (
       <section>
         <h2 className="font-serif font-bold text-xl mb-3 text-neutral-900">
           📝 내 기사
@@ -218,6 +259,7 @@ export default function MyPage() {
           </>
         )}
       </section>
+      )}
     </div>
   );
 }
