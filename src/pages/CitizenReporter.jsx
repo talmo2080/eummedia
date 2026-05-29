@@ -317,12 +317,6 @@ export default function CitizenReporter() {
               로그인된 계정({user.email})으로 신청합니다. 편집국장 검토 후 1-3일 이내 연락드립니다.
             </div>
 
-            {error && (
-              <div style={{ background: '#fee2e2', color: '#dc2626', padding: '12px 16px', borderRadius: 6, fontSize: 13, marginBottom: 16, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                {error}
-              </div>
-            )}
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ marginBottom: 14 }}>
               <div>
                 <label style={lbl}>성함 <span style={{ color: '#e8432d' }}>*</span></label>
@@ -368,12 +362,39 @@ export default function CitizenReporter() {
                 value={form.experience} onChange={e => setForm(f => ({ ...f, experience: e.target.value }))} />
             </div>
 
-            <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginBottom: 22 }}>
-              <input type="checkbox" checked={form.agree} onChange={e => setForm(f => ({ ...f, agree: e.target.checked }))} style={{ marginTop: 3, flexShrink: 0 }} />
-              <span style={{ fontSize: 12, color: '#555', lineHeight: 1.6 }}>
-                [필수] 개인정보(이름·연락처)를 시민기자 지원 심사 목적으로 수집·이용하는 것에 동의합니다.
-              </span>
-            </label>
+            {/* 동의 체크박스 영역 — 미체크 + 제출 시 빨간 강조 */}
+            {(() => {
+              const showAgreeError = !form.agree && error.includes('개인정보 수집')
+              return (
+                <div style={{
+                  marginBottom: 16,
+                  padding: '12px 14px',
+                  border: showAgreeError ? '2px solid #dc2626' : '1px solid #e0e0e0',
+                  borderRadius: 6,
+                  background: showAgreeError ? '#fff5f5' : '#fafafa',
+                  transition: 'background 0.2s, border-color 0.2s',
+                }}>
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer' }}>
+                    <input type="checkbox" checked={form.agree} onChange={e => setForm(f => ({ ...f, agree: e.target.checked }))} style={{ marginTop: 3, flexShrink: 0, width: 18, height: 18, cursor: 'pointer' }} />
+                    <span style={{ fontSize: 12.5, color: '#1a1a1a', lineHeight: 1.6, fontWeight: 500 }}>
+                      [필수] 개인정보(이름·연락처)를 시민기자 지원 심사 목적으로 수집·이용하는 것에 동의합니다.
+                    </span>
+                  </label>
+                  {showAgreeError && (
+                    <div style={{ fontSize: 12, color: '#dc2626', marginTop: 8, marginLeft: 28, fontWeight: 600, lineHeight: 1.5 }}>
+                      ⚠ 개인정보 수집·이용 동의가 필요합니다
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
+
+            {/* 에러 메시지 — 버튼 바로 위 (스크롤 내려 클릭하는 사용자에게 즉시 노출) */}
+            {error && (
+              <div style={{ background: '#fee2e2', color: '#dc2626', padding: '12px 16px', borderRadius: 6, fontSize: 13, marginBottom: 12, lineHeight: 1.6, whiteSpace: 'pre-wrap', border: '1px solid #fca5a5' }}>
+                {error}
+              </div>
+            )}
 
             <button onClick={handleSubmit} disabled={loading}
               style={{ width: '100%', background: loading ? '#999' : '#0d2d52', color: 'white', border: 'none', padding: 16, fontSize: 14, fontWeight: 700, cursor: loading ? 'wait' : 'pointer', fontFamily: "'Noto Sans KR',sans-serif", letterSpacing: 0.5 }}>
