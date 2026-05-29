@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { getYouTubeEmbedUrl } from '../lib/youtube'
 import CardSlide from '../components/CardSlide'
+import { downloadCsv } from '../lib/csv'
 
 const NAVY = '#0d2d52'
 const BLUE = '#1c4f8a'
@@ -69,9 +70,35 @@ const CHANNEL_STATS = [
 const TABS = [
   { num: 1, icon: '📰', label: '기사 관리' },
   { num: 2, icon: '👥', label: '시민기자 관리' },
+  { num: 5, icon: '🧑‍🤝‍🧑', label: '회원 관리' },
   { num: 3, icon: '📊', label: '통계' },
   { num: 4, icon: '⚙️', label: '설정' },
 ]
+
+// 회원 관리 탭 — role 필터
+const STANDARD_ROLES = ['reader', 'writer', 'admin']
+const MEMBER_FILTERS = [
+  { key: 'all',    label: '전체' },
+  { key: 'reader', label: '독자' },
+  { key: 'writer', label: '시민기자' },
+  { key: 'admin',  label: '관리자' },
+  { key: 'other',  label: '기타' },  // publisher 등 표준 enum 외
+]
+
+function memberRoleLabel(role) {
+  return ({
+    reader: '독자',
+    writer: '시민기자',
+    admin: '관리자',
+    publisher: '발행인',
+  })[role] || role || '—'
+}
+
+function formatMemberDate(iso) {
+  if (!iso) return '—'
+  const d = new Date(iso)
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`
+}
 
 const ARTICLE_FILTERS = [
   { key: 'all', label: '전체' },
@@ -607,6 +634,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState([])
   const [articleFilter, setArticleFilter] = useState('all')
   const [userFilter, setUserFilter] = useState('all')
+  const [memberFilter, setMemberFilter] = useState('all')
   const [rejectingId, setRejectingId] = useState(null)
   const [rejectReason, setRejectReason] = useState('')
   const [approvedId, setApprovedId] = useState(null)
@@ -663,6 +691,32 @@ export default function AdminDashboard() {
     ? articles
     : articles.filter(a => a.status === articleFilter)
   // filteredUsers 제거 — 새 시민기자 관리 탭은 entries (writer_applications + legacy) 사용
+
+  // 회원 관리 탭 — 필터 + CSV 내보내기
+  const filteredMembers = memberFilter === 'all'
+    ? users
+    : memberFilter === 'other'
+      ? users.filter(u => !STANDARD_ROLES.includes(u.role))
+      : users.filter(u => u.role === memberFilter)
+
+  const downloadMembersCsv = () => {
+    const headers = [
+      { key: 'nickname', label: '닉네임' },
+      { key: 'email',    label: '이메일' },
+      { key: 'role',     label: '권한' },
+      { key: 'joined',   label: '가입일' },
+      { key: 'active',   label: '활성여부' },
+    ]
+    const rows = filteredMembers.map(u => ({
+      nickname: u.nickname,
+      email:    u.email,
+      role:     memberRoleLabel(u.role),
+      joined:   formatMemberDate(u.created_at),
+      active:   u.is_active ? '활성' : '비활성',
+    }))
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+    downloadCsv(rows, headers, `eummedia_members_${today}.csv`)
+  }
 
   // 필터 변경 시 페이지네이션 초기화 (render 중 state 조정 — React 19 권장 패턴)
   const [prevArticleFilter, setPrevArticleFilter] = useState(articleFilter)
@@ -1371,6 +1425,129 @@ export default function AdminDashboard() {
           </div>
           )
         })()}
+
+        {/* ━━ 탭 5: 회원 관리 ━━ */}
+        {activeTab === 5 && (
+          <div>
+            {/* 헤더 + CSV 버튼 */}
+            <div style={{
+              display: 'flex', flexWrap: 'wrap', alignItems: 'center',
+              justifyContent: 'space-between', gap: 12, margin: '0 0 12px 0',
+            }}>
+              <h1 style={{
+                fontFamily: SERIF, fontSize: 24, fontWeight: 700,
+                color: NAVY, margin: 0, lineHeight: 1.4,
+              }}>
+                🧑‍🤝‍🧑 회원 관리
+                <span style={{ fontSize: 16, fontWeight: 500, color: '#888', marginLeft: 8 }}>
+                  · 전체 {users.length}명
+                </span>
+              </h1>
+              <button type="button" onClick={downloadMembersCsv} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                background: NAVY, color: '#fff',
+                border: `2px solid ${GOLD}`,
+                padding: '12px 22px', borderRadius: 8,
+                fontSize: 15, fontWeight: 700, fontFamily: SANS,
+                cursor: 'pointer', boxShadow: '0 2px 8px rgba(13,45,82,0.18)',
+                transition: 'transform 0.15s, box-shadow 0.15s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(13,45,82,0.28)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(13,45,82,0.18)' }}>
+                <span>📥</span><span>CSV 내보내기</span>
+              </button>
+            </div>
+
+            {/* 개인정보 안내 */}
+            <div style={{
+              background: '#fff8e1', borderLeft: `4px solid ${ORANGE}`,
+              padding: '12px 16px', fontSize: 13, color: '#7d5a00',
+              lineHeight: 1.6, marginBottom: 18, borderRadius: 4,
+            }}>
+              🔒 회원 개인정보입니다. 다운로드 파일은 안전하게 관리하고 사용 후 삭제하세요.
+            </div>
+
+            {/* role 필터 */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18 }}>
+              {MEMBER_FILTERS.map(f => {
+                const count = f.key === 'all'
+                  ? users.length
+                  : f.key === 'other'
+                    ? users.filter(u => !STANDARD_ROLES.includes(u.role)).length
+                    : users.filter(u => u.role === f.key).length
+                const sel = memberFilter === f.key
+                return (
+                  <button key={f.key} type="button" onClick={() => setMemberFilter(f.key)}
+                    style={{
+                      padding: '10px 16px', fontSize: 14, fontWeight: 600,
+                      fontFamily: SANS,
+                      background: sel ? NAVY : '#fff',
+                      color: sel ? '#fff' : '#3a3a3a',
+                      border: `1px solid ${sel ? NAVY : '#d0d0d0'}`,
+                      borderRadius: 24, cursor: 'pointer',
+                    }}>
+                    {f.label} {count}
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* 목록 */}
+            {filteredMembers.length === 0 ? (
+              <div style={{ ...card, textAlign: 'center', color: '#888', fontSize: 16, padding: 40 }}>
+                해당 필터의 회원이 없습니다.
+              </div>
+            ) : (
+              <div style={{
+                overflowX: 'auto', background: '#fff',
+                border: '1px solid #e5e5e5', borderRadius: 8,
+              }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14, minWidth: 600 }}>
+                  <thead style={{ background: '#fafafa' }}>
+                    <tr>
+                      <th style={{ textAlign: 'left', padding: '12px 16px', color: NAVY, fontWeight: 700, borderBottom: '1px solid #ebebeb' }}>닉네임</th>
+                      <th style={{ textAlign: 'left', padding: '12px 16px', color: NAVY, fontWeight: 700, borderBottom: '1px solid #ebebeb' }}>이메일</th>
+                      <th style={{ textAlign: 'left', padding: '12px 16px', color: NAVY, fontWeight: 700, borderBottom: '1px solid #ebebeb' }}>권한</th>
+                      <th style={{ textAlign: 'left', padding: '12px 16px', color: NAVY, fontWeight: 700, borderBottom: '1px solid #ebebeb' }}>가입일</th>
+                      <th style={{ textAlign: 'left', padding: '12px 16px', color: NAVY, fontWeight: 700, borderBottom: '1px solid #ebebeb' }}>활성</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredMembers.map(u => {
+                      const badgeColor = u.role === 'admin' ? ORANGE
+                        : u.role === 'writer' ? BLUE
+                        : u.role === 'publisher' ? GREEN
+                        : u.role === 'reader' ? '#555'
+                        : RED
+                      const badgeBg = u.role === 'admin' ? '#fdf3e0'
+                        : u.role === 'writer' ? '#e8f4ff'
+                        : u.role === 'publisher' ? '#eef7f2'
+                        : u.role === 'reader' ? '#f0f0f0'
+                        : '#fef0ef'
+                      return (
+                        <tr key={u.id} style={{ borderTop: '1px solid #ebebeb' }}>
+                          <td style={{ padding: '12px 16px', color: '#2a2a2a' }}>{u.nickname || '—'}</td>
+                          <td style={{ padding: '12px 16px', color: '#3a3a3a' }}>{u.email || '—'}</td>
+                          <td style={{ padding: '12px 16px' }}>
+                            <span style={{
+                              display: 'inline-block', padding: '4px 10px', borderRadius: 12,
+                              fontSize: 12, fontWeight: 700,
+                              background: badgeBg, color: badgeColor,
+                            }}>{memberRoleLabel(u.role)}</span>
+                          </td>
+                          <td style={{ padding: '12px 16px', color: '#3a3a3a' }}>{formatMemberDate(u.created_at)}</td>
+                          <td style={{ padding: '12px 16px', color: u.is_active ? GREEN : RED, fontWeight: 700 }}>
+                            {u.is_active ? '✅' : '⛔'}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* ━━ 탭 3: 통계 ━━ */}
         {activeTab === 3 && (
