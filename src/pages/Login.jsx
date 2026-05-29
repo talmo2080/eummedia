@@ -25,6 +25,21 @@ export default function Login() {
     }
   }
 
+  const handleKakaoLogin = async () => {
+    setError("");
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'kakao',
+      options: {
+        redirectTo: window.location.origin + '/',
+      },
+    });
+    if (error) {
+      setError('카카오 로그인 중 오류가 발생했습니다: ' + error.message);
+    }
+    // 성공 시 Supabase가 카카오 OAuth 페이지로 리다이렉트 → 동의 후
+    // redirectTo로 복귀하면 AuthContext가 세션을 감지해 로그인 상태로 전환
+  };
+
   return (
     <div style={s.page}>
       <main style={s.main}>
@@ -74,7 +89,7 @@ export default function Login() {
 
           <div style={s.divider}><span>또는</span></div>
 
-          <button style={s.kakaoBtn}>
+          <button type="button" onClick={handleKakaoLogin} style={s.kakaoBtn}>
             <span>💛</span> 카카오로 로그인
           </button>
 
