@@ -76,24 +76,9 @@ export default function Signup() {
         return;
       }
 
-      // 2. users 테이블 INSERT (role='reader' default 유지) — 에러 체크 추가
-      const { error: usersError } = await supabase.from('users').insert({
-        id: data.user.id,
-        nickname: form.name,
-        email: form.email,
-        role: 'reader',
-      });
-      if (usersError) {
-        setError(
-          `회원 정보 저장에 실패했습니다.\n` +
-          `${usersError.message}\n\n` +
-          `작성하신 신청서 내용은 그대로 보존됩니다.\n` +
-          `잠시 후 [✍️ 시민기자 신청하기]를 다시 눌러주세요.`
-        );
-        return;
-      }
-
-      // 3. writer_applications INSERT — 시민기자 지원서
+      // 2. writer_applications INSERT — 시민기자 지원서
+      // (public.users 행은 auth.users INSERT 트리거 handle_new_auth_user()가
+      //  자동 생성하므로 클라이언트에서 별도 INSERT 하지 않음 — PK 충돌 방지)
       const { error: appError } = await supabase.from('writer_applications').insert({
         user_id: data.user.id,
         name: form.name.trim(),
