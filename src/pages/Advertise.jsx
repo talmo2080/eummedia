@@ -159,9 +159,12 @@ export default function Advertise() {
             이음미디어는 광고주를 기사의 주인공으로 만듭니다.<br />
             구글·네이버·ChatGPT 검색에서 동시에 노출됩니다.
           </p>
-          <div style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '18px 24px', fontSize: 14, lineHeight: 1.8 }}>
-            <strong style={{ color: '#f0a882' }}>"배너 광고는 클릭되지 않습니다.</strong> 하지만 기사는 검색되고, 읽히고, 공유됩니다.<br />
-            이음미디어의 광고는 <strong style={{ color: '#f0a882' }}>영원히 남는 콘텐츠</strong>입니다."
+          <div style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', padding: '18px 24px', fontSize: 15, lineHeight: 1.8, textAlign: 'center' }}>
+            발행하는 순간, <strong style={{ color: '#f0a882' }}>검색에 잡힙니다</strong>.<br />
+            노출의 끝까지, <strong style={{ color: '#f0a882' }}>직접 만듭니다</strong>.
+            <div style={{ fontSize: 13, marginTop: 8, opacity: 0.85 }}>
+              — 직접 지은 신문, <strong style={{ color: '#f0a882' }}>이음미디어</strong>
+            </div>
           </div>
         </div>
       </div>
