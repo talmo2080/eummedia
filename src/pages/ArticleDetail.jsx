@@ -29,6 +29,27 @@ function splitIntoParagraphs(content) {
   return parts.map(p => p.replace(new RegExp(PROTECT, 'g'), '.') + '.');
 }
 
+// === 단락 분할 전 박스 태그 [quote/box/info] 보호 ===
+// 단락 분할(\n+ 또는 마침표 split)이 박스 태그 내부의 줄바꿈·마침표로
+// 태그를 쪼개 paragraphToHtml의 ^...$ 매칭이 깨지는 버그 우회.
+// 블록을 충돌 가능성 극히 낮은 sentinel 토큰으로 치환 후,
+// 단락 분할 → 각 단락에서 토큰을 원래 블록으로 복원 → paragraphToHtml에 통째 전달.
+const BLOCK_SENTINEL_PREFIX = '__EUM_PRESERVED_BLOCK_';
+const BLOCK_SENTINEL_SUFFIX = '__';
+function preserveBlockTags(content) {
+  if (!content) return { text: '', blocks: [] };
+  const blocks = [];
+  const text = content.replace(/\[(quote|box|info)\]([\s\S]*?)\[\/\1\]/g, (full) => {
+    blocks.push(full);
+    return `${BLOCK_SENTINEL_PREFIX}${blocks.length - 1}${BLOCK_SENTINEL_SUFFIX}`;
+  });
+  return { text, blocks };
+}
+function restoreBlockTags(text, blocks) {
+  if (!blocks.length) return text;
+  return text.replace(/__EUM_PRESERVED_BLOCK_(\d+)__/g, (_, i) => blocks[Number(i)] || '');
+}
+
 // HTML escape (XSS 방지) — 본문은 textarea 입력값이라 escape 후 커스텀 태그만 HTML로 변환
 function escapeHtml(s) {
   return String(s ?? '')
@@ -588,12 +609,16 @@ export default function ArticleDetail() {
 
           {/* 본문 — 평문 + 원문 보기 (스테이지 1) — 모바일 16/1.8, 데스크탑 17/2.0 */}
           <div className="text-[16px] leading-[1.8] lg:text-[17px] lg:leading-[2.0] text-neutral-800" style={{ fontFamily:"'Noto Sans KR', sans-serif", marginBottom:"24px" }}>
-            {((a.content && a.content.includes('\n'))
-              ? a.content.split(/\n+/).map(p => p.trim()).filter(Boolean)
-              : splitIntoParagraphs(a.content)
-            ).flatMap((para, i, arr) => {
+            {(() => {
+              // 단락 분할 전 박스 태그 보호 — 분할기가 박스 내부를 쪼개 매칭이 깨지는 버그 우회
+              const { text: pc, blocks } = preserveBlockTags(a.content);
+              // 박스가 있으면 무조건 \n 분기 사용 (splitIntoParagraphs의 무조건 '.' 추가가 박스 매칭을 깨뜨림)
+              const paragraphs = (blocks.length > 0 || (pc && pc.includes('\n')))
+                ? pc.split(/\n+/).map(p => p.trim()).filter(Boolean)
+                : splitIntoParagraphs(pc);
+              return paragraphs.flatMap((para, i, arr) => {
               const midIdx = Math.floor((arr.length - 1) / 2);
-              const html = paragraphToHtml(para);
+              const html = paragraphToHtml(restoreBlockTags(para, blocks));
               const items = [<div key={"p-"+i} dangerouslySetInnerHTML={{ __html: html }} />];
               // 본문 중간 배너 — inline_ad_title 있을 때만 삽입 (이미지 유무에 따라 자동 분기)
               if (i === midIdx && article.inline_ad_title) {
@@ -639,7 +664,8 @@ export default function ArticleDetail() {
                 }
               }
               return items;
-            })}
+              });
+            })()}
           </div>
           <div style={{ borderTop:"2px solid #bbb", margin:"24px 0" }} />
           <div style={{ display:"flex", justifyContent: article.external_url ? "space-between" : "center", alignItems:"flex-start", marginBottom:"24px" }}>
