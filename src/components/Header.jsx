@@ -171,15 +171,17 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Link to={myPageTarget} style={{
-                  color: NAVY, textDecoration: "none",
-                  border: `1.5px solid ${NAVY}`,
-                  borderRadius: 4,
-                  fontSize: 13, fontWeight: 700,
-                  padding: "6px 14px",
-                }}>
-                  {profile?.nickname || "회원"} {roleLabel}
-                </Link>
+                {role !== "admin" && (
+                  <Link to={myPageTarget} style={{
+                    color: NAVY, textDecoration: "none",
+                    border: `1.5px solid ${NAVY}`,
+                    borderRadius: 4,
+                    fontSize: 13, fontWeight: 700,
+                    padding: "6px 14px",
+                  }}>
+                    {profile?.nickname || "회원"} {roleLabel}
+                  </Link>
+                )}
                 <button onClick={handleLogout} style={{
                   color: NAVY, background: "transparent",
                   cursor: "pointer",
@@ -367,19 +369,21 @@ export default function Header() {
                 </>
               ) : (
                 <>
-                  <Link
-                    to={myPageTarget}
-                    onClick={closeMenu}
-                    style={{
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      minHeight: 52, padding: "10px 16px", marginBottom: 10,
-                      color: GOLD_SOFT, border: `1.5px solid ${GOLD_SOFT}`,
-                      fontSize: 19, fontWeight: 700, textDecoration: "none",
-                      borderRadius: 4,
-                    }}
-                  >
-                    {profile?.nickname || "회원"} {roleLabel}
-                  </Link>
+                  {role !== "admin" && (
+                    <Link
+                      to={myPageTarget}
+                      onClick={closeMenu}
+                      style={{
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        minHeight: 52, padding: "10px 16px", marginBottom: 10,
+                        color: GOLD_SOFT, border: `1.5px solid ${GOLD_SOFT}`,
+                        fontSize: 19, fontWeight: 700, textDecoration: "none",
+                        borderRadius: 4,
+                      }}
+                    >
+                      {profile?.nickname || "회원"} {roleLabel}
+                    </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     style={{
