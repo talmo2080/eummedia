@@ -292,6 +292,58 @@ export default function Advertise() {
         </div>
       </div>
 
+      {/* ── WHY EUM MEDIA — 노출 강점 4종 ── */}
+      <div style={{ background: '#fafafa', borderTop: '1px solid #e0e0e0', borderBottom: '1px solid #e0e0e0', padding: '52px 0' }}>
+        <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ textAlign: 'center', marginBottom: 36 }}>
+            <div style={{ fontSize: 10, color: '#1c4f8a', fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>WHY EUM MEDIA</div>
+            <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 22, fontWeight: 700, color: '#0d2d52' }}>왜 이음미디어에 광고해야 할까요</div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {[
+              {
+                icon: '🔍',
+                title: '발행 즉시 검색에 잡힙니다',
+                body: '대부분의 신생 매체는 기사를 올려도 검색에 안 잡힙니다. 이음미디어는 발행하는 순간, 구글·네이버가 바로 읽는 완성된 파일이 자동으로 만들어집니다.',
+              },
+              {
+                icon: '🤖',
+                title: 'AI가 인용하는 기사',
+                body: '챗GPT 같은 AI에게 "이 동네 좋은 가게"를 물었을 때 사장님 가게가 답으로 나올 수 있도록 — AI가 이해하기 좋은 구조화된 형식으로 기사를 만듭니다.',
+              },
+              {
+                icon: '📖',
+                title: '광고가 아니라, 이야기입니다',
+                body: '배너는 지나치지만 이야기는 읽힙니다. 사장님의 진심을 기사로 쓰면 검색에 오래 남아 계속 사람을 데려옵니다.',
+              },
+              {
+                icon: '💬',
+                title: '카톡과 토요일 소식으로 한 번 더',
+                body: '검색에만 머물지 않습니다. 카카오톡 공유로 퍼지고, 매주 토요일 구독자 소식에 실려 한 번 더 노출됩니다.',
+              },
+            ].map((card, i) => (
+              <div key={i} style={{
+                background: 'white',
+                borderLeft: '4px solid #0d2d52',
+                padding: '24px 28px',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              }}>
+                <div style={{ fontSize: 28, marginBottom: 12 }}>{card.icon}</div>
+                <div style={{
+                  fontFamily: "'Noto Serif KR',serif", fontSize: 17, fontWeight: 700,
+                  color: '#0d2d52', marginBottom: 10, lineHeight: 1.5,
+                }}>
+                  {card.title}
+                </div>
+                <div style={{ fontSize: 13.5, color: '#4a4a4a', lineHeight: 1.85 }}>
+                  {card.body}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ── 광고 패키지 ── */}
       <div style={{ maxWidth: 960, margin: '0 auto', padding: '52px 24px' }}>
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
@@ -357,7 +409,7 @@ export default function Advertise() {
             ChatGPT·Perplexity가 당신의 브랜드를 추천합니다
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {['✅ 구글 상위 노출', '✅ 네이버 최적화', '✅ ChatGPT 인용', '✅ Perplexity 노출', '✅ 영구 보존'].map(t => (
+            {['✅ 구글 상위 노출', '✅ 네이버 최적화', '✅ AI 검색 인용'].map(t => (
               <span key={t} style={{ background: 'rgba(255,255,255,0.15)', padding: '6px 14px', fontSize: 12 }}>{t}</span>
             ))}
           </div>
