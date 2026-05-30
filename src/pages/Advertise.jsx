@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 
 const AD_PACKAGES = [
   {
@@ -132,6 +133,22 @@ export default function Advertise() {
   const [selectedPkg, setSelectedPkg] = useState('STEP 2')
   const [stage, setStage] = useState('form')
   const [openFaq, setOpenFaq] = useState(null)
+  const [publishedCount, setPublishedCount] = useState(null)   // 발행 기사 실시간 카운트
+
+  // 발행 기사 카운트 — supabase articles 테이블 published 상태만
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const { count, error } = await supabase
+        .from('articles')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'published')
+      if (cancelled) return
+      if (error) { console.error('[Advertise] published count error:', error); return }
+      setPublishedCount(count)
+    })()
+    return () => { cancelled = true }
+  }, [])
 
   const handleSubmit = () => {
     if (!form.company || !form.name || !form.phone || !form.email) {
@@ -423,7 +440,7 @@ export default function Advertise() {
       <div style={{ background: '#0d2d52', color: 'white', padding: '36px 0' }}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4" style={{ maxWidth: 960, margin: '0 auto', padding: '0 24px' }}>
           {[
-            { num: '39건', label: '발행 기사' },
+            { num: publishedCount != null ? `${publishedCount}건` : '…', label: '발행 기사' },
             { num: '7개', label: '콘텐츠 채널' },
             { num: '모집 중', label: '시민기자' },
             { num: '40~70대', label: '주요 독자층' },
