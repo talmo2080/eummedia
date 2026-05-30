@@ -304,6 +304,7 @@ export default function ArticleEditor() {
   // 서식 5종 — 커서 위치에 태그 삽입 (선택 텍스트 있으면 감싸기, 없으면 기본 텍스트 자동 선택)
   const FORMAT_ACTIONS = [
     { label: '굵게',     icon: 'B',  title: '굵게 — 선택 텍스트 강조 (**텍스트**)',          before: '**',        after: '**',         defaultText: '굵게' },
+    { label: '기울기',   icon: 'I',  title: '기울기 — 인용·강조 (*텍스트*)',                  before: '*',         after: '*',          defaultText: '기울기 텍스트' },
     { label: '소제목',   icon: 'H',  title: '소제목 — 단락 머리 (## 소제목)',                before: '\n## ',     after: '\n',         defaultText: '소제목' },
     { label: '인용구',   icon: '"',  title: '인용구 — 출처·인터뷰 ([quote]...[/quote])',     before: '\n[quote]', after: '[/quote]\n', defaultText: '인용 내용' },
     { label: '강조박스', icon: '★', title: '강조박스 — 포인트 ([box]...[/box])',            before: '\n[box]',   after: '[/box]\n',   defaultText: '강조할 내용' },

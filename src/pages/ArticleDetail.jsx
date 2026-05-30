@@ -69,25 +69,40 @@ function paragraphToHtml(p) {
   }
   let m = text.match(/^\[quote\]([\s\S]*)\[\/quote\]$/);
   if (m) {
-    const inner = escapeHtml(m[1]).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    const inner = escapeHtml(m[1])
+      .replace(/\*\*\*([^*]+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+      .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>');
     return `<blockquote style="border-left:3px solid #c9a84c;margin:20px 0;padding:16px 20px;background:#fafaf7;color:#555;font-style:italic;font-size:1.05rem;">${inner}</blockquote>`;
   }
   m = text.match(/^\[box\]([\s\S]*)\[\/box\]$/);
   if (m) {
-    const inner = escapeHtml(m[1]).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    const inner = escapeHtml(m[1])
+      .replace(/\*\*\*([^*]+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+      .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>');
     return `<div style="background:#fdf6ec;border:1px solid #e8c98a;border-radius:8px;padding:16px 20px;margin:20px 0;">${inner}</div>`;
   }
   m = text.match(/^\[info\]([\s\S]*)\[\/info\]$/);
   if (m) {
-    const inner = escapeHtml(m[1]).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    const inner = escapeHtml(m[1])
+      .replace(/\*\*\*([^*]+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+      .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>');
     return `<div style="background:#f0f5ff;border:1px solid #93b4e8;border-left:4px solid #0d2d52;border-radius:8px;padding:16px 20px;margin:20px 0;">${inner}</div>`;
   }
   m = text.match(/^##\s+(.+)$/);
   if (m) {
-    const inner = escapeHtml(m[1]).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    const inner = escapeHtml(m[1])
+      .replace(/\*\*\*([^*]+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+      .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>');
     return `<h3 style="font-size:1.2rem;font-weight:700;border-left:4px solid #0d2d52;padding-left:12px;margin:24px 0 12px;">${inner}</h3>`;
   }
-  const escaped = escapeHtml(text).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  const escaped = escapeHtml(text)
+    .replace(/\*\*\*([^*]+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>');
   return `<p style="margin:0 0 1em 0;">${escaped}</p>`;
 }
 
