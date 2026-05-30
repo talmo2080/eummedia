@@ -108,12 +108,7 @@ function paragraphToHtml(p) {
 
 const socialIconStyle = { fontSize: "24px", textDecoration: "none", lineHeight: 1 };
 
-const AUTHOR_ARTICLES = [
-  { id:"a1", title:"닥터리부트, 두피케어의 새로운 기준을 세우다", date:"2026.04.20" },
-  { id:"a2", title:"봉숭아학당 26기 수료식, 시민기자의 탄생", date:"2026.04.10" },
-  { id:"a3", title:"고양시 일산, 미디어 리터러시 교육 현장", date:"2026.03.28" },
-];
-
+// (AUTHOR_ARTICLES MOCK 제거됨 — 동적 fetch로 교체, authorArticles state 사용)
 // (INIT_COMMENTS MOCK 제거됨 — supabase comments 테이블에서 실시간 fetch)
 
 function StickyBtn({ onClick, title, bg, fg, active, activeColor, children }) {
@@ -237,6 +232,7 @@ export default function ArticleDetail() {
   const [error, setError] = useState(null);
   const [popular, setPopular] = useState([]);
   const [related, setRelated] = useState([]);
+  const [authorArticles, setAuthorArticles] = useState([]);   // 이 기자의 다른 기사 — author_id 동적 fetch
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [copied, setCopied] = useState(false);
@@ -386,7 +382,7 @@ export default function ArticleDetail() {
     (async () => {
       const { data, error: err } = await supabase
         .from('articles')
-        .select('id, slug, title, summary, content, thumbnail_url, video_url, published_at, channel_id, like_count, tags, external_url, inline_ad_image, inline_ad_link, inline_ad_title, inline_ad_subtitle, channels(name, slug, english_slug)')
+        .select('id, slug, title, summary, content, thumbnail_url, video_url, published_at, channel_id, author_id, like_count, tags, external_url, inline_ad_image, inline_ad_link, inline_ad_title, inline_ad_subtitle, channels(name, slug, english_slug)')
         .eq('slug', slug)
         .eq('status', 'published')
         .single();
@@ -402,6 +398,26 @@ export default function ArticleDetail() {
     })();
     return () => { cancelled = true; };
   }, [slug]);
+
+  // 이 기자의 다른 기사 — article.author_id 기준 published 3건 (현재 기사 제외)
+  useEffect(() => {
+    if (!article?.author_id || !article?.id) { setAuthorArticles([]); return; }
+    let cancelled = false;
+    (async () => {
+      const { data, error: err } = await supabase
+        .from('articles')
+        .select('id, slug, title, published_at, thumbnail_url')
+        .eq('author_id', article.author_id)
+        .eq('status', 'published')
+        .neq('id', article.id)
+        .order('published_at', { ascending: false })
+        .limit(3);
+      if (cancelled) return;
+      if (err) { console.error('[ArticleDetail AUTHOR_ARTICLES] fetch error:', err); return; }
+      setAuthorArticles(data ?? []);
+    })();
+    return () => { cancelled = true; };
+  }, [article?.author_id, article?.id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -864,20 +880,26 @@ export default function ArticleDetail() {
                 {showAuthorMore && (
                   <div>
                     <div style={{ fontSize:"13px", color:"#3a3a3a", lineHeight:"1.7", marginBottom:"16px" }}>{a.author_intro}</div>
-                    <div style={{ paddingTop:"14px", borderTop:"1px solid #e0e0e0" }}>
-                      <div style={{ fontSize:"11px", color:"#9a9a9a", fontWeight:"700", letterSpacing:"1px", marginBottom:"10px" }}>이 기자의 다른 기사</div>
-                      <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
-                        {AUTHOR_ARTICLES.map(art => (
-                          <Link key={art.id} to={"/이음매거진/" + art.id} style={{ display:"flex", alignItems:"center", gap:"10px", textDecoration:"none" }}>
-                            <div style={{ width:"56px", height:"42px", background:"#eef3fa", borderRadius:"3px", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.1rem" }}>📰</div>
-                            <div>
-                              <div style={{ fontSize:"12px", color:"#1a1a1a", fontWeight:"600", lineHeight:"1.4" }}>{art.title}</div>
-                              <div style={{ fontSize:"10px", color:"#9a9a9a", marginTop:"2px" }}>{art.date}</div>
-                            </div>
-                          </Link>
-                        ))}
+                    {authorArticles.length > 0 && (
+                      <div style={{ paddingTop:"14px", borderTop:"1px solid #e0e0e0" }}>
+                        <div style={{ fontSize:"11px", color:"#9a9a9a", fontWeight:"700", letterSpacing:"1px", marginBottom:"10px" }}>이 기자의 다른 기사</div>
+                        <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
+                          {authorArticles.map(art => (
+                            <Link key={art.id} to={`/article/${art.slug}`} style={{ display:"flex", alignItems:"center", gap:"10px", textDecoration:"none" }}>
+                              <div style={{ width:"56px", height:"42px", background:"#eef3fa", borderRadius:"3px", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.1rem", overflow:"hidden" }}>
+                                {art.thumbnail_url
+                                  ? <img src={art.thumbnail_url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                                  : '📰'}
+                              </div>
+                              <div>
+                                <div style={{ fontSize:"12px", color:"#1a1a1a", fontWeight:"600", lineHeight:"1.4" }}>{art.title}</div>
+                                <div style={{ fontSize:"10px", color:"#9a9a9a", marginTop:"2px" }}>{formatDate(art.published_at)}</div>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 )}
               </div>
