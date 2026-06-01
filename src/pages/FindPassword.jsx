@@ -66,7 +66,7 @@ export default function FindPassword() {
               <div style={s.links}>
                 <Link to="/login" style={s.link}>로그인</Link>
                 <span style={s.dot}>·</span>
-                <Link to="/signup" style={s.link}>회원가입</Link>
+                <Link to="/register" style={s.link}>회원가입</Link>
               </div>
             </>
           )}

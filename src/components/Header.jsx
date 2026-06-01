@@ -162,7 +162,7 @@ export default function Header() {
                   border: `1.5px solid ${NAVY}`,
                   padding: "6px 14px", borderRadius: 4,
                 }}>로그인</Link>
-                <Link to="/signup" style={{
+                <Link to="/register" style={{
                   background: NAVY, color: "#fff",
                   textDecoration: "none",
                   fontSize: 13, fontWeight: 800,
@@ -356,7 +356,7 @@ export default function Header() {
                     }}
                   >로그인</Link>
                   <Link
-                    to="/signup"
+                    to="/register"
                     onClick={closeMenu}
                     style={{
                       display: "flex", alignItems: "center", justifyContent: "center",

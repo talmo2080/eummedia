@@ -9,6 +9,7 @@ import ArticleDetail from './pages/ArticleDetail'
 import ChannelList from './pages/ChannelList'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import Register from './pages/Register'
 import FindPassword from './pages/FindPassword'
 import Terms from './pages/Terms'
 import AdminDashboard from './pages/AdminDashboard'
@@ -36,6 +37,7 @@ function App() {
             <Route path="/channel" element={<Navigate to="/" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/find-password" element={<FindPassword />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/admin" element={

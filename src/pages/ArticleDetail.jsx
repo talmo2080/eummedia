@@ -787,9 +787,14 @@ export default function ArticleDetail() {
                 <div style={{ fontSize:"13px", color:"#6b6b6b", marginBottom:"10px" }}>
                   💬 댓글은 로그인 후 작성할 수 있습니다.
                 </div>
-                <Link to="/login" style={{ display:"inline-block", background:"#0d2d52", color:"white", padding:"8px 20px", fontSize:"12px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit" }}>
-                  로그인하기
-                </Link>
+                <div style={{ display:"flex", justifyContent:"center", gap:"8px", flexWrap:"wrap" }}>
+                  <Link to="/login" style={{ display:"inline-block", background:"#0d2d52", color:"white", padding:"8px 20px", fontSize:"12px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit" }}>
+                    로그인
+                  </Link>
+                  <Link to="/register" style={{ display:"inline-block", background:"#fff", color:"#0d2d52", padding:"8px 20px", fontSize:"12px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit", border:"1px solid #0d2d52" }}>
+                    회원가입
+                  </Link>
+                </div>
               </div>
             )}
 

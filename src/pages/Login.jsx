@@ -94,7 +94,7 @@ export default function Login() {
           </button>
 
           <div style={s.links}>
-            <Link to="/signup" style={s.link}>회원가입</Link>
+            <Link to="/register" style={s.link}>회원가입</Link>
             <span style={s.dot}>·</span>
             <Link to="/find-password" style={s.link}>비밀번호 찾기</Link>
           </div>
