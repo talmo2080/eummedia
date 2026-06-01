@@ -49,6 +49,9 @@ export default function CitizenReporter() {
     motive: '', experience: '', agree: false,
   })
   const [stage, setStage] = useState('form')   // form / submitted
+  // 자격 자가확인 게이트 — 폼을 보여줄 자격이 있는 사용자 한정 노출
+  // null: 아직 선택 안 함 / '봉숭아학당 수료자' | '이음평생교육원 수료자': 폼 펼침 / '미수료': 안내
+  const [qualified, setQualified] = useState(null)
   const [openFaq, setOpenFaq] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -309,12 +312,66 @@ export default function CitizenReporter() {
               마이페이지로 가기
             </Link>
           </div>
+        ) : qualified === null ? (
+          /* 자격 자가확인 게이트 — 폼 진입 전 단계 */
+          <div style={{ background: '#f7f8fa', border: '1px solid #e0e0e0', borderTop: '4px solid #0d2d52', padding: '32px' }}>
+            <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 20, fontWeight: 700, color: '#0d2d52', marginBottom: 6 }}>
+              자격 확인
+            </div>
+            <div style={{ fontSize: 14, color: '#3a3a3a', marginBottom: 24, lineHeight: 1.7 }}>
+              아래 자격에 해당하시나요?
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <button type="button" onClick={() => { setQualified('봉숭아학당 수료자'); setForm(f => ({ ...f, qualify: '봉숭아학당 수료자' })) }}
+                style={{ background: '#0d2d52', color: 'white', border: 'none', padding: '20px 24px', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif", textAlign: 'left', lineHeight: 1.5, minHeight: 56 }}>
+                ✅ 봉숭아학당 방송스피치 과정 수료자
+              </button>
+              <button type="button" onClick={() => { setQualified('이음평생교육원 수료자'); setForm(f => ({ ...f, qualify: '이음평생교육원 수료자' })) }}
+                style={{ background: '#0d2d52', color: 'white', border: 'none', padding: '20px 24px', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif", textAlign: 'left', lineHeight: 1.5, minHeight: 56 }}>
+                ✅ 이음평생교육원 시민기자 과정 수료자
+              </button>
+              <button type="button" onClick={() => setQualified('미수료')}
+                style={{ background: 'white', color: '#0d2d52', border: '2px solid #c9a84c', padding: '20px 24px', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif", textAlign: 'left', lineHeight: 1.5, minHeight: 56 }}>
+                아직 수료 전입니다
+              </button>
+            </div>
+          </div>
+        ) : qualified === '미수료' ? (
+          /* 미수료 안내 — 봉숭아학당 27기 진입 유도 */
+          <div style={{ background: '#fff7ed', border: '1px solid #fdba74', borderLeft: '5px solid #c9a84c', padding: '36px 32px' }}>
+            <div style={{ fontSize: 38, marginBottom: 14 }}>🎤</div>
+            <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 20, fontWeight: 700, color: '#9a3412', marginBottom: 12, lineHeight: 1.5 }}>
+              먼저 봉숭아학당 방송스피치 과정 수료가 필요합니다
+            </div>
+            <div style={{ fontSize: 14, color: '#5a3a1a', lineHeight: 1.85, marginBottom: 22 }}>
+              이음미디어 시민기자가 되려면 먼저 봉숭아학당 방송스피치 과정을 수료해야 합니다.<br />
+              아래 버튼으로 봉숭아학당 27기 신청을 보내주세요.
+            </div>
+            <a href="mailto:press@eummedia.kr?subject=[봉숭아학당 27기 신청]"
+              style={{ background: '#0d2d52', color: 'white', padding: '14px 28px', fontSize: 14, fontWeight: 700, textDecoration: 'none', display: 'inline-block', fontFamily: "'Noto Sans KR',sans-serif", marginRight: 10, minHeight: 48, boxSizing: 'border-box', lineHeight: 1.7 }}>
+              봉숭아학당 27기 신청하기 →
+            </a>
+            <button type="button" onClick={() => setQualified(null)}
+              style={{ background: 'transparent', color: '#0d2d52', border: 'none', padding: '14px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif", textDecoration: 'underline' }}>
+              ← 자격 확인 다시
+            </button>
+          </div>
         ) : (
-          /* 폼 — 로그인 + 신청서 없음 */
+          /* 폼 — 로그인 + 신청서 없음 + 자격 확인 통과 */
           <div style={{ background: '#f7f8fa', border: '1px solid #e0e0e0', borderTop: '4px solid #0d2d52', padding: '32px' }}>
             <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 20, fontWeight: 700, color: '#0d2d52', marginBottom: 6 }}>시민기자 지원하기</div>
-            <div style={{ fontSize: 12, color: '#6b6b6b', marginBottom: 22, lineHeight: 1.6 }}>
+            <div style={{ fontSize: 12, color: '#6b6b6b', marginBottom: 14, lineHeight: 1.6 }}>
               로그인된 계정({user.email})으로 신청합니다. 편집국장 검토 후 1-3일 이내 연락드립니다.
+            </div>
+            {/* 선택한 자격 표시 + 다시 선택 */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '10px 14px', background: '#eef3fa', border: '1px solid #c9d6e8', marginBottom: 22, fontSize: 13 }}>
+              <span style={{ color: '#0d2d52' }}>
+                선택한 자격: <strong>{qualified}</strong>
+              </span>
+              <button type="button" onClick={() => setQualified(null)}
+                style={{ background: 'transparent', color: '#1c4f8a', border: 'none', padding: 0, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'Noto Sans KR',sans-serif", textDecoration: 'underline' }}>
+                다시 선택
+              </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ marginBottom: 14 }}>
