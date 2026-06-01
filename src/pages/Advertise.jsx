@@ -193,16 +193,17 @@ export default function Advertise() {
             <div style={{ fontSize: 10, color: '#1c4f8a', fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>HOW IT WORKS</div>
             <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 22, fontWeight: 700, color: '#0d2d52' }}>광고 기사 제작 과정</div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
               { icon: '📞', title: '문의 접수', desc: '광고 상품 선택 후 문의 폼 제출' },
               { icon: '🤝', title: '미팅·인터뷰', desc: '편집국장과 상담 후 내용 확정' },
+              { icon: '📄', title: '광고의뢰서', desc: '상담 확정 후 광고의뢰서·입금 계좌 발송' },
               { icon: '✍️', title: '기사 작성', desc: '전문 기자가 스토리 기사 작성' },
               { icon: '🚀', title: '게시·배포', desc: '전 채널 동시 발행' },
               { icon: '🤖', title: 'AI·SEO 노출', desc: '구글·네이버·ChatGPT·Perplexity 최적화' },
             ].map((s, i) => (
               <div key={i} style={{ textAlign: 'center', padding: '24px 16px', background: 'white', border: '1px solid #e0e0e0', borderLeft: i > 0 ? 'none' : '1px solid #e0e0e0', position: 'relative' }}>
-                {i < 4 && <div style={{ position: 'absolute', right: -14, top: '50%', transform: 'translateY(-50%)', fontSize: 20, color: '#c0c8d4', zIndex: 1 }}>→</div>}
+                {i < 5 && <div style={{ position: 'absolute', right: -14, top: '50%', transform: 'translateY(-50%)', fontSize: 20, color: '#c0c8d4', zIndex: 1 }}>→</div>}
                 <div style={{ fontSize: 32, marginBottom: 10 }}>{s.icon}</div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#0d2d52', marginBottom: 4 }}>{s.title}</div>
                 <div style={{ fontSize: 11, color: '#6b6b6b', lineHeight: 1.6 }}>{s.desc}</div>
@@ -475,7 +476,7 @@ export default function Advertise() {
           <div style={{ background: '#f7f8fa', border: '1px solid #e0e0e0', borderTop: '4px solid #0d2d52', padding: '36px' }}>
             <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 22, fontWeight: 700, color: '#0d2d52', marginBottom: 6 }}>광고 문의하기</div>
             <div style={{ fontSize: 12, color: '#6b6b6b', marginBottom: 28, lineHeight: 1.6 }}>
-              문의 내용은 <strong>press@eummedia.kr</strong>로 전달됩니다. 24시간 내 편집국장이 직접 연락드립니다.
+              문의 내용은 <strong>press@eummedia.kr</strong>로 전달됩니다. 24시간 내 편집국장이 직접 연락드립니다. 상담 후 광고의뢰서와 입금 계좌를 개별 안내해 드립니다.
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ marginBottom: 14 }}>
