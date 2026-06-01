@@ -93,7 +93,7 @@ export default function Footer() {
             <div style={{
               fontSize: 13, fontWeight: 600, opacity: 0.95, marginBottom: 12,
             }}>
-              등록번호: 서울,아56526
+              등록번호: 서울 아56526
             </div>
 
             {/* 인물 영역 (3행) */}
@@ -215,7 +215,7 @@ export default function Footer() {
             <p>서울시 관악구 남부순환로 1699, 2층</p>
             <p>제보·광고문의: 02-6956-0339</p>
             <p>인터넷신문 등록일: 2026년 4월 27일</p>
-            <p>등록번호: 서울, 아56526</p>
+            <p>등록번호: 서울 아56526</p>
             <p>E-mail: press@eummedia.kr</p>
           </div>
 

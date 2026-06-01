@@ -86,7 +86,7 @@ export default function Subscribe() {
               <tbody>
                 <tr>
                   <td style={{ width: 100, padding: '8px 0 0 0', opacity: 0.55, fontWeight: 500, verticalAlign: 'top' }}>등록번호</td>
-                  <td style={{ padding: '8px 0 0 0', opacity: 0.95 }}>서울,아56526</td>
+                  <td style={{ padding: '8px 0 0 0', opacity: 0.95 }}>서울 아56526</td>
                 </tr>
                 <tr>
                   <td style={{ padding: '8px 0 0 0', opacity: 0.55, fontWeight: 500, verticalAlign: 'top' }}>발행 법인</td>
