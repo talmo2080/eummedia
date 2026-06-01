@@ -501,18 +501,22 @@ export default function About() {
               <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>구독 신청</div>
               <div style={{ fontSize: 12, opacity: 0.8 }}>매주 토요일 카카오톡으로</div>
             </Link>
-            <Link to="/citizen-reporter" style={{
-              background: '#fff', color: NAVY, textDecoration: 'none',
+            <div style={{
+              background: '#fff', color: NAVY,
               padding: '22px 24px', textAlign: 'center', fontFamily: SANS,
-              border: `2px solid ${NAVY}`, transition: 'all 0.2s',
-            }}
-              onMouseEnter={e => { e.currentTarget.style.background = NAVY; e.currentTarget.style.color = '#fff' }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = NAVY }}
-            >
+              border: `2px solid ${NAVY}`,
+            }}>
               <div style={{ fontSize: 24, marginBottom: 8 }}>✍️</div>
-              <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>시민기자 지원</div>
-              <div style={{ fontSize: 12, opacity: 0.8 }}>당신의 이야기로 잇기</div>
-            </Link>
+              <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>시민기자 안내</div>
+              <div style={{ fontSize: 12, lineHeight: 1.7, opacity: 0.85, marginBottom: 8 }}>
+                이음 시민기자는 봉숭아학당문화혁신학교<br />
+                방송스피치사관학교 수료자에게 자격이 주어집니다.
+              </div>
+              <div style={{ fontSize: 12, lineHeight: 1.7, opacity: 0.85 }}>
+                신청은 편집국장에게 문의하세요<br />
+                <a href="mailto:press@eummedia.kr" style={{ color: NAVY, fontWeight: 700, textDecoration: 'none' }}>press@eummedia.kr</a>
+              </div>
+            </div>
             <Link to="/advertise" style={{
               background: '#fff', color: NAVY, textDecoration: 'none',
               padding: '22px 24px', textAlign: 'center', fontFamily: SANS,
