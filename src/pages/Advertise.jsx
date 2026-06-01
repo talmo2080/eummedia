@@ -422,6 +422,22 @@ export default function Advertise() {
           ))}
         </div>
 
+        {/* 토요일 재노출 강조 띠 — 가격 카드 ↔ AI 배너 사이 */}
+        <div style={{
+          background: '#e8dcc0',
+          borderLeft: '4px solid #c9a84c',
+          padding: '18px 24px',
+          marginBottom: 14,
+          color: '#0d2d52',
+        }}>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6, lineHeight: 1.5 }}>
+            💬 한 번 실은 광고, 매주 토요일 카톡으로 한 번 더 푸시
+          </div>
+          <div style={{ fontSize: 12.5, opacity: 0.8, lineHeight: 1.6 }}>
+            발행된 광고 기사는 매주 토요일 이음미디어 카카오톡 채널 소식으로 구독자에게 다시 전해집니다.
+          </div>
+        </div>
+
         {/* AI 강점 배너 */}
         <div style={{ background: 'linear-gradient(135deg,#0d2d52,#1c4f8a)', color: 'white', padding: '24px 28px', marginBottom: 0 }}>
           <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.7, marginBottom: 8, letterSpacing: 1 }}>🤖 AI 검색 시대의 광고 전략</div>
