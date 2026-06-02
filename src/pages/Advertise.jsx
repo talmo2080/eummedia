@@ -150,12 +150,36 @@ export default function Advertise() {
     return () => { cancelled = true }
   }, [])
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.company || !form.name || !form.phone || !form.email) {
       alert('필수 항목(*)을 모두 입력해주세요.')
       return
     }
     if (!form.agree) { alert('개인정보 수집·이용에 동의해주세요.'); return }
+
+    // 1차: 서버리스 함수 호출 — Supabase 저장 + 편집장 텔레그램 즉시 알림
+    try {
+      const res = await fetch('/api/ad-inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company: form.company,
+          name: form.name,
+          phone: form.phone,
+          email: form.email,
+          package: form.package,
+          message: form.message,
+        }),
+      })
+      if (res.ok) { setStage('pending'); return }
+      // 200 외 응답 → 폴백
+      console.warn('[Advertise] /api/ad-inquiry non-200, falling back to mailto')
+    } catch (err) {
+      // 네트워크/타임아웃 → 폴백
+      console.warn('[Advertise] /api/ad-inquiry error, falling back to mailto:', err?.message)
+    }
+
+    // 폴백: 기존 mailto 동작 (서버 함수 실패해도 사용자 동선 보존)
     const subject = `[광고문의] ${form.package} - ${form.company}`
     const body = `[광고 문의]\n\n회사명·브랜드명: ${form.company}\n담당자: ${form.name}\n연락처: ${form.phone}\n이메일: ${form.email}\n광고 상품: ${form.package}\n\n문의 내용:\n${form.message || '(내용 없음)'}`
     window.location.href = `mailto:press@eummedia.kr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
