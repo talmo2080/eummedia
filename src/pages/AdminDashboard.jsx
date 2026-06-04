@@ -729,6 +729,22 @@ export default function AdminDashboard() {
   const hasMoreArticles = filteredArticles.length > visibleArticleCount
   const remainingArticles = filteredArticles.length - visibleArticleCount
 
+  // 발행 시 Vercel 재배포 트리거 — 서버 함수가 access token으로 admin/publisher 검증 후 Deploy Hook 호출
+  // 실패해도 발행은 성공 처리 (콘솔 경고만, 사용자 동선 안 끊김)
+  const triggerDeploy = async (source) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) { console.warn('[deploy hook] no session, skip'); return }
+      const r = await fetch('/api/trigger-deploy', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      })
+      if (!r.ok) console.warn(`[deploy hook] ${source} non-200:`, r.status)
+    } catch (err) {
+      console.warn(`[deploy hook] ${source} error:`, err?.message || err)
+    }
+  }
+
   const approveArticle = async (id) => {
     const nowIso = new Date().toISOString()
     const { error } = await supabase
@@ -738,6 +754,9 @@ export default function AdminDashboard() {
     if (error) { alert(`승인 실패: ${error.message}`); return }
     setArticles(articles.map(a => a.id === id ? { ...a, status: 'published', published_at: nowIso } : a))
     setApprovedId(id)
+    // 발행 성공 후 Vercel 재배포 트리거 (prerender 갱신 → 검색·AI 노출)
+    // 실패해도 발행 자체는 성공 — 사용자 동선 안 끊김 (콘솔 경고만)
+    triggerDeploy('approveArticle')
   }
   const startReject = (id) => { setRejectingId(id); setRejectReason('') }
   const confirmReject = async (id) => {

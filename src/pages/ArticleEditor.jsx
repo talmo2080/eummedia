@@ -822,6 +822,22 @@ export default function ArticleEditor() {
     }
   }
 
+  // 발행 시 Vercel 재배포 트리거 — 서버 함수가 access token으로 admin/publisher 검증 후 Deploy Hook 호출
+  // 실패해도 발행은 성공 처리 (콘솔 경고만, 사용자 동선 안 끊김)
+  const triggerDeploy = async (source) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) { console.warn('[deploy hook] no session, skip'); return }
+      const r = await fetch('/api/trigger-deploy', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      })
+      if (!r.ok) console.warn(`[deploy hook] ${source} non-200:`, r.status)
+    } catch (err) {
+      console.warn(`[deploy hook] ${source} error:`, err?.message || err)
+    }
+  }
+
   // ━━ 발행본 그대로 저장 (편집국장/발행인 전용 — 발행 기사 수정) ━━
   // status='published' 유지, published_at·slug·author_id 모두 보존, updated_at만 갱신
   const handlePublishUpdate = async () => {
@@ -839,6 +855,8 @@ export default function ArticleEditor() {
       setSavedAt(formatNow())
       setViewMode('publishUpdateSuccess')
       window.scrollTo({ top: 0, behavior: 'smooth' })
+      // 발행본 수정도 prerender 갱신 필요 (본문·이미지 변경 반영)
+      triggerDeploy('handlePublishUpdate')
     } catch (err) {
       console.error('[handlePublishUpdate] catch:', err)
       alert(`발행본 저장 중 오류: ${err?.message || err}`)
