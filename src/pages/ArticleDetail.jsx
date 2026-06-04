@@ -559,7 +559,7 @@ export default function ArticleDetail() {
         <div style={{ maxWidth:"1200px", margin:"0 auto", padding:"0 32px", display:"flex", gap:"6px", alignItems:"center" }}>
           <Link to="/" style={{ color:"#1c4f8a", textDecoration:"none" }}>홈</Link>
           <span>›</span>
-          <Link to={"/" + a.channel} style={{ color:"#1c4f8a", textDecoration:"none" }}>{a.channel}</Link>
+          <Link to={article.channels?.english_slug ? `/channel/${article.channels.english_slug}` : '/'} style={{ color:"#1c4f8a", textDecoration:"none" }}>{a.channel}</Link>
           <span>›</span>
           <span>{a.title}</span>
         </div>
