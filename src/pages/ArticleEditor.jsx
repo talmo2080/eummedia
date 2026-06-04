@@ -293,9 +293,11 @@ export default function ArticleEditor() {
   const [inlineAdSubtitle, setInlineAdSubtitle] = useState('')
   const [uploading, setUploading] = useState(false)
   const [bannerUploading, setBannerUploading] = useState(false)
+  const [inlineImageUploading, setInlineImageUploading] = useState(false)   // 본문 콘텐츠 이미지 업로드 상태
   const [originalStatus, setOriginalStatus] = useState(null)
   const fileInputRef = useRef(null)
   const bannerFileInputRef = useRef(null)
+  const inlineImageFileInputRef = useRef(null)   // 본문 콘텐츠 이미지 파일 input
   const contentRef = useRef(null)
 
   // admin/publisher만 다른 기자 글 fetch + 발행본 그대로 저장 가능
@@ -656,6 +658,63 @@ export default function ArticleEditor() {
       alert(`업로드 실패: ${err.message || '알 수 없는 오류'}`)
     } finally {
       setBannerUploading(false)
+      e.target.value = ''
+    }
+  }
+
+  // 본문 콘텐츠 이미지 — 광고 배너와 별개 (링크 X, [협찬] X, 순수 콘텐츠)
+  // 업로드 → 커서 위치에 [이미지:URL|캡션을 입력하세요] 자동 삽입
+  const openInlineImageFilePicker = () => {
+    if (inlineImageUploading) return
+    inlineImageFileInputRef.current?.click()
+  }
+  const handleInlineImageFileSelect = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!user) { alert('로그인이 필요합니다.'); return }
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드 가능합니다.')
+      e.target.value = ''
+      return
+    }
+    const MAX_SIZE = 10 * 1024 * 1024
+    if (file.size > MAX_SIZE) {
+      alert(`이미지가 너무 큽니다 (${(file.size/1024/1024).toFixed(1)}MB).\n10MB 이하로 부탁드립니다.`)
+      e.target.value = ''
+      return
+    }
+    setInlineImageUploading(true)
+    try {
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
+      // eslint-disable-next-line react-hooks/purity
+      const path = `${user.id}/inline-${Date.now()}.${ext}`
+      const { error } = await supabase.storage
+        .from('article-images')
+        .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type })
+      if (error) throw error
+      const { data: { publicUrl } } = supabase.storage
+        .from('article-images')
+        .getPublicUrl(path)
+      // 커서 위치에 [이미지:URL|캡션] 태그 삽입 (단락 단위 매칭 위해 앞뒤 \n 강제)
+      const ta = contentRef.current
+      const start = ta?.selectionStart ?? content.length
+      const end = ta?.selectionEnd ?? content.length
+      const defaultCaption = '캡션을 입력하세요'
+      const snippet = `\n[이미지:${publicUrl}|${defaultCaption}]\n`
+      const newContent = content.slice(0, start) + snippet + content.slice(end)
+      setContent(newContent)
+      // 커서를 캡션 텍스트 위치로 — 사용자가 바로 수정 가능
+      setTimeout(() => {
+        if (!ta) return
+        ta.focus()
+        const captionStart = start + snippet.indexOf(defaultCaption)
+        ta.setSelectionRange(captionStart, captionStart + defaultCaption.length)
+      }, 0)
+    } catch (err) {
+      console.error('inline image upload error:', err)
+      alert(`업로드 실패: ${err.message || '알 수 없는 오류'}`)
+    } finally {
+      setInlineImageUploading(false)
       e.target.value = ''
     }
   }
@@ -1261,12 +1320,32 @@ export default function ArticleEditor() {
                     <span>{action.label}</span>
                   </button>
                 ))}
+                {/* 본문 콘텐츠 이미지 — 별도 버튼 (비동기 업로드 + 자동 태그 삽입) */}
+                <button type="button"
+                  onClick={openInlineImageFilePicker}
+                  disabled={inlineImageUploading}
+                  title="본문 중간 이미지 넣기 — 표·사진·도표. 업로드 후 [이미지:URL|캡션] 자동 삽입"
+                  style={{
+                    minWidth: 44, minHeight: 44, padding: '8px 14px',
+                    background: inlineImageUploading ? '#f0f0f0' : '#fff',
+                    color: NAVY,
+                    border: `1.5px solid ${NAVY}`, borderRadius: 6,
+                    fontSize: 16, fontWeight: 700,
+                    cursor: inlineImageUploading ? 'wait' : 'pointer', fontFamily: SANS,
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                  }}>
+                  <span style={{ fontSize: 18, fontWeight: 900, lineHeight: 1 }}>📷</span>
+                  <span>{inlineImageUploading ? '업로드 중...' : '이미지 넣기'}</span>
+                </button>
+                <input ref={inlineImageFileInputRef} type="file" accept="image/*"
+                  onChange={handleInlineImageFileSelect}
+                  style={{ display: 'none' }} />
               </div>
               <textarea ref={contentRef} style={inp({
                 height: 600, resize: 'vertical', lineHeight: 1.9,
               })}
                 value={content} onChange={e => setContent(e.target.value)}
-                placeholder={'기사 본문을 입력하세요 (500자 이상 권장)\n\n서식: **굵게** / ## 소제목 / [quote]인용[/quote] / [box]강조[/box] / [info]정보[/info] / --- 구분선'} />
+                placeholder={'기사 본문을 입력하세요 (500자 이상 권장)\n\n서식: **굵게** / ## 소제목 / [quote]인용[/quote] / [box]강조[/box] / [info]정보[/info] / [이미지:URL|캡션] / --- 구분선'} />
               <div style={{
                 textAlign: 'right', fontSize: 18, fontWeight: 700,
                 color: content.length >= 500 ? GREEN : RED, marginTop: 8,

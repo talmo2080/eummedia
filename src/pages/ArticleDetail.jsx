@@ -42,7 +42,14 @@ const BLOCK_SENTINEL_SUFFIX = '__';
 function preserveBlockTags(content) {
   if (!content) return { text: '', blocks: [] };
   const blocks = [];
-  const text = content.replace(/\[(quote|box|info)\]([\s\S]*?)\[\/\1\]/g, (full) => {
+  // (1) 박스 태그 [quote/box/info]...[/...] — 닫는 태그가 있는 블록
+  let text = content.replace(/\[(quote|box|info)\]([\s\S]*?)\[\/\1\]/g, (full) => {
+    blocks.push(full);
+    return `${BLOCK_SENTINEL_PREFIX}${blocks.length - 1}${BLOCK_SENTINEL_SUFFIX}`;
+  });
+  // (2) 본문 콘텐츠 이미지 [이미지:URL|캡션] — self-closing 단일 태그
+  //     URL/캡션 안에 줄바꿈·마침표 있으면 단락 분할이 깨질 수 있으므로 동일 보호
+  text = text.replace(/\[이미지:[^\]]+\]/g, (full) => {
     blocks.push(full);
     return `${BLOCK_SENTINEL_PREFIX}${blocks.length - 1}${BLOCK_SENTINEL_SUFFIX}`;
   });
@@ -93,6 +100,24 @@ function paragraphToHtml(p) {
       .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
       .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>');
     return `<div style="background:#f0f5ff;border:1px solid #93b4e8;border-left:4px solid #0d2d52;border-radius:8px;padding:16px 20px;margin:20px 0;">${inner}</div>`;
+  }
+  // 본문 콘텐츠 이미지 [이미지:URL|캡션] — <figure><img alt><figcaption></figure>
+  // 캡션을 alt에 주입 → SSG prerender HTML에 그대로 박혀 검색·AI 노출
+  m = text.match(/^\[이미지:([^|\]]+)(?:\|([^\]]*))?\]$/);
+  if (m) {
+    const url = String(m[1]).trim();
+    const caption = (m[2] || '').trim();
+    // 보안: https:// 시작 URL만 허용 (외부 임의 URL 방어)
+    if (/^https:\/\//.test(url)) {
+      const safeUrl = escapeHtml(url);
+      const safeCaption = escapeHtml(caption);
+      const altAttr = safeCaption || '본문 이미지';
+      const figcaption = caption
+        ? `<figcaption style="font-size:0.85rem;color:#888;text-align:center;margin-top:8px;line-height:1.6;">${safeCaption}</figcaption>`
+        : '';
+      return `<figure style="margin:28px auto;text-align:center;"><img src="${safeUrl}" alt="${altAttr}" loading="lazy" style="max-width:100%;height:auto;display:block;margin:0 auto;border-radius:4px;" />${figcaption}</figure>`;
+    }
+    // 잘못된 URL (http://, javascript: 등) — 일반 단락으로 fallthrough (escape 처리)
   }
   m = text.match(/^##\s+(.+)$/);
   if (m) {
