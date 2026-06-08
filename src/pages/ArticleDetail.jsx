@@ -321,7 +321,7 @@ export default function ArticleDetail() {
       content: {
         title: article.title,
         description: article.summary || '',
-        imageUrl: article.thumbnail_url || 'https://eummedia.kr/og-image.png',
+        imageUrl: article.thumbnail_url || 'https://www.eummedia.kr/og-image.png',
         link: {
           mobileWebUrl: window.location.href,
           webUrl: window.location.href,

@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const SITE_URL = 'https://eummedia.kr';
+const SITE_URL = 'https://www.eummedia.kr';
 const FEED_URL = `${SITE_URL}/rss.xml`;
 const OUT_PATH = path.resolve('public/rss.xml');
 const FEED_LIMIT = 30;

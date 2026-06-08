@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(__dirname, '../dist');
-const SITE_URL = 'https://eummedia.kr';
+const SITE_URL = 'https://www.eummedia.kr';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 const DEFAULT_OG_DESC = '시니어와 소상공인, 이웃의 이야기를 조명하는 인터넷신문';
 
@@ -44,6 +44,7 @@ function applyArticleMeta(html, article, url) {
   return html
     .replace(/(<title>)[^<]*(<\/title>)/, `$1${t}$2`)
     .replace(/(<meta name="description" content=")[^"]*(")/, `$1${d}$2`)
+    .replace(/(<link rel="canonical" href=")[^"]*(")/, `$1${u}$2`)
     .replace(/(<meta property="og:type" content=")[^"]*(")/, `$1article$2`)
     .replace(/(<meta property="og:title" content=")[^"]*(")/, `$1${t}$2`)
     .replace(/(<meta property="og:description" content=")[^"]*(")/, `$1${d}$2`)

@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const SITE_URL = 'https://eummedia.kr';
+const SITE_URL = 'https://www.eummedia.kr';
 const OUT_PATH = path.resolve('public/sitemap.xml');
 
 // ───────── .env 로더 (dotenv 없이 직접 파싱) ─────────
