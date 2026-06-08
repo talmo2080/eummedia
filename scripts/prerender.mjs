@@ -29,7 +29,45 @@ function escHtml(s) {
     .replace(/'/g, '&#39;');
 }
 
+// NewsArticle JSON-LD 생성 — Schema.org 기사 스키마
+// (검색엔진 — 특히 네이버·구글 뉴스 — 이 기사 메타데이터를 정확히 파싱하도록 함)
+function buildNewsArticleJsonLd(article, fullUrl) {
+  const headline = article.title || '';
+  const description = (article.summary && article.summary.trim()) || DEFAULT_OG_DESC;
+  const image = article.thumbnail_url || DEFAULT_OG_IMAGE;
+  const datePublished = article.published_at || '';
+  const dateModified  = article.updated_at  || article.published_at || '';
+  const authorName = article.users?.nickname || '이음미디어 편집부';
+
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline,
+    image: [image],
+    datePublished,
+    dateModified,
+    author: { '@type': 'Person', name: authorName },
+    publisher: {
+      '@type': 'Organization',
+      name: '이음미디어',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${SITE_URL}/og-image.png`,
+      },
+    },
+    description,
+    mainEntityOfPage: fullUrl,
+  };
+  // JSON.stringify의 자체 escape는 </script>, <, > 위험을 해소하지 못함 — 추가 처리
+  const json = JSON.stringify(data)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026');
+  return `<script type="application/ld+json">${json}</script>`;
+}
+
 // 기사 페이지의 <title> + og/twitter/description 메타를 기사별 값으로 교체
+// + NewsArticle JSON-LD 를 </head> 직전에 삽입
 function applyArticleMeta(html, article, url) {
   const title = `${article.title} | 이음미디어`;
   const desc = (article.summary && article.summary.trim()) || DEFAULT_OG_DESC;
@@ -40,6 +78,8 @@ function applyArticleMeta(html, article, url) {
   const d = escHtml(desc);
   const i = escHtml(image);
   const u = escHtml(fullUrl);
+
+  const newsJsonLd = buildNewsArticleJsonLd(article, fullUrl);
 
   return html
     .replace(/(<title>)[^<]*(<\/title>)/, `$1${t}$2`)
@@ -52,7 +92,9 @@ function applyArticleMeta(html, article, url) {
     .replace(/(<meta property="og:url" content=")[^"]*(")/, `$1${u}$2`)
     .replace(/(<meta name="twitter:title" content=")[^"]*(")/, `$1${t}$2`)
     .replace(/(<meta name="twitter:description" content=")[^"]*(")/, `$1${d}$2`)
-    .replace(/(<meta name="twitter:image" content=")[^"]*(")/, `$1${i}$2`);
+    .replace(/(<meta name="twitter:image" content=")[^"]*(")/, `$1${i}$2`)
+    // NewsArticle JSON-LD — </head> 직전에 삽입 (기존 Organization/WebSite JSON-LD와 공존)
+    .replace(/<\/head>/, `  ${newsJsonLd}\n  </head>`);
 }
 
 async function getUrls() {
@@ -62,10 +104,11 @@ async function getUrls() {
     '/advertise', '/report', '/citizen-reporter', '/terms',
   ];
 
-  // 기사 — slug + OG 후처리에 필요한 필드 함께 fetch
+  // 기사 — slug + OG/JSON-LD 후처리에 필요한 필드 함께 fetch
+  // (NewsArticle JSON-LD에 published_at, updated_at, 기자명 필요)
   const { data: articles } = await supabase
     .from('articles')
-    .select('slug, title, summary, thumbnail_url')
+    .select('slug, title, summary, thumbnail_url, published_at, updated_at, users(nickname)')
     .eq('status', 'published');
   const articleUrls = (articles || []).map(a => `/article/${a.slug}`);
   // slug → article Map (savePage에서 OG 메타 교체에 사용)

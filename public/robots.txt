@@ -7,4 +7,18 @@ Disallow: /login
 Disallow: /signup
 Disallow: /find-password
 
+# 네이버 봇 — 명시적 허용 (private 경로는 동일하게 차단)
+User-agent: Yeti
+Allow: /
+Disallow: /admin
+Disallow: /write
+Disallow: /mypage
+Disallow: /login
+Disallow: /signup
+Disallow: /find-password
+
+# 다음(카카오) 봇 — 명시적 허용
+User-agent: Daum
+Allow: /
+
 Sitemap: https://www.eummedia.kr/sitemap.xml
