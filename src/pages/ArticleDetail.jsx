@@ -484,7 +484,8 @@ export default function ArticleDetail() {
     return () => { cancelled = true; };
   }, [channelId, slug]);
 
-  // 📺 영상 갤러리 — 현재 기사 제외, 영상 있는 published 기사 최신순
+  // 📺 영상 갤러리 — show_in_gallery=true 큐레이션, 최신순 6건
+  // (모든 기사 페이지에서 동일 노출 — 자기제외 제거. 큐레이션이 정세연의 결정)
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -492,9 +493,9 @@ export default function ArticleDetail() {
         .from('articles')
         .select('slug, title, video_url, thumbnail_url, channels(name)')
         .eq('status', 'published')
+        .eq('show_in_gallery', true)
         .not('video_url', 'is', null)
         .neq('video_url', '')
-        .neq('slug', slug)
         .order('published_at', { ascending: false })
         .limit(6);
       if (cancelled) return;
@@ -502,7 +503,7 @@ export default function ArticleDetail() {
       setGalleryVideos(data ?? []);
     })();
     return () => { cancelled = true; };
-  }, [slug]);
+  }, []);
 
   // 💬 댓글 fetch — 기사 로드 후 articleId 기준 (is_deleted=false)
   const articleId = article?.id;
@@ -984,10 +985,19 @@ export default function ArticleDetail() {
             </div>
           </div>
 
-          {/* 📺 영상 갤러리 — 현재 기사 제외, 공용 컴포넌트 (0건 시 섹션 숨김) */}
+          {/* 📺 영상 갤러리 — show_in_gallery=true 큐레이션 (0건 시 섹션 숨김) */}
           {galleryVideos.length > 0 && (
             <div style={{ marginTop:"32px" }}>
-              <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52", borderLeft:"4px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px" }}>📺 영상 갤러리</div>
+              <div style={{
+                display:"flex", alignItems:"center", justifyContent:"space-between",
+                borderLeft:"4px solid #0d2d52", paddingLeft:"12px", marginBottom:"16px",
+              }}>
+                <div style={{ fontSize:"20px", fontWeight:"700", color:"#0d2d52" }}>📺 영상 갤러리</div>
+                <Link to="/videos" style={{
+                  fontSize:"13px", fontWeight:"700", color:"#0d2d52",
+                  textDecoration:"none", borderBottom:"1px solid #0d2d52", paddingBottom:"1px",
+                }}>더보기 →</Link>
+              </div>
               <VideoGallery videos={galleryVideos} />
             </div>
           )}
