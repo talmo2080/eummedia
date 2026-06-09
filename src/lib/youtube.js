@@ -1,5 +1,7 @@
-// YouTube URL 패턴 — watch?v=, youtu.be/, embed/, shorts/ (+ m.youtube, 쿼리·타임스탬프 변형)
-const YT_RE = /(?:youtube\.com\/watch\?(?:[^&]*&)*v=|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtu\.be\/)([A-Za-z0-9_-]{11})/;
+// YouTube URL 패턴 — watch?v=, embed/, shorts/, live/, youtu.be/
+// 도메인 변형: youtube.com / www.youtube.com / m.youtube.com 모두 지원
+// 쿼리·타임스탬프(?t=, &si=) 등 부가 파라미터는 11자 ID 뒤로 흘려보냄
+const YT_RE = /(?:(?:m\.|www\.)?youtube\.com\/(?:watch\?(?:[^&]*&)*v=|embed\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/;
 
 // URL → 11자 VIDEO_ID. 실패 시 null
 export function getYouTubeVideoId(url) {
