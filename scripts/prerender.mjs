@@ -102,6 +102,7 @@ async function getUrls() {
     '/', '/about', '/subscribe',
     '/privacy', '/youth', '/login', '/signup',
     '/advertise', '/report', '/citizen-reporter', '/terms',
+    '/videos',
   ];
 
   // 기사 — slug + OG/JSON-LD 후처리에 필요한 필드 함께 fetch

@@ -22,6 +22,7 @@ import Privacy from './pages/Privacy'
 import YouthPolicy from './pages/YouthPolicy'
 import ArticleEditor from './pages/ArticleEditor'
 import MyPage from './pages/MyPage'
+import Videos from './pages/Videos'
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/youth" element={<YouthPolicy />} />
+            <Route path="/videos" element={<Videos />} />
             <Route path="/write" element={
               <ProtectedRoute requiredRole="writer"><ArticleEditor /></ProtectedRoute>
             } />

@@ -35,6 +35,7 @@ const STATIC_PAGES = [
   { loc: '/report',            priority: 0.5, changefreq: 'monthly' },
   { loc: '/citizen-reporter',  priority: 0.6, changefreq: 'monthly' },
   { loc: '/subscribe',         priority: 0.5, changefreq: 'monthly' },
+  { loc: '/videos',            priority: 0.7, changefreq: 'weekly'  },
   { loc: '/terms',             priority: 0.3, changefreq: 'yearly'  },
   { loc: '/privacy',           priority: 0.3, changefreq: 'yearly'  },
   { loc: '/youth',             priority: 0.3, changefreq: 'yearly'  },
