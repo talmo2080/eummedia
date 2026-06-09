@@ -350,53 +350,34 @@ export default function ArticleEditor() {
   })
   const toggleManual = (key) => setManualChecks(c => ({ ...c, [key]: !c[key] }))
 
-  // 맞춤법 검사 — Anthropic API 직접 호출 (Claude Haiku)
-  // ⚠️ 보안 위험: API 키가 클라 번들에 노출 (VITE_ANTHROPIC_API_KEY)
-  // ⚠️ CORS 위험: Anthropic API는 브라우저 직접 호출 차단할 수 있음 (필요 시 dangerouslyAllowBrowser)
+  // 맞춤법 검사 — Vercel 서버리스 프록시 경유 (Claude Haiku)
+  // API 키는 서버 환경변수(ANTHROPIC_SPELLCHECK_KEY 또는 ANTHROPIC_API_KEY) 사용
+  // 클라이언트 번들엔 키 노출 X (D1 보안 보강)
   const handleSpellCheck = async () => {
     if (isSpellChecking) return
     if (!content.trim()) {
       alert('본문을 먼저 입력해주세요.')
       return
     }
-    const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY
-    if (!apiKey) {
-      alert('맞춤법 검사 키가 설정되지 않았습니다. (관리자에게 문의)')
-      return
-    }
     setIsSpellChecking(true)
+    // 클라이언트 timeout 25초 — 서버 15초 + 네트워크 여유
     const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), 15000)
+    const timer = setTimeout(() => controller.abort(), 25000)
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/spellcheck-ai', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 300,
-          messages: [{
-            role: 'user',
-            content: `다음 글의 맞춤법과 오탈자를 검사해주세요.
-오류가 없으면 "이상 없음"만,
-오류가 있으면 번호 목록으로 수정 제안 3건 이내만 출력하세요.
-
-글: ${content.slice(0, 800)}`,
-          }],
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: content.slice(0, 800) }),
         signal: controller.signal,
       })
       if (!response.ok) {
-        const errBody = await response.text()
-        alert(`맞춤법 검사 실패 (${response.status}):\n${errBody.slice(0, 400)}`)
+        const errData = await response.json().catch(() => ({}))
+        const errMsg = errData.error || `HTTP ${response.status}`
+        alert(`맞춤법 검사 실패: ${errMsg}`)
         return
       }
       const data = await response.json()
-      const result = data?.content?.[0]?.text || ''
+      const result = data?.text || ''
       if (!result) {
         alert('맞춤법 검사 응답 형식 오류')
         return
@@ -410,7 +391,7 @@ export default function ArticleEditor() {
       setManualChecks(c => ({ ...c, spelling: true }))
     } catch (err) {
       if (err.name === 'AbortError') {
-        alert('맞춤법 검사 시간 초과 (15초). 다시 시도해주세요.')
+        alert('맞춤법 검사 시간 초과 (25초). 다시 시도해주세요.')
       } else {
         alert(`맞춤법 검사 중 오류: ${err.message || '알 수 없는 오류'}`)
       }
