@@ -286,6 +286,10 @@ export default function ArticleEditor() {
   const [thumbnailUrl, setThumbnailUrl] = useState('')
   const [imageAlt, setImageAlt] = useState('')
   const [videoUrl, setVideoUrl] = useState('')
+  // 영상 노출 위치 — show_in_article(기사 본문 끝) / show_in_gallery(영상 갤러리)
+  // 둘 다 false면 표시 안 함 (default). 시민기자는 article만 토글, 편집국장은 둘 다.
+  const [showInArticle, setShowInArticle] = useState(false)
+  const [showInGallery, setShowInGallery] = useState(false)
   const [content, setContent] = useState('')
   const [inlineAdImage, setInlineAdImage] = useState('')
   const [inlineAdLink, setInlineAdLink] = useState('')
@@ -444,6 +448,8 @@ export default function ArticleEditor() {
       setThumbnailUrl(data.thumbnail_url || '')
       setImageAlt(data.image_alt || '')
       setVideoUrl(data.video_url || '')
+      setShowInArticle(!!data.show_in_article)
+      setShowInGallery(!!data.show_in_gallery)
       setReporter(data.author_name || '')
       setExternalUrl(data.external_url || '')
       setInlineAdImage(data.inline_ad_image || '')
@@ -737,6 +743,8 @@ export default function ArticleEditor() {
       thumbnail_url: thumbnailUrl.trim() || null,
       tags: mergedTags.length > 0 ? mergedTags : null,
       video_url: videoUrl.trim() || null,
+      show_in_article: !!showInArticle,
+      show_in_gallery: !!showInGallery,
       author_name: (reporter || profile?.nickname || '').trim() || null,
       image_alt: imageAlt.trim() || null,
       external_url: externalUrl.trim() || null,
@@ -867,7 +875,8 @@ export default function ArticleEditor() {
 
   const resetForm = () => {
     setChannel(''); setTitle(''); setReporter(''); setTagInput(''); setTags([])
-    setSummary(''); setThumbnailUrl(''); setImageAlt(''); setVideoUrl(''); setContent('')
+    setSummary(''); setThumbnailUrl(''); setImageAlt(''); setVideoUrl('')
+    setShowInArticle(false); setShowInGallery(false); setContent('')
     setExternalUrl(''); setInlineAdImage(''); setInlineAdLink(''); setInlineAdTitle(''); setInlineAdSubtitle('')
     setOriginalStatus(null)
     setManualChecks({
@@ -1301,7 +1310,7 @@ export default function ArticleEditor() {
                 placeholder="사진 설명 — 예: 고양시 닥터리부트 두피케어 체험" />
             </div>
 
-            {/* 7. 영상 URL (선택) */}
+            {/* 7. 영상 URL + 노출 위치 (선택) */}
             <div style={card}>
               <label style={lbl}>
                 영상 URL <span style={{ color: '#888', fontWeight: 500, fontSize: 16 }}>(선택)</span>
@@ -1310,9 +1319,97 @@ export default function ArticleEditor() {
                 value={videoUrl} onChange={e => setVideoUrl(e.target.value)}
                 placeholder="예: https://www.youtube.com/watch?v=..." />
               <div style={{ fontSize: 16, color: '#666', marginTop: 10, lineHeight: 1.7 }}>
-                영상이 있으면 <strong>YouTube 링크</strong>를 넣어주세요.<br />
+                <strong>유튜브 링크</strong>를 넣고, 아래에서 <strong>어디에 노출할지</strong> 선택하세요.<br />
                 사진만 있는 기사는 비워두셔도 됩니다.
               </div>
+
+              {/* 노출 위치 라디오 — 시민기자 2개 / 편집국장 4개 */}
+              {(() => {
+                // 라디오 옵션 정의 — adminOnly true면 편집국장 전용
+                const placementOptions = [
+                  {
+                    key: 'article', article: true, gallery: false, adminOnly: false,
+                    label: '기사 아래에만 표시',
+                    desc: '이 기사 본문 끝에만 영상이 나옵니다.',
+                  },
+                  {
+                    key: 'gallery', article: false, gallery: true, adminOnly: true,
+                    label: '영상 갤러리에만 표시',
+                    desc: '메인의 영상 갤러리에만 노출됩니다 (기사 본문엔 안 나옴).',
+                  },
+                  {
+                    key: 'both', article: true, gallery: true, adminOnly: true,
+                    label: '둘 다 표시',
+                    desc: '기사 본문 + 영상 갤러리 둘 다에 노출됩니다.',
+                  },
+                  {
+                    key: 'none', article: false, gallery: false, adminOnly: false,
+                    label: '표시 안 함',
+                    desc: '영상 URL은 저장되지만 화면에 안 보입니다 (기본값).',
+                  },
+                ];
+                const visible = isAdminOrPublisher
+                  ? placementOptions
+                  : placementOptions.filter(o => !o.adminOnly);
+                // 현재 선택된 키 판별
+                const currentKey =
+                  (showInArticle && showInGallery) ? 'both' :
+                  showInArticle ? 'article' :
+                  showInGallery ? 'gallery' : 'none';
+
+                return (
+                  <div style={{ marginTop: 20 }}>
+                    <div style={{ fontSize: 17, fontWeight: 700, color: NAVY, marginBottom: 12 }}>
+                      영상 노출 위치 선택
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {visible.map(opt => {
+                        const selected = opt.key === currentKey;
+                        return (
+                          <label key={opt.key}
+                            style={{
+                              display: 'flex', alignItems: 'flex-start', gap: 14,
+                              padding: '16px 18px', borderRadius: 8,
+                              border: `2px solid ${selected ? NAVY : '#d8d8d8'}`,
+                              background: selected ? '#f0f5fb' : '#fff',
+                              cursor: 'pointer', transition: 'border-color 0.15s, background 0.15s',
+                              fontFamily: SANS,
+                            }}>
+                            <input type="radio" name="videoPlacement"
+                              value={opt.key} checked={selected}
+                              onChange={() => {
+                                setShowInArticle(opt.article);
+                                setShowInGallery(opt.gallery);
+                              }}
+                              style={{
+                                width: 24, height: 24, marginTop: 2,
+                                accentColor: NAVY, cursor: 'pointer', flexShrink: 0,
+                              }} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{
+                                fontSize: 18, fontWeight: 700,
+                                color: selected ? NAVY : '#1a1a1a', marginBottom: 4,
+                              }}>{opt.label}</div>
+                              <div style={{ fontSize: 15, color: '#5a5a5a', lineHeight: 1.5 }}>
+                                {opt.desc}
+                              </div>
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+                    {!isAdminOrPublisher && (
+                      <div style={{
+                        marginTop: 12, padding: '10px 14px',
+                        background: '#f7f8fa', border: '1px solid #e0e0e0', borderRadius: 6,
+                        fontSize: 14, color: '#666', lineHeight: 1.6,
+                      }}>
+                        💡 영상 갤러리 노출은 편집국장이 별도로 검토·선별합니다.
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
 
             {/* 8. 본문 */}
