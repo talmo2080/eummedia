@@ -410,7 +410,7 @@ export default function ArticleDetail() {
     (async () => {
       const { data, error: err } = await supabase
         .from('articles')
-        .select('id, slug, title, summary, content, thumbnail_url, video_url, published_at, channel_id, author_id, like_count, tags, external_url, inline_ad_image, inline_ad_link, inline_ad_title, inline_ad_subtitle, channels(name, slug, english_slug)')
+        .select('id, slug, title, summary, content, thumbnail_url, video_url, show_in_article, show_in_gallery, published_at, channel_id, author_id, like_count, tags, external_url, inline_ad_image, inline_ad_link, inline_ad_title, inline_ad_subtitle, channels(name, slug, english_slug)')
         .eq('slug', slug)
         .eq('status', 'published')
         .single();
@@ -567,6 +567,7 @@ export default function ArticleDetail() {
     published_at: formatDate(article.published_at),
     content: article.content,
     video_url: article.video_url,
+    show_in_article: !!article.show_in_article,
     author_name: "정세연 편집국장",
     author_bio: "닥터리부트 두피관리센터(일산) 원장 · 두피전문가 27년 · 이음미디어 편집국장",
     author_intro: "두피 전문가 27년 경력의 정세연 원장이자 이음미디어 편집국장입니다. 세상을 잇고 사람을 잇는 이야기를 발굴합니다.",
@@ -751,8 +752,10 @@ export default function ArticleDetail() {
             </div>
           )}
 
-          {/* 🎬 영상 임베드 — video_url + 유효한 YouTube일 때만 */}
+          {/* 🎬 영상 임베드 — show_in_article=true + video_url + 유효한 YouTube일 때만 */}
+          {/* show_in_article=false면 video_url은 보존되지만 본문엔 노출 X (영상 갤러리에만 또는 미노출) */}
           {(() => {
+            if (!a.show_in_article) return null;
             const embedUrl = getYouTubeEmbedUrl(a.video_url);
             if (!embedUrl) return null;
             return (
