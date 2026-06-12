@@ -45,8 +45,8 @@ export default function Header() {
     role === "admin" ? "편집국장" :
     role === "publisher" ? "발행인" :
     role === "writer" ? "기자" : "독자";
-  // 닉네임 버튼 목적지 — admin은 /admin, 그 외(writer/reader/publisher)는 /mypage
-  const myPageTarget = role === "admin" ? "/admin" : "/mypage";
+  // 닉네임 버튼 목적지 — admin·publisher는 /admin (기사관리+내 임시저장 통합), writer/reader는 /mypage
+  const myPageTarget = (role === "admin" || role === "publisher") ? "/admin" : "/mypage";
 
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);

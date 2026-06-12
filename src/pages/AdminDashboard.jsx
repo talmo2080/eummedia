@@ -53,6 +53,8 @@ const ARTICLE_STATUS_LABELS = {
   submitted: { label: '검토대기', color: RED, bg: '#fef0ef' },
   rejected: { label: '반려됨', color: ORANGE, bg: '#fff8f0' },
   published: { label: '발행됨', color: GREEN, bg: '#eef7f2' },
+  // 임시저장 — '내 임시저장' 탭에서만 노출 (admin/publisher 본인 author_id만)
+  draft: { label: '임시저장', color: '#b45309', bg: '#fff8e1' },
 }
 
 // USER_STATUS_LABELS 제거 — 새 카드는 inline badge로 대체
@@ -105,6 +107,8 @@ const ARTICLE_FILTERS = [
   { key: 'submitted', label: '검토대기 🔴' },
   { key: 'rejected', label: '반려됨' },
   { key: 'published', label: '발행됨' },
+  // 본인(admin/publisher) author_id의 draft만 — 권한 분기는 렌더 시점에 적용
+  { key: 'my_draft', label: '내 임시저장', adminOrPublisherOnly: true },
 ]
 
 const USER_FILTERS = [
@@ -627,12 +631,14 @@ function CardNewsModal({ article, onClose, onDelete, onSaved }) {
 }
 
 export default function AdminDashboard() {
-  const { profile } = useAuth()
+  const { user, profile } = useAuth()
   const canAct = profile?.role === 'admin'   // 발행/반려/승인/정지/카드뉴스 등 모든 액션
-  // 홈 1면 대표 지정은 admin/publisher 둘 다 가능 (편집국장 + 발행인)
+  // 홈 1면 대표 지정 + '내 임시저장' 탭은 admin/publisher 둘 다 가능
   const isAdminOrPublisher = profile?.role === 'admin' || profile?.role === 'publisher'
   const [activeTab, setActiveTab] = useState(1)
   const [articles, setArticles] = useState([])
+  // '내 임시저장' 탭 전용 — 본인 author_id의 status='draft' (남의 draft 안 보임)
+  const [myDrafts, setMyDrafts] = useState([])
   const [users, setUsers] = useState([])
   const [articleFilter, setArticleFilter] = useState('all')
   const [userFilter, setUserFilter] = useState('all')
@@ -649,6 +655,24 @@ export default function AdminDashboard() {
   const [appRejectReason, setAppRejectReason] = useState('')
   // 카드뉴스 보유 article.id 집합 — "🗑 카드뉴스 삭제" 버튼 노출 판단용
   const [cardnewsSet, setCardnewsSet] = useState(() => new Set())
+
+  // 본인 임시저장 fetch — admin/publisher 권한 + user.id 확정 후 (myDrafts default [])
+  useEffect(() => {
+    if (!isAdminOrPublisher || !user) return
+    let cancelled = false
+    ;(async () => {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*, channels(name)')
+        .eq('status', 'draft')
+        .eq('author_id', user.id)
+        .order('updated_at', { ascending: false })
+      if (cancelled) return
+      if (error) { console.error('my_draft fetch:', error); return }
+      setMyDrafts(data || [])
+    })()
+    return () => { cancelled = true }
+  }, [isAdminOrPublisher, user])
 
   useEffect(() => {
     (async () => {
@@ -689,9 +713,10 @@ export default function AdminDashboard() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const filteredArticles = articleFilter === 'all'
-    ? articles
-    : articles.filter(a => a.status === articleFilter)
+  const filteredArticles =
+    articleFilter === 'my_draft' ? myDrafts :        // 본인 draft 별도 state
+    articleFilter === 'all'      ? articles :        // 기존 4개 status 전체
+    articles.filter(a => a.status === articleFilter)
   // filteredUsers 제거 — 새 시민기자 관리 탭은 entries (writer_applications + legacy) 사용
 
   // 회원 관리 탭 — 필터 + CSV 내보내기
@@ -745,6 +770,17 @@ export default function AdminDashboard() {
     } catch (err) {
       console.warn(`[deploy hook] ${source} error:`, err?.message || err)
     }
+  }
+
+  // 🗑 본인 임시저장 삭제 (my_draft 탭 전용) — author_id 가드로 본인 글만 삭제
+  const deleteMyDraft = async (id) => {
+    if (!window.confirm('이 임시저장 기사를 삭제하시겠습니까? 복구할 수 없습니다.')) return
+    const { error } = await supabase.from('articles')
+      .delete()
+      .eq('id', id)
+      .eq('author_id', user.id)
+    if (error) { alert(`삭제 실패: ${error.message}`); return }
+    setMyDrafts(prev => prev.filter(a => a.id !== id))
   }
 
   // ⭐ 홈 1면 대표 지정 토글 — admin/publisher 전용
@@ -1111,8 +1147,12 @@ export default function AdminDashboard() {
             </div>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
-              {ARTICLE_FILTERS.map(f => {
+              {ARTICLE_FILTERS
+                .filter(f => !f.adminOrPublisherOnly || isAdminOrPublisher)
+                .map(f => {
                 const sel = articleFilter === f.key
+                // 내 임시저장 탭은 본인 draft 카운트 노출
+                const count = f.key === 'my_draft' ? myDrafts.length : null
                 return (
                   <button key={f.key} type="button" onClick={() => setArticleFilter(f.key)}
                     style={{
@@ -1124,7 +1164,7 @@ export default function AdminDashboard() {
                       borderRadius: 24,
                       cursor: 'pointer', transition: 'all 0.15s',
                     }}>
-                    {f.label}
+                    {f.label}{count !== null ? ` (${count})` : ''}
                   </button>
                 )
               })}
@@ -1230,6 +1270,18 @@ export default function AdminDashboard() {
 
                   {!isRejecting && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      {/* 임시저장 — 본인 draft만 표시되므로 권한 추가 가드 불필요 */}
+                      {a.status === 'draft' && (
+                        <>
+                          <Link to={`/write?id=${a.id}`}
+                            style={{ ...btnStyle(NAVY), textDecoration: 'none', display: 'inline-block' }}>
+                            ✍️ 이어서 작성
+                          </Link>
+                          <button onClick={() => deleteMyDraft(a.id)} style={btnStyle(RED, true)}>
+                            🗑 삭제
+                          </button>
+                        </>
+                      )}
                       {a.status === 'submitted' && (
                         <>
                           {canAct && <button onClick={() => approveArticle(a.id)} style={btnStyle(GREEN)}>✅ 승인·발행</button>}
