@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import VideoGallery from "../components/VideoGallery";
@@ -204,6 +204,12 @@ function StockWidget() {
 export default function Home() {
   const [heroArticle, setHeroArticle] = useState(null);
   const [articles, setArticles] = useState([]);
+  // 🎠 1면 대표 캐러셀 — 편집국장이 /admin에서 지정 (is_main_featured)
+  // 0건이면 heroArticle(최신 1건) 폴백, 1~3건이면 캐러셀로 회전
+  const [featuredArticles, setFeaturedArticles] = useState([]);
+  const [activeFeaturedIndex, setActiveFeaturedIndex] = useState(0);
+  const [carouselPaused, setCarouselPaused] = useState(false);
+  const carouselTouchStartRef = useRef(0);
   const [popular, setPopular] = useState([]);
   const [videosList, setVideosList] = useState([]);
   const [error, setError] = useState(null);
@@ -217,23 +223,79 @@ export default function Home() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data, error: queryError } = await supabase
+      // (1) 1면 대표 캐러셀 — featured 3건 (편집국장 지정 순)
+      const { data: featured, error: fErr } = await supabase
         .from('articles')
         .select('slug, title, summary, thumbnail_url, published_at, author_name, channels(name)')
         .eq('status', 'published')
-        .order('published_at', { ascending: false })
-        .limit(7);
+        .eq('is_main_featured', true)
+        .order('main_featured_order', { ascending: true })
+        .limit(3);
       if (cancelled) return;
-      if (queryError) {
-        console.error('[HERO+ARTICLES] supabase error:', queryError);
+      if (fErr) {
+        console.error('[FEATURED] supabase error:', fErr);
+        setError('대표 기사를 불러오지 못했어요. 잠시 후 새로고침 해주세요.');
+        return;
+      }
+      const featuredList = featured ?? [];
+
+      // (2) 그리드용 latest — featured slug 제외하고 fetch (중복 노출 방지)
+      //     featured 0건이면 limit 7 (폴백: 첫번째가 hero), 있으면 limit 6
+      let latestQuery = supabase
+        .from('articles')
+        .select('slug, title, summary, thumbnail_url, published_at, author_name, channels(name)')
+        .eq('status', 'published')
+        .order('published_at', { ascending: false });
+      if (featuredList.length > 0) {
+        const slugList = featuredList.map(a => `"${a.slug}"`).join(',');
+        latestQuery = latestQuery.not('slug', 'in', `(${slugList})`).limit(6);
+      } else {
+        latestQuery = latestQuery.limit(7);
+      }
+      const { data: latest, error: lErr } = await latestQuery;
+      if (cancelled) return;
+      if (lErr) {
+        console.error('[HERO+ARTICLES] supabase error:', lErr);
         setError('최신 기사를 불러오지 못했어요. 잠시 후 새로고침 해주세요.');
         return;
       }
-      setHeroArticle(data?.[0] ?? null);
-      setArticles(data?.slice(1) ?? []);
+
+      // (3) 폴백 분기
+      if (featuredList.length === 0) {
+        // 폴백: 기존 로직 그대로 — 최신 1건 hero + 나머지 6건 그리드
+        setFeaturedArticles([]);
+        setHeroArticle(latest?.[0] ?? null);
+        setArticles(latest?.slice(1) ?? []);
+      } else {
+        // 캐러셀 활성: featured는 캐러셀, latest는 그리드
+        setFeaturedArticles(featuredList);
+        setHeroArticle(null);
+        setArticles(latest ?? []);
+      }
     })();
     return () => { cancelled = true; };
   }, []);
+
+  // 🎠 캐러셀 자동 회전 (5초) + 호버 일시정지
+  useEffect(() => {
+    if (featuredArticles.length <= 1 || carouselPaused) return;
+    const id = setInterval(() => {
+      setActiveFeaturedIndex(i => (i + 1) % featuredArticles.length);
+    }, 5000);
+    return () => clearInterval(id);
+  }, [featuredArticles.length, carouselPaused]);
+
+  // 캐러셀 핸들러 (공용)
+  const carouselNext = () => setActiveFeaturedIndex(i => (i + 1) % featuredArticles.length);
+  const carouselPrev = () => setActiveFeaturedIndex(i => (i - 1 + featuredArticles.length) % featuredArticles.length);
+  const carouselJump = (i) => setActiveFeaturedIndex(i);
+  const carouselOnTouchStart = (e) => { carouselTouchStartRef.current = e.changedTouches[0].screenX; };
+  const carouselOnTouchEnd = (e) => {
+    const delta = carouselTouchStartRef.current - e.changedTouches[0].screenX;
+    if (Math.abs(delta) > 50 && featuredArticles.length > 1) {
+      if (delta > 0) carouselNext(); else carouselPrev();
+    }
+  };
 
   // 🔥 이번주 인기 기사 — view_count 우선, 동률 시 published_at 보조
   // (view_count 카운팅 시작 전까지는 사실상 최신순으로 동작)
@@ -298,8 +360,86 @@ export default function Home() {
       {/* 순서: HERO → 최신 → 카드뉴스 → 인기 → 광고 → 7채널 → 주식 */}
       <div className="lg:hidden">
 
-        {/* ① HERO 톱 1개 — 메인 헤드라인 */}
-        {heroArticle && (
+        {/* ① HERO 톱 — 1면 대표 캐러셀 (1~3개) 또는 폴백(최신 1건) */}
+        {featuredArticles.length > 0 ? (
+          <div className="px-4 pt-5 pb-5 mb-5 border-b border-neutral-200"
+               onTouchStart={carouselOnTouchStart} onTouchEnd={carouselOnTouchEnd}>
+            {/* 슬라이드 영역 — 3개 다 DOM 렌더, opacity로만 토글 (크롤러·SEO 정합) */}
+            <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100 rounded-sm mb-3">
+              {featuredArticles.map((a, i) => {
+                const active = i === activeFeaturedIndex;
+                return (
+                  <Link key={a.slug} to={"/article/" + a.slug}
+                    aria-hidden={!active} tabIndex={active ? 0 : -1}
+                    style={{
+                      position: i === 0 ? 'relative' : 'absolute',
+                      inset: 0,
+                      opacity: active ? 1 : 0,
+                      pointerEvents: active ? 'auto' : 'none',
+                      transition: 'opacity 0.5s ease',
+                      display: 'block',
+                    }}>
+                    <img src={a.thumbnail_url} alt={a.title}
+                      className="w-full h-full object-cover" />
+                    {a.channels?.name && (
+                      <span className="absolute top-2 right-2 bg-white/95 text-neutral-900 text-[10px] font-bold px-2 py-0.5 rounded">
+                        {a.channels.name}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+            {/* 슬라이드 텍스트 영역 — 3개 다 DOM 렌더 */}
+            <div className="relative">
+              {featuredArticles.map((a, i) => {
+                const active = i === activeFeaturedIndex;
+                return (
+                  <Link key={a.slug + '-text'} to={"/article/" + a.slug}
+                    aria-hidden={!active} tabIndex={active ? 0 : -1}
+                    style={{
+                      position: i === 0 ? 'relative' : 'absolute',
+                      inset: i === 0 ? 'auto' : 0,
+                      opacity: active ? 1 : 0,
+                      pointerEvents: active ? 'auto' : 'none',
+                      transition: 'opacity 0.5s ease',
+                      display: 'block', textDecoration: 'none', color: 'inherit',
+                    }}>
+                    <h2 className="font-serif text-[22px] font-bold leading-[1.3] text-neutral-900 mb-2 line-clamp-3">
+                      {a.title}
+                    </h2>
+                    <p className="text-[14px] text-neutral-600 line-clamp-1 mb-1">
+                      {a.summary}
+                    </p>
+                    <div className="text-[11px] text-neutral-500">
+                      {a.author_name ? `${a.author_name} · ` : ''}{formatDate(a.published_at)}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+            {/* 점 인디케이터 (모바일·데스크탑 공통) */}
+            {featuredArticles.length > 1 && (
+              <div className="flex justify-center gap-2 mt-4">
+                {featuredArticles.map((_, i) => (
+                  <button key={i} type="button"
+                    onClick={() => carouselJump(i)}
+                    aria-label={`슬라이드 ${i + 1} 보기`}
+                    aria-current={i === activeFeaturedIndex}
+                    className="block"
+                    style={{
+                      width: 10, height: 10, padding: 0,
+                      borderRadius: '50%', border: 'none',
+                      background: i === activeFeaturedIndex ? '#0d2d52' : '#cfd3da',
+                      cursor: 'pointer',
+                      transition: 'background 0.15s',
+                    }} />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : heroArticle && (
+          /* 폴백 — featured 0건일 때 최신 1건 hero (기존 로직) */
           <Link to={"/article/" + heroArticle.slug}
             className="block px-4 pt-5 pb-5 mb-5 border-b border-neutral-200">
             <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100 rounded-sm mb-3">
@@ -516,8 +656,93 @@ export default function Home() {
       <div className="hidden lg:grid lg:grid-cols-[1fr_300px]" style={{ maxWidth:"1200px", margin:"0 auto", padding:"32px 32px 56px", gap:"40px", alignItems:"start" }}>
 
         <main>
-          {/* 히어로 */}
-          {heroArticle ? (
+          {/* 히어로 — 1면 대표 캐러셀 (1~3개) 또는 폴백(최신 1건) */}
+          {featuredArticles.length > 0 ? (
+            <div style={{ position:"relative", marginBottom:"24px" }}
+                 onMouseEnter={() => setCarouselPaused(true)}
+                 onMouseLeave={() => setCarouselPaused(false)}>
+              {/* 슬라이드 컨테이너 — 3개 다 DOM 렌더, opacity로만 토글 */}
+              <div style={{ position:"relative", width:"100%", height:"380px", overflow:"hidden" }}>
+                {featuredArticles.map((a, i) => {
+                  const active = i === activeFeaturedIndex;
+                  return (
+                    <Link key={a.slug} to={"/article/" + a.slug}
+                      aria-hidden={!active} tabIndex={active ? 0 : -1}
+                      style={{
+                        position:"absolute", inset:0,
+                        display:"block", textDecoration:"none",
+                        opacity: active ? 1 : 0,
+                        pointerEvents: active ? 'auto' : 'none',
+                        transition: 'opacity 0.5s ease',
+                      }}>
+                      <img src={a.thumbnail_url} alt={a.title}
+                        style={{ width:"100%", height:"380px", objectFit:"cover", display:"block" }} />
+                      <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 60%)" }} />
+                      <div style={{ position:"absolute", bottom:0, left:0, right:0, padding:"28px" }}>
+                        <span style={{ fontSize:"10px", color:"#c9a84c", fontWeight:"700", letterSpacing:"2px" }}>{a.channels?.name}</span>
+                        <h2 style={{ fontFamily:"serif", fontSize:"26px", fontWeight:"700", color:"white", lineHeight:"1.4", margin:"8px 0", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{a.title}</h2>
+                        <p style={{ fontSize:"13px", color:"rgba(255,255,255,0.8)", margin:0, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{a.summary}</p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+              {/* 좌우 화살표 — 데스크탑 전용 (2개 이상일 때만) */}
+              {featuredArticles.length > 1 && (
+                <>
+                  <button type="button" onClick={carouselPrev}
+                    aria-label="이전 슬라이드"
+                    style={{
+                      position:"absolute", left:12, top:"50%", transform:"translateY(-50%)",
+                      width:40, height:40, borderRadius:"50%",
+                      background:"rgba(0,0,0,0.45)", color:"#fff",
+                      border:"none", cursor:"pointer", fontSize:18, fontWeight:700,
+                      display:"flex", alignItems:"center", justifyContent:"center",
+                      transition:"background 0.15s",
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,0.7)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "rgba(0,0,0,0.45)"}>
+                    ‹
+                  </button>
+                  <button type="button" onClick={carouselNext}
+                    aria-label="다음 슬라이드"
+                    style={{
+                      position:"absolute", right:12, top:"50%", transform:"translateY(-50%)",
+                      width:40, height:40, borderRadius:"50%",
+                      background:"rgba(0,0,0,0.45)", color:"#fff",
+                      border:"none", cursor:"pointer", fontSize:18, fontWeight:700,
+                      display:"flex", alignItems:"center", justifyContent:"center",
+                      transition:"background 0.15s",
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,0.7)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "rgba(0,0,0,0.45)"}>
+                    ›
+                  </button>
+                </>
+              )}
+              {/* 점 인디케이터 (이미지 위 오버레이) */}
+              {featuredArticles.length > 1 && (
+                <div style={{
+                  position:"absolute", bottom:12, left:0, right:0,
+                  display:"flex", justifyContent:"center", gap:8,
+                }}>
+                  {featuredArticles.map((_, i) => (
+                    <button key={i} type="button"
+                      onClick={() => carouselJump(i)}
+                      aria-label={`슬라이드 ${i + 1} 보기`}
+                      aria-current={i === activeFeaturedIndex}
+                      style={{
+                        width:10, height:10, padding:0,
+                        borderRadius:"50%", border:"1px solid rgba(255,255,255,0.7)",
+                        background: i === activeFeaturedIndex ? '#fff' : 'rgba(255,255,255,0.3)',
+                        cursor:"pointer", transition:"background 0.15s",
+                      }} />
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : heroArticle ? (
+            /* 폴백 — featured 0건일 때 최신 1건 hero (기존 로직) */
             <Link to={"/article/" + heroArticle.slug} style={{ display:"block", textDecoration:"none", marginBottom:"24px", position:"relative", overflow:"hidden" }}>
               <img src={heroArticle.thumbnail_url} alt={heroArticle.title} style={{ width:"100%", height:"380px", objectFit:"cover", display:"block" }} />
               <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 60%)" }} />
