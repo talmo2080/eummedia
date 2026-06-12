@@ -307,7 +307,7 @@ export default function ArticleEditor() {
   // admin/publisher만 다른 기자 글 fetch + 발행본 그대로 저장 가능
   const isAdminOrPublisher = profile?.role === 'admin' || profile?.role === 'publisher'
 
-  // 서식 5종 — 커서 위치에 태그 삽입 (선택 텍스트 있으면 감싸기, 없으면 기본 텍스트 자동 선택)
+  // 서식 7종 — 커서 위치에 태그 삽입 (선택 텍스트 있으면 감싸기, 없으면 기본 텍스트 자동 선택)
   const FORMAT_ACTIONS = [
     { label: '굵게',     icon: 'B',  title: '굵게 — 선택 텍스트 강조 (**텍스트**)',          before: '**',        after: '**',         defaultText: '굵게' },
     { label: '기울기',   icon: 'I',  title: '기울기 — 인용·강조 (*텍스트*)',                  before: '*',         after: '*',          defaultText: '기울기 텍스트' },
@@ -315,6 +315,7 @@ export default function ArticleEditor() {
     { label: '인용구',   icon: '"',  title: '인용구 — 출처·인터뷰 ([quote]...[/quote])',     before: '\n[quote]', after: '[/quote]\n', defaultText: '인용 내용' },
     { label: '강조박스', icon: '★', title: '강조박스 — 포인트 ([box]...[/box])',            before: '\n[box]',   after: '[/box]\n',   defaultText: '강조할 내용' },
     { label: '정보박스', icon: 'ℹ', title: '정보박스 — 보조 정보 ([info]...[/info])',       before: '\n[info]',  after: '[/info]\n',  defaultText: '정보 내용' },
+    { label: '링크',     icon: '🔗', title: '링크 — 외부 페이지 ([링크:https://URL|텍스트])',  before: '[링크:https://|', after: ']', defaultText: '텍스트' },
   ]
 
   const insertOrWrap = (before, after, defaultText) => {

@@ -82,7 +82,12 @@ function paragraphToHtml(p) {
     const inner = escapeHtml(m[1])
       .replace(/\*\*\*([^*]+?)\*\*\*/g, '<strong><em>$1</em></strong>')
       .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>');
+      .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>')
+      // [링크:https://URL|텍스트] — https 시작 URL만 허용 (보안). 텍스트 생략 가능
+      .replace(/\[링크:(https:\/\/[^|\]]+)(?:\|([^\]]*))?\]/g, (_, url, text) => {
+        const label = (text || url).trim();
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#0d2d52;text-decoration:underline;font-weight:600;">${label}</a>`;
+      });
     return `<blockquote style="border-left:3px solid #c9a84c;margin:20px 0;padding:16px 20px;background:#fafaf7;color:#555;font-style:italic;font-size:1.05rem;">${inner}</blockquote>`;
   }
   m = text.match(/^\[box\]([\s\S]*)\[\/box\]$/);
@@ -90,7 +95,12 @@ function paragraphToHtml(p) {
     const inner = escapeHtml(m[1])
       .replace(/\*\*\*([^*]+?)\*\*\*/g, '<strong><em>$1</em></strong>')
       .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>');
+      .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>')
+      // [링크:https://URL|텍스트] — https 시작 URL만 허용 (보안). 텍스트 생략 가능
+      .replace(/\[링크:(https:\/\/[^|\]]+)(?:\|([^\]]*))?\]/g, (_, url, text) => {
+        const label = (text || url).trim();
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#0d2d52;text-decoration:underline;font-weight:600;">${label}</a>`;
+      });
     return `<div style="background:#fdf6ec;border:1px solid #e8c98a;border-radius:8px;padding:16px 20px;margin:20px 0;">${inner}</div>`;
   }
   m = text.match(/^\[info\]([\s\S]*)\[\/info\]$/);
@@ -98,7 +108,12 @@ function paragraphToHtml(p) {
     const inner = escapeHtml(m[1])
       .replace(/\*\*\*([^*]+?)\*\*\*/g, '<strong><em>$1</em></strong>')
       .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>');
+      .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>')
+      // [링크:https://URL|텍스트] — https 시작 URL만 허용 (보안). 텍스트 생략 가능
+      .replace(/\[링크:(https:\/\/[^|\]]+)(?:\|([^\]]*))?\]/g, (_, url, text) => {
+        const label = (text || url).trim();
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#0d2d52;text-decoration:underline;font-weight:600;">${label}</a>`;
+      });
     return `<div style="background:#f0f5ff;border:1px solid #93b4e8;border-left:4px solid #0d2d52;border-radius:8px;padding:16px 20px;margin:20px 0;">${inner}</div>`;
   }
   // 본문 콘텐츠 이미지 [이미지:URL|캡션] — <figure><img alt><figcaption></figure>
@@ -124,13 +139,23 @@ function paragraphToHtml(p) {
     const inner = escapeHtml(m[1])
       .replace(/\*\*\*([^*]+?)\*\*\*/g, '<strong><em>$1</em></strong>')
       .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>');
+      .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>')
+      // [링크:https://URL|텍스트] — https 시작 URL만 허용 (보안). 텍스트 생략 가능
+      .replace(/\[링크:(https:\/\/[^|\]]+)(?:\|([^\]]*))?\]/g, (_, url, text) => {
+        const label = (text || url).trim();
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#0d2d52;text-decoration:underline;font-weight:600;">${label}</a>`;
+      });
     return `<h3 style="font-size:1.2rem;font-weight:700;border-left:4px solid #0d2d52;padding-left:12px;margin:24px 0 12px;">${inner}</h3>`;
   }
   const escaped = escapeHtml(text)
     .replace(/\*\*\*([^*]+?)\*\*\*/g, '<strong><em>$1</em></strong>')
     .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>');
+    .replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '<em>$1</em>')
+    // [링크:https://URL|텍스트] — https 시작 URL만 허용 (보안). 텍스트 생략 가능
+    .replace(/\[링크:(https:\/\/[^|\]]+)(?:\|([^\]]*))?\]/g, (_, url, text) => {
+      const label = (text || url).trim();
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#0d2d52;text-decoration:underline;font-weight:600;">${label}</a>`;
+    });
   return `<p style="margin:0 0 1em 0;">${escaped}</p>`;
 }
 
