@@ -1029,16 +1029,47 @@ export default function ArticleDetail() {
           </div>
         </main>
 
-        {/* 사이드바 */}
+        {/* 사이드바 — 협찬 3개 (양주상회 → 플레이앤팝 → 닥터리부트) */}
         <aside className="lg:sticky lg:top-5" style={{ display:"flex", flexDirection:"column", gap:"24px" }}>
+
+          {/* 광고(양주상회) — 사진 배너 + 내부 라우트 */}
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
             <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
-            <div style={{ width:"100%", height:"120px", background:"linear-gradient(135deg,#0d2d52,#1c4f8a)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:"12px", borderRadius:"2px" }}>
-              <div style={{ textAlign:"center", color:"white", padding:"0 12px" }}>
-                <div style={{ fontSize:"22px", marginBottom:"6px" }}>💆</div>
-                <div style={{ fontSize:"12px", fontWeight:"700" }}>닥터리부트 두피관리센터</div>
-              </div>
+            <img src="/ads/yangju-sanghoe.jpg" alt="양주상회 종암동 고깃집"
+                 loading="lazy"
+                 style={{ display:"block", width:"100%", height:"120px", objectFit:"cover", marginBottom:"12px", borderRadius:"2px" }} />
+            <div style={{ fontSize:"12px", fontWeight:"700", color:"#0d2d52", marginBottom:"3px", lineHeight:"1.4" }}>14년 부부의 손맛, 종암동 고깃집</div>
+            <div style={{ fontSize:"11px", color:"#6b6b6b", lineHeight:"1.6", marginBottom:"12px" }}>
+              직접 농사 · 김장 1000포기
             </div>
+            <Link to="/article/article-q787vlqn"
+                  style={{ display:"block", textAlign:"center", background:"#0d2d52", color:"white", padding:"9px", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit" }}>
+              기사 보기 →
+            </Link>
+          </div>
+
+          {/* 광고(플레이앤팝) — 사진 배너 + 내부 라우트 */}
+          <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
+            <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
+            <img src="/ads/play-and-pop.jpg" alt="오창 플레이앤팝 인형뽑기"
+                 loading="lazy"
+                 style={{ display:"block", width:"100%", height:"120px", objectFit:"cover", marginBottom:"12px", borderRadius:"2px" }} />
+            <div style={{ fontSize:"12px", fontWeight:"700", color:"#0d2d52", marginBottom:"3px", lineHeight:"1.4" }}>인건비 없이 24시간, 무인 인형뽑기 창업</div>
+            <div style={{ fontSize:"11px", color:"#6b6b6b", lineHeight:"1.6", marginBottom:"12px" }}>
+              오창 플레이앤팝 창업 이야기
+            </div>
+            <Link to="/article/article-idb8v7ux"
+                  style={{ display:"block", textAlign:"center", background:"#0d2d52", color:"white", padding:"9px", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit" }}>
+              기사 보기 →
+            </Link>
+          </div>
+
+          {/* 광고(닥터리부트) — 사진 배너 + 외부 링크 + SNS 4개 유지 */}
+          <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
+            <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
+            <img src="/ads/dr-reboot.jpg" alt="닥터리부트 두피관리센터"
+                 loading="lazy"
+                 style={{ display:"block", width:"100%", height:"120px", objectFit:"cover", marginBottom:"12px", borderRadius:"2px" }} />
             <div style={{ fontSize:"12px", fontWeight:"700", color:"#0d2d52", marginBottom:"3px", lineHeight:"1.4" }}>고객의 마지막 희망이 되고픈</div>
             <div style={{ fontSize:"11px", color:"#6b6b6b", lineHeight:"1.6", marginBottom:"12px" }}>
               정세연 원장 · 두피전문가 27년<br />
@@ -1054,25 +1085,6 @@ export default function ArticleDetail() {
               <a href="https://www.youtube.com/channel/UCVdGlBOwnxzPs5rnNGhAZuQ" target="_blank" rel="noopener noreferrer" title="유튜브" style={{ ...socialIconStyle, fontSize:"16px" }}>🎥</a>
               <a href="https://blog.naver.com/mzk6682" target="_blank" rel="noopener noreferrer" title="네이버 블로그" style={{ ...socialIconStyle, fontSize:"16px" }}>✍️</a>
             </div>
-          </div>
-
-          {/* 광고(양주상회) — 닥터리부트 아래 협찬 카드 */}
-          <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
-            <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
-            <div style={{ width:"100%", height:"120px", background:"linear-gradient(135deg,#0d2d52,#1c4f8a)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:"12px", borderRadius:"2px" }}>
-              <div style={{ textAlign:"center", color:"white", padding:"0 12px" }}>
-                <div style={{ fontSize:"22px", marginBottom:"6px" }}>🥩</div>
-                <div style={{ fontSize:"12px", fontWeight:"700" }}>양주상회</div>
-              </div>
-            </div>
-            <div style={{ fontSize:"12px", fontWeight:"700", color:"#0d2d52", marginBottom:"3px", lineHeight:"1.4" }}>14년 부부의 손맛, 종암동 고깃집</div>
-            <div style={{ fontSize:"11px", color:"#6b6b6b", lineHeight:"1.6", marginBottom:"12px" }}>
-              직접 농사 · 김장 1000포기
-            </div>
-            <Link to="/article/article-q787vlqn"
-                  style={{ display:"block", textAlign:"center", background:"#0d2d52", color:"white", padding:"9px", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit" }}>
-              기사 보기 →
-            </Link>
           </div>
 
           <div>
