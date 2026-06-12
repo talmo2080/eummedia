@@ -1056,6 +1056,25 @@ export default function ArticleDetail() {
             </div>
           </div>
 
+          {/* 광고(양주상회) — 닥터리부트 아래 협찬 카드 */}
+          <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
+            <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
+            <div style={{ width:"100%", height:"120px", background:"linear-gradient(135deg,#0d2d52,#1c4f8a)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:"12px", borderRadius:"2px" }}>
+              <div style={{ textAlign:"center", color:"white", padding:"0 12px" }}>
+                <div style={{ fontSize:"22px", marginBottom:"6px" }}>🥩</div>
+                <div style={{ fontSize:"12px", fontWeight:"700" }}>양주상회</div>
+              </div>
+            </div>
+            <div style={{ fontSize:"12px", fontWeight:"700", color:"#0d2d52", marginBottom:"3px", lineHeight:"1.4" }}>14년 부부의 손맛, 종암동 고깃집</div>
+            <div style={{ fontSize:"11px", color:"#6b6b6b", lineHeight:"1.6", marginBottom:"12px" }}>
+              직접 농사 · 김장 1000포기
+            </div>
+            <Link to="/article/article-q787vlqn"
+                  style={{ display:"block", textAlign:"center", background:"#0d2d52", color:"white", padding:"9px", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit" }}>
+              기사 보기 →
+            </Link>
+          </div>
+
           <div>
             <div style={{ fontSize:"12px", fontWeight:"700", color:"#555", borderBottom:"2px solid #0d2d52", paddingBottom:"8px", marginBottom:"12px" }}>이번 주 추천 기사</div>
             {popular.length > 0
