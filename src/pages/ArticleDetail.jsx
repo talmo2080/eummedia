@@ -435,7 +435,7 @@ export default function ArticleDetail() {
     (async () => {
       const { data, error: err } = await supabase
         .from('articles')
-        .select('id, slug, title, summary, content, thumbnail_url, video_url, show_in_article, show_in_gallery, published_at, channel_id, author_id, like_count, tags, external_url, inline_ad_image, inline_ad_link, inline_ad_title, inline_ad_subtitle, channels(name, slug, english_slug)')
+        .select('id, slug, title, summary, content, thumbnail_url, image_alt, video_url, show_in_article, show_in_gallery, published_at, channel_id, author_id, like_count, tags, external_url, inline_ad_image, inline_ad_link, inline_ad_title, inline_ad_subtitle, channels(name, slug, english_slug)')
         .eq('slug', slug)
         .eq('status', 'published')
         .single();
@@ -594,6 +594,7 @@ export default function ArticleDetail() {
     content: article.content,
     video_url: article.video_url,
     show_in_article: !!article.show_in_article,
+    image_alt: article.image_alt || '',
     author_name: "정세연 편집국장",
     author_bio: "닥터리부트 두피관리센터(일산) 원장 · 두피전문가 27년 · 이음미디어 편집국장",
     author_intro: "두피 전문가 27년 경력의 정세연 원장이자 이음미디어 편집국장입니다. 세상을 잇고 사람을 잇는 이야기를 발굴합니다.",
@@ -687,11 +688,17 @@ export default function ArticleDetail() {
           {/* 대표 이미지 — 모바일 16/9 비율(사진 규격 일치 → 잘림 없음), 데스크탑 380px 고정 cover 유지 */}
           <img
             src={a.thumbnail}
-            alt={a.title}
+            alt={a.image_alt || a.title}
             className="w-full aspect-[16/9] h-auto object-cover lg:aspect-auto lg:h-[380px]"
-            style={{ borderRadius:"4px", marginBottom:"10px", display:"block" }}
+            style={{ borderRadius:"4px", marginBottom: a.image_alt ? "6px" : "10px", display:"block" }}
           />
-          <div style={{ fontSize:"11px", color:"#9a9a9a", textAlign:"center", marginBottom:"32px", fontStyle:"italic" }}>{a.channel} / 이음미디어</div>
+          {/* 대표 이미지 캡션 — image_alt 있을 때만 노출 (본문 [이미지:] 캡션과 동일 스타일) */}
+          {a.image_alt && (
+            <div style={{ fontSize:"0.85rem", color:"#888", textAlign:"center", marginTop:"8px", lineHeight:"1.6" }}>
+              {a.image_alt}
+            </div>
+          )}
+          <div style={{ fontSize:"11px", color:"#9a9a9a", textAlign:"center", marginBottom:"32px", fontStyle:"italic", marginTop: a.image_alt ? "4px" : "0" }}>{a.channel} / 이음미디어</div>
 
           {/* 본문 — 평문 + 원문 보기 (스테이지 1) — 모바일 16/1.8, 데스크탑 17/2.0 */}
           <div className="text-[16px] leading-[1.8] lg:text-[17px] lg:leading-[2.0] text-neutral-800" style={{ fontFamily:"'Noto Sans KR', sans-serif", marginBottom:"24px" }}>
