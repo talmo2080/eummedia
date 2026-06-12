@@ -629,6 +629,8 @@ function CardNewsModal({ article, onClose, onDelete, onSaved }) {
 export default function AdminDashboard() {
   const { profile } = useAuth()
   const canAct = profile?.role === 'admin'   // 발행/반려/승인/정지/카드뉴스 등 모든 액션
+  // 홈 1면 대표 지정은 admin/publisher 둘 다 가능 (편집국장 + 발행인)
+  const isAdminOrPublisher = profile?.role === 'admin' || profile?.role === 'publisher'
   const [activeTab, setActiveTab] = useState(1)
   const [articles, setArticles] = useState([])
   const [users, setUsers] = useState([])
@@ -742,6 +744,71 @@ export default function AdminDashboard() {
       if (!r.ok) console.warn(`[deploy hook] ${source} non-200:`, r.status)
     } catch (err) {
       console.warn(`[deploy hook] ${source} error:`, err?.message || err)
+    }
+  }
+
+  // ⭐ 홈 1면 대표 지정 토글 — admin/publisher 전용
+  //   · 최대 3개 제한, main_featured_order 자동 관리 (1→2→3)
+  //   · 해제 시 남은 order 재정리 (빈 번호 없이 1,2,3 유지)
+  //   · 성공 시 triggerDeploy 호출 → prerender 갱신
+  const toggleMainFeatured = async (article) => {
+    const isCurrentlyFeatured = !!article.is_main_featured
+
+    if (!isCurrentlyFeatured) {
+      // ── 지정 시도 ──
+      const currentFeatured = articles.filter(a => a.is_main_featured)
+      if (currentFeatured.length >= 3) {
+        alert('홈 1면 대표는 최대 3개까지 지정할 수 있습니다.\n기존 대표를 해제한 후 다시 시도해주세요.')
+        return
+      }
+      const maxOrder = currentFeatured.reduce(
+        (m, a) => Math.max(m, a.main_featured_order || 0), 0
+      )
+      const newOrder = maxOrder + 1
+      const { error } = await supabase.from('articles')
+        .update({ is_main_featured: true, main_featured_order: newOrder })
+        .eq('id', article.id)
+      if (error) { alert(`대표 지정 실패: ${error.message}`); return }
+      setArticles(prev => prev.map(a => a.id === article.id
+        ? { ...a, is_main_featured: true, main_featured_order: newOrder }
+        : a
+      ))
+      triggerDeploy('toggleMainFeatured:add')
+    } else {
+      // ── 해제 + 남은 order 재정리 ──
+      const remaining = articles
+        .filter(a => a.is_main_featured && a.id !== article.id)
+        .sort((x, y) => (x.main_featured_order || 0) - (y.main_featured_order || 0))
+
+      // 1) 대상 기사 해제
+      const { error: e1 } = await supabase.from('articles')
+        .update({ is_main_featured: false, main_featured_order: null })
+        .eq('id', article.id)
+      if (e1) { alert(`대표 해제 실패: ${e1.message}`); return }
+
+      // 2) 남은 것들 order 재배치 (1, 2, ...) — 현재 order와 다른 경우만 update
+      const reorderMap = new Map()
+      for (let i = 0; i < remaining.length; i++) {
+        const newRank = i + 1
+        const cur = remaining[i].main_featured_order || 0
+        if (cur !== newRank) {
+          const { error: ue } = await supabase.from('articles')
+            .update({ main_featured_order: newRank })
+            .eq('id', remaining[i].id)
+          if (ue) {
+            console.warn(`[toggleMainFeatured] reorder fail id=${remaining[i].id}:`, ue.message)
+          }
+        }
+        reorderMap.set(remaining[i].id, newRank)
+      }
+
+      // 3) state 갱신 — 해제 + reorderMap 반영
+      setArticles(prev => prev.map(a => {
+        if (a.id === article.id) return { ...a, is_main_featured: false, main_featured_order: null }
+        if (reorderMap.has(a.id)) return { ...a, main_featured_order: reorderMap.get(a.id) }
+        return a
+      }))
+      triggerDeploy('toggleMainFeatured:remove')
     }
   }
 
@@ -1172,6 +1239,25 @@ export default function AdminDashboard() {
                       )}
                       {a.status === 'published' && (
                         <>
+                          {/* ⭐ 홈 1면 대표 지정 — admin/publisher 전용 */}
+                          {isAdminOrPublisher && (
+                            <button onClick={() => toggleMainFeatured(a)}
+                              title={a.is_main_featured
+                                ? `홈 1면 대표 (순서 ${a.main_featured_order}) — 해제`
+                                : '홈 1면 대표로 지정 (최대 3개)'}
+                              style={{
+                                padding: '8px 14px', fontSize: 13, fontWeight: 700,
+                                borderRadius: 4, cursor: 'pointer',
+                                background: a.is_main_featured ? '#d4a017' : '#fff',
+                                color: a.is_main_featured ? '#fff' : '#888',
+                                border: `1px solid ${a.is_main_featured ? '#d4a017' : '#bbb'}`,
+                                fontFamily: "'Noto Sans KR', sans-serif",
+                              }}>
+                              {a.is_main_featured
+                                ? `⭐ 대표 ${a.main_featured_order || ''}`
+                                : '☆ 대표 지정'}
+                            </button>
+                          )}
                           {canAct && (
                             <button onClick={() => setModalArticle({
                               ...a,
