@@ -210,6 +210,8 @@ export default function Home() {
   const [activeFeaturedIndex, setActiveFeaturedIndex] = useState(0);
   const [carouselPaused, setCarouselPaused] = useState(false);
   const carouselTouchStartRef = useRef(0);
+  // 📦 사이드 광고 — admin이 /admin에서 토글 ON 한 기사들 (show_in_side_ad)
+  const [sideAdArticles, setSideAdArticles] = useState([]);
   const [popular, setPopular] = useState([]);
   const [videosList, setVideosList] = useState([]);
   const [error, setError] = useState(null);
@@ -272,6 +274,24 @@ export default function Home() {
         setHeroArticle(null);
         setArticles(latest ?? []);
       }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // 📦 사이드 광고 fetch — show_in_side_ad=true 기사를 side_ad_order ASC
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error: err } = await supabase
+        .from('articles')
+        .select('slug, title, summary, thumbnail_url, side_ad_badge')
+        .eq('status', 'published')
+        .eq('show_in_side_ad', true)
+        .order('side_ad_order', { ascending: true, nullsFirst: false })
+        .limit(5);
+      if (cancelled) return;
+      if (err) { console.error('[SIDE_AD] supabase error:', err); return; }
+      setSideAdArticles(data ?? []);
     })();
     return () => { cancelled = true; };
   }, []);
@@ -586,6 +606,41 @@ export default function Home() {
           </Link>
         </div>
 
+        {/* ⑤-ab 사이드 광고 (DB 토글) — 양주상회 카드 아래, 모바일 */}
+        {sideAdArticles.map(ad => (
+          <div key={ad.slug} className="px-4 mb-7">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[10px] text-neutral-500 tracking-widest">광고</div>
+              {ad.side_ad_badge && (
+                <span className="text-[10px] font-bold text-[#1c4f8a] bg-[#e8f0fa] px-2 py-0.5 rounded tracking-wider">
+                  {ad.side_ad_badge}
+                </span>
+              )}
+            </div>
+            <Link to={"/article/" + ad.slug}
+                  className="block bg-white border border-neutral-200 rounded-sm overflow-hidden no-underline">
+              {ad.thumbnail_url && (
+                <img src={ad.thumbnail_url} alt={ad.title}
+                     loading="lazy"
+                     className="block w-full h-[120px] object-cover" />
+              )}
+              <div className="p-4">
+                <div className="text-[15px] font-bold text-[#0d2d52] mb-1 leading-snug line-clamp-2">
+                  {ad.title}
+                </div>
+                {ad.summary && (
+                  <div className="text-[12px] text-neutral-600 leading-relaxed mb-3 line-clamp-2">
+                    {ad.summary}
+                  </div>
+                )}
+                <div className="w-full bg-[#0d2d52] text-white text-center py-3 text-[14px] font-bold rounded-sm">
+                  기사 보기 →
+                </div>
+              </div>
+            </Link>
+          </div>
+        ))}
+
         {/* ⑤-b 플레이앤팝 — 사진 배너 + 내부 라우트 (기사) */}
         <div className="px-4 mb-7">
           <div className="text-[10px] text-neutral-500 tracking-widest mb-2">광고</div>
@@ -854,6 +909,35 @@ export default function Home() {
               기사 보기 →
             </Link>
           </div>
+
+          {/* 📦 사이드 광고 (DB 토글) — 양주상회 카드 바로 아래, side_ad_order ASC */}
+          {sideAdArticles.map(ad => (
+            <div key={ad.slug} style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"10px" }}>
+                <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px" }}>광고</div>
+                {ad.side_ad_badge && (
+                  <span style={{ fontSize:"10px", fontWeight:"700", color:"#1c4f8a", background:"#e8f0fa", padding:"2px 8px", borderRadius:"3px", letterSpacing:"0.5px" }}>
+                    {ad.side_ad_badge}
+                  </span>
+                )}
+              </div>
+              {ad.thumbnail_url && (
+                <img src={ad.thumbnail_url} alt={ad.title}
+                     loading="lazy"
+                     style={{ display:"block", width:"100%", height:"120px", objectFit:"cover", marginBottom:"12px", borderRadius:"2px" }} />
+              )}
+              <div style={{ fontSize:"12px", fontWeight:"700", color:"#0d2d52", marginBottom:"3px", lineHeight:"1.4", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{ad.title}</div>
+              {ad.summary && (
+                <div style={{ fontSize:"11px", color:"#6b6b6b", lineHeight:"1.6", marginBottom:"12px", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>
+                  {ad.summary}
+                </div>
+              )}
+              <Link to={"/article/" + ad.slug}
+                    style={{ display:"block", textAlign:"center", background:"#0d2d52", color:"white", padding:"9px", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"inherit" }}>
+                기사 보기 →
+              </Link>
+            </div>
+          ))}
 
           {/* 광고(플레이앤팝) — 사진 배너 + 내부 라우트 */}
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>

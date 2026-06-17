@@ -783,6 +783,62 @@ export default function AdminDashboard() {
     setMyDrafts(prev => prev.filter(a => a.id !== id))
   }
 
+  // 📦 사이드 광고 토글 — admin/publisher 전용
+  //   · ON: order/badge를 prompt로 입력 (order 비우면 자동 max+1, badge 비우면 빈값)
+  //   · OFF: confirm 후 해제 (order/badge null로)
+  //   · 성공 시 triggerDeploy 호출 → prerender 갱신
+  const toggleSideAd = async (article) => {
+    const isCurrently = !!article.show_in_side_ad
+
+    if (!isCurrently) {
+      // ── 지정 ──
+      const currentMax = articles.reduce(
+        (m, a) => (a.show_in_side_ad ? Math.max(m, a.side_ad_order || 0) : m), 0
+      )
+      const orderStr = window.prompt(
+        `사이드 광고 표시 순서를 입력하세요\n(비우면 자동 ${currentMax + 1}번 배정)`,
+        String(currentMax + 1)
+      )
+      if (orderStr === null) return  // 취소
+      const order = orderStr.trim() === '' ? currentMax + 1 : parseInt(orderStr.trim(), 10)
+      if (!Number.isFinite(order) || order < 1) {
+        alert('순서는 1 이상 숫자여야 합니다.')
+        return
+      }
+      const badge = window.prompt(
+        '배지 라벨 (협찬/광고/안내 등, 비우면 배지 표시 안 함)',
+        '협찬'
+      )
+      if (badge === null) return  // 취소
+
+      const { error } = await supabase.from('articles')
+        .update({
+          show_in_side_ad: true,
+          side_ad_order: order,
+          side_ad_badge: badge.trim() || null,
+        })
+        .eq('id', article.id)
+      if (error) { alert(`사이드 광고 지정 실패: ${error.message}`); return }
+      setArticles(prev => prev.map(a => a.id === article.id
+        ? { ...a, show_in_side_ad: true, side_ad_order: order, side_ad_badge: badge.trim() || null }
+        : a
+      ))
+      triggerDeploy('toggleSideAd:add')
+    } else {
+      // ── 해제 ──
+      if (!window.confirm('사이드 광고에서 제외하시겠습니까?')) return
+      const { error } = await supabase.from('articles')
+        .update({ show_in_side_ad: false, side_ad_order: null, side_ad_badge: null })
+        .eq('id', article.id)
+      if (error) { alert(`사이드 광고 해제 실패: ${error.message}`); return }
+      setArticles(prev => prev.map(a => a.id === article.id
+        ? { ...a, show_in_side_ad: false, side_ad_order: null, side_ad_badge: null }
+        : a
+      ))
+      triggerDeploy('toggleSideAd:remove')
+    }
+  }
+
   // ⭐ 홈 1면 대표 지정 토글 — admin/publisher 전용
   //   · 최대 3개 제한, main_featured_order 자동 관리 (1→2→3)
   //   · 해제 시 남은 order 재정리 (빈 번호 없이 1,2,3 유지)
@@ -1308,6 +1364,25 @@ export default function AdminDashboard() {
                               {a.is_main_featured
                                 ? `⭐ 대표 ${a.main_featured_order || ''}`
                                 : '☆ 대표 지정'}
+                            </button>
+                          )}
+                          {/* 📦 사이드 광고 토글 — admin/publisher 전용 */}
+                          {isAdminOrPublisher && (
+                            <button onClick={() => toggleSideAd(a)}
+                              title={a.show_in_side_ad
+                                ? `사이드 광고 (순서 ${a.side_ad_order}${a.side_ad_badge ? ` · ${a.side_ad_badge}` : ''}) — 해제`
+                                : '사이드 광고로 지정 (양주상회 박스 아래 노출)'}
+                              style={{
+                                padding: '8px 14px', fontSize: 13, fontWeight: 700,
+                                borderRadius: 4, cursor: 'pointer',
+                                background: a.show_in_side_ad ? '#1c4f8a' : '#fff',
+                                color: a.show_in_side_ad ? '#fff' : '#888',
+                                border: `1px solid ${a.show_in_side_ad ? '#1c4f8a' : '#bbb'}`,
+                                fontFamily: "'Noto Sans KR', sans-serif",
+                              }}>
+                              {a.show_in_side_ad
+                                ? `📦 사이드 ${a.side_ad_order || ''}${a.side_ad_badge ? ` (${a.side_ad_badge})` : ''}`
+                                : '☐ 사이드 광고'}
                             </button>
                           )}
                           {canAct && (
