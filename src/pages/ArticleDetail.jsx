@@ -435,7 +435,7 @@ export default function ArticleDetail() {
     (async () => {
       const { data, error: err } = await supabase
         .from('articles')
-        .select('id, slug, title, summary, content, thumbnail_url, image_alt, video_url, show_in_article, show_in_gallery, published_at, channel_id, author_id, like_count, tags, external_url, inline_ad_image, inline_ad_link, inline_ad_title, inline_ad_subtitle, channels(name, slug, english_slug)')
+        .select('id, slug, title, summary, content, thumbnail_url, image_alt, video_url, show_in_article, show_in_gallery, published_at, channel_id, author_id, like_count, view_count, tags, external_url, inline_ad_image, inline_ad_link, inline_ad_title, inline_ad_subtitle, channels(name, slug, english_slug)')
         .eq('slug', slug)
         .eq('status', 'published')
         .single();
@@ -532,6 +532,21 @@ export default function ArticleDetail() {
 
   // 💬 댓글 fetch — 기사 로드 후 articleId 기준 (is_deleted=false)
   const articleId = article?.id;
+
+  // 👁 조회수 카운팅 — 세션당 1회 +1 (sessionStorage 중복 차단)
+  //   · RPC increment_article_view_count — RLS 우회 view_count만 안전 증가
+  useEffect(() => {
+    if (!articleId) return;
+    if (typeof window === 'undefined' || !window.sessionStorage) return;
+    const sessionKey = `eum-viewed-${articleId}`;
+    if (sessionStorage.getItem(sessionKey)) return;
+    sessionStorage.setItem(sessionKey, '1');
+    supabase.rpc('increment_article_view_count', { p_article_id: articleId })
+      .then(({ error: rpcErr }) => {
+        if (rpcErr) console.warn('[view_count RPC] fail:', rpcErr.message);
+      });
+  }, [articleId]);
+
   useEffect(() => {
     if (!articleId) return;
     let cancelled = false;
@@ -599,7 +614,7 @@ export default function ArticleDetail() {
     author_bio: "닥터리부트 두피관리센터(일산) 원장 · 두피전문가 27년 · 이음미디어 편집국장",
     author_intro: "두피 전문가 27년 경력의 정세연 원장이자 이음미디어 편집국장입니다. 세상을 잇고 사람을 잇는 이야기를 발굴합니다.",
     tags: Array.isArray(article.tags) ? article.tags : [],
-    views: 1284,
+    view_count: article.view_count ?? 0,   // 진짜 조회수 (RPC로 +1, 100 미만 미표시)
     read_time: 5,
   };
   const color = CC[a.channel] || "#0d2d52";
@@ -651,7 +666,12 @@ export default function ArticleDetail() {
               </div>
               <div style={{ marginLeft:"auto", textAlign:"right", fontSize:"11px", color:"#9a9a9a", lineHeight:"1.8" }}>
                 <div>{a.published_at}</div>
-                <div>⏱ {a.read_time}분 · 👁 <strong style={{ color:"#555" }}>{a.views.toLocaleString()}</strong></div>
+                <div>
+                  ⏱ {a.read_time}분
+                  {a.view_count >= 100 && (
+                    <> · 👁 <strong style={{ color:"#555" }}>{a.view_count.toLocaleString()}</strong></>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -680,8 +700,12 @@ export default function ArticleDetail() {
               <span>{a.published_at}</span>
               <span className="mx-1.5 text-neutral-400">·</span>
               <span>읽기 {a.read_minutes || a.read_time || 5}분</span>
-              <span className="mx-1.5 text-neutral-400">·</span>
-              <span>{(a.view_count ?? a.views ?? 0).toLocaleString()}</span>
+              {a.view_count >= 100 && (
+                <>
+                  <span className="mx-1.5 text-neutral-400">·</span>
+                  <span>👁 {a.view_count.toLocaleString()}</span>
+                </>
+              )}
             </div>
           </div>
 
