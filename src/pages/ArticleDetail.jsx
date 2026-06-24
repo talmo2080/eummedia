@@ -88,7 +88,8 @@ function paragraphToHtml(p) {
         const label = (text || url).trim();
         return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#0d2d52;text-decoration:underline;font-weight:600;">${label}</a>`;
       });
-    return `<blockquote style="border-left:3px solid #c9a84c;margin:20px 0;padding:16px 20px;background:#fafaf7;color:#555;font-style:italic;font-size:1.05rem;">${inner}</blockquote>`;
+    // white-space:pre-line — 박스 내부 \n을 시각적 줄바꿈으로 자동 처리 (자동 줄바꿈은 그대로)
+    return `<blockquote style="border-left:3px solid #c9a84c;margin:20px 0;padding:16px 20px;background:#fafaf7;color:#555;font-style:italic;font-size:1.05rem;white-space:pre-line;">${inner}</blockquote>`;
   }
   m = text.match(/^\[box\]([\s\S]*)\[\/box\]$/);
   if (m) {
@@ -101,7 +102,8 @@ function paragraphToHtml(p) {
         const label = (text || url).trim();
         return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#0d2d52;text-decoration:underline;font-weight:600;">${label}</a>`;
       });
-    return `<div style="background:#fdf6ec;border:1px solid #e8c98a;border-radius:8px;padding:16px 20px;margin:20px 0;">${inner}</div>`;
+    // white-space:pre-line — 박스 내부 \n을 시각적 줄바꿈으로 자동 처리
+    return `<div style="background:#fdf6ec;border:1px solid #e8c98a;border-radius:8px;padding:16px 20px;margin:20px 0;white-space:pre-line;">${inner}</div>`;
   }
   m = text.match(/^\[info\]([\s\S]*)\[\/info\]$/);
   if (m) {
@@ -114,7 +116,8 @@ function paragraphToHtml(p) {
         const label = (text || url).trim();
         return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#0d2d52;text-decoration:underline;font-weight:600;">${label}</a>`;
       });
-    return `<div style="background:#f0f5ff;border:1px solid #93b4e8;border-left:4px solid #0d2d52;border-radius:8px;padding:16px 20px;margin:20px 0;">${inner}</div>`;
+    // white-space:pre-line — 박스 내부 \n을 시각적 줄바꿈으로 자동 처리
+    return `<div style="background:#f0f5ff;border:1px solid #93b4e8;border-left:4px solid #0d2d52;border-radius:8px;padding:16px 20px;margin:20px 0;white-space:pre-line;">${inner}</div>`;
   }
   // 본문 콘텐츠 이미지 [이미지:URL|캡션] — <figure><img alt><figcaption></figure>
   // 캡션을 alt에 주입 → SSG prerender HTML에 그대로 박혀 검색·AI 노출
