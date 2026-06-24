@@ -583,7 +583,28 @@ export default function Home() {
           );
         })()}
 
-        {/* ⑤ 광고 — 사이드 협찬 3개 (양주상회 → 플레이앤팝 → 닥터리부트) */}
+        {/* ⑤ 광고 — 피움 고정 배너 → 양주상회 → 플레이앤팝 → 닥터리부트 */}
+        {/* ⑤-pium 피움앱 고정 배너 — 항상 맨 위 */}
+        <div className="px-4 mb-7">
+          <div style={{ background:"#f0fdf4", border:"2px solid #166534", padding:"16px" }}>
+            <div style={{ fontSize:"9px", color:"#166534", letterSpacing:"1px", marginBottom:"10px", fontWeight:"700" }}>피움앱</div>
+            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center", gap:"8px", marginBottom:"14px" }}>
+              <img src="/pium-logo.png" alt="피움앱 로고"
+                   style={{ height:"44px", width:"auto", objectFit:"contain" }} />
+              <div style={{ fontSize:"15px", fontWeight:"800", color:"#166534", lineHeight:"1.4" }}>
+                경험이 기술을 입다
+              </div>
+              <div style={{ fontSize:"12px", color:"#3d3d3d", lineHeight:"1.6" }}>
+                비개발자가 만든 웹앱이 피어나는 곳
+              </div>
+            </div>
+            <Link to="/pium"
+                  style={{ display:"block", textAlign:"center", background:"#166534", color:"white", padding:"10px", fontSize:"14px", fontWeight:"700", textDecoration:"none", fontFamily:"'Noto Sans KR', sans-serif", borderRadius:"2px" }}>
+              웹앱스토어 구경하기 →
+            </Link>
+          </div>
+        </div>
+
         {/* ⑤-a 양주상회 — 사진 배너 + 내부 라우트 (기사) */}
         <div className="px-4 mb-7">
           <div className="text-[10px] text-neutral-500 tracking-widest mb-2">광고</div>
@@ -893,6 +914,25 @@ export default function Home() {
 
         {/* 사이드바 — 협찬 3개 (양주상회 → 플레이앤팝 → 닥터리부트) */}
         <aside className="lg:sticky lg:top-5" style={{ display:"flex", flexDirection:"column", gap:"24px" }}>
+
+          {/* 🌱 피움앱 고정 배너 — 항상 첫 번째 */}
+          <div style={{ background:"#f0fdf4", border:"2px solid #166534", padding:"16px" }}>
+            <div style={{ fontSize:"9px", color:"#166534", letterSpacing:"1px", marginBottom:"10px", fontWeight:"700" }}>피움앱</div>
+            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center", gap:"8px", marginBottom:"14px" }}>
+              <img src="/pium-logo.png" alt="피움앱 로고"
+                   style={{ height:"40px", width:"auto", objectFit:"contain" }} />
+              <div style={{ fontSize:"13px", fontWeight:"800", color:"#166534", lineHeight:"1.4" }}>
+                경험이 기술을 입다
+              </div>
+              <div style={{ fontSize:"11px", color:"#3d3d3d", lineHeight:"1.6" }}>
+                비개발자가 만든 웹앱이 피어나는 곳
+              </div>
+            </div>
+            <Link to="/pium"
+                  style={{ display:"block", textAlign:"center", background:"#166534", color:"white", padding:"9px", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"'Noto Sans KR', sans-serif", borderRadius:"2px" }}>
+              웹앱스토어 구경하기 →
+            </Link>
+          </div>
 
           {/* 광고(양주상회) — 사진 배너 + 내부 라우트 */}
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>

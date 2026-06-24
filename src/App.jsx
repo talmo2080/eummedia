@@ -23,6 +23,7 @@ import YouthPolicy from './pages/YouthPolicy'
 import ArticleEditor from './pages/ArticleEditor'
 import MyPage from './pages/MyPage'
 import Videos from './pages/Videos'
+import Pium from './pages/Pium'
 
 function App() {
   return (
@@ -56,6 +57,7 @@ function App() {
               <ProtectedRoute requiredRole="writer"><ArticleEditor /></ProtectedRoute>
             } />
             <Route path="/mypage" element={<MyPage />} />
+            <Route path="/pium" element={<Pium />} />
           </Routes>
         </main>
         <Footer />
