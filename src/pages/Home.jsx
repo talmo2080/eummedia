@@ -225,14 +225,14 @@ export default function Home() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      // (1) 1면 대표 캐러셀 — featured 3건 (편집국장 지정 순)
+      // (1) 1면 대표 캐러셀 — featured 최대 6건 (편집국장 지정 순)
       const { data: featured, error: fErr } = await supabase
         .from('articles')
         .select('slug, title, summary, thumbnail_url, published_at, author_name, channels(name)')
         .eq('status', 'published')
         .eq('is_main_featured', true)
         .order('main_featured_order', { ascending: true })
-        .limit(3);
+        .limit(6);
       if (cancelled) return;
       if (fErr) {
         console.error('[FEATURED] supabase error:', fErr);

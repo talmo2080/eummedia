@@ -840,8 +840,8 @@ export default function AdminDashboard() {
   }
 
   // ⭐ 홈 1면 대표 지정 토글 — admin/publisher 전용
-  //   · 최대 3개 제한, main_featured_order 자동 관리 (1→2→3)
-  //   · 해제 시 남은 order 재정리 (빈 번호 없이 1,2,3 유지)
+  //   · 최대 6개 제한, main_featured_order 자동 관리 (1→2→…→6)
+  //   · 해제 시 남은 order 재정리 (빈 번호 없이 1,2,…,N 유지)
   //   · 성공 시 triggerDeploy 호출 → prerender 갱신
   const toggleMainFeatured = async (article) => {
     const isCurrentlyFeatured = !!article.is_main_featured
@@ -849,8 +849,8 @@ export default function AdminDashboard() {
     if (!isCurrentlyFeatured) {
       // ── 지정 시도 ──
       const currentFeatured = articles.filter(a => a.is_main_featured)
-      if (currentFeatured.length >= 3) {
-        alert('홈 1면 대표는 최대 3개까지 지정할 수 있습니다.\n기존 대표를 해제한 후 다시 시도해주세요.')
+      if (currentFeatured.length >= 6) {
+        alert('홈 1면 대표는 최대 6개까지 지정할 수 있습니다.\n기존 대표를 해제한 후 다시 시도해주세요.')
         return
       }
       const maxOrder = currentFeatured.reduce(
@@ -1352,7 +1352,7 @@ export default function AdminDashboard() {
                             <button onClick={() => toggleMainFeatured(a)}
                               title={a.is_main_featured
                                 ? `홈 1면 대표 (순서 ${a.main_featured_order}) — 해제`
-                                : '홈 1면 대표로 지정 (최대 3개)'}
+                                : '홈 1면 대표로 지정 (최대 6개)'}
                               style={{
                                 padding: '8px 14px', fontSize: 13, fontWeight: 700,
                                 borderRadius: 4, cursor: 'pointer',
