@@ -151,8 +151,8 @@ export default function Header() {
           {/* 우측 버튼 — 데스크탑 (768px+) */}
           <div className="hidden md:flex" style={{ gap: 10, alignItems: "center" }}>
             {/* 피움 로고 */}
-            <Link to="/pium" style={{ display: "flex", alignItems: "center", textDecoration: "none", marginRight: 4, background: "#ffffff", borderRadius: 4, padding: "2px 4px" }}>
-              <img src="/pium-logo.png" alt="" style={{ height: 72, width: "auto", objectFit: "contain", display: "block", background: "#ffffff" }} />
+            <Link to="/pium" style={{ display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", marginRight: 4, background: "#ffffff", borderRadius: 4, padding: "6px 6px" }}>
+              <img src="/pium-logo.png" alt="" style={{ height: 90, width: "auto", objectFit: "contain", display: "block", background: "#ffffff" }} />
             </Link>
             <Link to="/advertise" style={{
               color: NAVY, textDecoration: "none",
