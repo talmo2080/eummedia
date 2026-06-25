@@ -25,7 +25,7 @@ const navItems = [
   { name: "이음뷰",     path: "/channel/view" },
   { name: "이음트렌드", path: "/channel/trend" },
   { name: "이음보이스", path: "/channel/voice" },
-  { name: "🌱피움",    path: "/pium" },
+  { name: "🌱 피움", path: "/pium" },
 ];
 
 // 오늘 날짜 — YYYY년 M월 D일 요일 (한국어)
@@ -151,8 +151,8 @@ export default function Header() {
           {/* 우측 버튼 — 데스크탑 (768px+) */}
           <div className="hidden md:flex" style={{ gap: 10, alignItems: "center" }}>
             {/* 피움 로고 */}
-            <Link to="/pium" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
-              <img src="/pium-logo.png" alt="피움앱" style={{ height: 28, width: "auto", objectFit: "contain" }} />
+            <Link to="/pium" style={{ display: "flex", alignItems: "center", textDecoration: "none", marginRight: 4 }}>
+              <img src="/pium-logo.png" alt="" style={{ height: 30, width: "auto", objectFit: "contain", display: "block" }} />
             </Link>
             <Link to="/advertise" style={{
               color: NAVY, textDecoration: "none",
