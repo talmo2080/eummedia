@@ -68,155 +68,266 @@ function CircuitBg({ opacity = 0.07 }) {
 }
 
 /* ────────────────────────────────────────
-   plum SVG 로고 (애니메이션)
+   히어로 배경 — 중앙에서 바깥으로 뻗는 회로
+──────────────────────────────────────── */
+function HeroBg() {
+  /* 중심: SVG 좌표계 500,340 (viewBox 1000x680) */
+  const CX = 500, CY = 340;
+
+  /* 정적 회로 라인 (가늘고 섬세하게) */
+  const staticPaths = [
+    /* 우상단 */
+    `M${CX},${CY} L560,${CY} L560,270 L660,270 L660,170 L800,170`,
+    `M560,270 L640,270 L640,200 L760,200 L760,130`,
+    `M660,170 L700,170 L700,100 L860,100`,
+    /* 좌상단 */
+    `M${CX},${CY} L430,${CY} L430,250 L310,250 L310,140 L170,140`,
+    `M430,250 L360,250 L360,170 L230,170 L230,80`,
+    `M310,140 L280,140 L280,60 L150,60`,
+    /* 우하단 */
+    `M${CX},${CY} L590,${CY} L590,420 L700,420 L700,540`,
+    `M590,420 L660,420 L660,490 L800,490 L800,580`,
+    `M700,420 L740,420 L740,520 L900,520`,
+    /* 좌하단 */
+    `M${CX},${CY} L400,${CY} L400,430 L280,430 L280,560`,
+    `M400,430 L330,430 L330,510 L190,510`,
+    `M280,430 L260,430 L260,560 L100,560`,
+    /* 우 */
+    `M${CX},${CY} L620,${CY} L620,290 L820,290`,
+    `M620,290 L760,290 L760,240 L920,240`,
+    /* 좌 */
+    `M${CX},${CY} L370,${CY} L370,310 L200,310`,
+    `M370,310 L300,310 L300,380 L120,380`,
+  ];
+
+  /* 빛 흐르는 라인 (stroke-dashoffset 애니메이션) */
+  const animPaths = [
+    { d:`M${CX},${CY} L560,${CY} L560,270 L660,270 L660,170 L800,170`, c:"#16a34a", len:370, dur:"3s",   b:"0s"   },
+    { d:`M${CX},${CY} L430,${CY} L430,250 L310,250 L310,140 L170,140`, c:"#7c3aed", len:390, dur:"3.5s", b:"0.6s" },
+    { d:`M${CX},${CY} L590,${CY} L590,420 L700,420 L700,540`,          c:"#16a34a", len:320, dur:"2.8s", b:"1.2s" },
+    { d:`M${CX},${CY} L400,${CY} L400,430 L280,430 L280,560`,          c:"#7c3aed", len:340, dur:"3.2s", b:"0.4s" },
+    { d:`M560,270 L640,270 L640,200 L760,200 L760,130`,                 c:"#16a34a", len:260, dur:"2.4s", b:"0.8s" },
+    { d:`M430,250 L360,250 L360,170 L230,170 L230,80`,                  c:"#9333ea", len:260, dur:"2.6s", b:"1.5s" },
+    { d:`M${CX},${CY} L620,${CY} L620,290 L820,290`,                    c:"#16a34a", len:320, dur:"2.9s", b:"0.2s" },
+    { d:`M${CX},${CY} L370,${CY} L370,310 L200,310`,                    c:"#7c3aed", len:300, dur:"3.1s", b:"1.0s" },
+  ];
+
+  /* 노드 (교차점 반짝임) */
+  const nodes = [
+    { x:560, y:CY,  c:"#16a34a", d:"2.2s", b:"0s"   },
+    { x:560, y:270, c:"#16a34a", d:"2.5s", b:"0.3s" },
+    { x:660, y:270, c:"#16a34a", d:"1.9s", b:"0.7s" },
+    { x:660, y:170, c:"#16a34a", d:"2.7s", b:"1.1s" },
+    { x:430, y:CY,  c:"#7c3aed", d:"2.3s", b:"0.4s" },
+    { x:430, y:250, c:"#7c3aed", d:"2.1s", b:"0.8s" },
+    { x:310, y:250, c:"#7c3aed", d:"2.6s", b:"0.2s" },
+    { x:310, y:140, c:"#7c3aed", d:"1.8s", b:"1.3s" },
+    { x:590, y:420, c:"#16a34a", d:"2.4s", b:"0.5s" },
+    { x:700, y:420, c:"#16a34a", d:"2.0s", b:"0.9s" },
+    { x:400, y:430, c:"#9333ea", d:"2.2s", b:"1.2s" },
+    { x:280, y:430, c:"#9333ea", d:"2.8s", b:"0.6s" },
+    { x:620, y:CY,  c:"#16a34a", d:"2.1s", b:"0.3s" },
+    { x:370, y:CY,  c:"#7c3aed", d:"2.5s", b:"0.7s" },
+    { x:640, y:270, c:"#16a34a", d:"1.7s", b:"1.0s" },
+    { x:360, y:250, c:"#9333ea", d:"2.3s", b:"0.1s" },
+  ];
+
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 1000 680"
+      preserveAspectRatio="xMidYMid slice"
+      style={{ position:"absolute", inset:0, width:"100%", height:"100%", pointerEvents:"none" }}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        {/* 배경 그라데이션 */}
+        <linearGradient id="hero-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%"   stopColor="#e8fdf5"/>
+          <stop offset="35%"  stopColor="#f0fdf9"/>
+          <stop offset="65%"  stopColor="#faf5ff"/>
+          <stop offset="100%" stopColor="#ede9fe"/>
+        </linearGradient>
+
+        {/* 중심→가장자리 페이드 마스크 */}
+        <radialGradient id="circuit-fade" cx="50%" cy="50%" r="50%">
+          <stop offset="10%"  stopColor="white" stopOpacity="1"/>
+          <stop offset="75%"  stopColor="white" stopOpacity="0.5"/>
+          <stop offset="100%" stopColor="white" stopOpacity="0"/>
+        </radialGradient>
+        <mask id="fade-out">
+          <rect width="1000" height="680" fill="url(#circuit-fade)"/>
+        </mask>
+      </defs>
+
+      {/* ① 배경 */}
+      <rect width="1000" height="680" fill="url(#hero-bg)"/>
+
+      {/* ② 정적 회로 (fade mask 적용) */}
+      <g mask="url(#fade-out)" stroke="#a7f3d0" strokeWidth="0.7" fill="none" opacity="0.7">
+        {staticPaths.map((d,i)=>(
+          <path key={i} d={d} strokeLinecap="round" strokeLinejoin="round"/>
+        ))}
+      </g>
+
+      {/* ③ 빛 흐르는 라인 */}
+      <g mask="url(#fade-out)">
+        {animPaths.map(({d,c,len,dur,b},i)=>(
+          <path key={i} d={d} stroke={c} strokeWidth="1.2" fill="none"
+                strokeLinecap="round" strokeLinejoin="round"
+                strokeDasharray={`28 ${len}`} strokeDashoffset={len}>
+            <animate attributeName="strokeDashoffset"
+                     from={len} to={-28}
+                     dur={dur} begin={b} repeatCount="indefinite"/>
+          </path>
+        ))}
+      </g>
+
+      {/* ④ 노드 */}
+      {nodes.map(({x,y,c,d,b},i)=>(
+        <circle key={i} cx={x} cy={y} r="2.5" fill={c} opacity="0">
+          <animate attributeName="opacity" values="0;0.8;0" dur={d} begin={b} repeatCount="indefinite"/>
+          <animate attributeName="r"       values="1.5;3;1.5" dur={d} begin={b} repeatCount="indefinite"/>
+        </circle>
+      ))}
+    </svg>
+  );
+}
+
+/* ────────────────────────────────────────
+   plum SVG 로고 (애니메이션, 밝은 배경용)
 ──────────────────────────────────────── */
 function PlumLogoSVG() {
   return (
     <svg
       viewBox="0 0 440 280"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ width:"min(400px,88vw)", height:"auto", overflow:"visible" }}
+      style={{ width:"min(380px,86vw)", height:"auto", overflow:"visible" }}
       aria-label="plum — 경험이 AI를 입다"
     >
       <defs>
-        {/* 초록 glow 필터 */}
-        <filter id="fg" x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation="6" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        {/* 보라 glow 필터 */}
-        <filter id="fp" x="-60%" y="-60%" width="220%" height="220%">
+        <filter id="fg2" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="5" result="b"/>
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
-        {/* 잎 glow 필터 */}
-        <filter id="fl" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="12" result="b"/>
+        <filter id="fp2" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
-        {/* 텍스트 glow */}
-        <filter id="ft" x="-10%" y="-30%" width="120%" height="160%">
-          <feGaussianBlur stdDeviation="4" result="b"/>
+        <filter id="fl2" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="8" result="b"/>
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
 
-      {/* ── 줄기 ── */}
-      <path d="M 185 185 L 185 118" stroke="#2d6a4f" strokeWidth="3.5"
-            strokeLinecap="round" filter="url(#fg)"/>
+      {/* 줄기 */}
+      <path d="M 185 185 L 185 118" stroke="#166534" strokeWidth="3.5" strokeLinecap="round"/>
 
-      {/* ── 잎 1 (좌측, 큰 잎) ── */}
+      {/* 잎 1 (좌측) */}
       <path d="M 185 118 C 165 105 138 92 140 68 C 142 48 168 46 183 62 Q 190 88 185 118 Z"
-            fill="#1a5c3a" filter="url(#fl)">
-        <animate attributeName="opacity" values="0.75;1;0.75" dur="3s" repeatCount="indefinite"/>
+            fill="#15803d" filter="url(#fl2)">
+        <animate attributeName="opacity" values="0.8;1;0.8" dur="3s" repeatCount="indefinite"/>
       </path>
-      {/* 잎 1 잎맥 */}
-      <path d="M 185 118 L 158 80" stroke="#4ade80" strokeWidth="1"
-            fill="none" opacity="0.5"/>
+      <path d="M 185 118 L 158 80" stroke="#166534" strokeWidth="1" fill="none" opacity="0.4"/>
 
-      {/* ── 잎 2 (우측, 메인 잎) ── */}
+      {/* 잎 2 (우측, 메인) */}
       <path d="M 185 100 C 200 88 228 75 238 52 C 246 33 228 20 210 34 Q 196 58 185 100 Z"
-            fill="#166534" filter="url(#fl)">
-        <animate attributeName="opacity" values="0.8;1;0.8" dur="2.5s" begin="0.4s" repeatCount="indefinite"/>
+            fill="#166534" filter="url(#fl2)">
+        <animate attributeName="opacity" values="0.85;1;0.85" dur="2.5s" begin="0.4s" repeatCount="indefinite"/>
       </path>
-      {/* 잎 2 잎맥 */}
-      <path d="M 185 100 L 220 55" stroke="#4ade80" strokeWidth="1"
-            fill="none" opacity="0.5"/>
+      <path d="M 185 100 L 220 55" stroke="#166534" strokeWidth="1" fill="none" opacity="0.4"/>
 
-      {/* ── 잎 3 (중간 작은 잎) ── */}
+      {/* 잎 3 (소) */}
       <path d="M 185 140 C 170 132 158 118 165 105 C 170 95 184 100 185 115 Z"
-            fill="#15803d">
+            fill="#14532d">
         <animate attributeName="opacity" values="0.6;0.9;0.6" dur="4s" begin="1s" repeatCount="indefinite"/>
       </path>
 
-      {/* ── 회로 라인 1 (잎2 → 오른쪽 상단) ── */}
-      <path d="M 235 50 L 262 50 L 262 28 L 300 28"
-            stroke="#4ade80" strokeWidth="1.5" fill="none"
+      {/* 회로 라인 1 */}
+      <path d="M 235 50 L 262 50 L 262 28 L 305 28"
+            stroke="#16a34a" strokeWidth="1.4" fill="none"
             strokeLinecap="round" strokeLinejoin="round"
-            strokeDasharray="90" strokeDashoffset="90">
-        <animate attributeName="strokeDashoffset" from="90" to="-90"
-                 dur="2s" repeatCount="indefinite"/>
+            strokeDasharray="28 100" strokeDashoffset="100">
+        <animate attributeName="strokeDashoffset" from="100" to="-28" dur="2s" repeatCount="indefinite"/>
       </path>
 
-      {/* ── 회로 라인 2 (중간에서 갈라짐) ── */}
-      <path d="M 262 50 L 290 72 L 330 72"
-            stroke="#c084fc" strokeWidth="1.5" fill="none"
+      {/* 회로 라인 2 */}
+      <path d="M 262 28 L 310 28 L 310 48 L 370 48"
+            stroke="#9333ea" strokeWidth="1.2" fill="none"
             strokeLinecap="round" strokeLinejoin="round"
-            strokeDasharray="85" strokeDashoffset="85">
-        <animate attributeName="strokeDashoffset" from="85" to="-85"
-                 dur="2.4s" begin="0.3s" repeatCount="indefinite"/>
+            strokeDasharray="28 120" strokeDashoffset="120">
+        <animate attributeName="strokeDashoffset" from="120" to="-28" dur="2.4s" begin="0.4s" repeatCount="indefinite"/>
       </path>
 
-      {/* ── 회로 라인 3 (상단에서 분기) ── */}
-      <path d="M 300 28 L 340 28 L 340 48 L 370 48"
-            stroke="#4ade80" strokeWidth="1.2" fill="none"
+      {/* 회로 라인 3 */}
+      <path d="M 262 50 L 300 72 L 345 72"
+            stroke="#16a34a" strokeWidth="1.2" fill="none"
             strokeLinecap="round" strokeLinejoin="round"
-            strokeDasharray="80" strokeDashoffset="80">
-        <animate attributeName="strokeDashoffset" from="80" to="-80"
-                 dur="1.8s" begin="0.6s" repeatCount="indefinite"/>
+            strokeDasharray="28 110" strokeDashoffset="110">
+        <animate attributeName="strokeDashoffset" from="110" to="-28" dur="2.2s" begin="0.7s" repeatCount="indefinite"/>
       </path>
 
-      {/* ── 회로 라인 4 (짧은 수직) ── */}
-      <path d="M 330 72 L 330 52 L 355 52"
-            stroke="#c084fc" strokeWidth="1" fill="none"
+      {/* 회로 라인 4 */}
+      <path d="M 310 48 L 345 48 L 345 30 L 390 30"
+            stroke="#9333ea" strokeWidth="1" fill="none"
             strokeLinecap="round" strokeLinejoin="round"
-            strokeDasharray="55" strokeDashoffset="55">
-        <animate attributeName="strokeDashoffset" from="55" to="-55"
-                 dur="2.1s" begin="0.9s" repeatCount="indefinite"/>
+            strokeDasharray="28 100" strokeDashoffset="100">
+        <animate attributeName="strokeDashoffset" from="100" to="-28" dur="1.9s" begin="1.1s" repeatCount="indefinite"/>
       </path>
 
-      {/* ── 회로 노드 (빛나는 점) ── */}
+      {/* 노드 */}
       {[
-        { cx:300, cy:28,  c:"#4ade80", d:"2s",   b:"0s"   },
-        { cx:370, cy:48,  c:"#4ade80", d:"1.8s", b:"0.3s" },
-        { cx:330, cy:72,  c:"#c084fc", d:"2.4s", b:"0.5s" },
-        { cx:355, cy:52,  c:"#c084fc", d:"2.1s", b:"0.8s" },
-        { cx:262, cy:50,  c:"#4ade80", d:"1.6s", b:"0.1s" },
-        { cx:290, cy:72,  c:"#c084fc", d:"2.2s", b:"0.6s" },
+        { cx:262, cy:50,  c:"#16a34a", d:"2s",   b:"0s"   },
+        { cx:305, cy:28,  c:"#16a34a", d:"1.8s", b:"0.3s" },
+        { cx:310, cy:48,  c:"#9333ea", d:"2.4s", b:"0.6s" },
+        { cx:370, cy:48,  c:"#9333ea", d:"2.0s", b:"0.9s" },
+        { cx:300, cy:72,  c:"#16a34a", d:"2.2s", b:"0.4s" },
+        { cx:345, cy:72,  c:"#16a34a", d:"1.9s", b:"1.2s" },
+        { cx:390, cy:30,  c:"#9333ea", d:"1.7s", b:"0.8s" },
       ].map(({cx,cy,c,d,b},i)=>(
-        <g key={i} filter={c==="#4ade80"?"url(#fg)":"url(#fp)"}>
-          <circle cx={cx} cy={cy} r="4" fill={c} opacity="0.3"/>
-          <circle cx={cx} cy={cy} r="2.5" fill={c}>
+        <g key={i}>
+          <circle cx={cx} cy={cy} r="4" fill={c} opacity="0.15"/>
+          <circle cx={cx} cy={cy} r="2.2" fill={c}>
             <animate attributeName="opacity" values="0.2;1;0.2" dur={d} begin={b} repeatCount="indefinite"/>
-            <animate attributeName="r" values="2;3.5;2" dur={d} begin={b} repeatCount="indefinite"/>
+            <animate attributeName="r" values="1.8;3.2;1.8"    dur={d} begin={b} repeatCount="indefinite"/>
           </circle>
         </g>
       ))}
 
-      {/* ── 흩어진 보라 반짝임 ── */}
+      {/* 보라 반짝임 */}
       {[
-        { cx:358, cy:20, d:"1.3s", b:"0s"   },
-        { cx:380, cy:38, d:"1.7s", b:"0.4s" },
-        { cx:345, cy:62, d:"2.0s", b:"0.7s" },
-        { cx:395, cy:55, d:"1.5s", b:"0.2s" },
+        { cx:380, cy:18, d:"1.4s", b:"0s"   },
+        { cx:400, cy:42, d:"1.8s", b:"0.5s" },
+        { cx:365, cy:58, d:"2.1s", b:"0.9s" },
+        { cx:415, cy:28, d:"1.6s", b:"0.3s" },
       ].map(({cx,cy,d,b},i)=>(
-        <circle key={i} cx={cx} cy={cy} r="2" fill="#c084fc" filter="url(#fp)">
-          <animate attributeName="opacity" values="0;0.9;0" dur={d} begin={b} repeatCount="indefinite"/>
+        <circle key={i} cx={cx} cy={cy} r="2" fill="#9333ea">
+          <animate attributeName="opacity" values="0;0.7;0" dur={d} begin={b} repeatCount="indefinite"/>
         </circle>
       ))}
 
-      {/* ── "p" (보라) ── */}
+      {/* "p" 보라 */}
       <text x="108" y="235"
             fontFamily="Georgia,'Times New Roman',serif"
             fontSize="95" fontWeight="900"
-            fill="#7c3aed" filter="url(#fp)" textAnchor="middle">
+            fill="#6d28d9" textAnchor="middle">
         p
         <animate attributeName="opacity" values="0.85;1;0.85" dur="3s" repeatCount="indefinite"/>
       </text>
 
-      {/* ── "lum" (짙은 초록) ── */}
-      <text x="282" y="235"
+      {/* "lum" 초록 */}
+      <text x="285" y="235"
             fontFamily="Georgia,'Times New Roman',serif"
             fontSize="95" fontWeight="900"
-            fill="#1a5c3a" filter="url(#ft)" textAnchor="middle">
+            fill="#14532d" textAnchor="middle">
         lum
       </text>
 
-      {/* ── 서브타이틀 ── */}
-      <text x="220" y="265"
+      {/* 서브타이틀 */}
+      <text x="220" y="268"
             fontFamily="'Noto Sans KR',sans-serif"
-            fontSize="13" fontWeight="700" letterSpacing="1"
-            fill="#64748b" textAnchor="middle">
+            fontSize="13" fontWeight="700" letterSpacing="1.5"
+            fill="#6b7280" textAnchor="middle">
         경험이 AI를 입다
       </text>
     </svg>
@@ -224,14 +335,13 @@ function PlumLogoSVG() {
 }
 
 /* ────────────────────────────────────────
-   블록 1 — 풀스크린 히어로
+   블록 1 — 풀스크린 히어로 (밝은 사이버틱 가든)
 ──────────────────────────────────────── */
 function Hero() {
   return (
     <section style={{
       position: "relative",
       minHeight: "100svh",
-      background: DARK_BG,
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -240,43 +350,29 @@ function Hero() {
       textAlign: "center",
       overflow: "hidden",
     }}>
-      <CircuitBg />
-
-      {/* 배경 글로우 */}
-      <div style={{
-        position:"absolute", top:"30%", left:"50%",
-        transform:"translate(-50%,-50%)",
-        width:600, height:600,
-        background:`radial-gradient(circle,${PLUM}1e 0%,transparent 70%)`,
-        pointerEvents:"none",
-      }}/>
-      <div style={{
-        position:"absolute", bottom:"20%", left:"25%",
-        width:300, height:300,
-        background:`radial-gradient(circle,${GREEN}1a 0%,transparent 70%)`,
-        pointerEvents:"none",
-      }}/>
+      {/* ★ 밝은 회로 배경 */}
+      <HeroBg />
 
       {/* ★ SVG 로고 */}
-      <div style={{ marginBottom:44, position:"relative" }}>
+      <div style={{ marginBottom:44, position:"relative", zIndex:1 }}>
         <PlumLogoSVG />
       </div>
 
-      {/* 메인 카피 */}
+      {/* 메인 카피 — 진남색 */}
       <h1 style={{
         fontSize:"clamp(22px,5vw,42px)",
         fontWeight:900,
-        color:TEXT_HI,
-        lineHeight:1.5,
+        color:"#0f2845",
+        lineHeight:1.55,
         margin:"0 0 24px",
         fontFamily:"'Noto Sans KR',sans-serif",
         letterSpacing:"-0.5px",
-        position:"relative",
+        position:"relative", zIndex:1,
       }}>
         몸으로 배운 마지막 세대,<br/>
         AI를 손에 쥔 첫 세대.<br/>
         <span style={{
-          background:`linear-gradient(90deg,${GREEN_LT},${PLUM_LT})`,
+          background:"linear-gradient(90deg,#16a34a,#7c3aed)",
           WebkitBackgroundClip:"text",
           WebkitTextFillColor:"transparent",
         }}>그 사이에 우리가 서 있습니다.</span>
@@ -285,24 +381,24 @@ function Hero() {
       {/* 서브 카피 */}
       <p style={{
         fontSize:"clamp(15px,2.5vw,20px)",
-        color:TEXT_MID,
+        color:"#374151",
         lineHeight:1.8,
         margin:"0 0 28px",
         maxWidth:540,
-        position:"relative",
+        position:"relative", zIndex:1,
       }}>
         평생의 경험을 기술로 남길 시간은,<br/>
-        <strong style={{color:TEXT_HI}}>지금밖에 없습니다.</strong>
+        <strong style={{color:"#0f2845"}}>지금밖에 없습니다.</strong>
       </p>
 
       {/* 소개 문구 */}
       <p style={{
         fontSize:"clamp(12px,2vw,14px)",
-        color:TEXT_LOW,
+        color:"#6b7280",
         lineHeight:1.9,
         maxWidth:480,
         margin:"0 0 64px",
-        position:"relative",
+        position:"relative", zIndex:1,
       }}>
         코딩 한 줄 못 하던 27년 차 두피전문가가<br/>
         3주 만에 신문 한 채를 지었습니다.<br/>
@@ -315,10 +411,11 @@ function Hero() {
         transform:"translateX(-50%)",
         display:"flex", flexDirection:"column", alignItems:"center", gap:4,
         animation:"pium-bounce 1.8s infinite",
+        zIndex:1,
       }}>
-        <span style={{fontSize:10, color:TEXT_LOW, letterSpacing:2}}>SCROLL</span>
+        <span style={{fontSize:10, color:"#9ca3af", letterSpacing:2}}>SCROLL</span>
         <svg width="20" height="12" viewBox="0 0 20 12" fill="none">
-          <path d="M2 2l8 8 8-8" stroke={GREEN_LT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M2 2l8 8 8-8" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </div>
 
