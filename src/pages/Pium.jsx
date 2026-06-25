@@ -335,7 +335,65 @@ function PlumLogoSVG() {
 }
 
 /* ────────────────────────────────────────
-   블록 1 — 풀스크린 히어로 (밝은 사이버틱 가든)
+   빛 흐름 SVG 오버레이 (이미지 위에 얹기)
+──────────────────────────────────────── */
+function LightOverlay() {
+  const paths = [
+    { d:"M500,340 L560,340 L560,260 L660,260 L660,160 L800,160", c:"#16a34a", len:370, dur:"3s",   b:"0s"   },
+    { d:"M500,340 L430,340 L430,240 L310,240 L310,130 L170,130", c:"#7c3aed", len:390, dur:"3.5s", b:"0.7s" },
+    { d:"M500,340 L590,340 L590,430 L710,430 L710,550",          c:"#16a34a", len:320, dur:"2.8s", b:"1.2s" },
+    { d:"M500,340 L400,340 L400,440 L270,440 L270,570",          c:"#9333ea", len:340, dur:"3.2s", b:"0.4s" },
+    { d:"M500,340 L500,250 L610,250 L610,160 L760,160",          c:"#16a34a", len:300, dur:"2.6s", b:"0.9s" },
+    { d:"M500,340 L500,430 L370,430 L370,540 L210,540",          c:"#7c3aed", len:320, dur:"3.0s", b:"0.5s" },
+    { d:"M500,340 L630,340 L630,280 L830,280",                   c:"#16a34a", len:330, dur:"2.9s", b:"0.2s" },
+    { d:"M500,340 L360,340 L360,300 L180,300",                   c:"#9333ea", len:320, dur:"3.1s", b:"1.0s" },
+  ];
+  const nodes = [
+    {x:560,y:340,c:"#16a34a"},{x:560,y:260,c:"#16a34a"},{x:660,y:260,c:"#16a34a"},
+    {x:430,y:340,c:"#7c3aed"},{x:430,y:240,c:"#7c3aed"},{x:310,y:240,c:"#7c3aed"},
+    {x:590,y:430,c:"#16a34a"},{x:710,y:430,c:"#16a34a"},
+    {x:400,y:440,c:"#9333ea"},{x:270,y:440,c:"#9333ea"},
+    {x:610,y:250,c:"#16a34a"},{x:370,y:430,c:"#7c3aed"},
+    {x:630,y:280,c:"#16a34a"},{x:360,y:300,c:"#9333ea"},
+  ];
+  return (
+    <svg aria-hidden="true"
+      viewBox="0 0 1000 680" preserveAspectRatio="xMidYMid slice"
+      style={{ position:"absolute", inset:0, width:"100%", height:"100%", pointerEvents:"none", zIndex:2 }}>
+      <defs>
+        <radialGradient id="lo-fade" cx="50%" cy="50%" r="50%">
+          <stop offset="15%" stopColor="white" stopOpacity="1"/>
+          <stop offset="80%" stopColor="white" stopOpacity="0.4"/>
+          <stop offset="100%" stopColor="white" stopOpacity="0"/>
+        </radialGradient>
+        <mask id="lo-mask">
+          <rect width="1000" height="680" fill="url(#lo-fade)"/>
+        </mask>
+      </defs>
+      <g mask="url(#lo-mask)">
+        {paths.map(({d,c,len,dur,b},i)=>(
+          <path key={i} d={d} stroke={c} strokeWidth="1.5" fill="none"
+                strokeLinecap="round" strokeLinejoin="round"
+                strokeDasharray={`22 ${len}`} strokeDashoffset={len}>
+            <animate attributeName="strokeDashoffset"
+                     from={len} to={-22} dur={dur} begin={b} repeatCount="indefinite"/>
+          </path>
+        ))}
+        {nodes.map(({x,y,c},i)=>(
+          <circle key={i} cx={x} cy={y} r="2.5" fill={c} opacity="0">
+            <animate attributeName="opacity" values="0;0.85;0"
+                     dur={`${1.8+i*0.15}s`} begin={`${(i*0.28)%2}s`} repeatCount="indefinite"/>
+            <animate attributeName="r" values="1.5;3;1.5"
+                     dur={`${1.8+i*0.15}s`} begin={`${(i*0.28)%2}s`} repeatCount="indefinite"/>
+          </circle>
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+/* ────────────────────────────────────────
+   블록 1 — 풀스크린 히어로 (pium-hero.png 배경)
 ──────────────────────────────────────── */
 function Hero() {
   return (
@@ -345,73 +403,80 @@ function Hero() {
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      justifyContent: "center",
-      padding: "64px 24px 80px",
+      justifyContent: "flex-end",
       textAlign: "center",
       overflow: "hidden",
+      backgroundImage: "url(/pium-hero.png)",
+      backgroundSize: "cover",
+      backgroundPosition: "center top",
     }}>
-      {/* ★ 밝은 회로 배경 */}
-      <HeroBg />
 
-      {/* ★ SVG 로고 */}
-      <div style={{ marginBottom:44, position:"relative", zIndex:1 }}>
-        <PlumLogoSVG />
+      {/* 하단 텍스트 가독성 — 흰 그라데이션 오버레이 */}
+      <div style={{
+        position:"absolute", inset:0,
+        background:"linear-gradient(to top, rgba(255,255,255,0.97) 0%, rgba(255,255,255,0.88) 28%, rgba(255,255,255,0.3) 52%, transparent 70%)",
+        pointerEvents:"none", zIndex:1,
+      }}/>
+
+      {/* ★ 빛 흐름 SVG 오버레이 */}
+      <LightOverlay />
+
+      {/* 텍스트 블록 */}
+      <div style={{ position:"relative", zIndex:3, padding:"0 24px 72px", width:"100%", maxWidth:680, margin:"0 auto" }}>
+
+        {/* 메인 카피 */}
+        <h1 style={{
+          fontSize:"clamp(22px,5vw,42px)",
+          fontWeight:900,
+          color:"#0f2845",
+          lineHeight:1.55,
+          margin:"0 0 22px",
+          fontFamily:"'Noto Sans KR',sans-serif",
+          letterSpacing:"-0.5px",
+        }}>
+          몸으로 배운 마지막 세대,<br/>
+          AI를 손에 쥔 첫 세대.<br/>
+          <span style={{
+            background:"linear-gradient(90deg,#16a34a,#7c3aed)",
+            WebkitBackgroundClip:"text",
+            WebkitTextFillColor:"transparent",
+          }}>그 사이에 우리가 서 있습니다.</span>
+        </h1>
+
+        {/* 서브 카피 */}
+        <p style={{
+          fontSize:"clamp(15px,2.5vw,20px)",
+          color:"#374151",
+          lineHeight:1.8,
+          margin:"0 0 22px",
+          maxWidth:540,
+          marginLeft:"auto", marginRight:"auto",
+        }}>
+          평생의 경험을 기술로 남길 시간은,<br/>
+          <strong style={{color:"#0f2845"}}>지금밖에 없습니다.</strong>
+        </p>
+
+        {/* 소개 문구 */}
+        <p style={{
+          fontSize:"clamp(12px,2vw,14px)",
+          color:"#6b7280",
+          lineHeight:1.9,
+          maxWidth:480,
+          margin:"0 auto",
+        }}>
+          코딩 한 줄 못 하던 27년 차 두피전문가가<br/>
+          3주 만에 신문 한 채를 지었습니다.<br/>
+          이제, 당신 차례입니다.
+        </p>
       </div>
-
-      {/* 메인 카피 — 진남색 */}
-      <h1 style={{
-        fontSize:"clamp(22px,5vw,42px)",
-        fontWeight:900,
-        color:"#0f2845",
-        lineHeight:1.55,
-        margin:"0 0 24px",
-        fontFamily:"'Noto Sans KR',sans-serif",
-        letterSpacing:"-0.5px",
-        position:"relative", zIndex:1,
-      }}>
-        몸으로 배운 마지막 세대,<br/>
-        AI를 손에 쥔 첫 세대.<br/>
-        <span style={{
-          background:"linear-gradient(90deg,#16a34a,#7c3aed)",
-          WebkitBackgroundClip:"text",
-          WebkitTextFillColor:"transparent",
-        }}>그 사이에 우리가 서 있습니다.</span>
-      </h1>
-
-      {/* 서브 카피 */}
-      <p style={{
-        fontSize:"clamp(15px,2.5vw,20px)",
-        color:"#374151",
-        lineHeight:1.8,
-        margin:"0 0 28px",
-        maxWidth:540,
-        position:"relative", zIndex:1,
-      }}>
-        평생의 경험을 기술로 남길 시간은,<br/>
-        <strong style={{color:"#0f2845"}}>지금밖에 없습니다.</strong>
-      </p>
-
-      {/* 소개 문구 */}
-      <p style={{
-        fontSize:"clamp(12px,2vw,14px)",
-        color:"#6b7280",
-        lineHeight:1.9,
-        maxWidth:480,
-        margin:"0 0 64px",
-        position:"relative", zIndex:1,
-      }}>
-        코딩 한 줄 못 하던 27년 차 두피전문가가<br/>
-        3주 만에 신문 한 채를 지었습니다.<br/>
-        이제, 당신 차례입니다.
-      </p>
 
       {/* 스크롤 화살표 */}
       <div style={{
-        position:"absolute", bottom:32, left:"50%",
+        position:"absolute", bottom:24, left:"50%",
         transform:"translateX(-50%)",
         display:"flex", flexDirection:"column", alignItems:"center", gap:4,
         animation:"pium-bounce 1.8s infinite",
-        zIndex:1,
+        zIndex:3,
       }}>
         <span style={{fontSize:10, color:"#9ca3af", letterSpacing:2}}>SCROLL</span>
         <svg width="20" height="12" viewBox="0 0 20 12" fill="none">
