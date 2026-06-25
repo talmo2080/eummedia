@@ -256,7 +256,9 @@ export default function Header() {
                 onMouseEnter={e => { if (!active) e.currentTarget.style.color = "#fff"; }}
                 onMouseLeave={e => { if (!active) e.currentTarget.style.color = CHANNEL_INACTIVE; }}
               >
-                {ch.name}
+                {ch.path === "/pium"
+                  ? <img src="/pium-logo.png" alt="피움" style={{ height: 28, width: "auto", objectFit: "contain", display: "block", verticalAlign: "middle" }} />
+                  : ch.name}
               </Link>
             );
           })}
