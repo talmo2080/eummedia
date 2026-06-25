@@ -1151,15 +1151,15 @@ export default function ArticleDetail() {
           <div style={{ background:"#f0fdf4", border:"2px solid #166534", borderRadius:"4px", overflow:"hidden" }}>
             <Link to="/pium" style={{ display:"block", textDecoration:"none" }}>
               <img src="/pium-banner.png" alt="피움앱 — 경험이 기술을 입다"
-                   style={{ display:"block", width:"100%", height:"auto" }} />
+                   style={{ display:"block", width:"100%", maxHeight:"120px", objectFit:"contain", objectPosition:"center" }} />
             </Link>
-            <div style={{ padding:"12px 14px", display:"flex", flexDirection:"column", gap:"8px" }}>
+            <div style={{ padding:"10px 12px", display:"flex", flexDirection:"column", gap:"7px" }}>
               <Link to="/pium"
-                    style={{ display:"block", textAlign:"center", background:"#166534", color:"white", padding:"9px", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"'Noto Sans KR', sans-serif", borderRadius:"2px" }}>
+                    style={{ display:"block", textAlign:"center", background:"#166534", color:"white", padding:"8px", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"'Noto Sans KR', sans-serif", borderRadius:"2px" }}>
                 웹앱스토어 구경하기 →
               </Link>
               <Link to="/pium-request"
-                    style={{ display:"block", textAlign:"center", background:"transparent", color:"#166534", padding:"8px", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"'Noto Sans KR', sans-serif", borderRadius:"2px", border:"1.5px solid #166534" }}>
+                    style={{ display:"block", textAlign:"center", background:"transparent", color:"#166534", padding:"7px", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"'Noto Sans KR', sans-serif", borderRadius:"2px", border:"1.5px solid #166534" }}>
                 이런 앱이 필요하세요? →
               </Link>
             </div>

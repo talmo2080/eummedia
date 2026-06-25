@@ -152,7 +152,7 @@ export default function Header() {
           <div className="hidden md:flex" style={{ gap: 10, alignItems: "center" }}>
             {/* 피움 로고 */}
             <Link to="/pium" style={{ display: "flex", alignItems: "center", textDecoration: "none", marginRight: 4 }}>
-              <img src="/pium-logo.png" alt="" style={{ height: 30, width: "auto", objectFit: "contain", display: "block" }} />
+              <img src="/pium-logo.png" alt="" style={{ height: 44, width: "auto", objectFit: "contain", display: "block" }} />
             </Link>
             <Link to="/advertise" style={{
               color: NAVY, textDecoration: "none",
