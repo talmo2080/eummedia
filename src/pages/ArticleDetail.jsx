@@ -1149,9 +1149,9 @@ export default function ArticleDetail() {
 
           {/* 🌱 피움앱 고정 배너 — 사이드바 항상 첫 번째 */}
           <div style={{ background:"#ffffff", border:"1px solid #e0e0e0", borderRadius:"4px", overflow:"hidden" }}>
-            <Link to="/pium" style={{ display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none", background:"#ffffff", height:"120px" }}>
+            <Link to="/pium" style={{ display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none", background:"#ffffff", height:"160px" }}>
               <img src="/pium-banner.png" alt="피움앱 — 경험이 기술을 입다"
-                   style={{ display:"block", width:"100%", height:"120px", objectFit:"contain", objectPosition:"center", background:"#ffffff" }} />
+                   style={{ display:"block", width:"100%", height:"160px", objectFit:"contain", objectPosition:"center", background:"#ffffff" }} />
             </Link>
             <div style={{ padding:"10px 12px", display:"flex", flexDirection:"column", gap:"7px" }}>
               <Link to="/pium"
