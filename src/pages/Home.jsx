@@ -586,18 +586,18 @@ export default function Home() {
         {/* ⑤ 광고 — 피움 고정 배너 → 양주상회 → 플레이앤팝 → 닥터리부트 */}
         {/* ⑤-pium 피움앱 고정 배너 — 항상 맨 위 */}
         <div className="px-4 mb-7">
-          <div style={{ background:"#f0fdf4", border:"2px solid #166534", borderRadius:"4px", overflow:"hidden" }}>
-            <Link to="/pium" style={{ display:"block", textDecoration:"none" }}>
+          <div style={{ background:"#ffffff", border:"1px solid #e0e0e0", borderRadius:"4px", overflow:"hidden" }}>
+            <Link to="/pium" style={{ display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none", background:"#ffffff", height:"120px" }}>
               <img src="/pium-banner.png" alt="피움앱 — 경험이 기술을 입다"
-                   style={{ display:"block", width:"100%", maxHeight:"50px", objectFit:"contain", objectPosition:"center" }} />
+                   style={{ display:"block", width:"100%", height:"120px", objectFit:"contain", objectPosition:"center" }} />
             </Link>
-            <div style={{ padding:"7px 10px", display:"flex", gap:"6px" }}>
+            <div style={{ padding:"8px 10px", display:"flex", gap:"6px" }}>
               <Link to="/pium"
-                    style={{ flex:1, display:"block", textAlign:"center", background:"#166534", color:"white", padding:"7px 0", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"'Noto Sans KR', sans-serif", borderRadius:"2px" }}>
+                    style={{ flex:1, display:"block", textAlign:"center", background:"#166534", color:"white", padding:"8px 0", fontSize:"12px", fontWeight:"700", textDecoration:"none", fontFamily:"'Noto Sans KR', sans-serif", borderRadius:"2px" }}>
                 웹앱스토어 →
               </Link>
               <Link to="/pium-request"
-                    style={{ flex:1, display:"block", textAlign:"center", background:"transparent", color:"#166534", padding:"7px 0", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"'Noto Sans KR', sans-serif", borderRadius:"2px", border:"1.5px solid #166534" }}>
+                    style={{ flex:1, display:"block", textAlign:"center", background:"transparent", color:"#166534", padding:"8px 0", fontSize:"12px", fontWeight:"700", textDecoration:"none", fontFamily:"'Noto Sans KR', sans-serif", borderRadius:"2px", border:"1.5px solid #166534" }}>
                 제작 문의 →
               </Link>
             </div>
@@ -915,10 +915,10 @@ export default function Home() {
         <aside className="lg:sticky lg:top-5" style={{ display:"flex", flexDirection:"column", gap:"24px" }}>
 
           {/* 🌱 피움앱 고정 배너 — 항상 첫 번째 */}
-          <div style={{ background:"#f0fdf4", border:"2px solid #166534", borderRadius:"4px", overflow:"hidden" }}>
-            <Link to="/pium" style={{ display:"block", textDecoration:"none" }}>
+          <div style={{ background:"#ffffff", border:"1px solid #e0e0e0", borderRadius:"4px", overflow:"hidden" }}>
+            <Link to="/pium" style={{ display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none", background:"#ffffff", height:"120px" }}>
               <img src="/pium-banner.png" alt="피움앱 — 경험이 기술을 입다"
-                   style={{ display:"block", width:"100%", maxHeight:"120px", objectFit:"contain", objectPosition:"center" }} />
+                   style={{ display:"block", width:"100%", height:"120px", objectFit:"contain", objectPosition:"center" }} />
             </Link>
             <div style={{ padding:"10px 12px", display:"flex", flexDirection:"column", gap:"7px" }}>
               <Link to="/pium"
