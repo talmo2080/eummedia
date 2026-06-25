@@ -68,6 +68,162 @@ function CircuitBg({ opacity = 0.07 }) {
 }
 
 /* ────────────────────────────────────────
+   plum SVG 로고 (애니메이션)
+──────────────────────────────────────── */
+function PlumLogoSVG() {
+  return (
+    <svg
+      viewBox="0 0 440 280"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ width:"min(400px,88vw)", height:"auto", overflow:"visible" }}
+      aria-label="plum — 경험이 AI를 입다"
+    >
+      <defs>
+        {/* 초록 glow 필터 */}
+        <filter id="fg" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="6" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        {/* 보라 glow 필터 */}
+        <filter id="fp" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        {/* 잎 glow 필터 */}
+        <filter id="fl" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="12" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        {/* 텍스트 glow */}
+        <filter id="ft" x="-10%" y="-30%" width="120%" height="160%">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      {/* ── 줄기 ── */}
+      <path d="M 185 185 L 185 118" stroke="#2d6a4f" strokeWidth="3.5"
+            strokeLinecap="round" filter="url(#fg)"/>
+
+      {/* ── 잎 1 (좌측, 큰 잎) ── */}
+      <path d="M 185 118 C 165 105 138 92 140 68 C 142 48 168 46 183 62 Q 190 88 185 118 Z"
+            fill="#1a5c3a" filter="url(#fl)">
+        <animate attributeName="opacity" values="0.75;1;0.75" dur="3s" repeatCount="indefinite"/>
+      </path>
+      {/* 잎 1 잎맥 */}
+      <path d="M 185 118 L 158 80" stroke="#4ade80" strokeWidth="1"
+            fill="none" opacity="0.5"/>
+
+      {/* ── 잎 2 (우측, 메인 잎) ── */}
+      <path d="M 185 100 C 200 88 228 75 238 52 C 246 33 228 20 210 34 Q 196 58 185 100 Z"
+            fill="#166534" filter="url(#fl)">
+        <animate attributeName="opacity" values="0.8;1;0.8" dur="2.5s" begin="0.4s" repeatCount="indefinite"/>
+      </path>
+      {/* 잎 2 잎맥 */}
+      <path d="M 185 100 L 220 55" stroke="#4ade80" strokeWidth="1"
+            fill="none" opacity="0.5"/>
+
+      {/* ── 잎 3 (중간 작은 잎) ── */}
+      <path d="M 185 140 C 170 132 158 118 165 105 C 170 95 184 100 185 115 Z"
+            fill="#15803d">
+        <animate attributeName="opacity" values="0.6;0.9;0.6" dur="4s" begin="1s" repeatCount="indefinite"/>
+      </path>
+
+      {/* ── 회로 라인 1 (잎2 → 오른쪽 상단) ── */}
+      <path d="M 235 50 L 262 50 L 262 28 L 300 28"
+            stroke="#4ade80" strokeWidth="1.5" fill="none"
+            strokeLinecap="round" strokeLinejoin="round"
+            strokeDasharray="90" strokeDashoffset="90">
+        <animate attributeName="strokeDashoffset" from="90" to="-90"
+                 dur="2s" repeatCount="indefinite"/>
+      </path>
+
+      {/* ── 회로 라인 2 (중간에서 갈라짐) ── */}
+      <path d="M 262 50 L 290 72 L 330 72"
+            stroke="#c084fc" strokeWidth="1.5" fill="none"
+            strokeLinecap="round" strokeLinejoin="round"
+            strokeDasharray="85" strokeDashoffset="85">
+        <animate attributeName="strokeDashoffset" from="85" to="-85"
+                 dur="2.4s" begin="0.3s" repeatCount="indefinite"/>
+      </path>
+
+      {/* ── 회로 라인 3 (상단에서 분기) ── */}
+      <path d="M 300 28 L 340 28 L 340 48 L 370 48"
+            stroke="#4ade80" strokeWidth="1.2" fill="none"
+            strokeLinecap="round" strokeLinejoin="round"
+            strokeDasharray="80" strokeDashoffset="80">
+        <animate attributeName="strokeDashoffset" from="80" to="-80"
+                 dur="1.8s" begin="0.6s" repeatCount="indefinite"/>
+      </path>
+
+      {/* ── 회로 라인 4 (짧은 수직) ── */}
+      <path d="M 330 72 L 330 52 L 355 52"
+            stroke="#c084fc" strokeWidth="1" fill="none"
+            strokeLinecap="round" strokeLinejoin="round"
+            strokeDasharray="55" strokeDashoffset="55">
+        <animate attributeName="strokeDashoffset" from="55" to="-55"
+                 dur="2.1s" begin="0.9s" repeatCount="indefinite"/>
+      </path>
+
+      {/* ── 회로 노드 (빛나는 점) ── */}
+      {[
+        { cx:300, cy:28,  c:"#4ade80", d:"2s",   b:"0s"   },
+        { cx:370, cy:48,  c:"#4ade80", d:"1.8s", b:"0.3s" },
+        { cx:330, cy:72,  c:"#c084fc", d:"2.4s", b:"0.5s" },
+        { cx:355, cy:52,  c:"#c084fc", d:"2.1s", b:"0.8s" },
+        { cx:262, cy:50,  c:"#4ade80", d:"1.6s", b:"0.1s" },
+        { cx:290, cy:72,  c:"#c084fc", d:"2.2s", b:"0.6s" },
+      ].map(({cx,cy,c,d,b},i)=>(
+        <g key={i} filter={c==="#4ade80"?"url(#fg)":"url(#fp)"}>
+          <circle cx={cx} cy={cy} r="4" fill={c} opacity="0.3"/>
+          <circle cx={cx} cy={cy} r="2.5" fill={c}>
+            <animate attributeName="opacity" values="0.2;1;0.2" dur={d} begin={b} repeatCount="indefinite"/>
+            <animate attributeName="r" values="2;3.5;2" dur={d} begin={b} repeatCount="indefinite"/>
+          </circle>
+        </g>
+      ))}
+
+      {/* ── 흩어진 보라 반짝임 ── */}
+      {[
+        { cx:358, cy:20, d:"1.3s", b:"0s"   },
+        { cx:380, cy:38, d:"1.7s", b:"0.4s" },
+        { cx:345, cy:62, d:"2.0s", b:"0.7s" },
+        { cx:395, cy:55, d:"1.5s", b:"0.2s" },
+      ].map(({cx,cy,d,b},i)=>(
+        <circle key={i} cx={cx} cy={cy} r="2" fill="#c084fc" filter="url(#fp)">
+          <animate attributeName="opacity" values="0;0.9;0" dur={d} begin={b} repeatCount="indefinite"/>
+        </circle>
+      ))}
+
+      {/* ── "p" (보라) ── */}
+      <text x="108" y="235"
+            fontFamily="Georgia,'Times New Roman',serif"
+            fontSize="95" fontWeight="900"
+            fill="#7c3aed" filter="url(#fp)" textAnchor="middle">
+        p
+        <animate attributeName="opacity" values="0.85;1;0.85" dur="3s" repeatCount="indefinite"/>
+      </text>
+
+      {/* ── "lum" (짙은 초록) ── */}
+      <text x="282" y="235"
+            fontFamily="Georgia,'Times New Roman',serif"
+            fontSize="95" fontWeight="900"
+            fill="#1a5c3a" filter="url(#ft)" textAnchor="middle">
+        lum
+      </text>
+
+      {/* ── 서브타이틀 ── */}
+      <text x="220" y="265"
+            fontFamily="'Noto Sans KR',sans-serif"
+            fontSize="13" fontWeight="700" letterSpacing="1"
+            fill="#64748b" textAnchor="middle">
+        경험이 AI를 입다
+      </text>
+    </svg>
+  );
+}
+
+/* ────────────────────────────────────────
    블록 1 — 풀스크린 히어로
 ──────────────────────────────────────── */
 function Hero() {
@@ -86,29 +242,24 @@ function Hero() {
     }}>
       <CircuitBg />
 
-      {/* 글로우 */}
+      {/* 배경 글로우 */}
       <div style={{
         position:"absolute", top:"30%", left:"50%",
         transform:"translate(-50%,-50%)",
         width:600, height:600,
-        background:`radial-gradient(circle,${PLUM}22 0%,transparent 70%)`,
+        background:`radial-gradient(circle,${PLUM}1e 0%,transparent 70%)`,
         pointerEvents:"none",
       }}/>
       <div style={{
-        position:"absolute", bottom:"20%", left:"20%",
+        position:"absolute", bottom:"20%", left:"25%",
         width:300, height:300,
-        background:`radial-gradient(circle,${GREEN}22 0%,transparent 70%)`,
+        background:`radial-gradient(circle,${GREEN}1a 0%,transparent 70%)`,
         pointerEvents:"none",
       }}/>
 
-      {/* plum 로고 */}
-      <div style={{
-        marginBottom:40,
-        filter:"drop-shadow(0 0 24px #4ade8066) drop-shadow(0 0 48px #c084fc44)",
-        position:"relative",
-      }}>
-        <img src="/pium-banner.png" alt="plum"
-          style={{ width:"min(320px,80vw)", height:"auto", objectFit:"contain", display:"block" }}/>
+      {/* ★ SVG 로고 */}
+      <div style={{ marginBottom:44, position:"relative" }}>
+        <PlumLogoSVG />
       </div>
 
       {/* 메인 카피 */}
