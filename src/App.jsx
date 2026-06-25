@@ -24,6 +24,7 @@ import ArticleEditor from './pages/ArticleEditor'
 import MyPage from './pages/MyPage'
 import Videos from './pages/Videos'
 import Pium from './pages/Pium'
+import PiumRequest from './pages/PiumRequest'
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
             } />
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/pium" element={<Pium />} />
+            <Route path="/pium-request" element={<PiumRequest />} />
           </Routes>
         </main>
         <Footer />
