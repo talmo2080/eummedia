@@ -586,8 +586,8 @@ export default function Home() {
         {/* ⑤ 광고 — 피움 고정 배너 → 양주상회 → 플레이앤팝 → 닥터리부트 */}
         {/* ⑤-pium 피움앱 고정 배너 — 항상 맨 위 */}
         <div className="px-4 mb-7">
-          <div style={{ background:"#f0fdf4", border:"1.5px solid #bbf7d0", borderRadius:"4px", overflow:"hidden" }}>
-            <Link to="/pium" style={{ display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none", background:"#f0fdf4", height:"120px" }}>
+          <div style={{ background:"#ffffff", border:"1px solid #e0e0e0", borderRadius:"4px", overflow:"hidden" }}>
+            <Link to="/pium" style={{ display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none", background:"#ffffff", height:"120px" }}>
               <img src="/pium-banner.png" alt="피움앱 — 경험이 기술을 입다"
                    style={{ display:"block", width:"100%", height:"120px", objectFit:"contain", objectPosition:"center" }} />
             </Link>
@@ -915,8 +915,8 @@ export default function Home() {
         <aside className="lg:sticky lg:top-5" style={{ display:"flex", flexDirection:"column", gap:"24px" }}>
 
           {/* 🌱 피움앱 고정 배너 — 항상 첫 번째 */}
-          <div style={{ background:"#f0fdf4", border:"1.5px solid #bbf7d0", borderRadius:"4px", overflow:"hidden" }}>
-            <Link to="/pium" style={{ display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none", background:"#f0fdf4", height:"120px" }}>
+          <div style={{ background:"#ffffff", border:"1px solid #e0e0e0", borderRadius:"4px", overflow:"hidden" }}>
+            <Link to="/pium" style={{ display:"flex", alignItems:"center", justifyContent:"center", textDecoration:"none", background:"#ffffff", height:"120px" }}>
               <img src="/pium-banner.png" alt="피움앱 — 경험이 기술을 입다"
                    style={{ display:"block", width:"100%", height:"120px", objectFit:"contain", objectPosition:"center" }} />
             </Link>
