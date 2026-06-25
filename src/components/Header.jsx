@@ -340,12 +340,14 @@ export default function Header() {
                 onClick={closeMenu}
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  minHeight: 52, padding: "10px 16px", marginBottom: 10,
-                  color: "#166534", border: "1.5px solid #166534",
-                  fontSize: 19, fontWeight: 700, textDecoration: "none",
+                  minHeight: 64, padding: "10px 16px", marginBottom: 10,
+                  border: "1.5px solid #166534",
+                  textDecoration: "none",
                   borderRadius: 4, background: "#f0fdf4",
                 }}
-              >🌱 피움앱</Link>
+              >
+                <img src="/pium-logo.png" alt="피움앱" style={{ height: 44, width: "auto", objectFit: "contain", display: "block" }} />
+              </Link>
               <Link
                 to="/advertise"
                 onClick={closeMenu}
