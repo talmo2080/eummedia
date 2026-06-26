@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { supabase } from "../lib/supabase";
 
 /* ── 다크 블록 공용 색상 ── */
 const DARK_BG  = "#0b1929";
@@ -58,6 +60,79 @@ function CircuitBg({ opacity = 0.07 }) {
           fill={i%2===0 ? "#4ade80" : "#c084fc"} />
       ))}
     </svg>
+  );
+}
+
+/* ────────────────────────────────────────
+   피움 로그인 상태 바
+──────────────────────────────────────── */
+function PiumAuthBar() {
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    navigate("/pium");
+  }
+
+  const piumRole = profile?.pium_role === "maker" ? "메이커" : "이용자";
+
+  if (!user) {
+    return (
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "center",
+        gap: 12, margin: "0 auto 44px", flexWrap: "wrap",
+      }}>
+        <span style={{ fontSize: 14, color: "#6b7280" }}>
+          메이커로 참여하려면 로그인하세요
+        </span>
+        <Link to="/login" style={{
+          display: "inline-flex", alignItems: "center", gap: 8,
+          background: "#FEE500", color: "#000",
+          textDecoration: "none", fontSize: 14, fontWeight: 700,
+          padding: "10px 20px", borderRadius: 8,
+          fontFamily: "'Noto Sans KR', sans-serif",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+        }}>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <ellipse cx="9" cy="7.5" rx="4.5" ry="4.5" fill="#000"/>
+            <path d="M3 15c0-3.314 2.686-5.5 6-5.5s6 2.186 6 5.5" stroke="#000" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          카카오 로그인
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{
+      display: "flex", alignItems: "center", justifyContent: "center",
+      gap: 14, margin: "0 auto 44px", flexWrap: "wrap",
+    }}>
+      <span style={{
+        fontSize: 14, color: "#374151", fontWeight: 600,
+        fontFamily: "'Noto Sans KR', sans-serif",
+      }}>
+        안녕하세요, <strong style={{ color: "#166534" }}>{profile?.nickname ?? "이용자"}</strong>님
+        &nbsp;
+        <span style={{
+          background: profile?.pium_role === "maker"
+            ? "linear-gradient(90deg,#16a34a,#7c3aed)" : "#e5e7eb",
+          color: profile?.pium_role === "maker" ? "#fff" : "#374151",
+          fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 99,
+        }}>{piumRole}</span>
+      </span>
+      <Link to="/mypage" style={{
+        fontSize: 13, color: "#166534", fontWeight: 700,
+        textDecoration: "none", padding: "6px 14px",
+        border: "1.5px solid #166534", borderRadius: 8,
+      }}>마이페이지</Link>
+      <button onClick={handleLogout} style={{
+        fontSize: 13, color: "#9ca3af", fontWeight: 600,
+        background: "none", border: "none", cursor: "pointer",
+        fontFamily: "'Noto Sans KR', sans-serif", padding: 0,
+      }}>로그아웃</button>
+    </div>
   );
 }
 
@@ -252,13 +327,16 @@ function Hero() {
           fontSize: "clamp(12px, 2vw, 14px)",
           color: "#6b7280",
           lineHeight: 1.9,
-          margin: "0 auto 44px",
+          margin: "0 auto 32px",
           maxWidth: 460,
         }}>
           코딩 한 줄 못 하던 27년 차 두피전문가가<br/>
           3주 만에 신문 한 채를 지었습니다.<br/>
           이제, 당신 차례입니다.
         </p>
+
+        {/* 로그인 상태 표시 */}
+        <PiumAuthBar />
 
         {/* 스크롤 유도 */}
         <div style={{

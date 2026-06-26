@@ -128,6 +128,65 @@ export default function MyPage() {
         </div>
       </section>
 
+      {/* ── 피움 섹션 ── */}
+      <section style={{
+        background: "linear-gradient(135deg, #f0fdf9 0%, #faf5ff 100%)",
+        border: "1.5px solid #d1fae5",
+        borderRadius: 12,
+        padding: "20px 24px",
+        marginBottom: 24,
+        fontFamily: "'Noto Sans KR', sans-serif",
+      }}>
+        {/* 헤더 */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom: 16 }}>
+          <div style={{ display:"flex", alignItems:"center", gap: 8 }}>
+            <img src="/pium-logo.png" alt="plum"
+                 style={{ height: 28, width:"auto", objectFit:"contain", mixBlendMode:"multiply" }}/>
+            <span style={{ fontSize: 15, fontWeight: 800, color: "#14532d" }}>피움 웹앱스토어</span>
+          </div>
+          <Link to="/pium" style={{
+            fontSize: 12, color: "#166534", fontWeight: 700,
+            textDecoration: "none", padding: "4px 12px",
+            border: "1.5px solid #166534", borderRadius: 20,
+          }}>피움 홈 →</Link>
+        </div>
+
+        {/* 역할 표시 */}
+        <div style={{ display:"flex", alignItems:"center", gap: 12, flexWrap:"wrap" }}>
+          <div style={{ display:"flex", alignItems:"center", gap: 8 }}>
+            <span style={{ fontSize: 13, color: "#374151" }}>피움 역할</span>
+            <span style={{
+              fontSize: 12, fontWeight: 700, padding: "3px 12px", borderRadius: 99,
+              background: profile?.pium_role === "maker"
+                ? "linear-gradient(90deg,#16a34a,#7c3aed)"
+                : "#e5e7eb",
+              color: profile?.pium_role === "maker" ? "#fff" : "#374151",
+            }}>
+              {profile?.pium_role === "maker" ? "🌱 메이커" : "이용자"}
+            </span>
+          </div>
+          {profile?.pium_role !== "maker" && (
+            <span style={{ fontSize: 12, color: "#9ca3af" }}>
+              앱을 등록하면 자동으로 메이커가 됩니다
+            </span>
+          )}
+        </div>
+
+        {/* 내 앱 목록 (2단계 예고) */}
+        <div style={{
+          marginTop: 16,
+          padding: "12px 16px",
+          background: "rgba(255,255,255,0.7)",
+          borderRadius: 8,
+          border: "1px dashed #bbf7d0",
+          textAlign: "center",
+          color: "#9ca3af",
+          fontSize: 13,
+        }}>
+          🌱 내 앱 목록은 2단계에서 추가됩니다
+        </div>
+      </section>
+
       {/* 1.2 시민기자 신청자 상태 카드 — reader + 신청서 있을 때만 */}
       {profile?.role === 'reader' && application && (
         <ApplicationStatusCard app={application} />

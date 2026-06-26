@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { supabase } from "../lib/supabase";
 
 const GREEN      = "#166534";
 const GREEN_DARK = "#14532d";
@@ -103,6 +105,13 @@ function GlowWires() {
 export default function PiumRequest() {
   const [form, setForm]     = useState({ name: "", contact: "", description: "" });
   const [status, setStatus] = useState("idle");
+  const { user, profile }   = useAuth();
+  const navigate            = useNavigate();
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    navigate("/pium");
+  }
 
   function handleChange(e) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -201,6 +210,31 @@ export default function PiumRequest() {
             매장·업무·취미 — 필요한 웹앱을 직접 제작해드립니다.<br/>
             아래로 편하게 문의 주세요.
           </p>
+        </div>
+
+        {/* 로그인 상태 바 */}
+        <div style={{
+          textAlign: "center", marginBottom: 20,
+          fontFamily: "'Noto Sans KR', sans-serif",
+        }}>
+          {user ? (
+            <span style={{ fontSize: 13, color: "#374151" }}>
+              <strong style={{ color: "#166534" }}>{profile?.nickname ?? "이용자"}</strong>님으로 문의합니다&nbsp;
+              <button onClick={handleLogout} style={{
+                fontSize: 12, color: "#9ca3af", background: "none",
+                border: "none", cursor: "pointer", fontFamily: "inherit",
+              }}>로그아웃</button>
+            </span>
+          ) : (
+            <Link to="/login" style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              background: "#FEE500", color: "#000",
+              textDecoration: "none", fontSize: 13, fontWeight: 700,
+              padding: "8px 16px", borderRadius: 8,
+            }}>
+              카카오 로그인 후 문의하기
+            </Link>
+          )}
         </div>
 
         {/* 폼 카드 */}
