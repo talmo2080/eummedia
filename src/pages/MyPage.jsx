@@ -130,8 +130,8 @@ export default function MyPage() {
 
       {/* ── 피움 섹션 ── */}
       <div style={{
-        background: "#bbf7d0",
-        border: "3px solid #15803d",
+        background: "linear-gradient(135deg, #dcfce7 0%, #ede9fe 100%)",
+        border: "1.5px solid #d1fae5",
         borderRadius: 12,
         padding: "20px 24px",
         marginBottom: 24,
