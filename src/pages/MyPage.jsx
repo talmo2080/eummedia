@@ -129,9 +129,9 @@ export default function MyPage() {
       </section>
 
       {/* ── 피움 섹션 ── */}
-      <section style={{
-        background: "linear-gradient(135deg, #dcfce7 0%, #ede9fe 100%)",
-        border: "2px solid #16a34a",
+      <div style={{
+        background: "#bbf7d0",
+        border: "3px solid #15803d",
         borderRadius: 12,
         padding: "20px 24px",
         marginBottom: 24,
@@ -185,7 +185,7 @@ export default function MyPage() {
         }}>
           🌱 내 앱 목록은 2단계에서 추가됩니다
         </div>
-      </section>
+      </div>
 
       {/* 1.2 시민기자 신청자 상태 카드 — reader + 신청서 있을 때만 */}
       {profile?.role === 'reader' && application && (
