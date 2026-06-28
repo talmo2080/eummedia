@@ -26,6 +26,7 @@ import Videos from './pages/Videos'
 import Pium from './pages/Pium'
 import PiumRequest from './pages/PiumRequest'
 import PiumSubmitPage from './pages/PiumSubmitPage'
+import PiumAdminPage from './pages/PiumAdminPage'
 
 function App() {
   return (
@@ -62,6 +63,9 @@ function App() {
             <Route path="/pium" element={<Pium />} />
             <Route path="/pium-request" element={<PiumRequest />} />
             <Route path="/pium-submit" element={<PiumSubmitPage />} />
+            <Route path="/pium-admin" element={
+              <ProtectedRoute requiredRole="admin"><PiumAdminPage /></ProtectedRoute>
+            } />
           </Routes>
         </main>
         <Footer />
