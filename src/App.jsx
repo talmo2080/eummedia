@@ -25,6 +25,7 @@ import MyPage from './pages/MyPage'
 import Videos from './pages/Videos'
 import Pium from './pages/Pium'
 import PiumRequest from './pages/PiumRequest'
+import PiumSubmitPage from './pages/PiumSubmitPage'
 
 function App() {
   return (
@@ -60,6 +61,7 @@ function App() {
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/pium" element={<Pium />} />
             <Route path="/pium-request" element={<PiumRequest />} />
+            <Route path="/pium-submit" element={<PiumSubmitPage />} />
           </Routes>
         </main>
         <Footer />
