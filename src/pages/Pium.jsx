@@ -539,7 +539,7 @@ function WhatBlock() {
           transition:"opacity 0.8s ease,transform 0.8s ease",
           display:"flex", gap:12, flexWrap:"wrap",
         }}>
-          <Link to="/pium" style={{
+          <Link to="/pium-store" style={{
             flex:"1 1 200px", display:"block", textAlign:"center",
             background:`linear-gradient(135deg,${GREEN},#15803d)`,
             color:"#fff", textDecoration:"none",
@@ -603,14 +603,24 @@ function ClosingBlock() {
         }}>
           당신이 plum의 1호 메이커가 되어주세요. 🌱
         </p>
-        <Link to="/subscribe" style={{
-          display:"inline-block",
-          background:`linear-gradient(135deg,${PLUM},#6d28d9)`,
-          color:"#fff", textDecoration:"none",
-          fontSize:16, fontWeight:800, padding:"16px 40px", borderRadius:8,
-          fontFamily:"'Noto Sans KR',sans-serif",
-          boxShadow:`0 4px 32px ${PLUM}55`, marginBottom:56,
-        }}>오픈 소식 받기 →</Link>
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:14, marginBottom:56 }}>
+          <Link to="/pium-store" style={{
+            display:"inline-block",
+            background:`linear-gradient(135deg,${GREEN},#15803d)`,
+            color:"#fff", textDecoration:"none",
+            fontSize:16, fontWeight:800, padding:"16px 40px", borderRadius:8,
+            fontFamily:"'Noto Sans KR',sans-serif",
+            boxShadow:`0 4px 32px ${GREEN}55`,
+          }}>🌱 웹앱 둘러보기 →</Link>
+          <Link to="/subscribe" style={{
+            display:"inline-block",
+            background:"transparent",
+            color:PLUM_LT, textDecoration:"none",
+            fontSize:15, fontWeight:700, padding:"12px 32px", borderRadius:8,
+            fontFamily:"'Noto Sans KR',sans-serif",
+            border:`1.5px solid ${PLUM_LT}`,
+          }}>오픈 소식 받기 →</Link>
+        </div>
         <div style={{ borderTop:"1px solid rgba(255,255,255,0.08)", paddingTop:32 }}>
           <p style={{
             fontSize:13, color:TEXT_LOW, lineHeight:1.9,

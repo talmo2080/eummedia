@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { pingSitemap } from '../lib/sitemapPing'
 import { useAuth } from '../contexts/AuthContext'
 
 const NAVY = '#0d2d52'
@@ -847,6 +848,8 @@ export default function ArticleEditor() {
       window.scrollTo({ top: 0, behavior: 'smooth' })
       // 발행본 수정도 prerender 갱신 필요 (본문·이미지 변경 반영)
       triggerDeploy('handlePublishUpdate')
+      // 색인 ping (구글·네이버 sitemap) — no-cors fire-and-forget
+      pingSitemap()
     } catch (err) {
       console.error('[handlePublishUpdate] catch:', err)
       alert(`발행본 저장 중 오류: ${err?.message || err}`)
@@ -1024,9 +1027,18 @@ export default function ArticleEditor() {
           }}>
             발행본이 즉시 반영되었습니다
           </h1>
-          <p style={{ fontSize: 18, color: '#666', margin: '0 0 32px 0', lineHeight: 1.6 }}>
+          <p style={{ fontSize: 18, color: '#666', margin: '0 0 24px 0', lineHeight: 1.6 }}>
             발행 시간(published_at)·URL(slug)·작성자(author)는 그대로 유지되었습니다.
           </p>
+
+          {/* 색인 ping 알림 — approved-banner와 동일 톤 */}
+          <div style={{
+            background: '#eef7f2', borderRadius: 8,
+            padding: '12px 16px', marginBottom: 24,
+            fontSize: 15, color: '#1c8a4f', fontWeight: 600,
+          }}>
+            ✅ 구글·네이버 색인 요청 완료
+          </div>
 
           <div style={{
             background: '#eef3fa', borderRadius: 12,

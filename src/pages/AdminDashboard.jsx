@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { getYouTubeEmbedUrl } from '../lib/youtube'
+import { pingSitemap } from '../lib/sitemapPing'
 import CardSlide from '../components/CardSlide'
 import { downloadCsv } from '../lib/csv'
 
@@ -916,6 +917,8 @@ export default function AdminDashboard() {
     // 발행 성공 후 Vercel 재배포 트리거 (prerender 갱신 → 검색·AI 노출)
     // 실패해도 발행 자체는 성공 — 사용자 동선 안 끊김 (콘솔 경고만)
     triggerDeploy('approveArticle')
+    // 색인 ping (구글·네이버 sitemap) — no-cors fire-and-forget, 응답 미검증
+    pingSitemap()
   }
   const startReject = (id) => { setRejectingId(id); setRejectReason('') }
   const confirmReject = async (id) => {
@@ -1245,6 +1248,9 @@ export default function AdminDashboard() {
                       fontSize: 16, color: GREEN, fontWeight: 600,
                     }}>
                       ✅ 발행됐습니다! 이제 카드뉴스를 만들어보세요.
+                      <div style={{ fontSize: 13, fontWeight: 500, marginTop: 4, opacity: 0.85 }}>
+                        ✅ 구글·네이버 색인 요청 완료
+                      </div>
                     </div>
                   )}
 

@@ -25,7 +25,7 @@ const navItems = [
   { name: "이음뷰",     path: "/channel/view" },
   { name: "이음트렌드", path: "/channel/trend" },
   { name: "이음보이스", path: "/channel/voice" },
-  { name: "🌱 피움", path: "/pium" },
+  { name: "🌱 피움", path: "/pium-store" },
 ];
 
 // 오늘 날짜 — YYYY년 M월 D일 요일 (한국어)
@@ -151,7 +151,7 @@ export default function Header() {
           {/* 우측 버튼 — 데스크탑 (768px+) */}
           <div className="hidden md:flex" style={{ gap: 10, alignItems: "center" }}>
             {/* 피움 로고 */}
-            <Link to="/pium" style={{ display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", marginRight: 4, background: "#ffffff", borderRadius: 4, padding: "6px 6px" }}>
+            <Link to="/pium-store" style={{ display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", marginRight: 4, background: "#ffffff", borderRadius: 4, padding: "6px 6px" }}>
               <img src="/pium-logo.png" alt="" style={{ height: 90, width: "auto", objectFit: "contain", display: "block", background: "#ffffff" }} />
             </Link>
             <Link to="/advertise" style={{
@@ -256,7 +256,7 @@ export default function Header() {
                 onMouseEnter={e => { if (!active) e.currentTarget.style.color = "#fff"; }}
                 onMouseLeave={e => { if (!active) e.currentTarget.style.color = CHANNEL_INACTIVE; }}
               >
-                {ch.path === "/pium"
+                {ch.path === "/pium-store"
                   ? <img src="/pium-logo.png" alt="피움" style={{ height: 28, width: "auto", objectFit: "contain", display: "block", verticalAlign: "middle" }} />
                   : ch.name}
               </Link>
@@ -338,7 +338,7 @@ export default function Header() {
               }}>활동</div>
 
               <Link
-                to="/pium"
+                to="/pium-store"
                 onClick={closeMenu}
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "center",
