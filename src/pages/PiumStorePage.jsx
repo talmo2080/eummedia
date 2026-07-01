@@ -1,5 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  HeartPulse, Store as StoreIcon, GraduationCap, Sparkles,
+  Briefcase, Home, Palette, MapPin, Newspaper, Wrench,
+  ChevronDown, ChevronUp, Star, Sprout,
+} from "lucide-react";
 import { supabase } from "../lib/supabase";
 
 const font  = "'Pretendard', 'Noto Sans KR', sans-serif";
@@ -8,50 +13,53 @@ const PURPLE = "#7c3aed";
 
 /* ── 카테고리 정의 ── */
 const CATEGORIES = [
-  { key: "health_beauty", label: "건강·뷰티",    emoji: "🏥", bg: "#fce7f3", color: "#9d174d" },
-  { key: "small_biz",     label: "소상공인·창업", emoji: "🏪", bg: "#dbeafe", color: "#1e40af" },
-  { key: "education",     label: "교육·학습",    emoji: "📚", bg: "#fef9c3", color: "#854d0e" },
-  { key: "ai_tool",       label: "AI 활용",      emoji: "🤖", bg: "#ede9fe", color: "#5b21b6" },
-  { key: "productivity",  label: "업무·생산성",  emoji: "🛠️", bg: "#ccfbf1", color: "#134e4a" },
-  { key: "lifestyle",     label: "생활·편의",    emoji: "🌿", bg: "#dcfce7", color: "#14532d" },
-  { key: "hobby",         label: "취미·창작",    emoji: "🎨", bg: "#ffedd5", color: "#9a3412" },
-  { key: "community",     label: "지역·커뮤니티", emoji: "🏘️", bg: "#ccfbf1", color: "#065f46" },
-  { key: "media",         label: "정보·미디어",  emoji: "📰", bg: "#e0f2fe", color: "#075985" },
-  { key: "expert_tool",   label: "전문가 도구",  emoji: "💼", bg: "#ede9fe", color: "#4c1d95" },
+  { key: "health_beauty", label: "건강·뷰티",    Icon: HeartPulse,    color: "#EC4899" },
+  { key: "small_biz",     label: "소상공인·창업", Icon: StoreIcon,     color: "#3B82F6" },
+  { key: "education",     label: "교육·학습",    Icon: GraduationCap, color: "#F59E0B" },
+  { key: "ai_tool",       label: "AI 활용",      Icon: Sparkles,      color: "#A78BFA" },
+  { key: "productivity",  label: "업무·생산성",  Icon: Briefcase,     color: "#818CF8" },
+  { key: "lifestyle",     label: "생활·편의",    Icon: Home,          color: "#34D399" },
+  { key: "hobby",         label: "취미·창작",    Icon: Palette,       color: "#FB923C" },
+  { key: "community",     label: "지역·커뮤니티", Icon: MapPin,        color: "#2DD4BF" },
+  { key: "media",         label: "정보·미디어",  Icon: Newspaper,     color: "#94A3B8" },
+  { key: "expert_tool",   label: "전문가 도구",  Icon: Wrench,        color: "#C084FC" },
 ];
 const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map(c => [c.key, c]));
 
-/* ── 캐러셀 슬라이드 (표시 순서: 새싹→잎사귀→꽃) ── */
+/* ── 캐러셀 슬라이드 ── */
 const SLIDES = [
   {
-    /* side-3: 새싹, 글씨 왼쪽 */
-    title:    "경험이 기술을 입다",
-    accent:   "기술",           // 민트 포인트 단어
-    sub:      "비개발자가 만든 진짜 웹앱",
-    cta:      "둘러보기",
-    ctaTo:    "#apps",
-    bg:       "/pium-side-3.jpg",
-    side:     "left",
+    title:      "경험이 기술을 입다",
+    accent:     "기술",
+    accentGrad: "linear-gradient(90deg,#60A5FA,#3B82F6)",
+    sub:        "비개발자가 만든 진짜 웹앱",
+    cta:        "둘러보기 →",
+    ctaTo:      "#apps",
+    btnColor:   "#3B82F6",
+    btnGlow:    "rgba(59,130,246,0.55)",
+    circuit:    "/pium-circuit-1.jpg",
   },
   {
-    /* side-2: 잎사귀, 글씨 오른쪽 */
-    title:    "앱보다 사람입니다",
-    accent:   "사람",
-    sub:      "이 앱을 피운 메이커를 만나보세요",
-    cta:      "메이커 만나기",
-    ctaTo:    "/pium-submit",
-    bg:       "/pium-side-2.jpg",
-    side:     "right",
+    title:      "앱보다 사람입니다",
+    accent:     "사람",
+    accentGrad: "linear-gradient(90deg,#34D399,#10B981)",
+    sub:        "이 앱을 피운 메이커를 만나보세요",
+    cta:        "메이커 만나기 →",
+    ctaTo:      "/pium-submit",
+    btnColor:   "#10B981",
+    btnGlow:    "rgba(16,185,129,0.55)",
+    circuit:    "/pium-circuit-2.jpg",
   },
   {
-    /* side-1: 꽃, 글씨 오른쪽 */
-    title:    "당신의 경험도 피어납니다",
-    accent:   "경험",
-    sub:      "지금 둘러보고, 직접 피워보세요",
-    cta:      "내 앱 피우기",
-    ctaTo:    "/pium-submit",
-    bg:       "/pium-side-1.jpg",
-    side:     "right",
+    title:      "당신의 경험도 피어납니다",
+    accent:     "경험",
+    accentGrad: "linear-gradient(90deg,#C084FC,#8B5CF6)",
+    sub:        "지금 둘러보고, 직접 피워보세요",
+    cta:        "내 앱 피우기 →",
+    ctaTo:      "/pium-submit",
+    btnColor:   "#8B5CF6",
+    btnGlow:    "rgba(139,92,246,0.55)",
+    circuit:    "/pium-circuit-3.jpg",
   },
 ];
 
@@ -67,75 +75,124 @@ const CAROUSEL_CSS = `
     0%, 90%, 100% { opacity: 0; }
     95%           { opacity: 1; }
   }
+
+  /* 회로 SVG 오버레이 */
+  .pium-circuit-svg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 1;
+    opacity: 0.38;
+  }
+
+  /* 회로 선 흐르는 빛 */
+  @keyframes pium-trace-flow {
+    0%   { stroke-dashoffset: 300; opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { stroke-dashoffset: 0;   opacity: 0; }
+  }
+  /* 노드 반짝임 */
+  @keyframes pium-dot-pulse {
+    0%, 100% { r: 2.5; opacity: 0.2; }
+    50%      { r: 4;   opacity: 1;   }
+  }
+  @keyframes pium-dot-flash {
+    0%, 85%, 100% { opacity: 0.15; }
+    90%           { opacity: 1; filter: drop-shadow(0 0 4px #10B981); }
+  }
+  .pium-trace {
+    fill: none;
+    stroke-dasharray: 300;
+    animation: pium-trace-flow 4s ease-in-out infinite;
+  }
+  .pium-dot-pulse  { animation: pium-dot-pulse 3s ease-in-out infinite; }
+  .pium-dot-flash  { animation: pium-dot-flash 4s ease-in-out infinite; }
+
   @media (prefers-reduced-motion: reduce) {
-    .pium-glow, .pium-node { animation: none !important; }
+    .pium-glow, .pium-node,
+    .pium-trace, .pium-dot-pulse, .pium-dot-flash { animation: none !important; }
+    .pium-circuit-svg { opacity: 0.18; }
   }
 
   .pium-carousel-wrap {
     position: relative; overflow: hidden;
     border-radius: 20px; margin: 20px 16px 0;
-    box-shadow: 0 6px 32px rgba(0,0,0,0.18);
-    background: #0d2a1e;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.30);
+    background: #0a0f22;
   }
   .pium-slide-bg {
-    position: relative;
-    min-height: 280px;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    position: relative; overflow: hidden;
+    min-height: clamp(360px, 42vw, 480px);
   }
 
-  /* 스크림: side별로 방향 반전 */
-  .pium-scrim-left {
+  /* 강조 단어 그라디언트 텍스트 */
+  .pium-accent {
+    background: var(--pium-accent-grad, linear-gradient(90deg,#34D399,#10B981));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* 회로 배경 이미지 */
+  .pium-circuit-img {
     position: absolute; inset: 0;
-    background: linear-gradient(to right, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.30) 45%, transparent 70%);
-  }
-  .pium-scrim-right {
-    position: absolute; inset: 0;
-    background: linear-gradient(to left, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.30) 45%, transparent 70%);
-  }
-
-  /* 텍스트 영역 */
-  .pium-text-left {
-    position: absolute; top: 0; left: 0; bottom: 0;
-    width: 52%;
-    display: flex; flex-direction: column; justify-content: center;
-    padding: 40px 20px 60px 40px;
-    text-align: left;
-  }
-  .pium-text-right {
-    position: absolute; top: 0; right: 0; bottom: 0;
-    width: 52%;
-    display: flex; flex-direction: column; justify-content: center;
-    padding: 40px 40px 60px 20px;
-    text-align: left;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    pointer-events: none;
+    z-index: 0;
   }
 
-  /* 빛 애니메이션 */
-  .pium-glow {
-    position: absolute; border-radius: 50%; pointer-events: none; z-index: 0;
-    animation: pium-glow-breath 4s ease-in-out infinite;
+  /* 스크림: 왼쪽 글씨 가독성 */
+  .pium-scrim {
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(
+      to right,
+      rgba(0,0,0,0.65) 0%,
+      rgba(0,0,0,0.42) 35%,
+      rgba(0,0,0,0.08) 60%,
+      transparent 80%
+    );
   }
+
+  /* 텍스트 전체 래퍼 */
+  .pium-text-overlay {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; align-items: center;
+    padding: 0 60px;
+  }
+  /* 텍스트 블록: 항상 왼쪽 */
+  .pium-text-block {
+    max-width: 420px;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 40px 0 60px;
+    text-align: left;
+    margin-right: auto;
+  }
+
+  /* 은은한 빛점 */
   .pium-node {
-    position: absolute; border-radius: 50%; pointer-events: none; z-index: 0;
+    position: absolute; border-radius: 50%; pointer-events: none; z-index: 2;
     animation: pium-node-blink 3.5s ease-in-out infinite;
   }
 
   /* 모바일 */
   @media (max-width: 640px) {
-    .pium-slide-bg { min-height: 0; background-position: center top; }
-    .pium-slide-bg::before {
-      content: ''; display: block; padding-top: 56%;
+    .pium-slide-bg { min-height: 0; }
+    .pium-slide-bg::before { content: ''; display: block; padding-top: 56%; }
+    .pium-scrim {
+      background: linear-gradient(
+        to right,
+        rgba(0,0,0,0.72) 0%,
+        rgba(0,0,0,0.45) 50%,
+        rgba(0,0,0,0.15) 80%,
+        transparent 100%
+      );
     }
-    .pium-scrim-left, .pium-scrim-right {
-      background: rgba(0,0,0,0.55);
-    }
-    .pium-text-left, .pium-text-right {
-      position: absolute; inset: 0;
-      width: 100%;
-      align-items: center; text-align: center;
-      padding: 20px 24px 52px;
-      justify-content: flex-end;
+    .pium-text-overlay { padding: 0 20px; }
+    .pium-text-block {
+      max-width: 78%;
+      padding: 20px 0 52px;
     }
   }
 `;
@@ -146,7 +203,7 @@ function renderTitle(title, accent) {
   return (
     <>
       {parts[0]}
-      <span style={{ color: "#10B981" }}>{accent}</span>
+      <span className="pium-accent">{accent}</span>
       {parts[1]}
     </>
   );
@@ -162,7 +219,7 @@ function HeroCarousel() {
   }, []);
 
   useEffect(() => {
-    timerRef.current = setInterval(() => go(cur + 1), 6000);
+    timerRef.current = setInterval(() => go(cur + 1), 5500);  // 5.5s 자동 넘김
     return () => clearInterval(timerRef.current);
   }, [cur, go]);
 
@@ -175,85 +232,79 @@ function HeroCarousel() {
   }
 
   const slide = SLIDES[cur];
-  const isLeft = slide.side === "left";
 
   return (
     <div className="pium-carousel-wrap">
       <style>{CAROUSEL_CSS}</style>
 
-      {/* 배경 이미지 */}
-      <div
-        className="pium-slide-bg"
-        style={{ backgroundImage: `url('${slide.bg}')` }}
-      >
-        {/* 빛 애니메이션 — 배경 글로우 */}
-        <div className="pium-glow" style={{
-          width: 220, height: 220,
-          background: "radial-gradient(circle, rgba(16,185,129,0.30) 0%, transparent 70%)",
-          bottom: -40, [isLeft ? "right" : "left"]: "30%",
-          animationDelay: "0s",
-        }} />
-        <div className="pium-glow" style={{
-          width: 140, height: 140,
-          background: "radial-gradient(circle, rgba(107,31,92,0.25) 0%, transparent 70%)",
-          top: 20, [isLeft ? "right" : "left"]: "10%",
-          animationDelay: "2s",
-        }} />
-        {/* 노드 반짝임 */}
+      {/* CSS 변수로 슬라이드별 강조색 주입 */}
+      <div className="pium-slide-bg" style={{ "--pium-accent-grad": slide.accentGrad }}>
+
+        {/* 레이어 0 — 회로 배경 이미지 */}
+        <img
+          src={slide.circuit}
+          alt=""
+          className="pium-circuit-img"
+        />
+
+        {/* 레이어 1 — 스크림 (왼쪽 어둡게) */}
+        <div className="pium-scrim" />
+
+        {/* 레이어 2 — 은은한 빛점 */}
         <div className="pium-node" style={{
-          width: 8, height: 8,
-          background: "#10B981",
-          boxShadow: "0 0 12px 4px rgba(16,185,129,0.7)",
-          top: "35%", [isLeft ? "right" : "left"]: "22%",
-          animationDelay: "1.2s",
+          width: 7, height: 7,
+          background: slide.btnColor,
+          boxShadow: `0 0 10px 3px ${slide.btnGlow}`,
+          top: "28%", left: "58%",
+          animationDelay: "0.8s",
         }} />
         <div className="pium-node" style={{
-          width: 6, height: 6,
-          background: "#a78bfa",
-          boxShadow: "0 0 10px 3px rgba(167,139,250,0.6)",
-          top: "60%", [isLeft ? "right" : "left"]: "38%",
-          animationDelay: "2.8s",
+          width: 5, height: 5,
+          background: slide.btnColor,
+          boxShadow: `0 0 8px 2px ${slide.btnGlow}`,
+          top: "62%", left: "72%",
+          animationDelay: "2.4s",
         }} />
 
-        {/* 방향별 스크림 */}
-        <div className={isLeft ? "pium-scrim-left" : "pium-scrim-right"} />
-
-        {/* 텍스트 영역 */}
-        <div className={isLeft ? "pium-text-left" : "pium-text-right"}>
-          <h2 style={{
-            fontSize: "clamp(20px, 3.6vw, 36px)", fontWeight: 800,
-            fontFamily: font, letterSpacing: "0.02em",
-            color: "#FFFFFF", margin: "0 0 10px", lineHeight: 1.30,
-            textShadow: "0 2px 12px rgba(0,0,0,0.55)",
-          }}>
-            {renderTitle(slide.title, slide.accent)}
-          </h2>
-          <p style={{
-            fontSize: "clamp(13px, 1.8vw, 16px)", fontWeight: 400,
-            fontFamily: font, color: "#D7E3E0",
-            margin: "0 0 24px", lineHeight: 1.65,
-            textShadow: "0 1px 6px rgba(0,0,0,0.45)",
-          }}>{slide.sub}</p>
-          <div>
-            <button
-              onClick={() => handleCta(slide.ctaTo)}
-              style={{
-                padding: "11px 28px", fontSize: 14, fontWeight: 700,
-                fontFamily: font, cursor: "pointer",
-                background: "#10B981",
-                color: "white", border: "none", borderRadius: 50,
-                boxShadow: "0 4px 18px rgba(16,185,129,0.45)",
-                transition: "transform 0.15s, box-shadow 0.15s",
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.transform = "scale(1.05)";
-                e.currentTarget.style.boxShadow = "0 6px 24px rgba(16,185,129,0.60)";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "0 4px 18px rgba(16,185,129,0.45)";
-              }}
-            >{slide.cta}</button>
+        {/* 레이어 3 — 텍스트 (z-index: 2) */}
+        <div className="pium-text-overlay">
+          <div className="pium-text-block">
+            <h2 style={{
+              fontSize: "clamp(22px, 3.8vw, 46px)", fontWeight: 800,
+              fontFamily: font, letterSpacing: "0.02em",
+              color: "#FFFFFF", margin: "0 0 12px", lineHeight: 1.25,
+              textShadow: "0 2px 16px rgba(0,0,0,0.60)",
+            }}>
+              {renderTitle(slide.title, slide.accent)}
+            </h2>
+            <p style={{
+              fontSize: "clamp(13px, 1.8vw, 16px)", fontWeight: 400,
+              fontFamily: font, color: "rgba(220,235,255,0.85)",
+              margin: "0 0 28px", lineHeight: 1.65,
+              textShadow: "0 1px 8px rgba(0,0,0,0.50)",
+            }}>{slide.sub}</p>
+            <div>
+              <button
+                onClick={() => handleCta(slide.ctaTo)}
+                style={{
+                  padding: "12px 30px", fontSize: 14, fontWeight: 700,
+                  fontFamily: font, cursor: "pointer",
+                  background: slide.btnColor,
+                  color: "white", border: "none", borderRadius: 50,
+                  boxShadow: `0 4px 20px ${slide.btnGlow}`,
+                  transition: "transform 0.15s, box-shadow 0.15s",
+                  letterSpacing: "0.02em",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = "scale(1.06)";
+                  e.currentTarget.style.boxShadow = `0 6px 28px ${slide.btnGlow}`;
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow = `0 4px 20px ${slide.btnGlow}`;
+                }}
+              >{slide.cta}</button>
+            </div>
           </div>
         </div>
       </div>
@@ -264,35 +315,36 @@ function HeroCarousel() {
         aria-label="이전 슬라이드"
         style={{
           position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
-          zIndex: 4, background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.30)",
+          zIndex: 5, background: "rgba(255,255,255,0.14)", border: "1px solid rgba(255,255,255,0.25)",
           borderRadius: "50%", width: 40, height: 40, cursor: "pointer",
-          color: "#ffffff", fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center",
-          backdropFilter: "blur(6px)", transition: "background 0.15s",
+          color: "#ffffff", fontSize: 22, display: "flex", alignItems: "center", justifyContent: "center",
+          backdropFilter: "blur(8px)", transition: "background 0.15s",
         }}
-        onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.32)"}
-        onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.18)"}
+        onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.28)"}
+        onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.14)"}
       >‹</button>
+
       {/* 우 화살표 */}
       <button
         onClick={() => go(cur + 1)}
         aria-label="다음 슬라이드"
         style={{
           position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
-          zIndex: 4, background: "rgba(255,255,255,0.18)", border: "1px solid rgba(255,255,255,0.30)",
+          zIndex: 5, background: "rgba(255,255,255,0.14)", border: "1px solid rgba(255,255,255,0.25)",
           borderRadius: "50%", width: 40, height: 40, cursor: "pointer",
-          color: "#ffffff", fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center",
-          backdropFilter: "blur(6px)", transition: "background 0.15s",
+          color: "#ffffff", fontSize: 22, display: "flex", alignItems: "center", justifyContent: "center",
+          backdropFilter: "blur(8px)", transition: "background 0.15s",
         }}
-        onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.32)"}
-        onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.18)"}
+        onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.28)"}
+        onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.14)"}
       >›</button>
 
       {/* 인디케이터 */}
       <div style={{
         position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)",
-        zIndex: 4, display: "flex", gap: 8,
+        zIndex: 5, display: "flex", gap: 8,
       }}>
-        {SLIDES.map((_, i) => (
+        {SLIDES.map((s, i) => (
           <button
             key={i}
             onClick={() => go(i)}
@@ -300,7 +352,7 @@ function HeroCarousel() {
             style={{
               width: i === cur ? 28 : 8, height: 8,
               borderRadius: 99, border: "none", cursor: "pointer",
-              background: i === cur ? "#10B981" : "rgba(255,255,255,0.40)",
+              background: i === cur ? s.btnColor : "rgba(255,255,255,0.35)",
               transition: "all 0.3s", padding: 0,
             }}
           />
@@ -311,90 +363,152 @@ function HeroCarousel() {
 }
 
 /* ══════════════════════════════════════
-   카테고리 컬러 박스
+   카테고리 다크 섹션
 ══════════════════════════════════════ */
+const CAT_CSS = `
+  .cat-section {
+    background: #0e2a30;
+    padding: 32px 0 48px;
+    /* 아래쪽으로 밝은 배경 그라데이션 전환 */
+    border-bottom: none;
+  }
+  .cat-section::after {
+    content: '';
+    display: block;
+    height: 56px;
+    background: linear-gradient(to bottom, #0e2a30, #FAFAFB);
+    margin-top: 32px;
+  }
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+  @media (max-width: 900px) {
+    .cat-grid { grid-template-columns: repeat(3, 1fr); gap: 9px; }
+  }
+  @media (max-width: 520px) {
+    .cat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  }
+  .cat-card {
+    padding: 13px 14px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.055);
+    border: 1.5px solid rgba(255,255,255,0.10);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px;
+    transition: transform .18s, background .18s, border-color .18s, box-shadow .18s;
+    font-family: inherit;
+    outline: none;
+    min-height: 52px;
+    text-align: left;
+    width: 100%;
+  }
+  .cat-card:hover {
+    transform: translateY(-3px);
+    background: rgba(255,255,255,0.10);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  }
+  .cat-card.active {
+    background: rgba(255,255,255,0.10);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cat-card, .cat-card:hover { transform: none !important; transition: background .18s, border-color .18s; }
+  }
+  .cat-more-btn {
+    width: 100%; margin-top: 14px;
+    padding: 14px 0; border-radius: 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1.5px solid rgba(255,255,255,0.14);
+    color: #ffffff; font-size: 16px; font-weight: 600;
+    font-family: inherit; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: border-color .18s, color .18s, background .18s;
+  }
+  .cat-more-btn:hover {
+    border-color: #10B981; color: #10B981; background: rgba(16,185,129,0.08);
+  }
+`;
+
+const SHOW_INIT = 6;
+
 function CategoryGrid({ activeKey, onSelect }) {
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? CATEGORIES : CATEGORIES.slice(0, SHOW_INIT);
+  const hidden = CATEGORIES.length - SHOW_INIT;
+
   return (
-    <div style={{
-      background: "rgba(255,255,255,0.96)",
-      borderTop: "1px solid #e5e7eb",
-      borderBottom: "1px solid #e5e7eb",
-      padding: "28px 0",
-    }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 16px" }}>
+    <div className="cat-section">
+      <style>{CAT_CSS}</style>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 20px" }}>
         <h3 style={{
-          fontSize: 16, fontWeight: 800, color: "#374151",
-          margin: "0 0 14px", fontFamily: font, letterSpacing: "-0.2px",
+          fontSize: 16, fontWeight: 800, color: "#ffffff",
+          margin: "0 0 16px", fontFamily: font, letterSpacing: "-0.2px",
         }}>상위 카테고리</h3>
-        <style>{`
-          .cat-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-          }
-          @media (max-width: 768px) {
-            .cat-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-          }
-          @media (max-width: 480px) {
-            .cat-grid { grid-template-columns: repeat(2, 1fr); }
-          }
-        `}</style>
+
         <div className="cat-grid">
-          {CATEGORIES.map(cat => {
+          {visible.map(cat => {
             const active = activeKey === cat.key;
+            const { Icon } = cat;
             return (
               <button
                 key={cat.key}
+                className={`cat-card${active ? " active" : ""}`}
                 onClick={() => onSelect(active ? null : cat.key)}
                 style={{
-                  padding: "14px 14px",
-                  borderRadius: 12,
-                  background: cat.bg,
-                  border: active ? `2px solid ${cat.color}` : "2px solid transparent",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 8,
-                  boxShadow: active
-                    ? `0 4px 16px ${cat.color}30`
-                    : "0 1px 4px rgba(0,0,0,0.06)",
-                  transition: "all 0.15s",
-                  fontFamily: font,
-                  outline: "none",
-                  minHeight: 52,
+                  borderColor: active ? cat.color : undefined,
+                  boxShadow: active ? `0 0 0 1px ${cat.color}66, 0 6px 20px rgba(0,0,0,0.25)` : undefined,
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = `0 6px 18px ${cat.color}28`;
                   e.currentTarget.style.borderColor = cat.color;
+                  e.currentTarget.querySelector(".cat-chip").style.background = cat.color;
+                  e.currentTarget.querySelector(".cat-chip").style.color = "#fff";
+                  e.currentTarget.querySelector(".cat-label").style.color = cat.color;
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = active ? `0 4px 16px ${cat.color}30` : "0 1px 4px rgba(0,0,0,0.06)";
-                  e.currentTarget.style.borderColor = active ? cat.color : "transparent";
+                  e.currentTarget.style.borderColor = active ? cat.color : "rgba(255,255,255,0.10)";
+                  e.currentTarget.querySelector(".cat-chip").style.background = "rgba(255,255,255,0.09)";
+                  e.currentTarget.querySelector(".cat-chip").style.color = "#AEB7C2";
+                  e.currentTarget.querySelector(".cat-label").style.color = active ? cat.color : "#D8DEE6";
                 }}
               >
-                {/* 카테고리명 — 왼쪽 */}
-                <span style={{
-                  fontSize: 13, fontWeight: 800,
-                  color: cat.color,
-                  lineHeight: 1.3, textAlign: "left",
-                  flex: 1,
+                <span className="cat-label" style={{
+                  fontSize: 13, fontWeight: 700,
+                  color: active ? cat.color : "#D8DEE6",
+                  lineHeight: 1.3, flex: 1,
+                  transition: "color .18s",
                 }}>{cat.label}</span>
 
-                {/* 아이콘 — 오른쪽 작은 원 */}
-                <span style={{
-                  width: 30, height: 30, flexShrink: 0,
+                <span className="cat-chip" style={{
+                  width: 36, height: 36, flexShrink: 0,
                   borderRadius: "50%",
-                  background: `${cat.color}18`,
+                  background: active ? cat.color : "rgba(255,255,255,0.09)",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 15,
-                }}>{cat.emoji}</span>
+                  color: active ? "#fff" : "#AEB7C2",
+                  transition: "background .18s, color .18s",
+                }}>
+                  <Icon size={16} strokeWidth={1.9} color="currentColor" />
+                </span>
               </button>
             );
           })}
         </div>
+
+        {/* 더보기 / 접기 버튼 */}
+        <button
+          className="cat-more-btn"
+          onClick={() => setExpanded(v => !v)}
+          aria-expanded={expanded}
+        >
+          {expanded ? (
+            <>접기 <ChevronUp size={18} /></>
+          ) : (
+            <>카테고리 더 보기 <span style={{ opacity: 0.7 }}>+{hidden}</span> <ChevronDown size={18} /></>
+          )}
+        </button>
       </div>
     </div>
   );
@@ -476,9 +590,22 @@ function AppCard({ app, onClick }) {
 }
 
 /* ── 초대장 Placeholder 카드 ── */
+const PLACEHOLDER_CSS = `
+  @keyframes ph-breathe {
+    0%, 100% { opacity: 0.38; filter: drop-shadow(0 0 0px #10B981); }
+    50%       { opacity: 0.52; filter: drop-shadow(0 0 6px rgba(16,185,129,0.35)); }
+  }
+  .ph-logo {
+    animation: ph-breathe 3.8s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ph-logo { animation: none !important; opacity: 0.40 !important; }
+  }
+`;
 function PlaceholderCard() {
   return (
     <Link to="/pium-submit" style={{ textDecoration: "none" }}>
+      <style>{PLACEHOLDER_CSS}</style>
       <div style={{
         background: "white", borderRadius: 18,
         border: "2px dashed #bbf7d0",
@@ -491,7 +618,15 @@ function PlaceholderCard() {
         onMouseEnter={e => { e.currentTarget.style.borderColor = GREEN; e.currentTarget.style.background = "#f0fdf4"; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = "#bbf7d0"; e.currentTarget.style.background = "white"; }}
       >
-        <div style={{ fontSize: 36, marginBottom: 10 }}>🌱</div>
+        <img
+          src="/pium-logo.png"
+          alt="피움"
+          className="ph-logo"
+          style={{
+            height: 40, width: "auto", objectFit: "contain",
+            marginBottom: 12, mixBlendMode: "multiply",
+          }}
+        />
         <p style={{
           fontSize: 13, color: "#6b7280", lineHeight: 1.6,
           margin: "0 0 16px", fontFamily: font, fontWeight: 600,
@@ -536,9 +671,117 @@ function AppGrid({ apps, minCards = 5, navigate }) {
 }
 
 /* ══════════════════════════════════════
+   밝은 배경 회로 — PICK·갓 피어난 섹션
+══════════════════════════════════════ */
+const BRIGHT_CSS = `
+  .bc-wrap {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .bc-line {
+    fill: none; stroke: #10B981;
+    stroke-linecap: round;
+  }
+  @keyframes bc-flash {
+    0%, 80%, 100% { opacity: 0.26; }
+    88%           { opacity: 0.88; filter: drop-shadow(0 0 7px #10B981); }
+  }
+  @keyframes bc-pulse {
+    0%, 100% { r: 2.5px; opacity: 0.28; }
+    50%      { r: 5px;   opacity: 0.70; }
+  }
+  .bc-dot-flash { animation: bc-flash 4.5s ease-in-out infinite; }
+  .bc-dot-pulse { animation: bc-pulse 3.2s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .bc-dot-flash, .bc-dot-pulse { animation: none !important; opacity: 0.12 !important; }
+  }
+`;
+
+function BrightCircuitBg() {
+  return (
+    <div className="bc-wrap">
+      <svg
+        width="100%" height="100%"
+        viewBox="0 0 1200 700"
+        preserveAspectRatio="xMidYMid slice"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {/* ── 수평/수직 트레이스 ── */}
+        <path className="bc-line" d="M0 80 L180 80 L180 160 L320 160 L320 80 L500 80" strokeWidth="1.4" opacity="0.32"/>
+        <path className="bc-line" d="M500 80 L500 200 L640 200" strokeWidth="1.2" opacity="0.28"/>
+        <path className="bc-line" d="M640 200 L800 200 L800 120 L1000 120 L1000 80 L1200 80" strokeWidth="1.4" opacity="0.32"/>
+
+        <path className="bc-line" d="M0 260 L100 260 L100 340 L240 340" strokeWidth="1.2" opacity="0.26"/>
+        <path className="bc-line" d="M240 340 L240 420 L380 420 L380 340 L560 340" strokeWidth="1.4" opacity="0.30"/>
+        <path className="bc-line" d="M560 340 L560 260 L720 260 L720 340 L900 340" strokeWidth="1.2" opacity="0.27"/>
+        <path className="bc-line" d="M900 340 L900 260 L1100 260 L1100 340 L1200 340" strokeWidth="1.3" opacity="0.28"/>
+
+        <path className="bc-line" d="M0 500 L160 500 L160 580 L300 580" strokeWidth="1.2" opacity="0.24"/>
+        <path className="bc-line" d="M300 580 L300 500 L500 500 L500 580 L680 580 L680 500 L860 500" strokeWidth="1.3" opacity="0.28"/>
+        <path className="bc-line" d="M860 500 L860 580 L1040 580 L1040 500 L1200 500" strokeWidth="1.2" opacity="0.26"/>
+
+        {/* ── 세로 연결선 ── */}
+        <path className="bc-line" d="M180 80 L180 0" strokeWidth="1" opacity="0.22"/>
+        <path className="bc-line" d="M320 160 L320 260" strokeWidth="1" opacity="0.22"/>
+        <path className="bc-line" d="M640 200 L640 340" strokeWidth="1" opacity="0.22"/>
+        <path className="bc-line" d="M900 340 L900 500" strokeWidth="1" opacity="0.22"/>
+        <path className="bc-line" d="M100 260 L100 0" strokeWidth="1" opacity="0.20"/>
+        <path className="bc-line" d="M1000 120 L1000 0" strokeWidth="1" opacity="0.20"/>
+        <path className="bc-line" d="M560 340 L560 500" strokeWidth="1" opacity="0.22"/>
+        <path className="bc-line" d="M300 580 L300 700" strokeWidth="1" opacity="0.20"/>
+        <path className="bc-line" d="M680 580 L680 700" strokeWidth="1" opacity="0.20"/>
+
+        {/* ── 반짝 노드 (bc-dot-flash) ── */}
+        {[
+          {cx:180, cy:80,  d:"0s"},   {cx:320, cy:160, d:"0.9s"},
+          {cx:500, cy:80,  d:"1.8s"}, {cx:640, cy:200, d:"0.5s"},
+          {cx:800, cy:200, d:"2.2s"}, {cx:240, cy:340, d:"1.3s"},
+          {cx:560, cy:340, d:"2.7s"}, {cx:900, cy:340, d:"0.7s"},
+          {cx:560, cy:500, d:"1.6s"}, {cx:860, cy:500, d:"3.0s"},
+          {cx:300, cy:580, d:"2.0s"}, {cx:680, cy:580, d:"1.1s"},
+        ].map(({cx, cy, d}, i) => (
+          <circle key={i} className="bc-dot-flash"
+            cx={cx} cy={cy} r="3.5" fill="#10B981"
+            style={{animationDelay: d}} />
+        ))}
+
+        {/* ── 호흡 노드 (bc-dot-pulse) ── */}
+        {[
+          {cx:100,  cy:260, d:"0s",   c:"#34D399"},
+          {cx:380,  cy:420, d:"1.2s", c:"#10B981"},
+          {cx:720,  cy:260, d:"2.4s", c:"#6EE7B7"},
+          {cx:1100, cy:260, d:"0.8s", c:"#34D399"},
+          {cx:160,  cy:500, d:"1.9s", c:"#10B981"},
+          {cx:1040, cy:500, d:"3.1s", c:"#6EE7B7"},
+        ].map(({cx, cy, d, c}, i) => (
+          <circle key={i} className="bc-dot-pulse"
+            cx={cx} cy={cy} r="2.5" fill={c}
+            style={{animationDelay: d}} />
+        ))}
+
+        {/* ── 작은 배경 점 ── */}
+        {[
+          [640,80],[800,120],[100,160],[380,340],[1100,340],
+          [500,500],[1040,580],[240,500],[720,500]
+        ].map(([cx,cy], i) => (
+          <circle key={i} cx={cx} cy={cy} r="2" fill="#10B981" opacity="0.22"/>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════
    섹션 헤더
 ══════════════════════════════════════ */
-function SectionTitle({ emoji, title, sub }) {
+const SECTION_ICONS = {
+  pick:   <Star   size={22} strokeWidth={2}   color="#10B981" fill="#10B98122" />,
+  sprout: <Sprout size={22} strokeWidth={1.8} color="#16a34a" />,
+};
+
+function SectionTitle({ icon, title, sub }) {
   return (
     <div style={{ marginBottom: 20 }}>
       <h2 style={{
@@ -546,7 +789,8 @@ function SectionTitle({ emoji, title, sub }) {
         color: "#111827", margin: "0 0 4px", fontFamily: font,
         display: "flex", alignItems: "center", gap: 8,
       }}>
-        <span>{emoji}</span> {title}
+        {SECTION_ICONS[icon] ?? null}
+        {title}
       </h2>
       {sub && <p style={{ fontSize: 14, color: "#9ca3af", margin: 0, fontFamily: font }}>{sub}</p>}
     </div>
@@ -601,6 +845,9 @@ export default function PiumStorePage() {
       {/* 1. 히어로 캐러셀 */}
       <HeroCarousel />
 
+      {/* 캐러셀↔카테고리 여백 */}
+      <div style={{ height: "clamp(24px, 4vw, 56px)", background: "#FAFAFB" }} />
+
       {/* 2. 카테고리 박스 */}
       <CategoryGrid activeKey={activeCategory} onSelect={setActiveCategory} />
 
@@ -631,23 +878,33 @@ export default function PiumStorePage() {
         </div>
       )}
 
-      {/* 3. 세연's PICK 섹션 */}
+      {/* 3·4 — PIUM's PICK + 갓 피어난 앱: 밝은 회로 배경 래퍼 */}
       {!activeCategory && (
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 16px 8px" }}>
-          <SectionTitle emoji="🌟" title="세연's PICK" sub="편집장이 직접 고른 앱" />
-          <AppGrid apps={pickedApps} minCards={5} navigate={navigate} />
-        </div>
-      )}
+        <div style={{ position: "relative", overflow: "hidden", background: "#FAFAFB" }}>
+          <style>{BRIGHT_CSS}</style>
+          {/* 밝은 배경 회로 SVG */}
+          <BrightCircuitBg />
 
-      {/* 4. 갓 피어난 앱 섹션 */}
-      {!activeCategory && (
-        <div id="apps" style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 16px 60px" }}>
-          <SectionTitle emoji="🌱" title="갓 피어난 앱" sub="가장 최근에 피움에 올라온 앱" />
-          {loading ? (
-            <div style={{ textAlign: "center", padding: 60, color: "#9ca3af" }}>불러오는 중...</div>
-          ) : (
-            <AppGrid apps={recentApps} minCards={5} navigate={navigate} />
-          )}
+          {/* 콘텐츠 (z-index 1 위) */}
+          <div style={{ position: "relative", zIndex: 1 }}>
+
+            {/* 3. PIUM's PICK */}
+            <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 16px 8px" }}>
+              <SectionTitle icon="pick" title={"PIUM's PICK"} />
+              <AppGrid apps={pickedApps} minCards={5} navigate={navigate} />
+            </div>
+
+            {/* 4. 갓 피어난 앱 */}
+            <div id="apps" style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 16px 60px" }}>
+              <SectionTitle icon="sprout" title="갓 피어난 앱" sub="가장 최근에 피움에 올라온 앱" />
+              {loading ? (
+                <div style={{ textAlign: "center", padding: 60, color: "#9ca3af" }}>불러오는 중...</div>
+              ) : (
+                <AppGrid apps={recentApps} minCards={5} navigate={navigate} />
+              )}
+            </div>
+
+          </div>
         </div>
       )}
     </div>

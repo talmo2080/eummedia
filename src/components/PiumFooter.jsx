@@ -14,12 +14,18 @@ export default function PiumFooter() {
     }}>
       <div style={{ maxWidth: 860, margin: "0 auto" }}>
 
-        {/* 로고 + 슬로건 */}
+        {/* 로고 → 슬로건 → 사업자정보 순, 전체 center */}
         <div style={{ marginBottom: 32, textAlign: "center" }}>
           <img
             src="/pium-logo.png"
             alt="피움"
-            style={{ height: 52, width: "auto", objectFit: "contain", marginBottom: 12, filter: "brightness(1.1)" }}
+            style={{
+              display: "block",
+              height: 52, width: "auto",
+              objectFit: "contain",
+              margin: "0 auto 16px",
+              filter: "brightness(1.1)",
+            }}
           />
           <p style={{ fontSize: 14, color: "#64748b", margin: 0, letterSpacing: 1 }}>
             경험이 기술을 입다

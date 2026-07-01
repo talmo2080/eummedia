@@ -592,7 +592,7 @@ export default function Home() {
                    style={{ display:"block", width:"100%", height:"160px", objectFit:"contain", objectPosition:"center", background:"#ffffff" }} />
             </Link>
             <div style={{ padding:"8px 10px", display:"flex", gap:"6px" }}>
-              <Link to="/pium"
+              <Link to="/pium-store"
                     style={{ flex:1, display:"block", textAlign:"center", background:"#166534", color:"white", padding:"8px 0", fontSize:"12px", fontWeight:"700", textDecoration:"none", fontFamily:"'Noto Sans KR', sans-serif", borderRadius:"2px" }}>
                 웹앱스토어 →
               </Link>
@@ -921,7 +921,7 @@ export default function Home() {
                    style={{ display:"block", width:"100%", height:"160px", objectFit:"contain", objectPosition:"center", background:"#ffffff" }} />
             </Link>
             <div style={{ padding:"10px 12px", display:"flex", flexDirection:"column", gap:"7px" }}>
-              <Link to="/pium"
+              <Link to="/pium-store"
                     style={{ display:"block", textAlign:"center", background:"#166534", color:"white", padding:"8px", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"'Noto Sans KR', sans-serif", borderRadius:"2px" }}>
                 웹앱스토어 구경하기 →
               </Link>

@@ -1154,7 +1154,7 @@ export default function ArticleDetail() {
                    style={{ display:"block", width:"100%", height:"160px", objectFit:"contain", objectPosition:"center", background:"#ffffff" }} />
             </Link>
             <div style={{ padding:"10px 12px", display:"flex", flexDirection:"column", gap:"7px" }}>
-              <Link to="/pium"
+              <Link to="/pium-store"
                     style={{ display:"block", textAlign:"center", background:"#166534", color:"white", padding:"8px", fontSize:"11px", fontWeight:"700", textDecoration:"none", fontFamily:"'Noto Sans KR', sans-serif", borderRadius:"2px" }}>
                 웹앱스토어 구경하기 →
               </Link>
