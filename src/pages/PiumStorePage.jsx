@@ -783,16 +783,21 @@ const SECTION_ICONS = {
 
 function SectionTitle({ icon, title, sub }) {
   return (
-    <div style={{ marginBottom: 20 }}>
+    <div style={{ marginBottom: 24 }}>
       <h2 style={{
-        fontSize: "clamp(18px, 3vw, 24px)", fontWeight: 900,
-        color: "#111827", margin: "0 0 4px", fontFamily: font,
-        display: "flex", alignItems: "center", gap: 8,
+        fontSize: "clamp(20px, 3vw, 26px)", fontWeight: 900,
+        color: "#111827", margin: "0 0 5px", fontFamily: font,
+        display: "flex", alignItems: "center", gap: 10,
       }}>
         {SECTION_ICONS[icon] ?? null}
         {title}
       </h2>
-      {sub && <p style={{ fontSize: 14, color: "#9ca3af", margin: 0, fontFamily: font }}>{sub}</p>}
+      {sub && (
+        <p style={{
+          fontSize: 13, color: "#6b7280", margin: 0,
+          fontFamily: font, paddingLeft: 32,
+        }}>{sub}</p>
+      )}
     </div>
   );
 }
@@ -878,24 +883,24 @@ export default function PiumStorePage() {
         </div>
       )}
 
-      {/* 3·4 — PIUM's PICK + 갓 피어난 앱: 밝은 회로 배경 래퍼 */}
+      {/* 3·4 — PIUM's PICK + 갓 피어난 앱 */}
       {!activeCategory && (
-        <div style={{ position: "relative", overflow: "hidden", background: "#FAFAFB" }}>
+        <>
           <style>{BRIGHT_CSS}</style>
-          {/* 밝은 배경 회로 SVG */}
-          <BrightCircuitBg />
 
-          {/* 콘텐츠 (z-index 1 위) */}
-          <div style={{ position: "relative", zIndex: 1 }}>
-
-            {/* 3. PIUM's PICK */}
-            <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 16px 8px" }}>
-              <SectionTitle icon="pick" title={"PIUM's PICK"} />
+          {/* 3. PIUM's PICK — 흰색 배경 */}
+          <div style={{ position: "relative", overflow: "hidden", background: "#FFFFFF" }}>
+            <BrightCircuitBg />
+            <div style={{ position: "relative", zIndex: 1, maxWidth: 1200, margin: "0 auto", padding: "40px 16px 36px" }}>
+              <SectionTitle icon="pick" title={"PIUM's PICK"} sub="피움이 직접 고른 앱" />
               <AppGrid apps={pickedApps} minCards={5} navigate={navigate} />
             </div>
+          </div>
 
-            {/* 4. 갓 피어난 앱 */}
-            <div id="apps" style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 16px 60px" }}>
+          {/* 4. 갓 피어난 앱 — 옅은 민트 배경 */}
+          <div id="apps" style={{ position: "relative", overflow: "hidden", background: "#EDF5F0", borderTop: "1px solid #E2EDE7" }}>
+            <BrightCircuitBg />
+            <div style={{ position: "relative", zIndex: 1, maxWidth: 1200, margin: "0 auto", padding: "40px 16px 60px" }}>
               <SectionTitle icon="sprout" title="갓 피어난 앱" sub="가장 최근에 피움에 올라온 앱" />
               {loading ? (
                 <div style={{ textAlign: "center", padding: 60, color: "#9ca3af" }}>불러오는 중...</div>
@@ -903,9 +908,8 @@ export default function PiumStorePage() {
                 <AppGrid apps={recentApps} minCards={5} navigate={navigate} />
               )}
             </div>
-
           </div>
-        </div>
+        </>
       )}
     </div>
   );
