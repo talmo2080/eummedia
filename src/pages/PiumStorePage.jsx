@@ -660,7 +660,7 @@ function AppGrid({ apps, minCards = 5, navigate }) {
       <style>{GRID_STYLE}</style>
       <div className="pium-grid">
         {apps.map(app => (
-          <AppCard key={app.id} app={app} onClick={() => navigate(`/pium-app/${app.id}`)} />
+          <AppCard key={app.slug ?? app.id} app={app} onClick={() => navigate(`/pium-app/${app.slug ?? app.id}`)} />
         ))}
         {Array.from({ length: placeholderCount }).map((_, i) => (
           <PlaceholderCard key={`ph-${i}`} />
@@ -839,8 +839,18 @@ export default function PiumStorePage() {
     ? allApps.filter(a => a.category === activeCategory)
     : allApps;
 
-  // 세연's PICK: 나중에 featured 컬럼으로 분리. 지금은 빈 배열
-  const pickedApps  = [];
+  // PIUM's PICK: 하드코딩 featured 앱 (DB 연동 전)
+  const pickedApps = [
+    {
+      slug:          "eummedia",
+      title:         "이음미디어",
+      summary:       "세상과 당신을 잇는 인터넷신문",
+      thumbnail_url: null,   // 이미지 준비 후 "/pium-app-eummedia.png" 교체
+      category:      "media",
+      price_model:   "free",
+      users:         { nickname: "정세연" },
+    },
+  ];
   // 갓 피어난 앱: 최근 4개 (카테고리 필터 미적용)
   const recentApps  = allApps.slice(0, 4);
 

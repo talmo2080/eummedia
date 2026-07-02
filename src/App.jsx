@@ -29,6 +29,7 @@ import PiumRequest from './pages/PiumRequest'
 import PiumSubmitPage from './pages/PiumSubmitPage'
 import PiumAdminPage from './pages/PiumAdminPage'
 import PiumStorePage from './pages/PiumStorePage'
+import PiumAppDetailPage from './pages/PiumAppDetailPage'
 
 /* ── 이음미디어 헤더·푸터를 피움 경로에서 숨기는 껍데기 ── */
 function AppShell() {
@@ -69,7 +70,7 @@ function AppShell() {
         <Route element={<PiumShell />}>
           <Route path="/pium" element={<Pium />} />
           <Route path="/pium-store" element={<PiumStorePage />} />
-          <Route path="/pium-app/:id" element={<PiumStorePage />} />
+          <Route path="/pium-app/:slug" element={<PiumAppDetailPage />} />
           <Route path="/pium-request" element={<PiumRequest />} />
           <Route path="/pium-submit" element={<PiumSubmitPage />} />
           <Route path="/pium-admin" element={
