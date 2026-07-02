@@ -13,7 +13,7 @@ const APPS = {
     title:         "이음미디어",
     categoryLabel: "정보·미디어",
     tagline:       "세상과 당신을 잇는 인터넷신문",
-    thumbnail:     "/images/eummedia-preview.png",
+    thumbnail:     "/eummedia-preview.png",
     appUrl:        "https://eummedia.kr",
     makerArticleUrl: "#",  // 메이커 기사 작성 후 실제 URL로 교체
     priceModel:    "free",
@@ -242,7 +242,7 @@ export default function PiumAppDetailPage() {
             <span style={{
               fontSize: 12, fontWeight: 700, padding: "4px 10px",
               borderRadius: 99, background: "#dcfce7", color: "#15803d", fontFamily: font,
-            }}>무료</span>
+            }}>열람 무료</span>
             {app.tags.map(t => (
               <span key={t} style={{
                 fontSize: 12, fontWeight: 600, padding: "4px 10px",
