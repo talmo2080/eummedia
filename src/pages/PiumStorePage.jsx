@@ -893,19 +893,22 @@ export default function PiumStorePage() {
             <BrightCircuitBg />
             <div style={{ position: "relative", zIndex: 1, maxWidth: 1200, margin: "0 auto", padding: "40px 16px 36px" }}>
               <SectionTitle icon="pick" title={"PIUM's PICK"} sub="피움이 직접 고른 앱" />
-              <AppGrid apps={pickedApps} minCards={5} navigate={navigate} />
+              <AppGrid apps={pickedApps} minCards={4} navigate={navigate} />
             </div>
           </div>
 
-          {/* 4. 갓 피어난 앱 — 옅은 민트 배경 */}
-          <div id="apps" style={{ position: "relative", overflow: "hidden", background: "#EDF5F0", borderTop: "1px solid #E2EDE7" }}>
+          {/* 섹션 사이 여백 — 회로 없는 중립 구간 */}
+          <div style={{ height: "clamp(28px, 4vw, 48px)", background: "#FAFAFB" }} />
+
+          {/* 4. 갓 피어난 앱 — 진한 민트 배경 */}
+          <div id="apps" style={{ position: "relative", overflow: "hidden", background: "#DCEDE3" }}>
             <BrightCircuitBg />
             <div style={{ position: "relative", zIndex: 1, maxWidth: 1200, margin: "0 auto", padding: "40px 16px 60px" }}>
               <SectionTitle icon="sprout" title="갓 피어난 앱" sub="가장 최근에 피움에 올라온 앱" />
               {loading ? (
                 <div style={{ textAlign: "center", padding: 60, color: "#9ca3af" }}>불러오는 중...</div>
               ) : (
-                <AppGrid apps={recentApps} minCards={5} navigate={navigate} />
+                <AppGrid apps={recentApps} minCards={4} navigate={navigate} />
               )}
             </div>
           </div>
