@@ -841,8 +841,8 @@ export default function PiumStorePage() {
 
   // 세연's PICK: 나중에 featured 컬럼으로 분리. 지금은 빈 배열
   const pickedApps  = [];
-  // 갓 피어난 앱: 최근 5개 (카테고리 필터 미적용)
-  const recentApps  = allApps.slice(0, 10);
+  // 갓 피어난 앱: 최근 4개 (카테고리 필터 미적용)
+  const recentApps  = allApps.slice(0, 4);
 
   return (
     <div style={{ minHeight: "100vh", background: "transparent", fontFamily: font }}>
