@@ -650,7 +650,7 @@ const GRID_STYLE = `
   }
   @media (min-width: 768px)  { .pium-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (min-width: 1024px) { .pium-grid { grid-template-columns: repeat(4, 1fr); } }
-  @media (min-width: 1280px) { .pium-grid { grid-template-columns: repeat(5, 1fr); } }
+  @media (min-width: 1280px) { .pium-grid { grid-template-columns: repeat(4, 1fr); } }
 `;
 
 function AppGrid({ apps, minCards = 5, navigate }) {
@@ -878,7 +878,7 @@ export default function PiumStorePage() {
           {loading ? (
             <div style={{ textAlign: "center", padding: 60, color: "#9ca3af" }}>불러오는 중...</div>
           ) : (
-            <AppGrid apps={filteredApps} minCards={5} navigate={navigate} />
+            <AppGrid apps={filteredApps} minCards={4} navigate={navigate} />
           )}
         </div>
       )}
