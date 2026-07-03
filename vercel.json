@@ -1,7 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/((?!api/|.*\\.[a-z0-9]+$).*)",
+      "source": "/((?!api/|.*\\.[a-z0-9]+$|article/|channel/|videos).*)",
       "destination": "/index.html"
     }
   ]
