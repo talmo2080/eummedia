@@ -114,6 +114,15 @@ function StockWidget() {
         </a>
       </div>
 
+      {/* 실시간 아님 고지 — 상단 강조 (독자가 수치 보기 전 인지) */}
+      <div style={{
+        padding:"10px 20px", background:"#fdf6ec",
+        borderBottom:"1px solid #e8c98a",
+        fontSize:"11px", fontWeight:"700", color:"#856404", lineHeight:1.5,
+      }}>
+        ※ 한국거래소 발표 종가입니다. 실시간 시세가 아니며, 영업일 기준 1일 후 갱신됩니다.
+      </div>
+
       <div style={{ padding:"16px 20px" }}>
         {loading ? (
           <div style={{ padding:"32px 8px", textAlign:"center", color:"#9a9a9a", fontSize:"12px" }}>
@@ -193,9 +202,6 @@ function StockWidget() {
           </>
         )}
 
-        <div style={{ fontSize:"10px", color:"#bbb", textAlign:"right", marginTop:"12px", lineHeight:1.6 }}>
-          ※ 한국거래소 발표 종가입니다. 실시간 시세가 아니며, 영업일 기준 1일 후 갱신됩니다.
-        </div>
       </div>
     </div>
   );
