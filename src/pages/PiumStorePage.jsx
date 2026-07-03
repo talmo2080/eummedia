@@ -845,7 +845,7 @@ export default function PiumStorePage() {
       slug:          "eummedia",
       title:         "이음미디어",
       summary:       "세상과 당신을 잇는 인터넷신문",
-      thumbnail_url: null,   // 이미지 준비 후 "/pium-app-eummedia.png" 교체
+      thumbnail_url: "/eummedia-preview.png",
       category:      "media",
       price_model:   "free",
       users:         { nickname: "정세연" },
