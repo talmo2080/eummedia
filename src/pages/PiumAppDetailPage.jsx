@@ -396,74 +396,65 @@ export default function PiumAppDetailPage() {
           <span style={{ color: GREEN, fontSize: 20 }}>🌱</span> 메이커
         </h2>
         {/* 메이커 + 기사 통합 카드 */}
-        <a
-          href={app.makerArticleUrl ?? undefined}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ display: "block", textDecoration: "none" }}
-        >
-          <div style={{
-            border: "1.5px solid rgba(16,185,129,0.22)",
-            borderRadius: 20, overflow: "hidden",
-            background: "rgba(16,185,129,0.06)",
-            transition: "border-color 0.15s",
-          }}
-            onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(16,185,129,0.50)"}
-            onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(16,185,129,0.22)"}
-          >
-            {/* 기사 대문 이미지 */}
-            {app.makerArticle && (
-              <img
-                src={app.makerArticle.thumbnail}
-                alt={app.makerArticle.title}
-                style={{ width: "100%", height: 180, objectFit: "cover", display: "block" }}
-              />
-            )}
+        <div className="pd-maker-card" style={{ flexDirection: "column", gap: 0, padding: 0, overflow: "hidden" }}>
 
-            {/* 메이커 정보 */}
-            <div style={{ padding: "20px 24px 24px", display: "flex", alignItems: "center", gap: 16 }}>
-              <div style={{
-                width: 56, height: 56, borderRadius: "50%", flexShrink: 0,
-                border: "2px solid rgba(16,185,129,0.40)",
-                overflow: "hidden",
-              }}>
-                <img
-                  src="/maker-seyeon.png"
-                  alt="정세연"
-                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                />
-              </div>
-              <div style={{ flex: 1 }}>
-                <p style={{
-                  fontSize: 16, fontWeight: 800, color: "#f1f5f9",
-                  margin: "0 0 4px", fontFamily: font,
-                }}>{app.maker.name}</p>
-                <p style={{
-                  fontSize: 12, color: "#64748b", margin: "0 0 10px",
-                  lineHeight: 1.6, fontFamily: font,
-                }}>{app.maker.bio}</p>
-                {app.makerArticle && (
-                  <p style={{
-                    fontSize: 13, color: "#94a3b8", margin: 0,
-                    fontFamily: font, lineHeight: 1.5,
-                    display: "-webkit-box", WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical", overflow: "hidden",
-                  }}>{app.makerArticle.title}</p>
-                )}
-              </div>
-            </div>
-
-            {/* 기사 보기 라벨 */}
+          {/* 프로필 영역 */}
+          <div style={{ display: "flex", alignItems: "center", gap: 20, padding: "24px 28px 20px" }}>
             <div style={{
-              padding: "10px 24px 14px",
-              borderTop: "1px solid rgba(255,255,255,0.06)",
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-            }}>
-              <span style={{ fontSize: 11, color: "#475569", fontFamily: font }}>🗞️ 이음미디어 기사</span>
-              <span style={{ fontSize: 12, color: GREEN, fontWeight: 700, fontFamily: font }}>이야기 보기 →</span>
+              width: 64, height: 64, borderRadius: "50%", flexShrink: 0,
+              background: "rgba(16,185,129,0.12)",
+              border: "2px solid rgba(16,185,129,0.30)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 28,
+            }}>🌿</div>
+            <div style={{ flex: 1 }}>
+              <p style={{
+                fontSize: 17, fontWeight: 800, color: "#f1f5f9",
+                margin: "0 0 5px", fontFamily: font,
+              }}>{app.maker.name}</p>
+              <p style={{
+                fontSize: 12, color: "#64748b", margin: 0,
+                lineHeight: 1.65, fontFamily: font,
+              }}>{app.maker.bio}</p>
             </div>
           </div>
-        </a>
+
+          {/* 기사 미리보기 (구분선 + 클릭 영역) */}
+          {app.makerArticleUrl && app.makerArticle && (
+            <a
+              href={app.makerArticleUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: "block", textDecoration: "none" }}
+            >
+              <div style={{
+                borderTop: "1px solid rgba(255,255,255,0.08)",
+                transition: "background 0.15s",
+              }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(16,185,129,0.06)"}
+                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+              >
+                <img
+                  src={app.makerArticle.thumbnail}
+                  alt={app.makerArticle.title}
+                  style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }}
+                />
+                <div style={{ padding: "14px 28px 20px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: 11, color: "#475569", margin: "0 0 6px", fontFamily: font }}>🗞️ 이음미디어 기사</p>
+                    <p style={{
+                      fontSize: 13, fontWeight: 700, color: "#cbd5e1",
+                      margin: 0, fontFamily: font, lineHeight: 1.6,
+                      display: "-webkit-box", WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical", overflow: "hidden",
+                    }}>{app.makerArticle.title}</p>
+                  </div>
+                  <span style={{ fontSize: 12, color: GREEN, fontWeight: 700, fontFamily: font, flexShrink: 0, paddingTop: 18 }}>보기 →</span>
+                </div>
+              </div>
+            </a>
+          )}
+        </div>
       </div>
 
       {/* ══ 소감 자리 (5단계 placeholder) ══ */}
