@@ -24,7 +24,7 @@ const APPS = {
     tags:          ["인터넷신문", "로컬", "미디어", "비개발자"],
     maker: {
       name: "정세연",
-      bio:  "닥터리부트 두피관리센터 대표 · 두피전문가 27년 · 이음매거진 편집국장 · 비개발자 메이커",
+      bio:  "닥터리부트 두피관리센터 대표 · 두피전문가 27년 · 이음매거진 편집국장 · AI에이전트전문가 1급",
     },
     whatItDoes: [
       {
@@ -398,11 +398,15 @@ export default function PiumAppDetailPage() {
         <div className="pd-maker-card">
           <div style={{
             width: 64, height: 64, borderRadius: "50%", flexShrink: 0,
-            background: "rgba(16,185,129,0.12)",
             border: "2px solid rgba(16,185,129,0.30)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 28,
-          }}>🌿</div>
+            overflow: "hidden",
+          }}>
+            <img
+              src="/maker-seyeon.png"
+              alt="정세연"
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
+          </div>
           <div style={{ flex: 1 }}>
             <p style={{
               fontSize: 17, fontWeight: 800, color: "#f1f5f9",
