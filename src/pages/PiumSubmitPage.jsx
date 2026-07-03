@@ -323,6 +323,22 @@ export default function PiumSubmitPage() {
           </p>
         </div>
 
+        {/* ── 기사 혜택 배너 ── */}
+        <div style={{
+          background: "linear-gradient(135deg,#166534,#14532d)",
+          borderRadius: 14, padding: "20px 24px", marginBottom: 20,
+          boxShadow: "0 4px 20px rgba(22,101,52,0.30)",
+          fontFamily: "'Noto Sans KR',sans-serif",
+        }}>
+          <p style={{ margin: "0 0 8px", fontSize: 15, fontWeight: 900, color: "#bbf7d0", lineHeight: 1.5 }}>
+            🖋 이음매거진 편집국장이 당신의 앱 스토리를 기사로 써드립니다
+          </p>
+          <p style={{ margin: 0, fontSize: 14, color: "#86efac", lineHeight: 1.8 }}>
+            앱을 올리면 이음미디어에 소개 기사가 실려요. <strong style={{ color: "#fff" }}>무료</strong>예요.<br/>
+            기사가 구글·네이버·AI 검색에 잡혀 독자가 당신을 찾아옵니다.
+          </p>
+        </div>
+
         {/* ── 폼 카드 ── */}
         <form onSubmit={handleSubmit}>
           <div style={{ background:"#fff", borderRadius:16, padding:"28px 28px 24px",

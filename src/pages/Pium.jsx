@@ -635,6 +635,64 @@ function ClosingBlock() {
   );
 }
 
+/* ────────────────────────────────────────
+   블록 — 기사 약속
+──────────────────────────────────────── */
+function ArticleBlock() {
+  const ref = useFadeIn(0);
+  return (
+    <section style={{
+      position:"relative", background:DARK_BG,
+      padding:"80px 24px", overflow:"hidden",
+    }}>
+      <CircuitBg opacity={0.04}/>
+      <div ref={ref} style={{
+        maxWidth:680, margin:"0 auto",
+        opacity:0, transform:"translateY(32px)",
+        transition:"opacity 0.8s ease,transform 0.8s ease",
+      }}>
+        <div style={{
+          background:"rgba(22,101,52,0.12)",
+          border:"1.5px solid rgba(74,222,128,0.25)",
+          borderRadius:20, padding:"40px 36px",
+        }}>
+          <p style={{
+            fontSize:14, fontWeight:800, letterSpacing:"0.1em",
+            color:GREEN_LT, margin:"0 0 16px", textTransform:"uppercase",
+            fontFamily:"'Noto Sans KR',sans-serif",
+          }}>피움 × 이음미디어</p>
+          <p style={{
+            fontSize:"clamp(18px,3vw,26px)", fontWeight:900, color:TEXT_HI,
+            lineHeight:1.5, margin:"0 0 20px",
+            fontFamily:"'Noto Sans KR',sans-serif",
+          }}>
+            제품은 피움이,<br/>
+            <span style={{ color:GREEN_LT }}>사람은 이음미디어가 전합니다.</span>
+          </p>
+          <p style={{
+            fontSize:"clamp(14px,2vw,17px)", color:TEXT_MID,
+            lineHeight:2, margin:"0 0 28px",
+            fontFamily:"'Noto Sans KR',sans-serif",
+          }}>
+            그래서 피움은 — 이음매거진 편집국장이 당신의 앱 뒤에 있는 사람 이야기를 기사로 써드립니다.<br/>
+            앱을 올리는 것만으로, 구글·네이버·AI가 당신을 찾아가는 글이 생겨요.<br/>
+            <span style={{ color:TEXT_HI, fontWeight:700 }}>무료입니다.</span>
+          </p>
+          <Link to="/pium-submit" style={{
+            display:"inline-block",
+            background:`linear-gradient(135deg,${GREEN},#15803d)`,
+            color:"#fff", textDecoration:"none",
+            borderRadius:10, padding:"13px 28px",
+            fontSize:15, fontWeight:800,
+            fontFamily:"'Noto Sans KR',sans-serif",
+            boxShadow:"0 4px 16px rgba(22,101,52,0.35)",
+          }}>내 앱 피우기 →</Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ════════════════════════════════════════
    메인 컴포넌트
 ════════════════════════════════════════ */
@@ -644,6 +702,7 @@ export default function Pium() {
       <Hero />
       <WhyBlock />
       <InsightBlock />
+      <ArticleBlock />
       <WhatBlock />
       <ClosingBlock />
     </div>

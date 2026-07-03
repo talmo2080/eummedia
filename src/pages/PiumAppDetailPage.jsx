@@ -15,7 +15,7 @@ const APPS = {
     tagline:       "세상과 당신을 잇는 인터넷신문",
     thumbnail:     "/eummedia-preview.png",
     appUrl:        "https://eummedia.kr",
-    makerArticleUrl: "#",  // 메이커 기사 작성 후 실제 URL로 교체
+    makerArticleUrl: "https://www.eummedia.kr/article/article-ofkvp4bo",
     priceModel:    "free",
     tags:          ["인터넷신문", "로컬", "미디어", "비개발자"],
     maker: {

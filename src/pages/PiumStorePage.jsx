@@ -44,6 +44,7 @@ const SLIDES = [
     accent:     "사람",
     accentGrad: "linear-gradient(90deg,#34D399,#10B981)",
     sub:        "이 앱을 피운 메이커를 만나보세요",
+    subExtra:   "편집국장이 당신의 앱 스토리를 기사로 써드려요 — 무료",
     cta:        "메이커 만나기 →",
     ctaTo:      "/pium-submit",
     btnColor:   "#10B981",
@@ -283,6 +284,14 @@ function HeroCarousel() {
               margin: "0 0 28px", lineHeight: 1.65,
               textShadow: "0 1px 8px rgba(0,0,0,0.50)",
             }}>{slide.sub}</p>
+            {slide.subExtra && (
+              <p style={{
+                fontSize: "clamp(11px, 1.4vw, 13px)", fontWeight: 600,
+                fontFamily: font, color: "rgba(167,243,208,0.85)",
+                margin: "-16px 0 24px", lineHeight: 1.5,
+                textShadow: "0 1px 6px rgba(0,0,0,0.50)",
+              }}>🖋 {slide.subExtra}</p>
+            )}
             <div>
               <button
                 onClick={() => handleCta(slide.ctaTo)}
