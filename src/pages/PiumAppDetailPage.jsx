@@ -395,85 +395,75 @@ export default function PiumAppDetailPage() {
         <h2 className="pd-section-title">
           <span style={{ color: GREEN, fontSize: 20 }}>🌱</span> 메이커
         </h2>
-        <div className="pd-maker-card">
+        {/* 메이커 + 기사 통합 카드 */}
+        <a
+          href={app.makerArticleUrl ?? undefined}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: "block", textDecoration: "none" }}
+        >
           <div style={{
-            width: 64, height: 64, borderRadius: "50%", flexShrink: 0,
-            border: "2px solid rgba(16,185,129,0.30)",
-            overflow: "hidden",
-          }}>
-            <img
-              src="/maker-seyeon.png"
-              alt="정세연"
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-            />
-          </div>
-          <div style={{ flex: 1 }}>
-            <p style={{
-              fontSize: 17, fontWeight: 800, color: "#f1f5f9",
-              margin: "0 0 6px", fontFamily: font,
-            }}>{app.maker.name}</p>
-            <p style={{
-              fontSize: 13, color: "#64748b", margin: "0 0 16px",
-              lineHeight: 1.65, fontFamily: font,
-            }}>{app.maker.bio}</p>
-            {app.makerArticleUrl ? (
-              <a
-                href={app.makerArticleUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  fontSize: 13, color: GREEN, fontWeight: 700,
-                  textDecoration: "none", fontFamily: font,
-                }}
-              >이 메이커의 이야기 보기 →</a>
-            ) : (
-              <span style={{
-                fontSize: 12, color: "#334155", fontWeight: 600, fontFamily: font,
-                padding: "5px 14px", borderRadius: 99,
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.08)",
-              }}>이야기 기사 준비 중</span>
-            )}
-          </div>
-        </div>
-
-        {/* 기사 미리보기 카드 */}
-        {app.makerArticleUrl && app.makerArticle && (
-          <a
-            href={app.makerArticleUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: "block", textDecoration: "none", marginTop: 20 }}
+            border: "1.5px solid rgba(16,185,129,0.22)",
+            borderRadius: 20, overflow: "hidden",
+            background: "rgba(16,185,129,0.06)",
+            transition: "border-color 0.15s",
+          }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(16,185,129,0.50)"}
+            onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(16,185,129,0.22)"}
           >
-            <div style={{
-              border: "1px solid rgba(16,185,129,0.20)",
-              borderRadius: 14, overflow: "hidden",
-              background: "rgba(255,255,255,0.03)",
-              transition: "border-color 0.15s",
-            }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(16,185,129,0.50)"}
-              onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(16,185,129,0.20)"}
-            >
+            {/* 기사 대문 이미지 */}
+            {app.makerArticle && (
               <img
                 src={app.makerArticle.thumbnail}
                 alt={app.makerArticle.title}
                 style={{ width: "100%", height: 180, objectFit: "cover", display: "block" }}
               />
-              <div style={{ padding: "14px 18px 18px" }}>
+            )}
+
+            {/* 메이커 정보 */}
+            <div style={{ padding: "20px 24px 24px", display: "flex", alignItems: "center", gap: 16 }}>
+              <div style={{
+                width: 56, height: 56, borderRadius: "50%", flexShrink: 0,
+                border: "2px solid rgba(16,185,129,0.40)",
+                overflow: "hidden",
+              }}>
+                <img
+                  src="/maker-seyeon.png"
+                  alt="정세연"
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
                 <p style={{
-                  fontSize: 11, fontWeight: 700, color: GREEN,
-                  margin: "0 0 8px", fontFamily: font, letterSpacing: "0.04em",
-                }}>🗞️ 이음미디어 기사</p>
+                  fontSize: 16, fontWeight: 800, color: "#f1f5f9",
+                  margin: "0 0 4px", fontFamily: font,
+                }}>{app.maker.name}</p>
                 <p style={{
-                  fontSize: 14, fontWeight: 700, color: "#e2e8f0",
-                  margin: 0, fontFamily: font, lineHeight: 1.6,
-                  display: "-webkit-box", WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical", overflow: "hidden",
-                }}>{app.makerArticle.title}</p>
+                  fontSize: 12, color: "#64748b", margin: "0 0 10px",
+                  lineHeight: 1.6, fontFamily: font,
+                }}>{app.maker.bio}</p>
+                {app.makerArticle && (
+                  <p style={{
+                    fontSize: 13, color: "#94a3b8", margin: 0,
+                    fontFamily: font, lineHeight: 1.5,
+                    display: "-webkit-box", WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical", overflow: "hidden",
+                  }}>{app.makerArticle.title}</p>
+                )}
               </div>
             </div>
-          </a>
-        )}
+
+            {/* 기사 보기 라벨 */}
+            <div style={{
+              padding: "10px 24px 14px",
+              borderTop: "1px solid rgba(255,255,255,0.06)",
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+            }}>
+              <span style={{ fontSize: 11, color: "#475569", fontFamily: font }}>🗞️ 이음미디어 기사</span>
+              <span style={{ fontSize: 12, color: GREEN, fontWeight: 700, fontFamily: font }}>이야기 보기 →</span>
+            </div>
+          </div>
+        </a>
       </div>
 
       {/* ══ 소감 자리 (5단계 placeholder) ══ */}
