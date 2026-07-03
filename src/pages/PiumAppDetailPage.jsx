@@ -16,6 +16,10 @@ const APPS = {
     thumbnail:     "/eummedia-preview.png",
     appUrl:        "https://eummedia.kr",
     makerArticleUrl: "https://www.eummedia.kr/article/article-ofkvp4bo",
+    makerArticle: {
+      thumbnail: "https://avbsniuthpcejjcdeiyw.supabase.co/storage/v1/object/public/article-images/39b41153-941a-4f29-a970-d4695478fd56/1783041226984.png",
+      title: "비개발자가 만든 웹앱, '피움'에서 꽃핀다 — 바이브코딩으로 두피전문가가 3주 만에 신문을 지은 이유",
+    },
     priceModel:    "free",
     tags:          ["인터넷신문", "로컬", "미디어", "비개발자"],
     maker: {
@@ -428,6 +432,44 @@ export default function PiumAppDetailPage() {
             )}
           </div>
         </div>
+
+        {/* 기사 미리보기 카드 */}
+        {app.makerArticleUrl && app.makerArticle && (
+          <a
+            href={app.makerArticleUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: "block", textDecoration: "none", marginTop: 20 }}
+          >
+            <div style={{
+              border: "1px solid rgba(16,185,129,0.20)",
+              borderRadius: 14, overflow: "hidden",
+              background: "rgba(255,255,255,0.03)",
+              transition: "border-color 0.15s",
+            }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(16,185,129,0.50)"}
+              onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(16,185,129,0.20)"}
+            >
+              <img
+                src={app.makerArticle.thumbnail}
+                alt={app.makerArticle.title}
+                style={{ width: "100%", height: 180, objectFit: "cover", display: "block" }}
+              />
+              <div style={{ padding: "14px 18px 18px" }}>
+                <p style={{
+                  fontSize: 11, fontWeight: 700, color: GREEN,
+                  margin: "0 0 8px", fontFamily: font, letterSpacing: "0.04em",
+                }}>🗞️ 이음미디어 기사</p>
+                <p style={{
+                  fontSize: 14, fontWeight: 700, color: "#e2e8f0",
+                  margin: 0, fontFamily: font, lineHeight: 1.6,
+                  display: "-webkit-box", WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical", overflow: "hidden",
+                }}>{app.makerArticle.title}</p>
+              </div>
+            </div>
+          </a>
+        )}
       </div>
 
       {/* ══ 소감 자리 (5단계 placeholder) ══ */}
