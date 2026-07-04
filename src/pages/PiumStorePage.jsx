@@ -863,7 +863,7 @@ export default function PiumStorePage() {
       slug:          "jungseyeon",
       title:         "정세연 프로필",
       summary:       "전문가 프로필 페이지",
-      thumbnail_url: "/images/jungseyeon-preview.png",
+      thumbnail_url: "/jungseyeon-preview.png",
       category:      "expert_tool",
       price_model:   "free",
       users:         { nickname: "정세연" },
