@@ -331,7 +331,7 @@ export default function PiumSubmitPage() {
           fontFamily: "'Noto Sans KR',sans-serif",
         }}>
           <p style={{ margin: "0 0 8px", fontSize: 15, fontWeight: 900, color: "#bbf7d0", lineHeight: 1.5 }}>
-            🖋 이음매거진 편집국장이 당신의 앱 스토리를 기사로 써드립니다
+            🖋 이음미디어 편집국장이 당신의 앱 스토리를 기사로 써드립니다
           </p>
           <p style={{ margin: 0, fontSize: 14, color: "#86efac", lineHeight: 1.8 }}>
             앱을 올리면 이음미디어에 소개 기사가 실려요. <strong style={{ color: "#fff" }}>무료</strong>예요.<br/>

@@ -674,7 +674,7 @@ function ArticleBlock() {
             lineHeight:2, margin:"0 0 28px",
             fontFamily:"'Noto Sans KR',sans-serif",
           }}>
-            그래서 피움은 — 이음매거진 편집국장이 당신의 앱 뒤에 있는 사람 이야기를 기사로 써드립니다.<br/>
+            그래서 피움은 — 이음미디어 편집국장이 당신의 앱 뒤에 있는 사람 이야기를 기사로 써드립니다.<br/>
             앱을 올리는 것만으로, 구글·네이버·AI가 당신을 찾아가는 글이 생겨요.<br/>
             <span style={{ color:TEXT_HI, fontWeight:700 }}>무료입니다.</span>
           </p>
