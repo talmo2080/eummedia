@@ -859,6 +859,15 @@ export default function PiumStorePage() {
       price_model:   "free",
       users:         { nickname: "정세연" },
     },
+    {
+      slug:          "jungseyeon",
+      title:         "정세연 프로필",
+      summary:       "전문가 프로필 페이지",
+      thumbnail_url: "/images/jungseyeon-preview.png",
+      category:      "expert_tool",
+      price_model:   "free",
+      users:         { nickname: "정세연" },
+    },
   ];
   // 갓 피어난 앱: 최근 4개 (카테고리 필터 미적용)
   const recentApps  = allApps.slice(0, 4);

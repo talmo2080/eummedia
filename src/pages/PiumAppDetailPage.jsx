@@ -47,6 +47,46 @@ const APPS = {
       "\"나도 이런 인터넷신문을 갖고 싶다\"는 분",
     ],
   },
+
+  jungseyeon: {
+    slug:          "jungseyeon",
+    title:         "정세연 프로필",
+    categoryLabel: "전문가 도구",
+    tagline:       "전문가 프로필 페이지",
+    thumbnail:     "/images/jungseyeon-preview.png",
+    appUrl:        "https://talmo2080.github.io/jungseyeon/",
+    makerArticleUrl: "https://www.eummedia.kr/article/article-ofkvp4bo",
+    makerArticle: {
+      thumbnail: "https://avbsniuthpcejjcdeiyw.supabase.co/storage/v1/object/public/article-images/39b41153-941a-4f29-a970-d4695478fd56/1783041226984.png",
+      title: "비개발자가 만든 웹앱, '피움'에서 꽃핀다 — 바이브코딩으로 두피전문가가 3주 만에 신문을 지은 이유",
+    },
+    priceModel:    "free",
+    tags:          ["프로필", "전문가", "1인사업가", "비개발자"],
+    maker: {
+      name: "정세연",
+      bio:  "닥터리부트 두피관리센터 대표 · 두피전문가 27년 · 이음매거진 편집국장 · AI에이전트전문가 1급",
+    },
+    whatItDoes: [
+      {
+        icon: "🪪",
+        title: "전문가 프로필",
+        desc: "경력·철학·전문 분야·연락처를 한 페이지에 담은 전문가 프로필. 두피전문가와 편집국장이라는 두 정체성을 \"사람에 닿는 일\"이라는 하나의 시선으로 엮음.",
+      },
+    ],
+    searchStrong: [
+      "반응형 원페이지 — 모바일·PC 모두 깔끔하게",
+      "두 정체성을 하나로 잇는 스토리 구조로 방문자가 '이 사람이 누구인지' 한눈에 파악",
+      "상담·문의 폼 내장 — 방문자가 바로 연락할 수 있음",
+    ],
+    howToUse: [
+      "링크 접속해 프로필 열람",
+      "하단 폼으로 상담·문의",
+    ],
+    whoFor: [
+      "여러 일을 하는 전문가·강사·1인 사업가",
+      "자기 브랜드를 온라인에 담고 싶은 분",
+    ],
+  },
 };
 
 /* ── CSS ── */
