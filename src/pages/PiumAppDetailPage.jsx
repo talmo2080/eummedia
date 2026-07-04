@@ -53,7 +53,7 @@ const APPS = {
     title:         "정세연 프로필",
     categoryLabel: "전문가 도구",
     tagline:       "전문가 프로필 페이지",
-    thumbnail:     "/jungseyeon-preview.png",
+    thumbnail:     "/jungseyeon-director.jpg.png",
     appUrl:        "https://talmo2080.github.io/jungseyeon/",
     makerArticleUrl: "https://www.eummedia.kr/article/article-ofkvp4bo",
     makerArticle: {
