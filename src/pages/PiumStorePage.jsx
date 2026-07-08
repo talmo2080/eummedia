@@ -868,6 +868,15 @@ export default function PiumStorePage() {
       price_model:   "free",
       users:         { nickname: "정세연" },
     },
+    {
+      slug:          "sungchangwoon",
+      title:         "성창운",
+      summary:       "봉숭아학당문화혁신학교 총장 · 강사·문화기획",
+      thumbnail_url: "/sungchangwoon-director.jpg.jpg",
+      category:      "expert_tool",
+      price_model:   "free",
+      users:         { nickname: "성창운" },
+    },
   ];
   // 갓 피어난 앱: 최근 4개 (카테고리 필터 미적용)
   const recentApps  = allApps.slice(0, 4);

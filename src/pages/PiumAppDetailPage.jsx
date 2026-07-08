@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, Award, Sparkles, Heart, MessageCircle, Users, Tv, ArrowRight, TrendingUp, Phone, Quote, BookOpen } from "lucide-react";
 
 const font  = "'Pretendard', 'Noto Sans KR', sans-serif";
 const GREEN = "#10B981";
@@ -86,6 +86,16 @@ const APPS = {
       "여러 일을 하는 전문가·강사·1인 사업가",
       "자기 브랜드를 온라인에 담고 싶은 분",
     ],
+  },
+
+  sungchangwoon: {
+    slug:          "sungchangwoon",
+    title:         "성창운",
+    categoryLabel: "전문가·문화",
+    tagline:       "전문가 프로필 페이지",
+    thumbnail:     "/sungchangwoon-director.jpg.jpg",
+    appUrl:        "https://litt.ly/bongdang",
+    layoutStyle:   "tile-dashboard",
   },
 };
 
@@ -204,6 +214,243 @@ const PAGE_CSS = `
   @media (max-width: 768px) { .pd-mobile-cta { display: block; } }
 `;
 
+/* ══════════════════════════════════════
+   성창운 — 타일 대시보드 페이지
+══════════════════════════════════════ */
+const SCW = {
+  BG:   "#F4F1EA",
+  CARD: "#FFFFFF",
+  GOLD: "#B08D2E",
+  GOLDL:"#D9BE7A",
+  WINE: "#7E2B3F",
+  INK:  "#241F1A",
+  MUTE: "#8B8172",
+};
+const scwTile = {
+  background: SCW.CARD,
+  borderRadius: 18,
+  boxShadow: "0 6px 24px rgba(120,95,30,.08)",
+  border: "1px solid #EDE6D6",
+};
+const SCW_CSS = `
+  .scw-wrap { background:${SCW.BG}; min-height:100vh; font-family:'Pretendard','Noto Sans KR',sans-serif; padding:28px 20px 60px; }
+  .scw-grid { display:grid; grid-template-columns:1.35fr 1fr; grid-auto-rows:minmax(10px,auto); gap:16px; max-width:980px; margin:0 auto; }
+  @media(max-width:640px){ .scw-grid{ grid-template-columns:1fr; } .scw-col-span{ grid-column:1!important; } }
+  .scw-hero-tile { grid-row:span 2; }
+  @media(max-width:640px){ .scw-hero-tile{ grid-row:span 1; min-height:280px!important; } }
+  .scw-chip { background:#fff; border:1px solid ${SCW.GOLDL}; color:${SCW.GOLD}; border-radius:999px; padding:6px 14px; font-size:12.5px; font-weight:700; }
+  .scw-award-item { padding:10px 0; border-bottom:1px solid #EDE6D6; display:flex; gap:10px; align-items:flex-start; }
+  .scw-award-item:last-child { border-bottom:none; }
+`;
+
+function SungchangwoonPage() {
+  const font = "'Pretendard','Noto Sans KR',sans-serif";
+
+  const AWARDS_ALL = [
+    { year:"2015", title:"도전창조 경영인 대상" },
+    { year:"2016", title:"대한민국 감동무대 문화예술축제 대상" },
+    { year:"2016", title:"광복71주년 한·중 환경문화예술제 대상" },
+    { year:"2018", title:"봉숭아학당 힐링웃음교실 브랜드 대상" },
+    { year:"2018", title:"빛낸 도전한국인 대상" },
+    { year:"2019", title:"국회교육위원회 위원장상" },
+    { year:"2020", title:"서울특별시 의회 의장상" },
+    { year:"2022", title:"글로벌컨슈머 시상식 탑리더십 대상" },
+    { year:"2023", title:"한국을 빛낸 글로벌 100인 대상" },
+    { year:"2023", title:"아시아리더 대상" },
+    { year:"2026", title:"AI혁신 기업상 & 도전한국인 AI교육혁신대상" },
+  ];
+
+  return (
+    <div className="scw-wrap">
+      <style>{SCW_CSS}</style>
+
+      {/* 뒤로가기 */}
+      <div style={{ maxWidth:980, margin:"0 auto 16px", fontFamily:font }}>
+        <Link to="/pium-store" style={{ display:"inline-flex", alignItems:"center", gap:6, color:SCW.MUTE, textDecoration:"none", fontSize:13, fontWeight:600 }}>
+          <ArrowLeft size={14}/> 스토어로 돌아가기
+        </Link>
+        <p style={{ fontSize:12, color:SCW.MUTE, margin:"6px 0 0" }}>웹앱 둘러보기 · 전문가·문화 &nbsp;/&nbsp; <span style={{ color:SCW.INK }}>성창운</span></p>
+      </div>
+
+      <div className="scw-grid">
+
+        {/* 1. 히어로 타일 */}
+        <div style={{ ...scwTile, padding:0, overflow:"hidden", position:"relative", minHeight:340, display:"flex", flexDirection:"column", justifyContent:"flex-end" }} className="scw-hero-tile">
+          {/* 배경 — 금색 자카드 정장 사진 */}
+          <div style={{ position:"absolute", inset:0, backgroundImage:"url(/sungchangwoon-director.jpg.jpg)", backgroundSize:"cover", backgroundPosition:"center top" }}/>
+          {/* 하단 텍스트 가독성용 그라디언트만 */}
+          <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,.68) 0%, rgba(0,0,0,.18) 50%, transparent 100%)" }}/>
+          <div style={{ position:"relative", padding:"26px 26px 28px", color:"#fff" }}>
+            <span style={{ fontSize:11.5, fontWeight:700, letterSpacing:".14em", color:SCW.GOLDL }}>문화창조는 신화창조다</span>
+            <h1 style={{ fontSize:40, fontWeight:800, margin:"8px 0 4px", letterSpacing:"-.01em", fontFamily:font }}>성창운</h1>
+            <div style={{ width:46, height:3, background:SCW.GOLDL, margin:"6px 0 12px" }}/>
+            <p style={{ fontSize:13.5, color:"rgba(255,255,255,.9)", margin:0, lineHeight:1.7, fontFamily:font }}>
+              봉숭아학당문화혁신학교 총장<br/>
+              <a href="https://www.eummedia.kr/" target="_blank" rel="noopener noreferrer"
+                style={{ color:SCW.GOLDL, fontWeight:700, textDecoration:"underline", textUnderlineOffset:3 }}>
+                이음미디어 발행인 ↗
+              </a>
+              &nbsp;· 웃자대한민국협회 회장
+            </p>
+          </div>
+        </div>
+
+        {/* 2. 소개 인용 타일 */}
+        <div style={{ ...scwTile, padding:"22px 22px" }}>
+          <Quote size={22} color={SCW.GOLDL}/>
+          <p style={{ fontSize:14, color:"#5b5347", lineHeight:1.75, margin:"8px 0 0", fontFamily:font }}>
+            마음을 여는 웃음레크와 힐링 스피치, 체질별 맞춤 소통으로 당신의 일상과 조직에 <b style={{ color:SCW.WINE }}>활력</b>을 넣어드립니다.<br/>
+            <span style={{ fontSize:13, color:SCW.MUTE }}>'문화창조는 신화창조다'라는 신념 아래, 웃음과 소통으로 개인의 건강을 돕고 조직의 변화를 이끌어냅니다.</span>
+          </p>
+        </div>
+
+        {/* 3. 실적 숫자 타일 */}
+        <div style={{ ...scwTile, padding:"18px 10px", display:"flex" }}>
+          {[["5,000+","강의(회)"],["11","수상"],["6","저서"],["31","나눔 후원"]].map(([n,l],i)=>(
+            <div key={i} style={{ flex:1, textAlign:"center", borderRight:i<3?"1px solid #EDE6D6":"none" }}>
+              <div style={{ fontSize:26, fontWeight:800, color:SCW.GOLD, fontFamily:font }}>{n}</div>
+              <div style={{ fontSize:11.5, color:SCW.MUTE, marginTop:2, fontFamily:font }}>{l}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* 4. 수상 배너 (전체폭) */}
+        <div style={{ gridColumn:"1 / -1", borderRadius:16, padding:"15px 22px", background:`linear-gradient(100deg,${SCW.WINE},${SCW.GOLD})`, color:"#fff", display:"flex", alignItems:"center", gap:12, boxShadow:"0 6px 24px rgba(120,95,30,.08)" }} className="scw-col-span">
+          <Award size={20} color="#fff"/>
+          <span style={{ fontSize:11, fontWeight:800, background:"rgba(255,255,255,.22)", borderRadius:6, padding:"2px 8px", fontFamily:font }}>NEW</span>
+          <span style={{ fontSize:14, fontWeight:600, fontFamily:font }}>2026 국회 도전페스티벌 · AI혁신 기업상 &amp; 도전한국인 AI교육혁신대상</span>
+        </div>
+
+        {/* 5. 전문 4분야 (2x2) */}
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+          {[[Sparkles,"사상체질"],[Heart,"건강·대체의학"],[Users,"소통·리더십"],[MessageCircle,"힐링 스피치"]].map(([Ic,t],i)=>(
+            <div key={i} style={{ ...scwTile, padding:"16px 14px" }}>
+              <Ic size={19} color={SCW.GOLD} strokeWidth={2}/>
+              <p style={{ fontSize:13.5, fontWeight:700, color:SCW.INK, margin:"8px 0 0", fontFamily:font }}>{t}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* 6. 수상 사진 타일 */}
+        <div style={{ ...scwTile, padding:0, overflow:"hidden", minHeight:200, position:"relative" }}>
+          <img src="/sungchangwoon-award.jpg.jpg" alt="도전한국인 AI교육혁신대상"
+            style={{ width:"100%", height:"100%", objectFit:"cover", display:"block", minHeight:200 }}
+            onError={e=>{ e.currentTarget.style.display="none"; e.currentTarget.parentNode.style.background="#20242c"; }}
+          />
+          <div style={{ position:"absolute", inset:8, border:`1px solid ${SCW.GOLD}55`, borderRadius:12, pointerEvents:"none" }}/>
+        </div>
+
+        {/* 7. 미래 비전 타일 (전체폭) */}
+        <div style={{ gridColumn:"1 / -1", ...scwTile, padding:"22px 24px", background:`linear-gradient(120deg,#FCF6E8,#F7EDD5)`, border:`1px solid ${SCW.GOLDL}66` }} className="scw-col-span">
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+            <TrendingUp size={19} color={SCW.GOLD}/>
+            <h2 style={{ fontSize:18, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>미래 비전 · 이음평생교육원</h2>
+            <span style={{ fontSize:12, color:SCW.MUTE, marginLeft:4 }}>"도전에는 나이가 없다"</span>
+          </div>
+          <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginTop:10 }}>
+            {["소상공인 바이브코딩","시니어 AI활용","청년 웃음치료","시니어 자립교육","시니어 문화활동"].map(p=>(
+              <span key={p} className="scw-chip">{p}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* 8. 봉당TV */}
+        <a href="https://www.youtube.com/@성창운-i4d" target="_blank" rel="noopener noreferrer"
+          style={{ ...scwTile, background:"#1c1f26", border:"none", padding:"20px 20px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:11 }}>
+            <Tv size={26} color="#FF5252"/>
+            <div>
+              <p style={{ fontSize:15, fontWeight:800, color:"#fff", margin:0, fontFamily:font }}>봉당TV</p>
+              <p style={{ fontSize:11.5, color:"rgba(255,255,255,.55)", margin:"2px 0 0", fontFamily:font }}>웃음·인문학·문화</p>
+            </div>
+          </div>
+          <ArrowRight size={18} color="#fff"/>
+        </a>
+
+        {/* 9. 저서 */}
+        <div style={{ ...scwTile, padding:"16px 18px", display:"flex", alignItems:"center", gap:10 }}>
+          <BookOpen size={20} color={SCW.GOLD}/>
+          <div>
+            <p style={{ fontSize:14, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>저서 6권</p>
+            <p style={{ fontSize:11.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>복을 짓는 리더의 삶 외</p>
+          </div>
+        </div>
+
+        {/* 10. 활동 현장 갤러리 (전체폭) */}
+        <div style={{ gridColumn:"1 / -1", ...scwTile, padding:"20px 20px 16px" }} className="scw-col-span">
+          <p style={{ fontSize:13, fontWeight:800, color:SCW.GOLD, margin:"0 0 14px", letterSpacing:".06em", fontFamily:font }}>활동 현장</p>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+            {/* 강연 사진 */}
+            <div style={{ borderRadius:14, overflow:"hidden", position:"relative", background:"#e8e0d0" }}>
+              <img src="/sungchangwoon-lecture.jpg.jpg" alt="한국 열린사이버대학 특강"
+                style={{ width:"100%", height:200, objectFit:"cover", display:"block" }}
+                onError={e=>{ e.currentTarget.style.display="none"; }}
+              />
+              <div style={{ padding:"10px 14px 12px", background:"#fff" }}>
+                <p style={{ fontSize:11.5, fontWeight:700, color:SCW.INK, margin:"0 0 2px", fontFamily:font }}>사상체질과 즐거운 소통리더십</p>
+                <p style={{ fontSize:11, color:SCW.MUTE, margin:0, fontFamily:font }}>한국 열린사이버대학 상담심리학 특강</p>
+              </div>
+            </div>
+            {/* 국회 도전페스티벌 */}
+            <div style={{ borderRadius:14, overflow:"hidden", position:"relative", background:"#e8e0d0" }}>
+              <img src="/sungchangwoon-festival.jpg.jpg" alt="2026 국회 도전페스티벌"
+                style={{ width:"100%", height:200, objectFit:"cover", display:"block" }}
+                onError={e=>{ e.currentTarget.style.display="none"; }}
+              />
+              <div style={{ padding:"10px 14px 12px", background:"#fff" }}>
+                <p style={{ fontSize:11.5, fontWeight:700, color:SCW.INK, margin:"0 0 2px", fontFamily:font }}>2026 국회 도전페스티벌</p>
+                <p style={{ fontSize:11, color:SCW.MUTE, margin:0, fontFamily:font }}>AI혁신 기업상 · 도전한국인 AI교육혁신대상 수상</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 11. 수상 이력 (전체폭, 접기 없이 대표 5개) */}
+        <div style={{ gridColumn:"1 / -1", ...scwTile, padding:"20px 24px" }} className="scw-col-span">
+          <p style={{ fontSize:13, fontWeight:800, color:SCW.GOLD, margin:"0 0 12px", letterSpacing:".06em", textTransform:"uppercase", fontFamily:font }}>수상 이력</p>
+          {AWARDS_ALL.slice(-5).map((a,i)=>(
+            <div key={i} className="scw-award-item">
+              <span style={{ fontSize:11, fontWeight:700, color:SCW.GOLDL, fontFamily:font, minWidth:36, paddingTop:2 }}>{a.year}</span>
+              <span style={{ fontSize:13.5, color:SCW.INK, fontFamily:font, lineHeight:1.5 }}>{a.title}</span>
+            </div>
+          ))}
+          <p style={{ fontSize:11.5, color:SCW.MUTE, margin:"12px 0 0", fontFamily:font }}>외 총 11회 수상</p>
+        </div>
+
+        {/* 11. CTA 버튼 (전체폭) */}
+        <div style={{ gridColumn:"1 / -1", display:"flex", gap:12, flexWrap:"wrap", marginTop:2 }} className="scw-col-span">
+          <a href="https://litt.ly/bongdang" target="_blank" rel="noopener noreferrer"
+            style={{ flex:"1 1 220px", padding:"15px", borderRadius:14, background:SCW.GOLD, color:"#fff", fontSize:15.5, fontWeight:800, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8, textDecoration:"none", fontFamily:font }}>
+            <ExternalLink size={17}/> 바로 보기 (전체 채널)
+          </a>
+          <a href="tel:010-9893-0330"
+            style={{ padding:"15px 20px", borderRadius:14, background:"#fff", color:SCW.WINE, fontSize:14.5, fontWeight:700, border:`1.5px solid ${SCW.WINE}`, cursor:"pointer", display:"flex", alignItems:"center", gap:7, textDecoration:"none", fontFamily:font }}>
+            <Phone size={15}/> 강의 문의
+          </a>
+          <a href="https://www.eummedia.kr/article/article-hlrcqtv8" target="_blank" rel="noopener noreferrer"
+            style={{ padding:"15px 20px", borderRadius:14, background:"#fff", color:SCW.INK, fontSize:14.5, fontWeight:700, border:"1px solid #E0D8C6", cursor:"pointer", display:"flex", alignItems:"center", gap:7, textDecoration:"none", fontFamily:font }}>
+            이야기 보기 <ArrowRight size={15}/>
+          </a>
+        </div>
+
+        {/* 12. 소셜 링크 */}
+        <div style={{ gridColumn:"1 / -1", display:"flex", gap:10, flexWrap:"wrap" }} className="scw-col-span">
+          {[
+            { label:"네이버 카페", href:"https://cafe.naver.com/kk304915" },
+            { label:"네이버 블로그", href:"https://blog.naver.com/kkk304915" },
+          ].map(s=>(
+            <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+              style={{ fontSize:12.5, fontWeight:700, color:SCW.MUTE, background:"#fff", border:"1px solid #EDE6D6", borderRadius:99, padding:"7px 16px", textDecoration:"none", fontFamily:font }}>
+              {s.label} ↗
+            </a>
+          ))}
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
 /* ── 404 ── */
 function NotFound() {
   return (
@@ -224,6 +471,9 @@ function NotFound() {
 /* ── 메인 컴포넌트 ── */
 export default function PiumAppDetailPage() {
   const { slug } = useParams();
+
+  if (slug === "sungchangwoon") return <SungchangwoonPage />;
+
   const app = APPS[slug];
 
   if (!app) return <NotFound />;
