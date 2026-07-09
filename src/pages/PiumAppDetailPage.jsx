@@ -236,7 +236,7 @@ const scwTile = {
 const SCW_CSS = `
   .scw-wrap { background:${SCW.BG}; min-height:100vh; font-family:'Pretendard','Noto Sans KR',sans-serif; padding:28px 20px 60px; }
   .scw-grid { display:grid; grid-template-columns:1.35fr 1fr; grid-auto-rows:minmax(10px,auto); gap:16px; max-width:980px; margin:0 auto; }
-  @media(max-width:640px){ .scw-grid{ grid-template-columns:1fr; } .scw-col-span{ grid-column:1!important; } }
+  @media(max-width:640px){ .scw-grid{ grid-template-columns:1fr; } .scw-col-span{ grid-column:1!important; } .scw-grid > *{ min-width:0; } }
   .scw-ch-grid { grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
   @media(max-width:900px){ .scw-ch-grid{ grid-template-columns:repeat(2,1fr); } }
   @media(max-width:480px){ .scw-ch-grid{ grid-template-columns:1fr; } }
@@ -252,9 +252,16 @@ const SCW_CSS = `
     .scw-ch-grid > *:nth-child(4n+1),.scw-ch-grid > *:nth-child(4n) { --ch-bg:#FBF6EC; --ch-bdr:1px solid #EDE6D6; --ch-text:#241F1A; --ch-sub:rgba(36,31,26,.55); }
     .scw-ch-grid > *:nth-child(odd) { --ch-bg:#1c1f26; --ch-bdr:none; --ch-text:#fff; --ch-sub:rgba(255,255,255,.55); }
   }
-  .scw-hero-tile { grid-column:1; }
-  @media(max-width:640px){ .scw-hero-tile{ grid-column:1; } }
-  @media(max-width:640px){ .scw-hero-overlay{ padding:24px 20px 52px !important; } }
+  .scw-hero-tile { grid-column:1; grid-row:1; min-width:0; }
+  .scw-hero-tile img { max-width:100%; }
+  .scw-hero-right { grid-column:2; grid-row:1; display:flex; flex-direction:column; gap:16px; min-width:0; }
+  .scw-hero-right > * { min-width:0; }
+  @media(max-width:640px){
+    .scw-hero-tile { grid-column:1; grid-row:1; }
+    .scw-hero-overlay { padding:20px 18px 28px !important; }
+    .scw-hero-overlay h1 { font-size:28px !important; }
+    .scw-hero-right { grid-column:1; grid-row:2; gap:12px; }
+  }
   .scw-chip-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:8px; margin-top:10px; }
   .scw-chip-grid .scw-chip { text-align:center; }
   .scw-chip { background:#fff; border:1px solid ${SCW.GOLDL}; color:${SCW.GOLD}; border-radius:999px; padding:6px 14px; font-size:12.5px; font-weight:700; }
@@ -325,7 +332,7 @@ function SungchangwoonPage() {
 
         {/* ── 상단 2열: 히어로(좌) + 오른쪽 스택(우) ── */}
         {/* 히어로 타일 — 전신 노출 */}
-        <div style={{ ...scwTile, padding:0, overflow:"hidden", position:"relative", gridColumn:1, gridRow:"1" }} className="scw-hero-tile">
+        <div style={{ ...scwTile, padding:0, overflow:"hidden", position:"relative" }} className="scw-hero-tile">
           <img
             src="/sungchangwoon-director.jpg.jpg"
             alt="성창운 총장 전신"
@@ -347,7 +354,7 @@ function SungchangwoonPage() {
         </div>
 
         {/* 오른쪽 스택 래퍼 — 히어로 높이만큼 채움 */}
-        <div style={{ gridColumn:2, gridRow:"1", display:"flex", flexDirection:"column", gap:16 }}>
+        <div className="scw-hero-right">
           {/* 소개 인용 */}
           <div style={{ ...scwTile, padding:"22px 22px" }}>
             <Quote size={22} color={SCW.GOLDL}/>

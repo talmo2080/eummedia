@@ -66,6 +66,37 @@ function buildNewsArticleJsonLd(article, fullUrl) {
   return `<script type="application/ld+json">${json}</script>`;
 }
 
+// 피움앱 프로필 페이지 OG 메타 데이터
+const PIUM_APP_PROFILES = {
+  '/pium-app/sungchangwoon': {
+    title: '성창운 · 봉숭아학당문화혁신학교 총장 | 이음미디어',
+    desc: '웃음레크·힐링 스피치·사상체질 소통 강의 전문가. 강의·섭외 문의 010-9893-0330',
+    image: `${SITE_URL}/sungchangwoon-og.jpg`,
+  },
+};
+
+// 피움앱 프로필 페이지의 <title> + og/twitter/description 메타를 프로필별 값으로 교체
+function applyPiumAppMeta(html, profile, url) {
+  const fullUrl = `${SITE_URL}${url}`;
+  const t = escHtml(profile.title);
+  const d = escHtml(profile.desc);
+  const i = escHtml(profile.image);
+  const u = escHtml(fullUrl);
+
+  return html
+    .replace(/(<title>)[^<]*(<\/title>)/, `$1${t}$2`)
+    .replace(/(<meta name="description" content=")[^"]*(")/, `$1${d}$2`)
+    .replace(/(<link rel="canonical" href=")[^"]*(")/, `$1${u}$2`)
+    .replace(/(<meta property="og:type" content=")[^"]*(")/, `$1profile$2`)
+    .replace(/(<meta property="og:title" content=")[^"]*(")/, `$1${t}$2`)
+    .replace(/(<meta property="og:description" content=")[^"]*(")/, `$1${d}$2`)
+    .replace(/(<meta property="og:image" content=")[^"]*(")/, `$1${i}$2`)
+    .replace(/(<meta property="og:url" content=")[^"]*(")/, `$1${u}$2`)
+    .replace(/(<meta name="twitter:title" content=")[^"]*(")/, `$1${t}$2`)
+    .replace(/(<meta name="twitter:description" content=")[^"]*(")/, `$1${d}$2`)
+    .replace(/(<meta name="twitter:image" content=")[^"]*(")/, `$1${i}$2`);
+}
+
 // 기사 페이지의 <title> + og/twitter/description 메타를 기사별 값으로 교체
 // + NewsArticle JSON-LD 를 </head> 직전에 삽입
 function applyArticleMeta(html, article, url) {
@@ -103,6 +134,8 @@ async function getUrls() {
     '/privacy', '/youth', '/login', '/signup',
     '/advertise', '/report', '/citizen-reporter', '/terms',
     '/videos',
+    // 피움앱 프로필 페이지
+    ...Object.keys(PIUM_APP_PROFILES),
   ];
 
   // 기사 — slug + OG/JSON-LD 후처리에 필요한 필드 함께 fetch
@@ -138,6 +171,11 @@ async function savePage(browser, url, baseUrl, articlesMap) {
     const slug = url.slice('/article/'.length);
     const article = articlesMap.get(slug);
     if (article) html = applyArticleMeta(html, article, url);
+  }
+  // 피움앱 프로필 페이지면 프로필별 OG 메타 교체
+  if (url.startsWith('/pium-app/')) {
+    const profile = PIUM_APP_PROFILES[url];
+    if (profile) html = applyPiumAppMeta(html, profile, url);
   }
 
   const filePath = url === '/'
