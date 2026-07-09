@@ -871,8 +871,8 @@ export default function PiumStorePage() {
     {
       slug:          "sungchangwoon",
       title:         "성창운",
-      summary:       "봉숭아학당문화혁신학교 총장 · 강사·문화기획",
-      thumbnail_url: "/sungchangwoon-director.jpg.jpg",
+      summary:       "봉숭아학당문화혁신학교 총장 · 웃음레크·힐링 스피치 전문가",
+      thumbnail_url: "/sungchangwoon-og.jpg",
       category:      "expert_tool",
       price_model:   "free",
       users:         { nickname: "성창운" },
