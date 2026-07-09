@@ -243,6 +243,8 @@ const SCW_CSS = `
   .scw-hero-tile { grid-column:1; }
   @media(max-width:640px){ .scw-hero-tile{ grid-column:1; } }
   @media(max-width:640px){ .scw-hero-overlay{ padding:24px 20px 52px !important; } }
+  .scw-chip-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:8px; margin-top:10px; }
+  .scw-chip-grid .scw-chip { text-align:center; }
   .scw-chip { background:#fff; border:1px solid ${SCW.GOLDL}; color:${SCW.GOLD}; border-radius:999px; padding:6px 14px; font-size:12.5px; font-weight:700; }
   .scw-award-item { padding:10px 0; border-bottom:1px solid #EDE6D6; display:flex; gap:10px; align-items:flex-start; }
   .scw-award-item:last-child { border-bottom:none; }
@@ -442,12 +444,12 @@ function SungchangwoonPage() {
           <div style={{ width:36, height:3, background:SCW.GOLD, borderRadius:2, marginBottom:16 }}/>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
             {[
-              [Mic,       "방송스피치사관학교", "말하기와 스피치를 훈련하는 배움터"],
-              [Building2, "기업·관공서 강의",   "기업·기관을 찾아가는 맞춤 강의"],
-              [Sparkles,  "싱글벙글나비축제",   "웃음으로 함께하는 문화 나눔의 장"],
-              [Coffee,    "찾아가는인생다방",   "사람을 찾아가 마음을 나누는 소통 프로그램"],
-            ].map(([Ic,t,desc],i)=>(
-              <div key={i} style={{ ...scwTile, padding:"18px 16px" }}>
+              [Mic,       "방송스피치사관학교", "말하기와 스피치를 훈련하는 배움터",    "#FBF3E2"],
+              [Building2, "기업·관공서 강의",   "기업·기관을 찾아가는 맞춤 강의",       "#EAF1EA"],
+              [Sparkles,  "싱글벙글나비축제",   "웃음으로 함께하는 문화 나눔의 장",     "#F8ECEF"],
+              [Coffee,    "찾아가는인생다방",   "사람을 찾아가 마음을 나누는 소통 프로그램", "#FBEEE4"],
+            ].map(([Ic,t,desc,bg],i)=>(
+              <div key={i} style={{ ...scwTile, padding:"18px 16px", background:bg }}>
                 <Ic size={19} color={SCW.GOLD} strokeWidth={2}/>
                 <p style={{ fontSize:13.5, fontWeight:700, color:SCW.INK, margin:"8px 0 3px", fontFamily:font }}>{t}</p>
                 <p style={{ fontSize:11.5, color:SCW.MUTE, margin:0, fontFamily:font, lineHeight:1.4 }}>{desc}</p>
@@ -463,9 +465,9 @@ function SungchangwoonPage() {
             <h2 style={{ fontSize:18, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>미래 비전 · 이음평생교육원</h2>
             <span style={{ fontSize:12, color:SCW.MUTE, marginLeft:4 }}>"도전에는 나이가 없다"</span>
           </div>
-          <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginTop:10 }}>
-            {["소상공인 바이브코딩","시니어 AI활용","청년 웃음치료","시니어 자립교육","시니어 문화활동"].map(p=>(
-              <span key={p} className="scw-chip">{p}</span>
+          <div className="scw-chip-grid">
+            {["소상공인 바이브코딩","시니어 AI활용","청년 웃음치료","웃음치료전문가","시니어 자립교육","시니어 문화활동"].map(p=>(
+              <span key={p} className="scw-chip" style={{ textAlign:"center" }}>{p}</span>
             ))}
           </div>
         </div>
@@ -568,15 +570,23 @@ function SungchangwoonPage() {
         </div>
 
         {/* 11. CTA 버튼 (전체폭) */}
-        <div style={{ gridColumn:"1 / -1", display:"flex", gap:12, flexWrap:"wrap", marginTop:2, justifyContent:"center" }} className="scw-col-span">
+        <div style={{ gridColumn:"1 / -1", display:"flex", flexDirection:"column", gap:10, marginTop:2 }} className="scw-col-span">
+          {/* 강의 문의 — 전체폭 큰 버튼 */}
           <button onClick={()=>setFormOpen(true)}
-            style={{ padding:"15px 20px", borderRadius:14, background:"#fff", color:SCW.WINE, fontSize:14.5, fontWeight:700, border:`1.5px solid ${SCW.WINE}`, cursor:"pointer", display:"flex", alignItems:"center", gap:7, fontFamily:font }}>
-            <Phone size={15}/> 강의 문의
+            style={{ width:"100%", padding:"18px 24px", borderRadius:14, background:SCW.WINE, color:"#fff", fontSize:16, fontWeight:800, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8, fontFamily:font, boxShadow:`0 4px 18px ${SCW.WINE}44` }}>
+            <Phone size={17}/> 강의 문의 · 섭외하기
           </button>
-          <a href="https://www.eummedia.kr/article/170444181"
-            style={{ padding:"15px 20px", borderRadius:14, background:"#fff", color:SCW.INK, fontSize:14.5, fontWeight:700, border:"1px solid #E0D8C6", cursor:"pointer", display:"flex", alignItems:"center", gap:7, textDecoration:"none", fontFamily:font }}>
-            이야기 보기 <ArrowRight size={15}/>
-          </a>
+          {/* 전화 + 이야기보기 보조 버튼 */}
+          <div style={{ display:"flex", gap:10 }}>
+            <a href="tel:010-9893-0330"
+              style={{ flex:1, padding:"13px 16px", borderRadius:12, background:"#fff", color:SCW.INK, fontSize:13.5, fontWeight:700, border:`1.5px solid ${SCW.WINE}44`, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6, textDecoration:"none", fontFamily:font }}>
+              <Phone size={13} color={SCW.WINE}/> <span style={{ color:SCW.WINE }}>010-9893-0330</span>
+            </a>
+            <a href="https://cafe.naver.com/kk304915" target="_blank" rel="noopener noreferrer"
+              style={{ flex:1, padding:"13px 16px", borderRadius:12, background:"#fff", color:SCW.INK, fontSize:13.5, fontWeight:700, border:"1px solid #E0D8C6", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6, textDecoration:"none", fontFamily:font }}>
+              이음소식 <ArrowRight size={13}/>
+            </a>
+          </div>
         </div>
 
       </div>
