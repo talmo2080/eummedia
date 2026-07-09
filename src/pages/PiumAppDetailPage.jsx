@@ -486,6 +486,7 @@ function SungchangwoonPage() {
               ["/sungchangwoon-activity-meet.jpg",       "기업 강의"],
               ["/sungchangwoon-activity-senior.jpg",     "싱글벙글 나비축제 2"],
               ["/sungchangwoon-activity-graduation.png", "방송스피치사관학교 졸업식"],
+              ["/sungchangwoon-activity-yearend.jpg",    "웃자대한민국협회 송년페스티벌"],
             ].map(([src,title])=>(
               <div key={src} style={{ borderRadius:14, overflow:"hidden", background:"#e8e0d0" }}>
                 <img src={src} alt={title}
