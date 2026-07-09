@@ -242,6 +242,7 @@ const SCW_CSS = `
   @media(max-width:480px){ .scw-ch-grid{ grid-template-columns:1fr; } }
   .scw-hero-tile { grid-column:1; }
   @media(max-width:640px){ .scw-hero-tile{ grid-column:1; } }
+  @media(max-width:640px){ .scw-hero-overlay{ padding:24px 20px 52px !important; } }
   .scw-chip { background:#fff; border:1px solid ${SCW.GOLDL}; color:${SCW.GOLD}; border-radius:999px; padding:6px 14px; font-size:12.5px; font-weight:700; }
   .scw-award-item { padding:10px 0; border-bottom:1px solid #EDE6D6; display:flex; gap:10px; align-items:flex-start; }
   .scw-award-item:last-child { border-bottom:none; }
@@ -316,17 +317,17 @@ function SungchangwoonPage() {
             alt="성창운 총장 전신"
             style={{ width:"100%", height:"auto", display:"block" }}
           />
-          <div style={{ position:"absolute", bottom:0, left:0, right:0, background:"linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,.22) 60%, transparent 100%)", padding:"32px 26px 28px", color:"#fff" }}>
+          <div className="scw-hero-overlay" style={{ position:"absolute", bottom:0, left:0, right:0, background:"linear-gradient(to top, rgba(0,0,0,.76) 0%, rgba(0,0,0,.28) 65%, transparent 100%)", padding:"32px 26px 36px", color:"#fff" }}>
             <span style={{ fontSize:11.5, fontWeight:700, letterSpacing:".14em", color:SCW.GOLDL }}>문화창조는 신화창조다</span>
             <h1 style={{ fontSize:40, fontWeight:800, margin:"8px 0 4px", letterSpacing:"-.01em", fontFamily:font }}>성창운</h1>
             <div style={{ width:46, height:3, background:SCW.GOLDL, margin:"6px 0 12px" }}/>
-            <p style={{ fontSize:13.5, color:"rgba(255,255,255,.9)", margin:0, lineHeight:1.7, fontFamily:font }}>
+            <p style={{ fontSize:15, fontWeight:700, color:"rgba(255,255,255,.97)", margin:0, lineHeight:1.75, fontFamily:font }}>
               봉숭아학당문화혁신학교 총장<br/>
               <a href="https://www.eummedia.kr/" target="_blank" rel="noopener noreferrer"
                 style={{ color:SCW.GOLDL, fontWeight:700, textDecoration:"underline", textUnderlineOffset:3 }}>
                 이음미디어 발행인 ↗
               </a>
-              &nbsp;· 웃자대한민국협회 회장
+              {" · "}웃자대한민국협회 회장
             </p>
           </div>
         </div>
@@ -472,29 +473,27 @@ function SungchangwoonPage() {
         {/* 10. 활동 현장 갤러리 (전체폭) */}
         <div style={{ gridColumn:"1 / -1", ...scwTile, padding:"20px 20px 16px" }} className="scw-col-span">
           <p style={{ fontSize:13, fontWeight:800, color:SCW.GOLD, margin:"0 0 14px", letterSpacing:".06em", fontFamily:font }}>활동 현장</p>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
-            {/* 강연 사진 */}
-            <div style={{ borderRadius:14, overflow:"hidden", position:"relative", background:"#e8e0d0" }}>
-              <img src="/sungchangwoon-lecture.jpg.jpg" alt="한국 열린사이버대학 특강"
-                style={{ width:"100%", height:200, objectFit:"cover", display:"block" }}
-                onError={e=>{ e.currentTarget.style.display="none"; }}
-              />
-              <div style={{ padding:"10px 14px 12px", background:"#fff" }}>
-                <p style={{ fontSize:11.5, fontWeight:700, color:SCW.INK, margin:"0 0 2px", fontFamily:font }}>사상체질과 즐거운 소통리더십</p>
-                <p style={{ fontSize:11, color:SCW.MUTE, margin:0, fontFamily:font }}>한국 열린사이버대학 상담심리학 특강</p>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))", gap:12 }}>
+            {[
+              ["/sungchangwoon-lecture.jpg.jpg",         "사상체질과 즐거운 소통리더십"],
+              ["/sungchangwoon-festival.jpg.jpg",        "2026 국회 도전페스티벌"],
+              ["/sungchangwoon-activity-youth.jpg",      "청년 스마일 텐션업 · 웃음치료 특강"],
+              ["/sungchangwoon-activity-nabi.jpg",       "싱글벙글 나비축제"],
+              ["/sungchangwoon-activity-youth-group.jpg","청년 웃음 특강"],
+              ["/sungchangwoon-activity-cafe.jpg",       "벙글이의 찾아가는 인생다방"],
+              ["/sungchangwoon-activity-meet.jpg",       "기업 강의"],
+              ["/sungchangwoon-activity-senior.jpg",     "싱글벙글 나비축제 2"],
+            ].map(([src,title])=>(
+              <div key={src} style={{ borderRadius:14, overflow:"hidden", background:"#e8e0d0" }}>
+                <img src={src} alt={title}
+                  style={{ width:"100%", height:160, objectFit:"cover", display:"block" }}
+                  onError={e=>{ e.currentTarget.style.display="none"; }}
+                />
+                <div style={{ padding:"8px 12px 10px", background:"#fff" }}>
+                  <p style={{ fontSize:11.5, fontWeight:700, color:SCW.INK, margin:0, fontFamily:font }}>{title}</p>
+                </div>
               </div>
-            </div>
-            {/* 국회 도전페스티벌 */}
-            <div style={{ borderRadius:14, overflow:"hidden", position:"relative", background:"#e8e0d0" }}>
-              <img src="/sungchangwoon-festival.jpg.jpg" alt="2026 국회 도전페스티벌"
-                style={{ width:"100%", height:200, objectFit:"cover", display:"block" }}
-                onError={e=>{ e.currentTarget.style.display="none"; }}
-              />
-              <div style={{ padding:"10px 14px 12px", background:"#fff" }}>
-                <p style={{ fontSize:11.5, fontWeight:700, color:SCW.INK, margin:"0 0 2px", fontFamily:font }}>2026 국회 도전페스티벌</p>
-                <p style={{ fontSize:11, color:SCW.MUTE, margin:0, fontFamily:font }}>AI혁신 기업상 · 도전한국인 AI교육혁신대상 수상</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
@@ -569,7 +568,7 @@ function SungchangwoonPage() {
         </div>
 
         {/* 11. CTA 버튼 (전체폭) */}
-        <div style={{ gridColumn:"1 / -1", display:"flex", gap:12, flexWrap:"wrap", marginTop:2 }} className="scw-col-span">
+        <div style={{ gridColumn:"1 / -1", display:"flex", gap:12, flexWrap:"wrap", marginTop:2, justifyContent:"center" }} className="scw-col-span">
           <button onClick={()=>setFormOpen(true)}
             style={{ padding:"15px 20px", borderRadius:14, background:"#fff", color:SCW.WINE, fontSize:14.5, fontWeight:700, border:`1.5px solid ${SCW.WINE}`, cursor:"pointer", display:"flex", alignItems:"center", gap:7, fontFamily:font }}>
             <Phone size={15}/> 강의 문의
