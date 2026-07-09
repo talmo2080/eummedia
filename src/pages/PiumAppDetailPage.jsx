@@ -240,6 +240,18 @@ const SCW_CSS = `
   .scw-ch-grid { grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
   @media(max-width:900px){ .scw-ch-grid{ grid-template-columns:repeat(2,1fr); } }
   @media(max-width:480px){ .scw-ch-grid{ grid-template-columns:1fr; } }
+  /* 채널 체커보드: 3열=홀짝, 2열=4n+1/4n, 1열=홀짝 */
+  .scw-ch-grid > * { --ch-bg:#FBF6EC; --ch-bdr:1px solid #EDE6D6; --ch-text:#241F1A; --ch-sub:rgba(36,31,26,.55); }
+  .scw-ch-grid > *:nth-child(odd) { --ch-bg:#1c1f26; --ch-bdr:none; --ch-text:#fff; --ch-sub:rgba(255,255,255,.55); }
+  @media(max-width:900px){
+    .scw-ch-grid > * { --ch-bg:#FBF6EC; --ch-bdr:1px solid #EDE6D6; --ch-text:#241F1A; --ch-sub:rgba(36,31,26,.55); }
+    .scw-ch-grid > *:nth-child(odd) { --ch-bg:#FBF6EC; --ch-bdr:1px solid #EDE6D6; --ch-text:#241F1A; --ch-sub:rgba(36,31,26,.55); }
+    .scw-ch-grid > *:nth-child(4n+1),.scw-ch-grid > *:nth-child(4n) { --ch-bg:#1c1f26; --ch-bdr:none; --ch-text:#fff; --ch-sub:rgba(255,255,255,.55); }
+  }
+  @media(max-width:480px){
+    .scw-ch-grid > *:nth-child(4n+1),.scw-ch-grid > *:nth-child(4n) { --ch-bg:#FBF6EC; --ch-bdr:1px solid #EDE6D6; --ch-text:#241F1A; --ch-sub:rgba(36,31,26,.55); }
+    .scw-ch-grid > *:nth-child(odd) { --ch-bg:#1c1f26; --ch-bdr:none; --ch-text:#fff; --ch-sub:rgba(255,255,255,.55); }
+  }
   .scw-hero-tile { grid-column:1; }
   @media(max-width:640px){ .scw-hero-tile{ grid-column:1; } }
   @media(max-width:640px){ .scw-hero-overlay{ padding:24px 20px 52px !important; } }
@@ -483,7 +495,7 @@ function SungchangwoonPage() {
               ["/sungchangwoon-activity-nabi.jpg",       "싱글벙글 나비축제"],
               ["/sungchangwoon-activity-youth-group.jpg","청년 웃음 특강"],
               ["/sungchangwoon-activity-cafe.jpg",       "벙글이의 찾아가는 인생다방"],
-              ["/sungchangwoon-activity-meet.jpg",       "기업 강의"],
+              ["/sungchangwoon-activity-meet.jpg",       "방송스피치사관학교 수업"],
               ["/sungchangwoon-activity-senior.jpg",     "싱글벙글 나비축제 2"],
               ["/sungchangwoon-activity-graduation.png", "방송스피치사관학교 졸업식"],
               ["/sungchangwoon-activity-yearend.jpg",    "웃자대한민국협회 송년페스티벌"],
@@ -503,72 +515,26 @@ function SungchangwoonPage() {
 
         {/* 10b. 채널 3×2 — 활동 현장 바로 아래 */}
         <div className="scw-ch-grid">
-          <a href="https://www.youtube.com/@성창운-i4d" target="_blank" rel="noopener noreferrer"
-            style={{ ...scwTile, background:"#1c1f26", border:"none", padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <Tv size={22} color="#FF5252"/>
-              <div>
-                <p style={{ fontSize:13.5, fontWeight:800, color:"#fff", margin:0, fontFamily:font }}>봉당TV</p>
-                <p style={{ fontSize:10.5, color:"rgba(255,255,255,.55)", margin:"2px 0 0", fontFamily:font }}>웃음·인문학·문화</p>
+          {[
+            { href:"https://www.youtube.com/@성창운-i4d", Icon:Tv,          iconColor:"#FF5252",  label:"봉당TV",         sub:"웃음·인문학·문화" },
+            { href:"https://www.eummedia.kr",             Icon:Newspaper,   iconColor:SCW.GOLD,   label:"이음미디어",       sub:"성창운 발행인" },
+            { href:"https://cafe.naver.com/kk304915",     Icon:Users,       iconColor:"currentColor", label:"네이버 카페",  sub:"봉숭아학당 커뮤니티" },
+            { href:"https://blog.naver.com/kkk304915",    Icon:BookOpen,    iconColor:"#03C75A",  label:"네이버 블로그",   sub:"성창운 블로그" },
+            { href:"https://blog.naver.com/smilekorean1", Icon:Smile,       iconColor:"currentColor", label:"웃자대한민국협회", sub:"사단법인 공식 블로그" },
+            { href:"https://litt.ly/bongdang",            Icon:ExternalLink, iconColor:"currentColor", label:"봉당 바로가기", sub:"전체 채널 한눈에" },
+          ].map(({href,Icon,iconColor,label,sub})=>(
+            <a key={label} href={href} target="_blank" rel="noopener noreferrer"
+              style={{ background:"var(--ch-bg)", border:"var(--ch-bdr)", borderRadius:18, boxShadow:"0 6px 24px rgba(120,95,30,.08)", padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none", color:"var(--ch-text)" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                <Icon size={22} color={iconColor}/>
+                <div>
+                  <p style={{ fontSize:13.5, fontWeight:800, color:"var(--ch-text)", margin:0, fontFamily:font }}>{label}</p>
+                  <p style={{ fontSize:10.5, color:"var(--ch-sub)", margin:"2px 0 0", fontFamily:font }}>{sub}</p>
+                </div>
               </div>
-            </div>
-            <ArrowRight size={14} color="#fff"/>
-          </a>
-          <a href="https://www.eummedia.kr" target="_blank" rel="noopener noreferrer"
-            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <Newspaper size={22} color={SCW.GOLD}/>
-              <div>
-                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>이음미디어</p>
-                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>성창운 발행인</p>
-              </div>
-            </div>
-            <ArrowRight size={14} color={SCW.MUTE}/>
-          </a>
-          <a href="https://cafe.naver.com/kk304915" target="_blank" rel="noopener noreferrer"
-            style={{ ...scwTile, background:"#1c1f26", border:"none", padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <Users size={22} color="#fff"/>
-              <div>
-                <p style={{ fontSize:13.5, fontWeight:800, color:"#fff", margin:0, fontFamily:font }}>네이버 카페</p>
-                <p style={{ fontSize:10.5, color:"rgba(255,255,255,.55)", margin:"2px 0 0", fontFamily:font }}>봉숭아학당 커뮤니티</p>
-              </div>
-            </div>
-            <ArrowRight size={14} color="#fff"/>
-          </a>
-          <a href="https://blog.naver.com/kkk304915" target="_blank" rel="noopener noreferrer"
-            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <BookOpen size={22} color="#03C75A"/>
-              <div>
-                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>네이버 블로그</p>
-                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>성창운 블로그</p>
-              </div>
-            </div>
-            <ArrowRight size={14} color={SCW.MUTE}/>
-          </a>
-          <a href="https://blog.naver.com/smilekorean1" target="_blank" rel="noopener noreferrer"
-            style={{ ...scwTile, background:"#1c1f26", border:"none", padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <Smile size={22} color="#fff"/>
-              <div>
-                <p style={{ fontSize:13.5, fontWeight:800, color:"#fff", margin:0, fontFamily:font }}>웃자대한민국협회</p>
-                <p style={{ fontSize:10.5, color:"rgba(255,255,255,.55)", margin:"2px 0 0", fontFamily:font }}>사단법인 공식 블로그</p>
-              </div>
-            </div>
-            <ArrowRight size={14} color="#fff"/>
-          </a>
-          <a href="https://litt.ly/bongdang" target="_blank" rel="noopener noreferrer"
-            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <ExternalLink size={22} color={SCW.GOLD}/>
-              <div>
-                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>봉당 바로가기</p>
-                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>전체 채널 한눈에</p>
-              </div>
-            </div>
-            <ArrowRight size={14} color={SCW.MUTE}/>
-          </a>
+              <ArrowRight size={14} color="currentColor"/>
+            </a>
+          ))}
         </div>
 
         {/* 11. CTA 버튼 (전체폭) */}
@@ -584,7 +550,7 @@ function SungchangwoonPage() {
               style={{ flex:1, padding:"13px 16px", borderRadius:12, background:"#fff", color:SCW.INK, fontSize:13.5, fontWeight:700, border:`1.5px solid ${SCW.WINE}44`, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6, textDecoration:"none", fontFamily:font }}>
               <Phone size={13} color={SCW.WINE}/> <span style={{ color:SCW.WINE }}>010-9893-0330</span>
             </a>
-            <a href="https://www.eummedia.kr/article/170444181" target="_blank" rel="noopener noreferrer"
+            <a href="https://cafe.naver.com/kk304915" target="_blank" rel="noopener noreferrer"
               style={{ flex:1, padding:"13px 16px", borderRadius:12, background:"#fff", color:SCW.INK, fontSize:13.5, fontWeight:700, border:"1px solid #E0D8C6", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6, textDecoration:"none", fontFamily:font }}>
               이음소식 <ArrowRight size={13}/>
             </a>
