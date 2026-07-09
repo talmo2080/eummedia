@@ -485,6 +485,7 @@ function SungchangwoonPage() {
               ["/sungchangwoon-activity-cafe.jpg",       "벙글이의 찾아가는 인생다방"],
               ["/sungchangwoon-activity-meet.jpg",       "기업 강의"],
               ["/sungchangwoon-activity-senior.jpg",     "싱글벙글 나비축제 2"],
+              ["/sungchangwoon-activity-graduation.png", "방송스피치사관학교 졸업식"],
             ].map(([src,title])=>(
               <div key={src} style={{ borderRadius:14, overflow:"hidden", background:"#e8e0d0" }}>
                 <img src={src} alt={title}
@@ -582,7 +583,7 @@ function SungchangwoonPage() {
               style={{ flex:1, padding:"13px 16px", borderRadius:12, background:"#fff", color:SCW.INK, fontSize:13.5, fontWeight:700, border:`1.5px solid ${SCW.WINE}44`, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6, textDecoration:"none", fontFamily:font }}>
               <Phone size={13} color={SCW.WINE}/> <span style={{ color:SCW.WINE }}>010-9893-0330</span>
             </a>
-            <a href="https://cafe.naver.com/kk304915" target="_blank" rel="noopener noreferrer"
+            <a href="https://www.eummedia.kr/article/170444181" target="_blank" rel="noopener noreferrer"
               style={{ flex:1, padding:"13px 16px", borderRadius:12, background:"#fff", color:SCW.INK, fontSize:13.5, fontWeight:700, border:"1px solid #E0D8C6", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6, textDecoration:"none", fontFamily:font }}>
               이음소식 <ArrowRight size={13}/>
             </a>
