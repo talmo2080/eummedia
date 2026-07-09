@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ExternalLink, Award, Sparkles, Heart, MessageCircle, Users, Tv, ArrowRight, TrendingUp, Phone, Quote, BookOpen } from "lucide-react";
+import { ArrowLeft, ExternalLink, Award, Sparkles, Heart, MessageCircle, Users, Tv, ArrowRight, TrendingUp, Phone, Quote, BookOpen, X, Send, CheckCircle, Newspaper, Smile, Mic, Building2, Coffee } from "lucide-react";
 
 const font  = "'Pretendard', 'Noto Sans KR', sans-serif";
 const GREEN = "#10B981";
@@ -236,6 +237,9 @@ const SCW_CSS = `
   .scw-wrap { background:${SCW.BG}; min-height:100vh; font-family:'Pretendard','Noto Sans KR',sans-serif; padding:28px 20px 60px; }
   .scw-grid { display:grid; grid-template-columns:1.35fr 1fr; grid-auto-rows:minmax(10px,auto); gap:16px; max-width:980px; margin:0 auto; }
   @media(max-width:640px){ .scw-grid{ grid-template-columns:1fr; } .scw-col-span{ grid-column:1!important; } }
+  .scw-ch-grid { grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  @media(max-width:900px){ .scw-ch-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:480px){ .scw-ch-grid{ grid-template-columns:1fr; } }
   .scw-hero-tile { grid-column:1; }
   @media(max-width:640px){ .scw-hero-tile{ grid-column:1; } }
   .scw-chip { background:#fff; border:1px solid ${SCW.GOLDL}; color:${SCW.GOLD}; border-radius:999px; padding:6px 14px; font-size:12.5px; font-weight:700; }
@@ -245,6 +249,36 @@ const SCW_CSS = `
 
 function SungchangwoonPage() {
   const font = "'Pretendard','Noto Sans KR',sans-serif";
+
+  const BLANK_FORM = { name:'', org:'', phone:'', email:'', lectureType:'', topics:[], datetime:'', headcount:'', duration:'', location:'', note:'' };
+  const [formOpen,   setFormOpen]   = useState(false);
+  const [formData,   setFormData]   = useState(BLANK_FORM);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted,  setSubmitted]  = useState(false);
+  const [submitErr,  setSubmitErr]  = useState('');
+
+  function setField(k, v) { setFormData(p => ({ ...p, [k]: v })); }
+  function toggleTopic(t) {
+    setFormData(p => ({
+      ...p,
+      topics: p.topics.includes(t) ? p.topics.filter(x => x !== t) : [...p.topics, t],
+    }));
+  }
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setSubmitting(true); setSubmitErr('');
+    try {
+      const res = await fetch('/api/scw-lecture-inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) { setSubmitted(true); }
+      else { setSubmitErr('제출 중 오류가 발생했습니다. 다시 시도해주세요.'); }
+    } catch { setSubmitErr('네트워크 오류가 발생했습니다.'); }
+    setSubmitting(false);
+  }
+  function closeForm() { setFormOpen(false); setSubmitted(false); setFormData(BLANK_FORM); setSubmitErr(''); }
 
   const AWARDS_ALL = [
     { year:"2015", title:"도전창조 경영인 대상" },
@@ -317,13 +351,14 @@ function SungchangwoonPage() {
             ))}
           </div>
           {/* 수상 사진 — 오른쪽 빈 공간 채움 */}
-          <div style={{ ...scwTile, padding:0, overflow:"hidden", flex:1, minHeight:160, position:"relative" }}>
+          <a href="https://www.eummedia.kr/article/article-hlrcqtv8"
+            style={{ ...scwTile, padding:0, overflow:"hidden", flex:1, minHeight:160, position:"relative", display:"block", cursor:"pointer" }}>
             <img src="/sungchangwoon-award.jpg.jpg" alt="도전한국인 AI교육혁신대상"
               style={{ width:"100%", height:"100%", objectFit:"cover", display:"block", minHeight:160 }}
               onError={e=>{ e.currentTarget.style.display="none"; }}
             />
             <div style={{ position:"absolute", inset:8, border:`1px solid ${SCW.GOLD}55`, borderRadius:12, pointerEvents:"none" }}/>
-          </div>
+          </a>
         </div>
 
         {/* 4. 수상 배너 (전체폭) */}
@@ -333,14 +368,46 @@ function SungchangwoonPage() {
           <span style={{ fontSize:14, fontWeight:600, fontFamily:font }}>2026 국회 도전페스티벌 · AI혁신 기업상 &amp; 도전한국인 AI교육혁신대상</span>
         </div>
 
-        {/* 5. 전문 4분야 (2x2) */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
-          {[[Sparkles,"사상체질"],[Heart,"건강·대체의학"],[Users,"소통·리더십"],[MessageCircle,"힐링 스피치"]].map(([Ic,t],i)=>(
-            <div key={i} style={{ ...scwTile, padding:"16px 14px" }}>
-              <Ic size={19} color={SCW.GOLD} strokeWidth={2}/>
-              <p style={{ fontSize:13.5, fontWeight:700, color:SCW.INK, margin:"8px 0 0", fontFamily:font }}>{t}</p>
-            </div>
-          ))}
+        {/* 5a. 전문분야 (2×2) */}
+        <div style={{ gridColumn:"1 / -1" }} className="scw-col-span">
+          <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:12 }}>
+            <Sparkles size={17} color={SCW.GOLD}/>
+            <span style={{ fontSize:14, fontWeight:800, color:SCW.INK, fontFamily:font }}>전문분야</span>
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+            {[
+              [Sparkles,      "사상체질"],
+              [Heart,         "건강·대체의학"],
+              [Users,         "소통·리더십"],
+              [MessageCircle, "힐링 스피치"],
+            ].map(([Ic,t],i)=>(
+              <div key={i} style={{ ...scwTile, padding:"16px 14px" }}>
+                <Ic size={19} color={SCW.GOLD} strokeWidth={2}/>
+                <p style={{ fontSize:13.5, fontWeight:700, color:SCW.INK, margin:"8px 0 0", fontFamily:font }}>{t}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 5b. 전문활동분야 (2×2) */}
+        <div style={{ gridColumn:"1 / -1" }} className="scw-col-span">
+          <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:12 }}>
+            <Mic size={17} color={SCW.GOLD}/>
+            <span style={{ fontSize:14, fontWeight:800, color:SCW.INK, fontFamily:font }}>전문활동분야</span>
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+            {[
+              [Mic,       "방송스피치사관학교"],
+              [Building2, "기업·관공서 강의"],
+              [Sparkles,  "싱글벙글나비축제"],
+              [Coffee,    "찾아가는인생다방"],
+            ].map(([Ic,t],i)=>(
+              <div key={i} style={{ ...scwTile, padding:"16px 14px" }}>
+                <Ic size={19} color={SCW.GOLD} strokeWidth={2}/>
+                <p style={{ fontSize:13.5, fontWeight:700, color:SCW.INK, margin:"8px 0 0", fontFamily:font }}>{t}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* 7. 미래 비전 타일 (전체폭) */}
@@ -357,18 +424,81 @@ function SungchangwoonPage() {
           </div>
         </div>
 
-        {/* 8. 봉당TV */}
-        <a href="https://www.youtube.com/@성창운-i4d" target="_blank" rel="noopener noreferrer"
-          style={{ ...scwTile, background:"#1c1f26", border:"none", padding:"20px 20px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:11 }}>
-            <Tv size={26} color="#FF5252"/>
-            <div>
-              <p style={{ fontSize:15, fontWeight:800, color:"#fff", margin:0, fontFamily:font }}>봉당TV</p>
-              <p style={{ fontSize:11.5, color:"rgba(255,255,255,.55)", margin:"2px 0 0", fontFamily:font }}>웃음·인문학·문화</p>
+        {/* 8. 채널 3×2 */}
+        <div className="scw-ch-grid">
+          {/* 봉당TV */}
+          <a href="https://www.youtube.com/@성창운-i4d" target="_blank" rel="noopener noreferrer"
+            style={{ ...scwTile, background:"#1c1f26", border:"none", padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <Tv size={22} color="#FF5252"/>
+              <div>
+                <p style={{ fontSize:13.5, fontWeight:800, color:"#fff", margin:0, fontFamily:font }}>봉당TV</p>
+                <p style={{ fontSize:10.5, color:"rgba(255,255,255,.55)", margin:"2px 0 0", fontFamily:font }}>웃음·인문학·문화</p>
+              </div>
             </div>
-          </div>
-          <ArrowRight size={18} color="#fff"/>
-        </a>
+            <ArrowRight size={14} color="#fff"/>
+          </a>
+          {/* 이음미디어 */}
+          <a href="https://www.eummedia.kr" target="_blank" rel="noopener noreferrer"
+            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <Newspaper size={22} color={SCW.GOLD}/>
+              <div>
+                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>이음미디어</p>
+                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>성창운 발행인</p>
+              </div>
+            </div>
+            <ArrowRight size={14} color={SCW.MUTE}/>
+          </a>
+          {/* 네이버 카페 */}
+          <a href="https://cafe.naver.com/kk304915" target="_blank" rel="noopener noreferrer"
+            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <Users size={22} color={SCW.GOLD}/>
+              <div>
+                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>네이버 카페</p>
+                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>봉숭아학당 커뮤니티</p>
+              </div>
+            </div>
+            <ArrowRight size={14} color={SCW.MUTE}/>
+          </a>
+          {/* 네이버 블로그 */}
+          <a href="https://blog.naver.com/kkk304915" target="_blank" rel="noopener noreferrer"
+            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <BookOpen size={22} color="#03C75A"/>
+              <div>
+                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>네이버 블로그</p>
+                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>성창운 블로그</p>
+              </div>
+            </div>
+            <ArrowRight size={14} color={SCW.MUTE}/>
+          </a>
+          {/* 웃자대한민국협회 */}
+          <a href="https://blog.naver.com/smilekorean1" target="_blank" rel="noopener noreferrer"
+            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <Smile size={22} color={SCW.WINE}/>
+              <div>
+                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>웃자대한민국협회</p>
+                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>사단법인 공식 블로그</p>
+              </div>
+            </div>
+            <ArrowRight size={14} color={SCW.MUTE}/>
+          </a>
+          {/* 봉당 바로가기 */}
+          <a href="https://litt.ly/bongdang" target="_blank" rel="noopener noreferrer"
+            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <ExternalLink size={22} color={SCW.GOLD}/>
+              <div>
+                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>봉당 바로가기</p>
+                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>전체 채널 한눈에</p>
+              </div>
+            </div>
+            <ArrowRight size={14} color={SCW.MUTE}/>
+          </a>
+        </div>
 
         {/* 9. 저서 6권 갤러리 (전체폭) */}
         <div style={{ gridColumn:"1 / -1", ...scwTile, padding:"20px 24px" }} className="scw-col-span">
@@ -434,34 +564,125 @@ function SungchangwoonPage() {
 
         {/* 11. CTA 버튼 (전체폭) */}
         <div style={{ gridColumn:"1 / -1", display:"flex", gap:12, flexWrap:"wrap", marginTop:2 }} className="scw-col-span">
-          <a href="https://litt.ly/bongdang" target="_blank" rel="noopener noreferrer"
-            style={{ flex:"1 1 220px", padding:"15px", borderRadius:14, background:SCW.GOLD, color:"#fff", fontSize:15.5, fontWeight:800, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8, textDecoration:"none", fontFamily:font }}>
-            <ExternalLink size={17}/> 바로 보기 (전체 채널)
-          </a>
-          <a href="tel:010-9893-0330"
-            style={{ padding:"15px 20px", borderRadius:14, background:"#fff", color:SCW.WINE, fontSize:14.5, fontWeight:700, border:`1.5px solid ${SCW.WINE}`, cursor:"pointer", display:"flex", alignItems:"center", gap:7, textDecoration:"none", fontFamily:font }}>
+          <button onClick={()=>setFormOpen(true)}
+            style={{ padding:"15px 20px", borderRadius:14, background:"#fff", color:SCW.WINE, fontSize:14.5, fontWeight:700, border:`1.5px solid ${SCW.WINE}`, cursor:"pointer", display:"flex", alignItems:"center", gap:7, fontFamily:font }}>
             <Phone size={15}/> 강의 문의
-          </a>
-          <a href="https://www.eummedia.kr/article/article-hlrcqtv8" target="_blank" rel="noopener noreferrer"
+          </button>
+          <a href="https://www.eummedia.kr/article/170444181"
             style={{ padding:"15px 20px", borderRadius:14, background:"#fff", color:SCW.INK, fontSize:14.5, fontWeight:700, border:"1px solid #E0D8C6", cursor:"pointer", display:"flex", alignItems:"center", gap:7, textDecoration:"none", fontFamily:font }}>
             이야기 보기 <ArrowRight size={15}/>
           </a>
         </div>
 
-        {/* 12. 소셜 링크 */}
-        <div style={{ gridColumn:"1 / -1", display:"flex", gap:10, flexWrap:"wrap" }} className="scw-col-span">
-          {[
-            { label:"네이버 카페", href:"https://cafe.naver.com/kk304915" },
-            { label:"네이버 블로그", href:"https://blog.naver.com/kkk304915" },
-          ].map(s=>(
-            <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
-              style={{ fontSize:12.5, fontWeight:700, color:SCW.MUTE, background:"#fff", border:"1px solid #EDE6D6", borderRadius:99, padding:"7px 16px", textDecoration:"none", fontFamily:font }}>
-              {s.label} ↗
-            </a>
-          ))}
-        </div>
-
       </div>
+
+      {/* ── 강의 문의 폼 모달 ── */}
+      {formOpen && (
+        <div style={{ position:"fixed", inset:0, zIndex:1000, display:"flex", alignItems:"flex-end", justifyContent:"center" }}
+          onClick={e=>{ if(e.target===e.currentTarget) closeForm(); }}>
+          {/* 딤 배경 */}
+          <div style={{ position:"absolute", inset:0, background:"rgba(0,0,0,.45)", backdropFilter:"blur(3px)" }}/>
+          {/* 패널 */}
+          <div style={{ position:"relative", width:"100%", maxWidth:640, maxHeight:"92vh", overflowY:"auto", background:SCW.BG, borderRadius:"24px 24px 0 0", padding:"28px 24px 40px", fontFamily:font }}>
+            {/* 헤더 */}
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
+              <div>
+                <h2 style={{ fontSize:20, fontWeight:800, color:SCW.INK, margin:0 }}>강의 문의</h2>
+                <p style={{ fontSize:12.5, color:SCW.MUTE, margin:"4px 0 0" }}>📞 직접 문의: 010-9893-0330</p>
+              </div>
+              <button onClick={closeForm} style={{ background:"none", border:"none", cursor:"pointer", padding:4, color:SCW.MUTE }}>
+                <X size={22}/>
+              </button>
+            </div>
+
+            {submitted ? (
+              <div style={{ textAlign:"center", padding:"40px 0" }}>
+                <CheckCircle size={52} color={SCW.GOLD} style={{ margin:"0 auto 16px" }}/>
+                <p style={{ fontSize:18, fontWeight:800, color:SCW.INK, margin:"0 0 8px" }}>신청이 접수됐습니다!</p>
+                <p style={{ fontSize:13.5, color:SCW.MUTE, margin:"0 0 28px", lineHeight:1.6 }}>곧 연락드리겠습니다.<br/>문의: 010-9893-0330</p>
+                <button onClick={closeForm}
+                  style={{ padding:"13px 32px", borderRadius:12, background:SCW.GOLD, color:"#fff", fontSize:15, fontWeight:700, border:"none", cursor:"pointer" }}>
+                  닫기
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} style={{ display:"flex", flexDirection:"column", gap:14 }}>
+                {[
+                  { label:"신청자 성함 *", key:"name", ph:"홍길동", required:true },
+                  { label:"소속 *", key:"org", ph:"회사/기관/단체명", required:true },
+                  { label:"연락처 *", key:"phone", ph:"010-0000-0000", required:true },
+                  { label:"이메일", key:"email", ph:"example@email.com", required:false },
+                ].map(f => (
+                  <label key={f.key} style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                    <span style={{ fontSize:13, fontWeight:700, color:SCW.INK }}>{f.label}</span>
+                    <input value={formData[f.key]} onChange={e=>setField(f.key, e.target.value)} required={f.required} placeholder={f.ph}
+                      style={{ padding:"11px 14px", borderRadius:10, border:"1.5px solid #E0D8C6", fontSize:14, fontFamily:font, background:"#fff", outline:"none", color:SCW.INK }} />
+                  </label>
+                ))}
+
+                {/* 강의 유형 */}
+                <label style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                  <span style={{ fontSize:13, fontWeight:700, color:SCW.INK }}>강의 유형 *</span>
+                  <select value={formData.lectureType} onChange={e=>setField('lectureType', e.target.value)} required
+                    style={{ padding:"11px 14px", borderRadius:10, border:"1.5px solid #E0D8C6", fontSize:14, fontFamily:font, background:"#fff", color:SCW.INK }}>
+                    <option value="">선택해주세요</option>
+                    {["기업 강의","공공·지자체","단체·모임","기타"].map(t=><option key={t} value={t}>{t}</option>)}
+                  </select>
+                </label>
+
+                {/* 희망 주제 */}
+                <div>
+                  <span style={{ fontSize:13, fontWeight:700, color:SCW.INK, display:"block", marginBottom:8 }}>희망 주제 (복수선택)</span>
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+                    {["웃음레크·힐링 스피치","사상체질 맞춤 소통","소통·리더십","건강·대체의학","기업 강의","기타"].map(t=>(
+                      <button type="button" key={t} onClick={()=>toggleTopic(t)}
+                        style={{ padding:"7px 14px", borderRadius:99, fontSize:12.5, fontWeight:700, border:`1.5px solid ${formData.topics.includes(t) ? SCW.GOLD : "#E0D8C6"}`, background:formData.topics.includes(t) ? `${SCW.GOLD}18` : "#fff", color:formData.topics.includes(t) ? SCW.GOLD : SCW.MUTE, cursor:"pointer", fontFamily:font }}>
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {[
+                  { label:"희망 일시", key:"datetime", ph:"예: 2026-09-15 오후" },
+                  { label:"예상 인원", key:"headcount", ph:"예: 50명" },
+                  { label:"장소", key:"location", ph:"지역 또는 온라인 여부" },
+                ].map(f => (
+                  <label key={f.key} style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                    <span style={{ fontSize:13, fontWeight:700, color:SCW.INK }}>{f.label}</span>
+                    <input value={formData[f.key]} onChange={e=>setField(f.key, e.target.value)} placeholder={f.ph}
+                      style={{ padding:"11px 14px", borderRadius:10, border:"1.5px solid #E0D8C6", fontSize:14, fontFamily:font, background:"#fff", outline:"none", color:SCW.INK }} />
+                  </label>
+                ))}
+
+                {/* 강의 시간 */}
+                <label style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                  <span style={{ fontSize:13, fontWeight:700, color:SCW.INK }}>강의 시간</span>
+                  <select value={formData.duration} onChange={e=>setField('duration', e.target.value)}
+                    style={{ padding:"11px 14px", borderRadius:10, border:"1.5px solid #E0D8C6", fontSize:14, fontFamily:font, background:"#fff", color:SCW.INK }}>
+                    <option value="">선택</option>
+                    {["1시간","2시간","반일","종일","협의"].map(t=><option key={t} value={t}>{t}</option>)}
+                  </select>
+                </label>
+
+                {/* 추가 요청 */}
+                <label style={{ display:"flex", flexDirection:"column", gap:5 }}>
+                  <span style={{ fontSize:13, fontWeight:700, color:SCW.INK }}>추가 요청사항</span>
+                  <textarea value={formData.note} onChange={e=>setField('note', e.target.value)} rows={3} placeholder="자유롭게 적어주세요"
+                    style={{ padding:"11px 14px", borderRadius:10, border:"1.5px solid #E0D8C6", fontSize:14, fontFamily:font, background:"#fff", resize:"vertical", outline:"none", color:SCW.INK }} />
+                </label>
+
+                {submitErr && <p style={{ fontSize:13, color:SCW.WINE, margin:0 }}>{submitErr}</p>}
+
+                <button type="submit" disabled={submitting}
+                  style={{ marginTop:4, padding:"15px", borderRadius:14, background:submitting ? "#ccc" : SCW.GOLD, color:"#fff", fontSize:15.5, fontWeight:800, border:"none", cursor:submitting?"not-allowed":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8, fontFamily:font }}>
+                  <Send size={17}/> {submitting ? "제출 중..." : "강의 신청 보내기"}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
