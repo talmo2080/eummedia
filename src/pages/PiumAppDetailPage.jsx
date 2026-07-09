@@ -368,22 +368,65 @@ function SungchangwoonPage() {
           <span style={{ fontSize:14, fontWeight:600, fontFamily:font }}>2026 국회 도전페스티벌 · AI혁신 기업상 &amp; 도전한국인 AI교육혁신대상</span>
         </div>
 
+        {/* 4b. 수상 이력 (전체폭) — 배너 바로 아래 */}
+        <div style={{ gridColumn:"1 / -1", ...scwTile, padding:"20px 24px" }} className="scw-col-span">
+          <p style={{ fontSize:13, fontWeight:800, color:SCW.GOLD, margin:"0 0 12px", letterSpacing:".06em", textTransform:"uppercase", fontFamily:font }}>수상 이력</p>
+          {AWARDS_ALL.slice(-5).map((a,i)=>(
+            <div key={i} className="scw-award-item">
+              <span style={{ fontSize:11, fontWeight:700, color:SCW.GOLDL, fontFamily:font, minWidth:36, paddingTop:2 }}>{a.year}</span>
+              <span style={{ fontSize:13.5, color:SCW.INK, fontFamily:font, lineHeight:1.5 }}>{a.title}</span>
+            </div>
+          ))}
+          <p style={{ fontSize:11.5, color:SCW.MUTE, margin:"12px 0 0", fontFamily:font }}>외 총 11회 수상</p>
+        </div>
+
+        {/* 4c. 저서 6권 갤러리 (전체폭) — 수상 이력 바로 아래 */}
+        <div style={{ gridColumn:"1 / -1", ...scwTile, padding:"20px 24px" }} className="scw-col-span">
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16 }}>
+            <BookOpen size={19} color={SCW.GOLD}/>
+            <span style={{ fontSize:15, fontWeight:800, color:SCW.INK, fontFamily:font }}>저서 6권</span>
+            <span style={{ fontSize:12, color:SCW.MUTE, fontFamily:font }}>— 무대에서 못다 한 말, 책으로</span>
+          </div>
+          <div style={{ display:"flex", gap:14, overflowX:"auto", paddingBottom:6, WebkitOverflowScrolling:"touch", scrollbarWidth:"thin", scrollbarColor:`${SCW.GOLDL} transparent` }}>
+            {[
+              ["sungchangwoon-book-1.jpg", "복을 짓는 리더의 삶"],
+              ["sungchangwoon-book-2.jpg", "말 잘하는 기술"],
+              ["sungchangwoon-book-3.jpg", "너 이렇게 살아 봤어?"],
+              ["sungchangwoon-book-4.jpg", "봉숭아학당에서 다시 피어나는 꽃"],
+              ["sungchangwoon-book-5.jpg", "홍채전문가 과정"],
+            ].map(([src, alt]) => (
+              <div key={src} style={{ flexShrink:0, width:125, borderRadius:10, overflow:"hidden", boxShadow:`0 4px 16px rgba(120,95,30,.15)`, border:`1px solid ${SCW.GOLDL}` }}>
+                <img src={`/${src}`} alt={alt}
+                  style={{ width:"100%", height:"auto", display:"block" }}
+                  onError={e=>{ e.currentTarget.style.display="none"; }}
+                />
+              </div>
+            ))}
+            <div style={{ flexShrink:0, width:125, minHeight:178, borderRadius:10, boxShadow:`0 4px 16px rgba(120,95,30,.10)`, border:`1px solid ${SCW.GOLDL}`, background:SCW.BG, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"16px 10px", textAlign:"center" }}>
+              <BookOpen size={22} color={SCW.GOLDL} style={{ marginBottom:10 }}/>
+              <p style={{ fontSize:13, fontWeight:700, color:SCW.INK, margin:0, lineHeight:1.55, fontFamily:font }}>체형관리사</p>
+            </div>
+          </div>
+        </div>
+
         {/* 5a. 전문분야 (2×2) */}
         <div style={{ gridColumn:"1 / -1" }} className="scw-col-span">
-          <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:12 }}>
-            <Sparkles size={17} color={SCW.GOLD}/>
-            <span style={{ fontSize:14, fontWeight:800, color:SCW.INK, fontFamily:font }}>전문분야</span>
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
+            <Sparkles size={19} color={SCW.GOLD}/>
+            <span style={{ fontSize:18, fontWeight:900, color:SCW.INK, fontFamily:font, letterSpacing:"-.01em" }}>전문분야</span>
           </div>
+          <div style={{ width:36, height:3, background:SCW.GOLD, borderRadius:2, marginBottom:16 }}/>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
             {[
-              [Sparkles,      "사상체질"],
-              [Heart,         "건강·대체의학"],
-              [Users,         "소통·리더십"],
-              [MessageCircle, "힐링 스피치"],
-            ].map(([Ic,t],i)=>(
-              <div key={i} style={{ ...scwTile, padding:"16px 14px" }}>
+              [Sparkles,      "사상체질",     "타고난 체질에 맞춘 건강과 소통"],
+              [Heart,         "건강·대체의학", "몸과 마음을 함께 살피는 건강법"],
+              [Users,         "소통·리더십",  "마음을 여는 관계, 사람을 이끄는 힘"],
+              [MessageCircle, "힐링 스피치",  "웃음과 위로가 스며드는 강연"],
+            ].map(([Ic,t,desc],i)=>(
+              <div key={i} style={{ ...scwTile, padding:"18px 16px" }}>
                 <Ic size={19} color={SCW.GOLD} strokeWidth={2}/>
-                <p style={{ fontSize:13.5, fontWeight:700, color:SCW.INK, margin:"8px 0 0", fontFamily:font }}>{t}</p>
+                <p style={{ fontSize:13.5, fontWeight:700, color:SCW.INK, margin:"8px 0 3px", fontFamily:font }}>{t}</p>
+                <p style={{ fontSize:11.5, color:SCW.MUTE, margin:0, fontFamily:font, lineHeight:1.4 }}>{desc}</p>
               </div>
             ))}
           </div>
@@ -391,20 +434,22 @@ function SungchangwoonPage() {
 
         {/* 5b. 전문활동분야 (2×2) */}
         <div style={{ gridColumn:"1 / -1" }} className="scw-col-span">
-          <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:12 }}>
-            <Mic size={17} color={SCW.GOLD}/>
-            <span style={{ fontSize:14, fontWeight:800, color:SCW.INK, fontFamily:font }}>전문활동분야</span>
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
+            <Mic size={19} color={SCW.GOLD}/>
+            <span style={{ fontSize:18, fontWeight:900, color:SCW.INK, fontFamily:font, letterSpacing:"-.01em" }}>전문활동분야</span>
           </div>
+          <div style={{ width:36, height:3, background:SCW.GOLD, borderRadius:2, marginBottom:16 }}/>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
             {[
-              [Mic,       "방송스피치사관학교"],
-              [Building2, "기업·관공서 강의"],
-              [Sparkles,  "싱글벙글나비축제"],
-              [Coffee,    "찾아가는인생다방"],
-            ].map(([Ic,t],i)=>(
-              <div key={i} style={{ ...scwTile, padding:"16px 14px" }}>
+              [Mic,       "방송스피치사관학교", "말하기와 스피치를 훈련하는 배움터"],
+              [Building2, "기업·관공서 강의",   "기업·기관을 찾아가는 맞춤 강의"],
+              [Sparkles,  "싱글벙글나비축제",   "웃음으로 함께하는 문화 나눔의 장"],
+              [Coffee,    "찾아가는인생다방",   "사람을 찾아가 마음을 나누는 소통 프로그램"],
+            ].map(([Ic,t,desc],i)=>(
+              <div key={i} style={{ ...scwTile, padding:"18px 16px" }}>
                 <Ic size={19} color={SCW.GOLD} strokeWidth={2}/>
-                <p style={{ fontSize:13.5, fontWeight:700, color:SCW.INK, margin:"8px 0 0", fontFamily:font }}>{t}</p>
+                <p style={{ fontSize:13.5, fontWeight:700, color:SCW.INK, margin:"8px 0 3px", fontFamily:font }}>{t}</p>
+                <p style={{ fontSize:11.5, color:SCW.MUTE, margin:0, fontFamily:font, lineHeight:1.4 }}>{desc}</p>
               </div>
             ))}
           </div>
@@ -420,103 +465,6 @@ function SungchangwoonPage() {
           <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginTop:10 }}>
             {["소상공인 바이브코딩","시니어 AI활용","청년 웃음치료","시니어 자립교육","시니어 문화활동"].map(p=>(
               <span key={p} className="scw-chip">{p}</span>
-            ))}
-          </div>
-        </div>
-
-        {/* 8. 채널 3×2 */}
-        <div className="scw-ch-grid">
-          {/* 봉당TV */}
-          <a href="https://www.youtube.com/@성창운-i4d" target="_blank" rel="noopener noreferrer"
-            style={{ ...scwTile, background:"#1c1f26", border:"none", padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <Tv size={22} color="#FF5252"/>
-              <div>
-                <p style={{ fontSize:13.5, fontWeight:800, color:"#fff", margin:0, fontFamily:font }}>봉당TV</p>
-                <p style={{ fontSize:10.5, color:"rgba(255,255,255,.55)", margin:"2px 0 0", fontFamily:font }}>웃음·인문학·문화</p>
-              </div>
-            </div>
-            <ArrowRight size={14} color="#fff"/>
-          </a>
-          {/* 이음미디어 */}
-          <a href="https://www.eummedia.kr" target="_blank" rel="noopener noreferrer"
-            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <Newspaper size={22} color={SCW.GOLD}/>
-              <div>
-                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>이음미디어</p>
-                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>성창운 발행인</p>
-              </div>
-            </div>
-            <ArrowRight size={14} color={SCW.MUTE}/>
-          </a>
-          {/* 네이버 카페 */}
-          <a href="https://cafe.naver.com/kk304915" target="_blank" rel="noopener noreferrer"
-            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <Users size={22} color={SCW.GOLD}/>
-              <div>
-                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>네이버 카페</p>
-                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>봉숭아학당 커뮤니티</p>
-              </div>
-            </div>
-            <ArrowRight size={14} color={SCW.MUTE}/>
-          </a>
-          {/* 네이버 블로그 */}
-          <a href="https://blog.naver.com/kkk304915" target="_blank" rel="noopener noreferrer"
-            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <BookOpen size={22} color="#03C75A"/>
-              <div>
-                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>네이버 블로그</p>
-                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>성창운 블로그</p>
-              </div>
-            </div>
-            <ArrowRight size={14} color={SCW.MUTE}/>
-          </a>
-          {/* 웃자대한민국협회 */}
-          <a href="https://blog.naver.com/smilekorean1" target="_blank" rel="noopener noreferrer"
-            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <Smile size={22} color={SCW.WINE}/>
-              <div>
-                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>웃자대한민국협회</p>
-                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>사단법인 공식 블로그</p>
-              </div>
-            </div>
-            <ArrowRight size={14} color={SCW.MUTE}/>
-          </a>
-          {/* 봉당 바로가기 */}
-          <a href="https://litt.ly/bongdang" target="_blank" rel="noopener noreferrer"
-            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <ExternalLink size={22} color={SCW.GOLD}/>
-              <div>
-                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>봉당 바로가기</p>
-                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>전체 채널 한눈에</p>
-              </div>
-            </div>
-            <ArrowRight size={14} color={SCW.MUTE}/>
-          </a>
-        </div>
-
-        {/* 9. 저서 6권 갤러리 (전체폭) */}
-        <div style={{ gridColumn:"1 / -1", ...scwTile, padding:"20px 24px" }} className="scw-col-span">
-          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16 }}>
-            <BookOpen size={19} color={SCW.GOLD}/>
-            <span style={{ fontSize:15, fontWeight:800, color:SCW.INK, fontFamily:font }}>저서 6권</span>
-            <span style={{ fontSize:12, color:SCW.MUTE, fontFamily:font }}>— 무대에서 못다 한 말, 책으로</span>
-          </div>
-          <div style={{ display:"flex", gap:14, overflowX:"auto", paddingBottom:6, WebkitOverflowScrolling:"touch", scrollbarWidth:"thin", scrollbarColor:`${SCW.GOLDL} transparent` }}>
-            {[1,2,3,4,5,6].map(n => (
-              <div key={n} style={{ flexShrink:0, width:128, borderRadius:10, overflow:"hidden", boxShadow:`0 4px 16px rgba(120,95,30,.13)`, border:`1px solid ${SCW.GOLDL}88` }}>
-                <img
-                  src={`/sungchangwoon-book-${n}.jpg.jpg`}
-                  alt={`성창운 저서 ${n}`}
-                  style={{ width:"100%", height:"auto", display:"block" }}
-                  onError={e=>{ e.currentTarget.parentNode.style.background="#F4EDD5"; e.currentTarget.style.display="none"; }}
-                />
-              </div>
             ))}
           </div>
         </div>
@@ -550,16 +498,74 @@ function SungchangwoonPage() {
           </div>
         </div>
 
-        {/* 11. 수상 이력 (전체폭, 접기 없이 대표 5개) */}
-        <div style={{ gridColumn:"1 / -1", ...scwTile, padding:"20px 24px" }} className="scw-col-span">
-          <p style={{ fontSize:13, fontWeight:800, color:SCW.GOLD, margin:"0 0 12px", letterSpacing:".06em", textTransform:"uppercase", fontFamily:font }}>수상 이력</p>
-          {AWARDS_ALL.slice(-5).map((a,i)=>(
-            <div key={i} className="scw-award-item">
-              <span style={{ fontSize:11, fontWeight:700, color:SCW.GOLDL, fontFamily:font, minWidth:36, paddingTop:2 }}>{a.year}</span>
-              <span style={{ fontSize:13.5, color:SCW.INK, fontFamily:font, lineHeight:1.5 }}>{a.title}</span>
+        {/* 10b. 채널 3×2 — 활동 현장 바로 아래 */}
+        <div className="scw-ch-grid">
+          <a href="https://www.youtube.com/@성창운-i4d" target="_blank" rel="noopener noreferrer"
+            style={{ ...scwTile, background:"#1c1f26", border:"none", padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <Tv size={22} color="#FF5252"/>
+              <div>
+                <p style={{ fontSize:13.5, fontWeight:800, color:"#fff", margin:0, fontFamily:font }}>봉당TV</p>
+                <p style={{ fontSize:10.5, color:"rgba(255,255,255,.55)", margin:"2px 0 0", fontFamily:font }}>웃음·인문학·문화</p>
+              </div>
             </div>
-          ))}
-          <p style={{ fontSize:11.5, color:SCW.MUTE, margin:"12px 0 0", fontFamily:font }}>외 총 11회 수상</p>
+            <ArrowRight size={14} color="#fff"/>
+          </a>
+          <a href="https://www.eummedia.kr" target="_blank" rel="noopener noreferrer"
+            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <Newspaper size={22} color={SCW.GOLD}/>
+              <div>
+                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>이음미디어</p>
+                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>성창운 발행인</p>
+              </div>
+            </div>
+            <ArrowRight size={14} color={SCW.MUTE}/>
+          </a>
+          <a href="https://cafe.naver.com/kk304915" target="_blank" rel="noopener noreferrer"
+            style={{ ...scwTile, background:"#1c1f26", border:"none", padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <Users size={22} color="#fff"/>
+              <div>
+                <p style={{ fontSize:13.5, fontWeight:800, color:"#fff", margin:0, fontFamily:font }}>네이버 카페</p>
+                <p style={{ fontSize:10.5, color:"rgba(255,255,255,.55)", margin:"2px 0 0", fontFamily:font }}>봉숭아학당 커뮤니티</p>
+              </div>
+            </div>
+            <ArrowRight size={14} color="#fff"/>
+          </a>
+          <a href="https://blog.naver.com/kkk304915" target="_blank" rel="noopener noreferrer"
+            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <BookOpen size={22} color="#03C75A"/>
+              <div>
+                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>네이버 블로그</p>
+                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>성창운 블로그</p>
+              </div>
+            </div>
+            <ArrowRight size={14} color={SCW.MUTE}/>
+          </a>
+          <a href="https://blog.naver.com/smilekorean1" target="_blank" rel="noopener noreferrer"
+            style={{ ...scwTile, background:"#1c1f26", border:"none", padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <Smile size={22} color="#fff"/>
+              <div>
+                <p style={{ fontSize:13.5, fontWeight:800, color:"#fff", margin:0, fontFamily:font }}>웃자대한민국협회</p>
+                <p style={{ fontSize:10.5, color:"rgba(255,255,255,.55)", margin:"2px 0 0", fontFamily:font }}>사단법인 공식 블로그</p>
+              </div>
+            </div>
+            <ArrowRight size={14} color="#fff"/>
+          </a>
+          <a href="https://litt.ly/bongdang" target="_blank" rel="noopener noreferrer"
+            style={{ ...scwTile, padding:"18px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", textDecoration:"none" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <ExternalLink size={22} color={SCW.GOLD}/>
+              <div>
+                <p style={{ fontSize:13.5, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>봉당 바로가기</p>
+                <p style={{ fontSize:10.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>전체 채널 한눈에</p>
+              </div>
+            </div>
+            <ArrowRight size={14} color={SCW.MUTE}/>
+          </a>
         </div>
 
         {/* 11. CTA 버튼 (전체폭) */}
