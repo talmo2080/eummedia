@@ -236,8 +236,8 @@ const SCW_CSS = `
   .scw-wrap { background:${SCW.BG}; min-height:100vh; font-family:'Pretendard','Noto Sans KR',sans-serif; padding:28px 20px 60px; }
   .scw-grid { display:grid; grid-template-columns:1.35fr 1fr; grid-auto-rows:minmax(10px,auto); gap:16px; max-width:980px; margin:0 auto; }
   @media(max-width:640px){ .scw-grid{ grid-template-columns:1fr; } .scw-col-span{ grid-column:1!important; } }
-  .scw-hero-tile { grid-row:span 2; }
-  @media(max-width:640px){ .scw-hero-tile{ grid-row:span 1; min-height:280px!important; } }
+  .scw-hero-tile { grid-column:1; }
+  @media(max-width:640px){ .scw-hero-tile{ grid-column:1; } }
   .scw-chip { background:#fff; border:1px solid ${SCW.GOLDL}; color:${SCW.GOLD}; border-radius:999px; padding:6px 14px; font-size:12.5px; font-weight:700; }
   .scw-award-item { padding:10px 0; border-bottom:1px solid #EDE6D6; display:flex; gap:10px; align-items:flex-start; }
   .scw-award-item:last-child { border-bottom:none; }
@@ -274,13 +274,15 @@ function SungchangwoonPage() {
 
       <div className="scw-grid">
 
-        {/* 1. 히어로 타일 */}
-        <div style={{ ...scwTile, padding:0, overflow:"hidden", position:"relative", minHeight:340, display:"flex", flexDirection:"column", justifyContent:"flex-end" }} className="scw-hero-tile">
-          {/* 배경 — 금색 자카드 정장 사진 */}
-          <div style={{ position:"absolute", inset:0, backgroundImage:"url(/sungchangwoon-director.jpg.jpg)", backgroundSize:"cover", backgroundPosition:"center top" }}/>
-          {/* 하단 텍스트 가독성용 그라디언트만 */}
-          <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,.68) 0%, rgba(0,0,0,.18) 50%, transparent 100%)" }}/>
-          <div style={{ position:"relative", padding:"26px 26px 28px", color:"#fff" }}>
+        {/* ── 상단 2열: 히어로(좌) + 오른쪽 스택(우) ── */}
+        {/* 히어로 타일 — 전신 노출 */}
+        <div style={{ ...scwTile, padding:0, overflow:"hidden", position:"relative", gridColumn:1, gridRow:"1" }} className="scw-hero-tile">
+          <img
+            src="/sungchangwoon-director.jpg.jpg"
+            alt="성창운 총장 전신"
+            style={{ width:"100%", height:"auto", display:"block" }}
+          />
+          <div style={{ position:"absolute", bottom:0, left:0, right:0, background:"linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,.22) 60%, transparent 100%)", padding:"32px 26px 28px", color:"#fff" }}>
             <span style={{ fontSize:11.5, fontWeight:700, letterSpacing:".14em", color:SCW.GOLDL }}>문화창조는 신화창조다</span>
             <h1 style={{ fontSize:40, fontWeight:800, margin:"8px 0 4px", letterSpacing:"-.01em", fontFamily:font }}>성창운</h1>
             <div style={{ width:46, height:3, background:SCW.GOLDL, margin:"6px 0 12px" }}/>
@@ -295,23 +297,33 @@ function SungchangwoonPage() {
           </div>
         </div>
 
-        {/* 2. 소개 인용 타일 */}
-        <div style={{ ...scwTile, padding:"22px 22px" }}>
-          <Quote size={22} color={SCW.GOLDL}/>
-          <p style={{ fontSize:14, color:"#5b5347", lineHeight:1.75, margin:"8px 0 0", fontFamily:font }}>
-            마음을 여는 웃음레크와 힐링 스피치, 체질별 맞춤 소통으로 당신의 일상과 조직에 <b style={{ color:SCW.WINE }}>활력</b>을 넣어드립니다.<br/>
-            <span style={{ fontSize:13, color:SCW.MUTE }}>'문화창조는 신화창조다'라는 신념 아래, 웃음과 소통으로 개인의 건강을 돕고 조직의 변화를 이끌어냅니다.</span>
-          </p>
-        </div>
-
-        {/* 3. 실적 숫자 타일 */}
-        <div style={{ ...scwTile, padding:"18px 10px", display:"flex" }}>
-          {[["5,000+","강의(회)"],["11","수상"],["6","저서"],["31","나눔 후원"]].map(([n,l],i)=>(
-            <div key={i} style={{ flex:1, textAlign:"center", borderRight:i<3?"1px solid #EDE6D6":"none" }}>
-              <div style={{ fontSize:26, fontWeight:800, color:SCW.GOLD, fontFamily:font }}>{n}</div>
-              <div style={{ fontSize:11.5, color:SCW.MUTE, marginTop:2, fontFamily:font }}>{l}</div>
-            </div>
-          ))}
+        {/* 오른쪽 스택 래퍼 — 히어로 높이만큼 채움 */}
+        <div style={{ gridColumn:2, gridRow:"1", display:"flex", flexDirection:"column", gap:16 }}>
+          {/* 소개 인용 */}
+          <div style={{ ...scwTile, padding:"22px 22px" }}>
+            <Quote size={22} color={SCW.GOLDL}/>
+            <p style={{ fontSize:14, color:"#5b5347", lineHeight:1.75, margin:"8px 0 0", fontFamily:font }}>
+              마음을 여는 웃음레크와 힐링 스피치, 체질별 맞춤 소통으로 당신의 일상과 조직에 <b style={{ color:SCW.WINE }}>활력</b>을 넣어드립니다.<br/>
+              <span style={{ fontSize:13, color:SCW.MUTE }}>'문화창조는 신화창조다'라는 신념 아래, 웃음과 소통으로 개인의 건강을 돕고 조직의 변화를 이끌어냅니다.</span>
+            </p>
+          </div>
+          {/* 실적 숫자 2×2 */}
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+            {[["5,000+","강의(회)"],["11","수상"],["6","저서"],["31","나눔 후원"]].map(([n,l],i)=>(
+              <div key={i} style={{ ...scwTile, padding:"18px 12px", textAlign:"center" }}>
+                <div style={{ fontSize:28, fontWeight:800, color:SCW.GOLD, fontFamily:font }}>{n}</div>
+                <div style={{ fontSize:11.5, color:SCW.MUTE, marginTop:4, fontFamily:font }}>{l}</div>
+              </div>
+            ))}
+          </div>
+          {/* 수상 사진 — 오른쪽 빈 공간 채움 */}
+          <div style={{ ...scwTile, padding:0, overflow:"hidden", flex:1, minHeight:160, position:"relative" }}>
+            <img src="/sungchangwoon-award.jpg.jpg" alt="도전한국인 AI교육혁신대상"
+              style={{ width:"100%", height:"100%", objectFit:"cover", display:"block", minHeight:160 }}
+              onError={e=>{ e.currentTarget.style.display="none"; }}
+            />
+            <div style={{ position:"absolute", inset:8, border:`1px solid ${SCW.GOLD}55`, borderRadius:12, pointerEvents:"none" }}/>
+          </div>
         </div>
 
         {/* 4. 수상 배너 (전체폭) */}
@@ -329,15 +341,6 @@ function SungchangwoonPage() {
               <p style={{ fontSize:13.5, fontWeight:700, color:SCW.INK, margin:"8px 0 0", fontFamily:font }}>{t}</p>
             </div>
           ))}
-        </div>
-
-        {/* 6. 수상 사진 타일 */}
-        <div style={{ ...scwTile, padding:0, overflow:"hidden", minHeight:200, position:"relative" }}>
-          <img src="/sungchangwoon-award.jpg.jpg" alt="도전한국인 AI교육혁신대상"
-            style={{ width:"100%", height:"100%", objectFit:"cover", display:"block", minHeight:200 }}
-            onError={e=>{ e.currentTarget.style.display="none"; e.currentTarget.parentNode.style.background="#20242c"; }}
-          />
-          <div style={{ position:"absolute", inset:8, border:`1px solid ${SCW.GOLD}55`, borderRadius:12, pointerEvents:"none" }}/>
         </div>
 
         {/* 7. 미래 비전 타일 (전체폭) */}
@@ -367,12 +370,24 @@ function SungchangwoonPage() {
           <ArrowRight size={18} color="#fff"/>
         </a>
 
-        {/* 9. 저서 */}
-        <div style={{ ...scwTile, padding:"16px 18px", display:"flex", alignItems:"center", gap:10 }}>
-          <BookOpen size={20} color={SCW.GOLD}/>
-          <div>
-            <p style={{ fontSize:14, fontWeight:800, color:SCW.INK, margin:0, fontFamily:font }}>저서 6권</p>
-            <p style={{ fontSize:11.5, color:SCW.MUTE, margin:"2px 0 0", fontFamily:font }}>복을 짓는 리더의 삶 외</p>
+        {/* 9. 저서 6권 갤러리 (전체폭) */}
+        <div style={{ gridColumn:"1 / -1", ...scwTile, padding:"20px 24px" }} className="scw-col-span">
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16 }}>
+            <BookOpen size={19} color={SCW.GOLD}/>
+            <span style={{ fontSize:15, fontWeight:800, color:SCW.INK, fontFamily:font }}>저서 6권</span>
+            <span style={{ fontSize:12, color:SCW.MUTE, fontFamily:font }}>— 무대에서 못다 한 말, 책으로</span>
+          </div>
+          <div style={{ display:"flex", gap:14, overflowX:"auto", paddingBottom:6, WebkitOverflowScrolling:"touch", scrollbarWidth:"thin", scrollbarColor:`${SCW.GOLDL} transparent` }}>
+            {[1,2,3,4,5,6].map(n => (
+              <div key={n} style={{ flexShrink:0, width:128, borderRadius:10, overflow:"hidden", boxShadow:`0 4px 16px rgba(120,95,30,.13)`, border:`1px solid ${SCW.GOLDL}88` }}>
+                <img
+                  src={`/sungchangwoon-book-${n}.jpg.jpg`}
+                  alt={`성창운 저서 ${n}`}
+                  style={{ width:"100%", height:"auto", display:"block" }}
+                  onError={e=>{ e.currentTarget.parentNode.style.background="#F4EDD5"; e.currentTarget.style.display="none"; }}
+                />
+              </div>
+            ))}
           </div>
         </div>
 
