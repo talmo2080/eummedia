@@ -550,7 +550,7 @@ function SungchangwoonPage() {
               style={{ flex:1, padding:"13px 16px", borderRadius:12, background:"#fff", color:SCW.INK, fontSize:13.5, fontWeight:700, border:`1.5px solid ${SCW.WINE}44`, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6, textDecoration:"none", fontFamily:font }}>
               <Phone size={13} color={SCW.WINE}/> <span style={{ color:SCW.WINE }}>010-9893-0330</span>
             </a>
-            <a href="https://cafe.naver.com/kk304915" target="_blank" rel="noopener noreferrer"
+            <a href="https://www.eummedia.kr/" target="_blank" rel="noopener noreferrer"
               style={{ flex:1, padding:"13px 16px", borderRadius:12, background:"#fff", color:SCW.INK, fontSize:13.5, fontWeight:700, border:"1px solid #E0D8C6", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6, textDecoration:"none", fontFamily:font }}>
               이음소식 <ArrowRight size={13}/>
             </a>
