@@ -296,6 +296,9 @@ export default function ArticleEditor() {
   const [inlineAdLink, setInlineAdLink] = useState('')
   const [inlineAdTitle, setInlineAdTitle] = useState('')
   const [inlineAdSubtitle, setInlineAdSubtitle] = useState('')
+  // 성과 데이터 (봉당·웃자·이음미디어 행사 기사 → 평생교육원·공모 실적 포트폴리오)
+  const [performanceData, setPerformanceData] = useState({})
+  const [performanceOpen, setPerformanceOpen] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [bannerUploading, setBannerUploading] = useState(false)
   const [inlineImageUploading, setInlineImageUploading] = useState(false)   // 본문 콘텐츠 이미지 업로드 상태
@@ -439,6 +442,13 @@ export default function ArticleEditor() {
       setInlineAdLink(data.inline_ad_link || '')
       setInlineAdTitle(data.inline_ad_title || '')
       setInlineAdSubtitle(data.inline_ad_subtitle || '')
+      // 성과 데이터 (편집 모드에서 기존 값 로드)
+      const pd = data.performance_data || {}
+      setPerformanceData(pd)
+      // 성과 데이터가 이미 있는 기사면 섹션 자동 펼침
+      if (pd && typeof pd === 'object' && Object.keys(pd).length > 0) {
+        setPerformanceOpen(true)
+      }
       setOriginalStatus(data.status || null)
       // citizen_checks JSONB에서 수동 7개만 복원 (자동 7개는 derive)
       if (data.citizen_checks && typeof data.citizen_checks === 'object') {
@@ -735,6 +745,26 @@ export default function ArticleEditor() {
       inline_ad_link: inlineAdLink.trim() || null,
       inline_ad_title: inlineAdTitle.trim() || null,
       inline_ad_subtitle: inlineAdSubtitle.trim() || null,
+      // 성과 데이터 (행사 기사만 채워짐 — 하나라도 값 있으면 객체 저장, 전부 비면 null)
+      // 숫자 필드는 실제 Number로 저장 → DB에서 통계·집계 시 형변환 불필요
+      performance_data: (() => {
+        if (!performanceData || typeof performanceData !== 'object') return null
+        const NUM_KEYS = ['participants', 'hours', 'completion']
+        const cleaned = {}
+        for (const [k, v] of Object.entries(performanceData)) {
+          if (v === '' || v === null || v === undefined) continue
+          if (NUM_KEYS.includes(k)) {
+            const n = Number(v)
+            if (Number.isNaN(n) || n < 0) continue
+            cleaned[k] = n
+          } else {
+            const s = typeof v === 'string' ? v.trim() : v
+            if (s === '' || s == null) continue
+            cleaned[k] = s
+          }
+        }
+        return Object.keys(cleaned).length > 0 ? cleaned : null
+      })(),
       // 시민기자 체크 — submitted 시 14개 결과 + 점수 저장 (draft 시도 무해)
       citizen_checks: allChecks,
       citizen_complete: totalDone,
@@ -863,6 +893,7 @@ export default function ArticleEditor() {
     setSummary(''); setThumbnailUrl(''); setImageAlt(''); setVideoUrl('')
     setShowInArticle(false); setShowInGallery(false); setContent('')
     setExternalUrl(''); setInlineAdImage(''); setInlineAdLink(''); setInlineAdTitle(''); setInlineAdSubtitle('')
+    setPerformanceData({}); setPerformanceOpen(false)
     setOriginalStatus(null)
     setManualChecks({
       leadParagraph: false, spelling: false, titleKeyword: false,
@@ -1543,6 +1574,142 @@ export default function ArticleEditor() {
                   value={inlineAdSubtitle} onChange={e => setInlineAdSubtitle(e.target.value)}
                   placeholder='예: "고객의 마지막 희망이 되고픈 두피전문가"' />
               </div>
+            </div>
+
+            {/* 9.5 성과 데이터 (선택) — 봉당·웃자·행사 기사만 사용
+                평생교육원·지자체 공모 제안서 '운영 실적 포트폴리오'용
+                기본 접힘. 값이 있으면 로딩 시 자동 펼침. */}
+            <div style={{
+              marginTop: 24,
+              border: '2px solid #e8ddc7',
+              borderRadius: 10,
+              overflow: 'hidden',
+              background: '#fffdf9',
+            }}>
+              <button type="button" onClick={() => setPerformanceOpen(o => !o)}
+                style={{
+                  width: '100%',
+                  padding: '18px 20px',
+                  background: performanceOpen ? '#f5efe0' : '#fafafa',
+                  border: 'none',
+                  borderBottom: performanceOpen ? '2px solid #e8ddc7' : 'none',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: NAVY,
+                  fontFamily: SANS,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
+                <span>📊 성과 데이터 (선택) — 봉당·웃자·행사 기사만 열어주세요</span>
+                <span style={{ fontSize: 18, color: '#8b7355' }}>{performanceOpen ? '▲' : '▼'}</span>
+              </button>
+
+              {performanceOpen && (
+                <div style={{ padding: 20 }}>
+                  <p style={{
+                    margin: '0 0 18px', fontSize: 13, color: '#8b7355',
+                    lineHeight: 1.7, background: '#fbf7ef',
+                    padding: '10px 14px', borderRadius: 6, borderLeft: '3px solid #d4b880',
+                  }}>
+                    💡 이 데이터는 1~5년 뒤 <strong>이음평생교육원 설립·지자체 공모 제안서</strong>의
+                    <strong> '운영 실적 증빙'</strong>으로 뽑아 씁니다. 모두 선택 항목이며,
+                    비어 있어도 정상 발행됩니다.
+                  </p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14, marginBottom: 14 }}>
+                    <div>
+                      <label style={lbl}>행사 날짜</label>
+                      <input style={inp()} type="date"
+                        value={performanceData.event_date || ''}
+                        onChange={e => setPerformanceData(prev => ({ ...prev, event_date: e.target.value }))} />
+                    </div>
+                    <div>
+                      <label style={lbl}>장소</label>
+                      <input style={inp()}
+                        value={performanceData.location || ''}
+                        onChange={e => setPerformanceData(prev => ({ ...prev, location: e.target.value }))}
+                        placeholder="예: 관악구민회관 3층" />
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: 14 }}>
+                    <label style={lbl}>주최·주관</label>
+                    <input style={inp()}
+                      value={performanceData.host || ''}
+                      onChange={e => setPerformanceData(prev => ({ ...prev, host: e.target.value }))}
+                      placeholder="예: 봉숭아학당문화혁신학교 (주관 이음미디어)" />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14, marginBottom: 14 }}>
+                    <div>
+                      <label style={lbl}>참여 인원 (명) ⭐ 가장 중요</label>
+                      <input style={inp()} type="number" min="0"
+                        value={performanceData.participants ?? ''}
+                        onChange={e => setPerformanceData(prev => ({ ...prev, participants: e.target.value }))}
+                        placeholder="48" />
+                    </div>
+                    <div>
+                      <label style={lbl}>수료·이수 인원 (명)</label>
+                      <input style={inp()} type="number" min="0"
+                        value={performanceData.completion ?? ''}
+                        onChange={e => setPerformanceData(prev => ({ ...prev, completion: e.target.value }))}
+                        placeholder="42" />
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: 14 }}>
+                    <label style={lbl}>대상 구성</label>
+                    <input style={inp()}
+                      value={performanceData.target_group || ''}
+                      onChange={e => setPerformanceData(prev => ({ ...prev, target_group: e.target.value }))}
+                      placeholder="예: 관악구 거주 시니어 / 경력단절여성 / 지역 청년" />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 14, marginBottom: 14 }}>
+                    <div>
+                      <label style={lbl}>프로그램·강좌명</label>
+                      <input style={inp()}
+                        value={performanceData.program || ''}
+                        onChange={e => setPerformanceData(prev => ({ ...prev, program: e.target.value }))}
+                        placeholder="예: AI로 자서전 쓰기 3주 과정" />
+                    </div>
+                    <div>
+                      <label style={lbl}>시수 (시간)</label>
+                      <input style={inp()} type="number" min="0" step="0.5"
+                        value={performanceData.hours ?? ''}
+                        onChange={e => setPerformanceData(prev => ({ ...prev, hours: e.target.value }))}
+                        placeholder="9" />
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: 14 }}>
+                    <label style={lbl}>만족도</label>
+                    <input style={inp()}
+                      value={performanceData.satisfaction || ''}
+                      onChange={e => setPerformanceData(prev => ({ ...prev, satisfaction: e.target.value }))}
+                      placeholder="예: 설문 92% / 후기 우수" />
+                  </div>
+
+                  <div style={{ marginBottom: 14 }}>
+                    <label style={lbl}>공익성 (기부·상생·취약계층 지원)</label>
+                    <textarea style={inp({ height: 64, resize: 'none' })}
+                      value={performanceData.public_value || ''}
+                      onChange={e => setPerformanceData(prev => ({ ...prev, public_value: e.target.value }))}
+                      placeholder="예: 참가비 전액 백혈병재단 기부, 지역 청년 서포터즈 5명 활동" />
+                  </div>
+
+                  <div>
+                    <label style={lbl}>기타 비고</label>
+                    <textarea style={inp({ height: 64, resize: 'none' })}
+                      value={performanceData.note || ''}
+                      onChange={e => setPerformanceData(prev => ({ ...prev, note: e.target.value }))}
+                      placeholder="예: 성창운 총장 격려 참석, 지역 언론 3사 취재" />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* 10. 하단 버튼 — 발행본 수정 모드(편집국장)인지에 따라 액션 버튼 분기 */}
