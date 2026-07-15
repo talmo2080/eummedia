@@ -17,6 +17,18 @@ const SERIF = "'Noto Serif KR', serif"
 const SANS = "'Noto Sans KR', sans-serif"
 const PAGE_SIZE = 15
 
+// 이음미디어 창간일 (KST 기준) — 매체 나이 계산·매체 정보 표시의 단일 진실 소스
+const FOUNDING_DATE = new Date('2026-06-04T00:00:00+09:00')
+const FOUNDING_DATE_LABEL = '2026년 6월 4일'
+
+// 창간 경과일 계산 (창간 당일 = 1일째, 창간 이전이면 최소 1 반환하여 음수 방지)
+// 사용처: 관리자 대시보드 통계 탭의 창간 배너 (자동 매일 갱신)
+function getFoundingDayCount() {
+  const MS_PER_DAY = 1000 * 60 * 60 * 24
+  const diff = Math.floor((Date.now() - FOUNDING_DATE.getTime()) / MS_PER_DAY)
+  return Math.max(1, diff + 1)
+}
+
 function formatDateTime(iso) {
   if (!iso) return ''
   const d = new Date(iso)
@@ -1839,11 +1851,11 @@ export default function AdminDashboard() {
               borderRadius: 12, padding: '32px 24px',
               textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
             }}>
-              <div style={{ fontSize: 16, opacity: 0.8, marginBottom: 8 }}>창간 D-day</div>
+              <div style={{ fontSize: 16, opacity: 0.8, marginBottom: 8 }}>매체 나이</div>
               <div style={{
                 fontFamily: SERIF, fontSize: 26, fontWeight: 700, color: GOLD,
               }}>
-                🎉 창간까지 D-18 (2026년 6월 4일)
+                🎉 창간 {getFoundingDayCount()}일째 ({FOUNDING_DATE_LABEL} 창간)
               </div>
             </div>
           </div>
@@ -1876,7 +1888,7 @@ export default function AdminDashboard() {
                     ['이메일', 'press@eummedia.kr'],
                     ['도메인', 'eummedia.kr'],
                     ['채널 수', '7개'],
-                    ['창간 예정일', '2026년 6월 4일'],
+                    ['창간일', `${FOUNDING_DATE_LABEL} (창간 ${getFoundingDayCount()}일째)`],
                   ].map(([k, v]) => (
                     <tr key={k} style={{ borderBottom: '1px solid #ebebeb' }}>
                       <th style={{
