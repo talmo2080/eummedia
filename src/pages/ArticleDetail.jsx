@@ -19,8 +19,9 @@ function formatDate(iso) {
   return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
 }
 
-// 이음미디어 창간(2026-06-08 KST) 이전 발행 기사에만 노출되는 "이음매거진 통합" 안내 cutoff
-const LEGACY_NOTICE_CUTOFF = new Date('2026-06-08T00:00:00+09:00');
+// 이음미디어 창간(2026-06-04 KST) 이전 발행 기사에만 노출되는 "이음매거진 통합" 안내 cutoff
+// 창간일 = AdminDashboard.jsx의 FOUNDING_DATE와 동일 개념 (2026-07-15 6/8→6/4 통일)
+const LEGACY_NOTICE_CUTOFF = new Date('2026-06-04T00:00:00+09:00');
 
 function splitIntoParagraphs(content) {
   if (!content) return [];
@@ -824,7 +825,7 @@ export default function ArticleDetail() {
               </div>
             </div>
           </div>
-          {/* 이음매거진 통합 안내 — 창간(2026-06-08 KST) 이전 발행 기사에만 노출 */}
+          {/* 이음매거진 통합 안내 — 창간(2026-06-04 KST) 이전 발행 기사에만 노출 */}
           {article.published_at && new Date(article.published_at) < LEGACY_NOTICE_CUTOFF && (
             <div style={{ fontSize:"12px", color:"#9a9a9a", marginBottom:"24px" }}>
               이음매거진은 인터넷신문 이음미디어로 통합되었습니다.<br />
