@@ -767,16 +767,14 @@ const OHJ3_CSS = `
 
   /* 강연 현장 */
   .ohj3-stage-band { background:var(--blush); padding:58px 0; }
-  .ohj3-feature { height:280px; border-radius:20px;
-    background:linear-gradient(160deg,#FFD9A8,#FFB3C7);
-    display:grid; place-items:center;
-    color:#8a4a63; font-weight:800; font-size:14px; text-align:center; }
-  .ohj3-thumbs { margin-top:12px; display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; }
-  .ohj3-thumb { flex:0 0 130px; height:90px; border-radius:12px; background:#fff;
-    border:1px solid #FFD3E0; display:grid; place-items:center;
-    color:var(--mute); font-size:11.5px; }
-  .ohj3-more { text-align:center; margin-top:14px; font-size:13px;
-    color:var(--rose); font-weight:800; }
+  .ohj3-feature-img { width:100%; border-radius:20px; display:block;
+    object-fit:cover; max-height:340px; }
+  .ohj3-lecture-strip { margin-top:14px; display:flex; gap:10px; overflow-x:auto;
+    padding-bottom:8px; -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin; scrollbar-color:#E11D74 transparent; }
+  .ohj3-lecture-strip img { height:110px; width:auto; display:block;
+    border-radius:12px; flex-shrink:0;
+    object-fit:contain; background:#fff; }
 
   /* 저서 */
   .ohj3-books-band { background:var(--ivory); padding:58px 0; }
@@ -985,18 +983,22 @@ function OhaengjaPage() {
         </div>
       </div>
 
-      {/* 강연 현장 (placeholder) */}
+      {/* 강연 현장 — 34장 */}
       <div className="ohj3-stage-band">
         <div className="ohj3-inner">
           <div className="ohj3-sec-k">ON STAGE</div>
           <div className="ohj3-sec-h jua">강연 현장</div>
-          <div className="ohj3-feature">🎤 대표 강연 사진 (큰 컷)</div>
-          <div className="ohj3-thumbs">
-            {["①","②","③","④","⑤","⑥"].map(n=>(
-              <div key={n} className="ohj3-thumb">현장 {n}</div>
+          <img src="/ohaengja-lecture-photos/ohaengja-lecture-1.jpg"
+            alt="오행자 대표 강연" className="ohj3-feature-img"
+            onError={e=>{ e.currentTarget.style.display="none"; }}/>
+          <div className="ohj3-lecture-strip">
+            {Array.from({length:33},(_,i)=>i+2).map(n=>(
+              <img key={n}
+                src={`/ohaengja-lecture-photos/ohaengja-lecture-${n}.jpg`}
+                alt={`강연 현장 ${n}`}
+                onError={e=>{ e.currentTarget.style.display="none"; }}/>
             ))}
           </div>
-          <div className="ohj3-more">+ 사진 20장이 이렇게 흐르며 이어져요 (좌우 스크롤)</div>
         </div>
       </div>
 
