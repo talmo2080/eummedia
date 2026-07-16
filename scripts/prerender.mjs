@@ -73,6 +73,11 @@ const PIUM_APP_PROFILES = {
     desc: '웃음레크·힐링 스피치·사상체질 소통 강의 전문가. 강의·섭외 문의 010-9893-0330',
     image: `${SITE_URL}/sungchangwoon-og.jpg`,
   },
+  '/pium-app/ohaengja': {
+    title: '오행자 · 봉숭아학당문화혁신학교 교수 | 이음미디어',
+    desc: '개그맨을 웃기는 웃음치료사. KBS·MBC·JTBC·EBS 등 방송 출연. 강의·섭외 문의 010-4321-7159',
+    image: `${SITE_URL}/ohaengja-profile.jpg`,
+  },
 };
 
 // 피움앱 프로필 페이지의 <title> + og/twitter/description 메타를 프로필별 값으로 교체

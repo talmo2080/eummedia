@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Award, Sparkles, Heart, MessageCircle, Users, Tv, ArrowRight, TrendingUp, Phone, Quote, BookOpen, X, Send, CheckCircle, Newspaper, Smile, Mic, Building2, Coffee } from "lucide-react";
 
@@ -677,6 +677,394 @@ function SungchangwoonPage() {
   );
 }
 
+/* ══════════════════════════════════════
+   오행자 — v3 세로형 매거진 페이지
+══════════════════════════════════════ */
+const OHJ3_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@700&family=Playfair+Display:wght@700;800;900&display=swap');
+
+  .ohj3 {
+    --rose:#E11D74; --coral:#FF6A3D; --sun:#FFC53D;
+    --ink:#34122B; --ivory:#FFF8F0; --blush:#FFEDF3; --plum:#2A1024; --mute:#9A8592;
+    font-family:Pretendard,-apple-system,sans-serif;
+    background:var(--ivory); color:var(--ink); line-height:1.6;
+  }
+  .ohj3 * { box-sizing:border-box; }
+  .ohj3 a { color:inherit; text-decoration:none; }
+  .ohj3 .jua { font-family:'Jua',Pretendard,sans-serif; }
+  .ohj3 .hand { font-family:'Gaegu',Pretendard,sans-serif; font-weight:700; }
+
+  .ohj3-back { padding:14px 20px; background:rgba(255,255,255,.9);
+    display:flex; align-items:center; gap:8px; border-bottom:1px solid #FFD9E6; }
+
+  .ohj3-inner { max-width:720px; margin:0 auto; padding:0 20px; }
+
+  /* HERO */
+  .ohj3-hero { background:linear-gradient(180deg,#1B0B17 0%,#2A1024 24%,#9C1C6A 56%,#E11D74 80%,#FF6A3D 100%);
+    color:#fff; padding:52px 0 0; text-align:center; overflow:hidden; }
+  .ohj3-hero .eyebrow { font-size:17px; color:var(--sun); }
+  .ohj3-hero .en { font-family:'Playfair Display',serif; font-weight:900; font-size:62px;
+    line-height:1; letter-spacing:.08em; margin:12px 0 0; color:#fff; }
+  .ohj3-hero .divider { width:44px; height:3px; background:var(--sun);
+    margin:20px auto; border-radius:2px; opacity:.9; }
+  .ohj3-hero h1 { font-size:84px; line-height:.9; margin:0 0 10px;
+    text-shadow:0 3px 18px rgba(0,0,0,.22); }
+  .ohj3-hero .sub { font-size:15px; font-weight:700; color:rgba(255,255,255,.95); margin-bottom:0; }
+  .ohj3-hero-photo { margin:30px auto 0; max-width:560px; border-radius:24px 24px 0 0; overflow:hidden; }
+  .ohj3-hero-photo img { width:100%; display:block; object-fit:cover; image-orientation:from-image; }
+
+  /* THESIS */
+  .ohj3-thesis { background:var(--ivory); padding:60px 0; text-align:center; }
+  .ohj3-thesis .big { font-size:40px; line-height:1.25; color:var(--ink); }
+  .ohj3-thesis .big span { color:var(--rose); }
+  .ohj3-thesis .small { margin-top:14px; font-size:15px; color:var(--mute); }
+
+  /* INTRO */
+  .ohj3-intro { background:var(--blush); padding:52px 0; }
+  .ohj3-intro .k { font-size:14px; color:var(--rose); font-weight:800; text-align:center; }
+  .ohj3-intro p { font-size:15px; line-height:1.9; color:#5c3a4d; text-align:center;
+    max-width:600px; margin:14px auto 0; }
+
+  /* STATS */
+  .ohj3-stats-band { background:var(--ivory); padding:40px 0; }
+  .ohj3-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  .ohj3-stat { text-align:center; }
+  .ohj3-stat .n { font-size:42px; line-height:1; color:var(--rose); }
+  .ohj3-stat .l { font-size:13px; color:var(--mute); margin-top:8px; }
+
+  /* 방송 (다크) */
+  .ohj3-tv { background:var(--plum); color:#fff; padding:60px 0; }
+  .ohj3-tv .k { font-size:14px; color:var(--sun); font-weight:800; text-align:center; }
+  .ohj3-tv h2 { font-size:34px; text-align:center; margin:8px 0 26px; }
+  .ohj3-tv-logos { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .ohj3-chip { border:1.5px solid rgba(255,255,255,.4); border-radius:999px;
+    padding:9px 17px; font-weight:800; font-size:16px; }
+  .ohj3-tv-strip { margin-top:24px; display:flex; gap:12px; overflow-x:auto;
+    padding-bottom:8px; -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin; scrollbar-color:#E11D74 transparent; }
+  .ohj3-tv-strip img { height:130px; width:auto; display:block; border-radius:14px;
+    flex-shrink:0; image-orientation:from-image; }
+  .ohj3-tv-shows { margin-top:16px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  .ohj3-show { background:rgba(255,255,255,.12); border-radius:8px;
+    padding:6px 12px; font-size:12.5px; color:rgba(255,255,255,.9); }
+
+  /* 전문분야 */
+  .ohj3-fields-band { background:var(--ivory); padding:58px 0; }
+  .ohj3-sec-k { font-size:14px; color:var(--rose); font-weight:800; text-align:center; }
+  .ohj3-sec-h { font-size:32px; text-align:center; margin:6px 0 26px; }
+  .ohj3-fields { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .ohj3-field { border-radius:20px; padding:22px 18px; color:#fff; text-align:center; }
+  .ohj3-field .fi { font-size:32px; }
+  .ohj3-field h3 { font-size:17px; margin:10px 0 5px; }
+  .ohj3-field p { font-size:12.5px; opacity:.96; line-height:1.5; }
+  .ohj3-field .badge { display:inline-block; margin-top:9px;
+    background:rgba(255,255,255,.24); border-radius:8px;
+    padding:4px 10px; font-size:11px; font-weight:800; }
+  .ohj3-f1 { background:linear-gradient(130deg,#FF6A3D,#FF9450); }
+  .ohj3-f2 { background:linear-gradient(130deg,#E11D74,#F0568F); }
+  .ohj3-f3 { background:linear-gradient(130deg,#7A34B0,#A64FD0); }
+  .ohj3-f4 { background:linear-gradient(130deg,#E8912E,#F6B44E); }
+
+  /* 강연 현장 */
+  .ohj3-stage-band { background:var(--blush); padding:58px 0; }
+  .ohj3-feature { height:280px; border-radius:20px;
+    background:linear-gradient(160deg,#FFD9A8,#FFB3C7);
+    display:grid; place-items:center;
+    color:#8a4a63; font-weight:800; font-size:14px; text-align:center; }
+  .ohj3-thumbs { margin-top:12px; display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; }
+  .ohj3-thumb { flex:0 0 130px; height:90px; border-radius:12px; background:#fff;
+    border:1px solid #FFD3E0; display:grid; place-items:center;
+    color:var(--mute); font-size:11.5px; }
+  .ohj3-more { text-align:center; margin-top:14px; font-size:13px;
+    color:var(--rose); font-weight:800; }
+
+  /* 저서 */
+  .ohj3-books-band { background:var(--ivory); padding:58px 0; }
+  .ohj3-books { display:flex; gap:14px; overflow-x:auto; padding-bottom:6px; }
+  .ohj3-book { flex:0 0 120px; }
+  .ohj3-book .cov { aspect-ratio:1/1.45; border-radius:10px;
+    background:linear-gradient(160deg,#FFE0B0,#FFB8CD);
+    display:grid; place-items:center; text-align:center; padding:12px;
+    font-size:12px; font-weight:800; color:#7a2b4a;
+    box-shadow:0 6px 16px rgba(120,40,74,.14); }
+  .ohj3-book .bt { font-size:11px; color:var(--mute); margin-top:7px; text-align:center; }
+
+  /* 채널 */
+  .ohj3-ch-band { background:var(--ivory); padding:58px 0; }
+  .ohj3-channels { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .ohj3-ch { display:flex; align-items:center; gap:12px; background:#fff;
+    border:1px solid #FFD9E6; border-radius:16px; padding:16px;
+    box-shadow:0 5px 14px rgba(224,29,116,.05); text-decoration:none; color:inherit; }
+  .ohj3-ch .ci { width:38px; height:38px; border-radius:11px; flex:0 0 auto;
+    display:grid; place-items:center; background:var(--blush); color:var(--rose); font-size:16px; }
+  .ohj3-ch .ct { flex:1; min-width:0; }
+  .ohj3-ch .ct b { display:block; font-size:15px; color:var(--ink); }
+  .ohj3-ch .ct span { font-size:11.5px; color:var(--mute); }
+  .ohj3-ch .arr { color:var(--rose); font-weight:800; }
+  .ohj3-ch-me { grid-column:1 / -1;
+    background:linear-gradient(120deg,#E11D74,#FF6A3D); border:none; }
+  .ohj3-ch-me .ci { background:rgba(255,255,255,.22); color:#fff; font-size:18px; }
+  .ohj3-ch-me .ct b { color:#fff; font-size:17px; }
+  .ohj3-ch-me .ct span { color:rgba(255,255,255,.85); }
+  .ohj3-ch-me .arr { color:#fff; }
+
+  /* 마음 (닫기) */
+  .ohj3-heart { background:linear-gradient(160deg,#3A1230,#2A1024);
+    color:#fff; padding:64px 0; text-align:center; }
+  .ohj3-heart .k { font-size:24px; color:var(--sun); }
+  .ohj3-heart h2 { font-size:34px; margin:6px 0 16px; }
+  .ohj3-heart p { font-size:15.5px; line-height:1.9; color:rgba(255,255,255,.85);
+    max-width:560px; margin:0 auto; }
+  .ohj3-heart .roles { margin-top:22px; display:flex; flex-wrap:wrap;
+    gap:9px; justify-content:center; }
+  .ohj3-heart .role { border:1px solid rgba(255,255,255,.3); border-radius:999px;
+    padding:8px 15px; font-size:12.5px; color:rgba(255,255,255,.92); }
+
+  /* CTA */
+  .ohj3-cta-band { background:var(--ivory); padding:50px 0 70px; }
+  .ohj3-cta .line { text-align:center; font-size:26px; margin-bottom:20px; }
+  .ohj3-cta-btns { display:flex; gap:12px; flex-wrap:wrap; }
+  .ohj3-btn { flex:1 1 100%; padding:20px; border-radius:18px; text-align:center;
+    font-size:18px; font-weight:800; color:#fff;
+    background:linear-gradient(120deg,#FF6A3D,#E11D74);
+    display:block; text-decoration:none; }
+  .ohj3-btn .ph { display:block; font-size:14px; font-weight:700;
+    color:rgba(255,255,255,.9); margin-top:4px; }
+  .ohj3-btn-tel { flex:1 1 100%; padding:18px; border-radius:16px; text-align:center;
+    font-size:17px; font-weight:800; background:#fff; color:#E11D74;
+    border:2px solid #E11D74; display:block; text-decoration:none; }
+  .ohj3-btn-tel .ph2 { display:block; font-size:14px; font-weight:700;
+    color:#E11D74; margin-top:3px; }
+
+  @media(max-width:560px) {
+    .ohj3-hero .en { font-size:42px; }
+    .ohj3-hero h1 { font-size:64px; }
+    .ohj3-thesis .big { font-size:30px; }
+    .ohj3-stats { grid-template-columns:repeat(2,1fr); gap:22px 14px; }
+    .ohj3-channels { grid-template-columns:1fr; }
+    .ohj3-ch-me { grid-column:auto; }
+  }
+`;
+
+const OHJ3_TV_COUNT = 24;
+
+function OhaengjaPage() {
+  return (
+    <div className="ohj3">
+      <style>{OHJ3_CSS}</style>
+
+      {/* 뒤로가기 */}
+      <div className="ohj3-back">
+        <Link to="/pium-store" style={{ display:"inline-flex", alignItems:"center", gap:6, color:"#9A8592", fontSize:13, fontWeight:600 }}>
+          <ArrowLeft size={14}/> 스토어로 돌아가기
+        </Link>
+      </div>
+
+      {/* HERO */}
+      <div className="ohj3-hero">
+        <div className="ohj3-inner">
+          <div className="eyebrow hand">개그맨을 웃기는 웃음치료사</div>
+          <div className="en">OH HAENG JA</div>
+          <div className="divider"/>
+          <h1 className="jua">오행자</h1>
+          <div className="sub">MZ세대 웃음 아이콘 · 소통·치유 전문가</div>
+        </div>
+        <div className="ohj3-hero-photo">
+          <img src="/ohaengja-profile.jpg" alt="오행자 교수"
+            onError={e=>{ e.currentTarget.parentElement.innerHTML=''; }}/>
+        </div>
+      </div>
+
+      {/* THESIS */}
+      <div className="ohj3-thesis">
+        <div className="ohj3-inner">
+          <div className="big jua">웃기지만,<br/><span>마음을 살립니다</span></div>
+          <div className="small hand">15초면 엔돌핀이 도는 사람</div>
+        </div>
+      </div>
+
+      {/* INTRO / PROFILE */}
+      <div className="ohj3-intro">
+        <div className="ohj3-inner">
+          <div className="k">PROFILE</div>
+          <p>'개그맨을 웃기는 웃음치료사'이자 'MZ세대 웃음 아이콘'으로 활약하는 소통·치유 전문가. 수많은 방송 출연과 대중 강연으로 긍정적인 웃음 에너지를 전파합니다.</p>
+          <p>상담심리학과 치유학(NLP·최면) 전문 지식을 바탕으로, 단순한 재미를 넘어 마음의 상처를 치유하고 생명을 살리는 웃음을 추구합니다. 동양고전과 인문학으로 '나를 찾아가는 과정'을 중시하며, 자신이 먼저 행복하고 스스로를 사랑할 때 진정한 '소통 리더십'이 나온다고 믿습니다.</p>
+        </div>
+      </div>
+
+      {/* STATS */}
+      <div className="ohj3-stats-band">
+        <div className="ohj3-inner">
+          <div className="ohj3-stats">
+            <div className="ohj3-stat"><div className="n jua">4,000+</div><div className="l">강의·강연</div></div>
+            <div className="ohj3-stat"><div className="n jua">30+</div><div className="l">방송 출연</div></div>
+            <div className="ohj3-stat"><div className="n jua">5</div><div className="l">저서</div></div>
+            <div className="ohj3-stat"><div className="n jua">5.7만</div><div className="l">유튜브 구독</div></div>
+          </div>
+        </div>
+      </div>
+
+      {/* 방송 (다크) */}
+      <div className="ohj3-tv">
+        <div className="ohj3-inner">
+          <div className="k">방송이 사랑한 얼굴</div>
+          <h2 className="jua">브라운관을 휩쓴 웃음</h2>
+          <div className="ohj3-tv-logos">
+            {["KBS","MBC","SBS","JTBC","MBN","EBS","채널A"].map(ch=>(
+              <span key={ch} className="ohj3-chip">{ch}</span>
+            ))}
+          </div>
+          <div className="ohj3-tv-strip">
+            {Array.from({length:OHJ3_TV_COUNT},(_,i)=>i+1).map(n=>(
+              <img key={n} src={`/ohaengja-tv-photos/ohaengja-tv-${n}.jpg`}
+                alt={`방송 출연 ${n}`}
+                onError={e=>{ e.currentTarget.style.display="none"; }}/>
+            ))}
+          </div>
+          <div className="ohj3-tv-shows">
+            {["아침마당","생방송 오늘의 아침","무엇이든 물어보살","알토란","살림남","기분좋은날","워크맨(400만) 출연","인천 프로야구 시구"].map(s=>(
+              <span key={s} className="ohj3-show">{s}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 전문분야 */}
+      <div className="ohj3-fields-band">
+        <div className="ohj3-inner">
+          <div className="ohj3-sec-k">EXPERTISE</div>
+          <div className="ohj3-sec-h jua">잘하는 것</div>
+          <div className="ohj3-fields">
+            <div className="ohj3-field ohj3-f1">
+              <div className="fi">📖</div>
+              <h3 className="jua">인문학 강의</h3>
+              <p>고전·인문·심리로 나를 찾아가는 시간</p>
+            </div>
+            <div className="ohj3-field ohj3-f2">
+              <div className="fi">💬</div>
+              <h3 className="jua">소통·커뮤니케이션</h3>
+              <p>공감과 설득, 관계를 여는 대화</p>
+            </div>
+            <div className="ohj3-field ohj3-f3">
+              <div className="fi">🎤</div>
+              <h3 className="jua">방송 스피치</h3>
+              <p>1인 방송인을 위한 말하기<span className="badge">방송스피치사관학교 28기 · 유튜버 150명 배출</span></p>
+            </div>
+            <div className="ohj3-field ohj3-f4">
+              <div className="fi">🍚</div>
+              <h3 className="jua">월요일 집밥 나눔</h3>
+              <p>매주 월요일 싱글벙글 나비축제, 정성스러운 집밥으로 사랑을 나눔</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 강연 현장 (placeholder) */}
+      <div className="ohj3-stage-band">
+        <div className="ohj3-inner">
+          <div className="ohj3-sec-k">ON STAGE</div>
+          <div className="ohj3-sec-h jua">강연 현장</div>
+          <div className="ohj3-feature">🎤 대표 강연 사진 (큰 컷)</div>
+          <div className="ohj3-thumbs">
+            {["①","②","③","④","⑤","⑥"].map(n=>(
+              <div key={n} className="ohj3-thumb">현장 {n}</div>
+            ))}
+          </div>
+          <div className="ohj3-more">+ 사진 20장이 이렇게 흐르며 이어져요 (좌우 스크롤)</div>
+        </div>
+      </div>
+
+      {/* 저서 5권 */}
+      <div className="ohj3-books-band">
+        <div className="ohj3-inner">
+          <div className="ohj3-sec-k">BOOKS</div>
+          <div className="ohj3-sec-h jua">쓴 책 5권</div>
+          <div className="ohj3-books">
+            {[
+              {t:["너 이렇게","살아봤어?"],y:"2024"},
+              {t:["봉숭아학당에서","다시 피어나는 꽃"],y:"2020"},
+              {t:["세상에 아프지","않은 사람은 없다"],y:"2018"},
+              {t:["소통리더십","(명강사 33인)"],y:"2016"},
+              {t:["토닥토닥","힐링수다"],y:"2015"},
+            ].map((b,i)=>(
+              <div key={i} className="ohj3-book">
+                <div className="cov">{b.t[0]}<br/>{b.t[1]}</div>
+                <div className="bt">{b.y}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 채널 5개 */}
+      <div className="ohj3-ch-band">
+        <div className="ohj3-inner">
+          <div className="ohj3-sec-k">CHANNELS</div>
+          <div className="ohj3-sec-h jua">채널 둘러보기</div>
+          <div className="ohj3-channels">
+            <a href="https://www.youtube.com/@%EC%9B%83%EC%9D%8C%EC%B9%98%EB%A3%8C%EC%82%AC%EC%98%A4%ED%96%89%EC%9E%90" target="_blank" rel="noopener noreferrer" className="ohj3-ch ohj3-ch-me">
+              <span className="ci">▶</span>
+              <div className="ct"><b>웃음치료사 오행자</b><span>웃음치료사 오행자 · 유튜브</span></div>
+              <span className="arr">↗</span>
+            </a>
+            <a href="https://www.youtube.com/@%EC%84%B1%EC%B0%BD%EC%9A%B4-i4d" target="_blank" rel="noopener noreferrer" className="ohj3-ch">
+              <span className="ci">▶</span>
+              <div className="ct"><b>봉당TV</b><span>성창운 · 유튜브</span></div>
+              <span className="arr">↗</span>
+            </a>
+            <a href="https://cafe.naver.com/kk304915" target="_blank" rel="noopener noreferrer" className="ohj3-ch">
+              <span className="ci">☕</span>
+              <div className="ct"><b>네이버 카페</b><span>봉숭아학당 커뮤니티</span></div>
+              <span className="arr">↗</span>
+            </a>
+            <a href="https://blog.naver.com/smilekorean1" target="_blank" rel="noopener noreferrer" className="ohj3-ch">
+              <span className="ci">✎</span>
+              <div className="ct"><b>웃자대한민국협회</b><span>공식 블로그</span></div>
+              <span className="arr">↗</span>
+            </a>
+            <a href="https://www.eummedia.kr/" target="_blank" rel="noopener noreferrer" className="ohj3-ch">
+              <span className="ci">▤</span>
+              <div className="ct"><b>이음미디어</b><span>인터넷신문</span></div>
+              <span className="arr">↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* 마음 (닫기) */}
+      <div className="ohj3-heart">
+        <div className="ohj3-inner">
+          <div className="k hand">웃음 뒤의 마음</div>
+          <h2 className="jua">웃기지만, 살립니다</h2>
+          <p>무대에선 누구보다 크게 웃기지만, 웃음 뒤에서 사람을 살리는 일을 합니다. 지치고 아픈 마음 곁에 앉아 토닥이는 것 — 그게 이 웃음의 진짜 이유예요.</p>
+          <div className="roles">
+            {["봉숭아학당 문화혁신학교 교수","웃자대한민국협회 교육본부장","열린사이버대 연구교수","참나사랑연구소 소장","참생명자살예방연구소 소장"].map(r=>(
+              <span key={r} className="role">{r}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="ohj3-cta-band">
+        <div className="ohj3-inner ohj3-cta">
+          <div className="line jua">이 웃음을, 당신의 무대로.</div>
+          <div className="ohj3-cta-btns">
+            <a href="mailto:ohj7159@naver.com" className="ohj3-btn jua">
+              ✍️ 강의 문의 · 섭외하기
+            </a>
+            <a href="tel:010-4321-7159" className="ohj3-btn-tel jua">
+              📞 바로 전화 연결
+              <span className="ph2">010-4321-7159</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
 /* ── 404 ── */
 function NotFound() {
   return (
@@ -699,6 +1087,7 @@ export default function PiumAppDetailPage() {
   const { slug } = useParams();
 
   if (slug === "sungchangwoon") return <SungchangwoonPage />;
+  if (slug === "ohaengja")     return <OhaengjaPage />;
 
   const app = APPS[slug];
 
