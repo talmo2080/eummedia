@@ -988,13 +988,13 @@ function OhaengjaPage() {
         <div className="ohj3-inner">
           <div className="ohj3-sec-k">ON STAGE</div>
           <div className="ohj3-sec-h jua">강연 현장</div>
-          <img src="/ohaengja-lecture-photos/ohaengja-lecture-1.jpg"
+          <img src="/ohaengja-lecture-photos/ohaengja-lecture-1.png"
             alt="오행자 대표 강연" className="ohj3-feature-img"
             onError={e=>{ e.currentTarget.style.display="none"; }}/>
           <div className="ohj3-lecture-strip">
             {Array.from({length:33},(_,i)=>i+2).map(n=>(
               <img key={n}
-                src={`/ohaengja-lecture-photos/ohaengja-lecture-${n}.jpg`}
+                src={`/ohaengja-lecture-photos/ohaengja-lecture-${n}.png`}
                 alt={`강연 현장 ${n}`}
                 onError={e=>{ e.currentTarget.style.display="none"; }}/>
             ))}
