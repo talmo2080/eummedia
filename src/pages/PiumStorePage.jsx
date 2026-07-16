@@ -877,6 +877,15 @@ export default function PiumStorePage() {
       price_model:   "free",
       users:         { nickname: "성창운" },
     },
+    {
+      slug:          "ohaengja",
+      title:         "오행자",
+      summary:       "개그맨을 웃기는 웃음치료사 · 방송 30+회 · 웃음강연",
+      thumbnail_url: "/ohaengja-og.jpg",
+      category:      "expert_tool",
+      price_model:   "free",
+      users:         { nickname: "오행자" },
+    },
   ];
   // 갓 피어난 앱: 최근 4개 (카테고리 필터 미적용)
   const recentApps  = allApps.slice(0, 4);

@@ -74,9 +74,9 @@ const PIUM_APP_PROFILES = {
     image: `${SITE_URL}/sungchangwoon-og.jpg`,
   },
   '/pium-app/ohaengja': {
-    title: '오행자 · 봉숭아학당문화혁신학교 교수 | 이음미디어',
-    desc: '개그맨을 웃기는 웃음치료사. KBS·MBC·JTBC·EBS 등 방송 출연. 강의·섭외 문의 010-4321-7159',
-    image: `${SITE_URL}/ohaengja-profile.jpg`,
+    title: '오행자 · 개그맨을 웃기는 웃음치료사 | 이음미디어',
+    desc: 'MZ세대 웃음 아이콘 · 소통·치유 전문가. 강의·섭외 문의 010-4321-7159',
+    image: `${SITE_URL}/ohaengja-og.jpg`,
   },
 };
 
