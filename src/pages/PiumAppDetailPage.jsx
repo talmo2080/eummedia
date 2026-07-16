@@ -847,7 +847,34 @@ const OHJ3_CSS = `
 
 const OHJ3_TV_COUNT = 24;
 
+const OHJ3_BLANK = { name:'', org:'', phone:'', email:'', lectureType:'', topics:[], datetime:'', headcount:'', duration:'', location:'', note:'' };
+const OHJ3_TOPICS = ["웃음치료·힐링","인문학 강의","소통·커뮤니케이션","방송 스피치","긍정 에너지·리더십","기타"];
+
 function OhaengjaPage() {
+  const [formOpen,   setFormOpen]   = useState(false);
+  const [formData,   setFormData]   = useState(OHJ3_BLANK);
+  const [submitted,  setSubmitted]  = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitErr,  setSubmitErr]  = useState('');
+
+  function setField(k, v) { setFormData(p => ({ ...p, [k]: v })); }
+  function toggleTopic(t) { setFormData(p => ({ ...p, topics: p.topics.includes(t) ? p.topics.filter(x=>x!==t) : [...p.topics, t] })); }
+  function closeForm() { setFormOpen(false); setSubmitted(false); setFormData(OHJ3_BLANK); setSubmitErr(''); }
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setSubmitting(true); setSubmitErr('');
+    try {
+      const res = await fetch('/api/ohj-lecture-inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) { setSubmitted(true); }
+      else { setSubmitErr('제출 중 오류가 발생했습니다. 다시 시도해주세요.'); }
+    } catch { setSubmitErr('네트워크 오류가 발생했습니다.'); }
+    setSubmitting(false);
+  }
+
   return (
     <div className="ohj3">
       <style>{OHJ3_CSS}</style>
@@ -977,7 +1004,7 @@ function OhaengjaPage() {
       <div className="ohj3-books-band">
         <div className="ohj3-inner">
           <div className="ohj3-sec-k">BOOKS</div>
-          <div className="ohj3-sec-h jua">쓴 책 5권</div>
+          <div className="ohj3-sec-h jua">오행자의 저서</div>
           <div className="ohj3-books">
             <div className="ohj3-book"><img src="/ohaengja-book-1.png" alt="토닥토닥 힐링수다"/></div>
             <div className="ohj3-book"><img src="/ohaengja-book-2.png" alt="세상에 아프지 않은 사람은 없다"/></div>
@@ -1041,9 +1068,9 @@ function OhaengjaPage() {
         <div className="ohj3-inner ohj3-cta">
           <div className="line jua">이 웃음을, 당신의 무대로.</div>
           <div className="ohj3-cta-btns">
-            <a href="mailto:ohj7159@naver.com" className="ohj3-btn jua">
+            <button onClick={()=>setFormOpen(true)} className="ohj3-btn jua" style={{border:"none",cursor:"pointer",fontFamily:"'Jua',Pretendard,sans-serif"}}>
               ✍️ 강의 문의 · 섭외하기
-            </a>
+            </button>
             <a href="tel:010-4321-7159" className="ohj3-btn-tel jua">
               📞 바로 전화 연결
               <span className="ph2">010-4321-7159</span>
@@ -1051,6 +1078,119 @@ function OhaengjaPage() {
           </div>
         </div>
       </div>
+
+      {/* ── 강의 문의 모달 ── */}
+      {formOpen && (
+        <div style={{position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}
+          onClick={e=>{ if(e.target===e.currentTarget) closeForm(); }}>
+          <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,.5)",backdropFilter:"blur(3px)"}}/>
+          <div style={{position:"relative",width:"100%",maxWidth:640,maxHeight:"92vh",overflowY:"auto",
+            background:"#FFF8F0",borderRadius:"24px 24px 0 0",padding:"28px 24px 40px",fontFamily:"Pretendard,-apple-system,sans-serif"}}>
+            {/* 헤더 */}
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+              <div>
+                <h2 style={{fontSize:20,fontWeight:800,color:"#34122B",margin:0}}>강의 문의</h2>
+                <p style={{fontSize:12.5,color:"#9A8592",margin:"4px 0 0"}}>📞 직접 문의: 010-4321-7159</p>
+              </div>
+              <button onClick={closeForm} style={{background:"none",border:"none",cursor:"pointer",padding:4,color:"#9A8592"}}>
+                <X size={22}/>
+              </button>
+            </div>
+
+            {submitted ? (
+              <div style={{textAlign:"center",padding:"40px 0"}}>
+                <CheckCircle size={52} color="#E11D74" style={{margin:"0 auto 16px"}}/>
+                <p style={{fontSize:18,fontWeight:800,color:"#34122B",margin:"0 0 8px"}}>신청이 접수됐습니다!</p>
+                <p style={{fontSize:13.5,color:"#9A8592",margin:"0 0 28px",lineHeight:1.6}}>곧 연락드리겠습니다.<br/>문의: 010-4321-7159</p>
+                <button onClick={closeForm}
+                  style={{padding:"13px 32px",borderRadius:12,background:"#E11D74",color:"#fff",fontSize:15,fontWeight:700,border:"none",cursor:"pointer"}}>
+                  닫기
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} style={{display:"flex",flexDirection:"column",gap:14}}>
+                {[
+                  {label:"신청자 성함 *",key:"name",ph:"홍길동",required:true},
+                  {label:"소속 *",key:"org",ph:"회사/기관/단체명",required:true},
+                  {label:"연락처 *",key:"phone",ph:"010-0000-0000",required:true},
+                  {label:"이메일",key:"email",ph:"example@email.com",required:false},
+                ].map(f=>(
+                  <label key={f.key} style={{display:"flex",flexDirection:"column",gap:5}}>
+                    <span style={{fontSize:13,fontWeight:700,color:"#34122B"}}>{f.label}</span>
+                    <input value={formData[f.key]} onChange={e=>setField(f.key,e.target.value)}
+                      required={f.required} placeholder={f.ph}
+                      style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid #FFD9E6",fontSize:14,background:"#fff",outline:"none",color:"#34122B"}}/>
+                  </label>
+                ))}
+
+                <label style={{display:"flex",flexDirection:"column",gap:5}}>
+                  <span style={{fontSize:13,fontWeight:700,color:"#34122B"}}>강의 유형 *</span>
+                  <select value={formData.lectureType} onChange={e=>setField('lectureType',e.target.value)} required
+                    style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid #FFD9E6",fontSize:14,background:"#fff",color:"#34122B"}}>
+                    <option value="">선택해주세요</option>
+                    {["기업 강의","공공·지자체","복지관·보건소","학교·교육기관","단체·모임","기타"].map(t=><option key={t} value={t}>{t}</option>)}
+                  </select>
+                </label>
+
+                <div>
+                  <span style={{fontSize:13,fontWeight:700,color:"#34122B",display:"block",marginBottom:8}}>희망 주제 (복수선택)</span>
+                  <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+                    {OHJ3_TOPICS.map(t=>(
+                      <button type="button" key={t} onClick={()=>toggleTopic(t)}
+                        style={{padding:"7px 14px",borderRadius:99,fontSize:12.5,fontWeight:700,
+                          border:`1.5px solid ${formData.topics.includes(t) ? "#E11D74" : "#FFD9E6"}`,
+                          background:formData.topics.includes(t) ? "#FFEDF3" : "#fff",
+                          color:formData.topics.includes(t) ? "#E11D74" : "#9A8592",
+                          cursor:"pointer"}}>
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {[
+                  {label:"희망 일시",key:"datetime",ph:"예: 2026-09-15 오후"},
+                  {label:"예상 인원",key:"headcount",ph:"예: 50명"},
+                  {label:"장소",key:"location",ph:"지역 또는 온라인 여부"},
+                ].map(f=>(
+                  <label key={f.key} style={{display:"flex",flexDirection:"column",gap:5}}>
+                    <span style={{fontSize:13,fontWeight:700,color:"#34122B"}}>{f.label}</span>
+                    <input value={formData[f.key]} onChange={e=>setField(f.key,e.target.value)} placeholder={f.ph}
+                      style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid #FFD9E6",fontSize:14,background:"#fff",outline:"none",color:"#34122B"}}/>
+                  </label>
+                ))}
+
+                <label style={{display:"flex",flexDirection:"column",gap:5}}>
+                  <span style={{fontSize:13,fontWeight:700,color:"#34122B"}}>강의 시간</span>
+                  <select value={formData.duration} onChange={e=>setField('duration',e.target.value)}
+                    style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid #FFD9E6",fontSize:14,background:"#fff",color:"#34122B"}}>
+                    <option value="">선택</option>
+                    {["1시간","2시간","반일","종일","협의"].map(t=><option key={t} value={t}>{t}</option>)}
+                  </select>
+                </label>
+
+                <label style={{display:"flex",flexDirection:"column",gap:5}}>
+                  <span style={{fontSize:13,fontWeight:700,color:"#34122B"}}>추가 요청사항</span>
+                  <textarea value={formData.note} onChange={e=>setField('note',e.target.value)}
+                    rows={3} placeholder="자유롭게 적어주세요"
+                    style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid #FFD9E6",fontSize:14,background:"#fff",resize:"vertical",outline:"none",color:"#34122B"}}/>
+                </label>
+
+                {submitErr && <p style={{fontSize:13,color:"#E11D74",margin:0}}>{submitErr}</p>}
+
+                <button type="submit" disabled={submitting}
+                  style={{marginTop:4,padding:"15px",borderRadius:14,
+                    background:submitting?"#ccc":"linear-gradient(120deg,#FF6A3D,#E11D74)",
+                    color:"#fff",fontSize:15.5,fontWeight:800,border:"none",
+                    cursor:submitting?"not-allowed":"pointer",
+                    display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+                  <Send size={17}/> {submitting ? "제출 중..." : "강의 신청 보내기"}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
 
     </div>
   );
