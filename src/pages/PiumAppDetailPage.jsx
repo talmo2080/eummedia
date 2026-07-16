@@ -780,14 +780,13 @@ const OHJ3_CSS = `
 
   /* 저서 */
   .ohj3-books-band { background:var(--ivory); padding:58px 0; }
-  .ohj3-books { display:flex; gap:14px; overflow-x:auto; padding-bottom:6px; }
-  .ohj3-book { flex:0 0 120px; }
-  .ohj3-book .cov { aspect-ratio:1/1.45; border-radius:10px;
-    background:linear-gradient(160deg,#FFE0B0,#FFB8CD);
-    display:grid; place-items:center; text-align:center; padding:12px;
-    font-size:12px; font-weight:800; color:#7a2b4a;
-    box-shadow:0 6px 16px rgba(120,40,74,.14); }
-  .ohj3-book .bt { font-size:11px; color:var(--mute); margin-top:7px; text-align:center; }
+  .ohj3-books { display:flex; gap:16px; overflow-x:auto; padding-bottom:8px;
+    -webkit-overflow-scrolling:touch; }
+  .ohj3-book { flex:0 0 auto; }
+  .ohj3-book img { display:block; height:180px; width:auto; border-radius:10px;
+    border:2px solid #F4C430;
+    box-shadow:0 6px 20px rgba(120,40,74,.22);
+    object-fit:cover; }
 
   /* 채널 */
   .ohj3-ch-band { background:var(--ivory); padding:58px 0; }
@@ -974,24 +973,16 @@ function OhaengjaPage() {
         </div>
       </div>
 
-      {/* 저서 5권 */}
+      {/* 저서 4권 (표지 있는 것만) */}
       <div className="ohj3-books-band">
         <div className="ohj3-inner">
           <div className="ohj3-sec-k">BOOKS</div>
           <div className="ohj3-sec-h jua">쓴 책 5권</div>
           <div className="ohj3-books">
-            {[
-              {t:["너 이렇게","살아봤어?"],y:"2024"},
-              {t:["봉숭아학당에서","다시 피어나는 꽃"],y:"2020"},
-              {t:["세상에 아프지","않은 사람은 없다"],y:"2018"},
-              {t:["소통리더십","(명강사 33인)"],y:"2016"},
-              {t:["토닥토닥","힐링수다"],y:"2015"},
-            ].map((b,i)=>(
-              <div key={i} className="ohj3-book">
-                <div className="cov">{b.t[0]}<br/>{b.t[1]}</div>
-                <div className="bt">{b.y}</div>
-              </div>
-            ))}
+            <div className="ohj3-book"><img src="/ohaengja-book-1.png" alt="토닥토닥 힐링수다"/></div>
+            <div className="ohj3-book"><img src="/ohaengja-book-2.png" alt="세상에 아프지 않은 사람은 없다"/></div>
+            <div className="ohj3-book"><img src="/ohaengja-book-3.png" alt="봉숭아학당에서 다시 피어나는 꽃"/></div>
+            <div className="ohj3-book"><img src="/ohaengja-book-4.jpg" alt="너 이렇게 살아봤어?"/></div>
           </div>
         </div>
       </div>
