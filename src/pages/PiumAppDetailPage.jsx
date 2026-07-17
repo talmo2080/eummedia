@@ -909,10 +909,17 @@ function OhaengjaPage() {
   const [submitErr,  setSubmitErr]  = useState('');
   const [tvPct,      setTvPct]      = useState(0);
   const [lecPct,     setLecPct]     = useState(0);
+  const [lecSel,     setLecSel]     = useState(0);
+  const [lecFade,    setLecFade]    = useState(true);
   const tvRef  = useRef(null);
   const lecRef = useRef(null);
   function onTvScroll()  { const el = tvRef.current;  if (el) setTvPct(el.scrollLeft  / (el.scrollWidth  - el.clientWidth)  * 100); }
   function onLecScroll() { const el = lecRef.current; if (el) setLecPct(el.scrollLeft / (el.scrollWidth - el.clientWidth) * 100); }
+  function selectLec(i) {
+    if (i === lecSel) return;
+    setLecFade(false);
+    setTimeout(() => { setLecSel(i); setLecFade(true); }, 180);
+  }
 
   function setField(k, v) { setFormData(p => ({ ...p, [k]: v })); }
   function toggleTopic(t) { setFormData(p => ({ ...p, topics: p.topics.includes(t) ? p.topics.filter(x=>x!==t) : [...p.topics, t] })); }
@@ -1152,14 +1159,26 @@ function OhaengjaPage() {
         <div className="ohj3-inner">
           <div className="ohj3-sec-k">ON STAGE</div>
           <div className="ohj3-sec-h jua">강연 현장</div>
-          <img src="/ohaengja-lecture-photos/ohaengja-lecture-1.png"
-            alt="오행자 대표 강연" className="ohj3-feature-img"
+          <img
+            src={`/ohaengja-lecture-photos/ohaengja-lecture-${lecSel+1}.png`}
+            alt={`오행자 강연 현장 ${lecSel+1}`}
+            className="ohj3-feature-img"
+            style={{opacity: lecFade ? 1 : 0, transition:'opacity .18s ease'}}
             onError={e=>{ e.currentTarget.style.display="none"; }}/>
           <div className="ohj3-lecture-strip" ref={lecRef} onScroll={onLecScroll}>
-            {Array.from({length:33},(_,i)=>i+2).map(n=>(
-              <img key={n}
-                src={`/ohaengja-lecture-photos/ohaengja-lecture-${n}.png`}
-                alt={`강연 현장 ${n}`}
+            {Array.from({length:34},(_,i)=>i).map(i=>(
+              <img key={i}
+                src={`/ohaengja-lecture-photos/ohaengja-lecture-${i+1}.png`}
+                alt={`강연 현장 ${i+1}`}
+                onClick={()=>selectLec(i)}
+                style={{
+                  cursor:'pointer',
+                  outline: lecSel===i ? '2.5px solid #E11D74' : '2.5px solid transparent',
+                  outlineOffset: '2px',
+                  borderRadius: '12px',
+                  opacity: lecSel===i ? 1 : 0.75,
+                  transition:'opacity .15s, outline .15s',
+                }}
                 onError={e=>{ e.currentTarget.style.display="none"; }}/>
             ))}
           </div>
