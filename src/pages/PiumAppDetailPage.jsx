@@ -1218,6 +1218,11 @@ function OhaengjaPage() {
               <div className="ct"><b>봉당TV</b><span>성창운 · 유튜브</span></div>
               <span className="arr">↗</span>
             </a>
+            <a href="https://litt.ly/bongdang" target="_blank" rel="noopener noreferrer" className="ohj3-ch">
+              <span className="ci">🔗</span>
+              <div className="ct" style={{whiteSpace:'normal'}}><b style={{whiteSpace:'normal'}}>봉숭아학당 문화혁신학교 / 웃자대한민국협회</b><span>전체 채널 한눈에</span></div>
+              <span className="arr">↗</span>
+            </a>
             <a href="https://cafe.naver.com/kk304915" target="_blank" rel="noopener noreferrer" className="ohj3-ch">
               <span className="ci">☕</span>
               <div className="ct"><b>네이버 카페</b><span>봉숭아학당 커뮤니티</span></div>
