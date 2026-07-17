@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+﻿import { useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Award, Sparkles, Heart, MessageCircle, Users, Tv, ArrowRight, TrendingUp, Phone, Quote, BookOpen, X, Send, CheckCircle, Newspaper, Smile, Mic, Building2, Coffee } from "lucide-react";
 
@@ -717,7 +717,8 @@ const OHJ3_CSS = `
   .ohj3-thesis { background:var(--ivory); padding:60px 0; text-align:center; }
   .ohj3-thesis .big { font-size:40px; line-height:1.25; color:var(--ink); }
   .ohj3-thesis .big span { color:var(--rose); }
-  .ohj3-thesis .small { margin-top:14px; font-size:15px; color:var(--mute); }
+  .ohj3-thesis .small { margin-top:14px; font-size:20px; color:var(--mute); }
+  @media (min-width:768px) { .ohj3-thesis .small { font-size:24px; } }
 
   /* INTRO */
   .ohj3-intro { background:var(--blush); padding:52px 0; }
@@ -740,8 +741,13 @@ const OHJ3_CSS = `
   .ohj3-chip { border:1.5px solid rgba(255,255,255,.4); border-radius:999px;
     padding:9px 17px; font-weight:800; font-size:16px; }
   .ohj3-tv-strip { margin-top:24px; display:flex; gap:12px; overflow-x:auto;
-    padding-bottom:8px; -webkit-overflow-scrolling:touch;
-    scrollbar-width:thin; scrollbar-color:#E11D74 transparent; }
+    padding-bottom:4px; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; }
+  .ohj3-tv-strip::-webkit-scrollbar { display:none; }
+  .ohj3-scroll-track { margin-top:12px; width:100%; height:3px;
+    background:rgba(255,255,255,.2); border-radius:999px; overflow:hidden; }
+  .ohj3-scroll-handle { height:3px; background:#E11D74; border-radius:999px;
+    transition:width .1s linear; }
   .ohj3-tv-strip img { height:130px; width:auto; display:block; border-radius:14px;
     flex-shrink:0; image-orientation:from-image; }
   .ohj3-tv-shows { margin-top:16px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
@@ -796,8 +802,9 @@ const OHJ3_CSS = `
   .ohj3-feature-img { width:100%; border-radius:20px; display:block;
     object-fit:cover; max-height:340px; }
   .ohj3-lecture-strip { margin-top:14px; display:flex; gap:10px; overflow-x:auto;
-    padding-bottom:8px; -webkit-overflow-scrolling:touch;
-    scrollbar-width:thin; scrollbar-color:#E11D74 transparent; }
+    padding-bottom:4px; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; }
+  .ohj3-lecture-strip::-webkit-scrollbar { display:none; }
   .ohj3-lecture-strip img { height:110px; width:auto; display:block;
     border-radius:12px; flex-shrink:0;
     object-fit:contain; background:#fff; }
@@ -900,6 +907,12 @@ function OhaengjaPage() {
   const [submitted,  setSubmitted]  = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitErr,  setSubmitErr]  = useState('');
+  const [tvPct,      setTvPct]      = useState(0);
+  const [lecPct,     setLecPct]     = useState(0);
+  const tvRef  = useRef(null);
+  const lecRef = useRef(null);
+  function onTvScroll()  { const el = tvRef.current;  if (el) setTvPct(el.scrollLeft  / (el.scrollWidth  - el.clientWidth)  * 100); }
+  function onLecScroll() { const el = lecRef.current; if (el) setLecPct(el.scrollLeft / (el.scrollWidth - el.clientWidth) * 100); }
 
   function setField(k, v) { setFormData(p => ({ ...p, [k]: v })); }
   function toggleTopic(t) { setFormData(p => ({ ...p, topics: p.topics.includes(t) ? p.topics.filter(x=>x!==t) : [...p.topics, t] })); }
@@ -984,12 +997,15 @@ function OhaengjaPage() {
               <span key={ch} className="ohj3-chip">{ch}</span>
             ))}
           </div>
-          <div className="ohj3-tv-strip">
+          <div className="ohj3-tv-strip" ref={tvRef} onScroll={onTvScroll}>
             {Array.from({length:OHJ3_TV_COUNT},(_,i)=>i+1).map(n=>(
               <img key={n} src={`/ohaengja-tv-photos/ohaengja-tv-${n}.jpg`}
                 alt={`방송 출연 ${n}`}
                 onError={e=>{ e.currentTarget.style.display="none"; }}/>
             ))}
+          </div>
+          <div className="ohj3-scroll-track">
+            <div className="ohj3-scroll-handle" style={{width:`${tvPct}%`}}/>
           </div>
           <div className="ohj3-tv-shows">
             {["아침마당","생방송 오늘의 아침","무엇이든 물어보살","알토란","살림남","기분좋은날","워크맨(400만) 출연","인천 프로야구 시구"].map(s=>(
@@ -1139,13 +1155,16 @@ function OhaengjaPage() {
           <img src="/ohaengja-lecture-photos/ohaengja-lecture-1.png"
             alt="오행자 대표 강연" className="ohj3-feature-img"
             onError={e=>{ e.currentTarget.style.display="none"; }}/>
-          <div className="ohj3-lecture-strip">
+          <div className="ohj3-lecture-strip" ref={lecRef} onScroll={onLecScroll}>
             {Array.from({length:33},(_,i)=>i+2).map(n=>(
               <img key={n}
                 src={`/ohaengja-lecture-photos/ohaengja-lecture-${n}.png`}
                 alt={`강연 현장 ${n}`}
                 onError={e=>{ e.currentTarget.style.display="none"; }}/>
             ))}
+          </div>
+          <div className="ohj3-scroll-track" style={{background:'rgba(0,0,0,.15)'}}>
+            <div className="ohj3-scroll-handle" style={{width:`${lecPct}%`}}/>
           </div>
         </div>
       </div>
