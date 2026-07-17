@@ -765,6 +765,32 @@ const OHJ3_CSS = `
   .ohj3-f3 { background:linear-gradient(130deg,#7A34B0,#A64FD0); }
   .ohj3-f4 { background:linear-gradient(130deg,#E8912E,#F6B44E); }
 
+  /* 이력 아코디언 */
+  .ohj3-career-band { background:var(--plum); padding:58px 0; }
+  .ohj3-acc-list { display:flex; flex-direction:column; gap:10px; margin-top:24px; }
+  .ohj3-acc-item { border:1px solid rgba(252,196,81,.25); border-radius:14px; overflow:hidden; }
+  .ohj3-acc-btn {
+    width:100%; background:rgba(255,255,255,.05); border:none; cursor:pointer;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 20px; color:#FCC451; font-family:'Jua',sans-serif; font-size:17px;
+    text-align:left;
+  }
+  .ohj3-acc-btn:hover { background:rgba(252,196,81,.08); }
+  .ohj3-acc-arrow { font-size:15px; transition:transform .2s; flex-shrink:0; }
+  .ohj3-acc-arrow.open { transform:rotate(90deg); }
+  .ohj3-acc-body {
+    display:none; padding:12px 20px 20px;
+    max-height:320px; overflow-y:auto;
+    scrollbar-width:thin; scrollbar-color:#FCC451 transparent;
+  }
+  .ohj3-acc-body.open { display:block; }
+  .ohj3-acc-row { display:flex; gap:10px; padding:6px 0;
+    border-bottom:1px solid rgba(255,255,255,.06); }
+  .ohj3-acc-row:last-child { border-bottom:none; }
+  .ohj3-acc-date { color:#FCC451; font-size:12px; min-width:90px;
+    flex-shrink:0; padding-top:1px; line-height:1.5; }
+  .ohj3-acc-text { color:rgba(255,255,255,.9); font-size:14px; line-height:1.6; }
+
   /* 강연 현장 */
   .ohj3-stage-band { background:var(--blush); padding:58px 0; }
   .ohj3-feature-img { width:100%; border-radius:20px; display:block;
@@ -847,6 +873,26 @@ const OHJ3_TV_COUNT = 24;
 
 const OHJ3_BLANK = { name:'', org:'', phone:'', email:'', lectureType:'', topics:[], datetime:'', headcount:'', duration:'', location:'', note:'' };
 const OHJ3_TOPICS = ["웃음치료·힐링","인문학 강의","소통·커뮤니케이션","방송 스피치","긍정 에너지·리더십","기타"];
+
+function OhjAccordion({ title, rows }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="ohj3-acc-item">
+      <button className="ohj3-acc-btn jua" onClick={() => setOpen(o => !o)}>
+        <span>{title}</span>
+        <span className={`ohj3-acc-arrow${open ? ' open' : ''}`}>▸</span>
+      </button>
+      <div className={`ohj3-acc-body${open ? ' open' : ''}`}>
+        {rows.map(([date, text], i) => (
+          <div key={i} className="ohj3-acc-row">
+            <span className="ohj3-acc-date">{date}</span>
+            <span className="ohj3-acc-text">{text}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function OhaengjaPage() {
   const [formOpen,   setFormOpen]   = useState(false);
@@ -979,6 +1025,108 @@ function OhaengjaPage() {
               <h3 className="jua">월요일 집밥 나눔</h3>
               <p>매주 월요일 싱글벙글 나비축제, 정성스러운 집밥으로 사랑을 나눔</p>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 이력 — 아코디언 3개 */}
+      <div className="ohj3-career-band">
+        <div className="ohj3-inner">
+          <div className="ohj3-sec-k">CAREER</div>
+          <div className="ohj3-sec-h jua" style={{color:'#FCC451'}}>이력</div>
+          <div className="ohj3-acc-list">
+            {[
+              {
+                title:'자격증·학력',
+                count:22,
+                rows:[
+                  ['2022.10.08','로드랜드대학교 치유학과(NLP,최면전공) 석사수료'],
+                  ['2009.06~2015.02','서울디지털대학교 상담심리학과(학사)'],
+                  ['2009.06~2015.02','서울디지털대학교 평생교육학과(학사)'],
+                  ['2017.05.24','부모교육 코칭지도사 1급 (YJ강사비전아카데미)'],
+                  ['2017.02.07','독서지도사 1급 (한국자격검정진흥원)'],
+                  ['2016.03.18','분노조절 상담사 2급 (한국상담협회)'],
+                  ['2016.03.16','방재안전관리사 1급 (119재난안전교육진흥원)'],
+                  ['2015.02.27','평생교육사 2급 (교육부장관)'],
+                  ['2013.05.08','심리상담사 1급 (한국상담문화원)'],
+                  ['2015.05.01','약물예방상담교육강사 (한국약물예방교육개발원)'],
+                  ['2014.04.03','학교폭력예방상담사 (한국약물예방교육개발원)'],
+                  ['2013.03.30','감정노동관리사 (감정노동연구소)'],
+                  ['2012.07.20','동화구연지도사 2급 (평생교육진흥연구회)'],
+                  ['2011.07.22','직무스트레스관리사 (한국직업능력평가원)'],
+                  ['2010.06.27','NLP마스터프랙티셔너 (정동문 변화성공트레이닝)'],
+                  ['2010.07.13','행복웃음MBA명강사 (한국행복웃음아카데미)'],
+                  ['2010.07.04','실버여가레크레이션 (한국웃음연구협회)'],
+                  ['2010.07.04','실버웃음건강지도사 (한국웃음연구협회)'],
+                  ['2008.10.26','웃음치료사 1급 (한국웃음치료연구소)'],
+                  ['2008.10.26','레크리에이션 1급 (한국웃음치료연구소)'],
+                  ['2013.03.01','한국형인성훈련강사양성과정 수료 (홍익뿌리교육연구원)'],
+                  ['2011','의식변화 프로그램 전 과정수료(깨어나기·알아가기·살아가기·통합비전) (삶을 예술로 가꾸는 사람들)'],
+                ],
+              },
+              {
+                title:'방송 출연',
+                count:29,
+                rows:[
+                  ['2026.07.02','MBN 알토란 별주부전'],
+                  ['2026.05.19','BBS불교방송 인생을 아름다워'],
+                  ['2026.05.02','KBS2 살림남 (박서진 가수)'],
+                  ['2026.04.18','뉴스공장 — 탁현민의 더 뷰티플'],
+                  ['2026.04.07','SPOTV 인천 프로야구 시구'],
+                  ['2026.03.11','채널A 잘 살면 좋잖아'],
+                  ['2026.01','JTBC 입만 살았네'],
+                  ['2025.12','KBS 굿모닝 대한민국 잡스타'],
+                  ['2025.06','MBC 기분좋은날'],
+                  ['2025.05','MBN 알토란'],
+                  ['2025.04','MBC 살맛나는 세상'],
+                  ['2025.02','KBS 아침마당'],
+                  ['2025.01','MBC 생방송 오늘의 아침'],
+                  ['2025.01','워크맨/워크돌 (구독자 400만 유튜브 채널)'],
+                  ['2024.12','EBS PD로그'],
+                  ['2018.07~현재','토닥토닥행자TV 유튜브 채널 운영 (구독자 5만 3천명)'],
+                  ['2023.10','랄랄 유튜브 채널'],
+                  ['2023.09','백세명수 유튜브 채널'],
+                  ['2023.08','KBS2 살림남'],
+                  ['2023.07.13','KBS2 홍김동전'],
+                  ['2023.07','팜트리아일랜드'],
+                  ['2022.11','E채널 개며느리'],
+                  ['2022.09','굿모닝FM 장성규입니다'],
+                  ['2022.07','튀르키예즈(터키즈) 유튜브 채널'],
+                  ['2022.02','이리오너라 유튜브 채널 — 못배운놈들'],
+                  ['2020.11.12','EBS 파란만장 인생 이야기'],
+                  ['2017.11.11','KBS1 황금연못'],
+                  ['2012.08.18','KBS TV비평'],
+                  ['2011.11.17','SBS 세상에 이런 일이'],
+                ],
+              },
+              {
+                title:'출강 이력',
+                count:19,
+                rows:[
+                  ['2026.06.01','남양주 축산농협'],
+                  ['2026.04.13','화성시문화재단'],
+                  ['2026.01.22','수원축산업협동조합'],
+                  ['2025.12.23','KT리빙'],
+                  ['2025.12.12','한국육아교육행정협의회'],
+                  ['2025.12.04','대구사과농업협동조합'],
+                  ['2025.11.28','경남교육청 공무원'],
+                  ['2025.11.24','인천공항공사'],
+                  ['2025.11.12','방송통신대학'],
+                  ['2025.10.11~11.01','생명보험사회공헌재단'],
+                  ['2025.10.16','한국야쿠르트'],
+                  ['2025.10.14','동작구보건소'],
+                  ['2025.09.30','성북구보건소'],
+                  ['2025.09.18','LG전자'],
+                  ['2025.08.12','용인교육청'],
+                  ['2025.07.16','지미션 (IT 기업)'],
+                  ['2025.07.03','서대문구육아지원센터'],
+                  ['2025.06.19','하이파이브 영화 시사회'],
+                  ['2025.06.17','안성시보건소'],
+                ],
+              },
+            ].map((acc, ai) => (
+              <OhjAccordion key={ai} title={`${acc.title} (${acc.count}건)`} rows={acc.rows} />
+            ))}
           </div>
         </div>
       </div>
