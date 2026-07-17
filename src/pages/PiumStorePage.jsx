@@ -880,7 +880,7 @@ export default function PiumStorePage() {
     {
       slug:          "ohaengja",
       title:         "오행자",
-      summary:       "개그맨을 웃기는 웃음치료사 · 방송 30+회 · 웃음강연",
+      summary:       "개그맨을 웃기는 웃음치료사 · MZ세대 웃음 아이콘",
       thumbnail_url: "/ohaengja-og.jpg",
       category:      "expert_tool",
       price_model:   "free",
