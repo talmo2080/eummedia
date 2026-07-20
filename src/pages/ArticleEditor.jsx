@@ -279,6 +279,9 @@ export default function ArticleEditor() {
   const [activeTab, setActiveTab] = useState(1)
   const [channel, setChannel] = useState('')
   const [title, setTitle] = useState('')
+  // 기사 주소 (slug) — 사용자가 한글로 입력 가능. 비우면 기존/자동 생성값 사용.
+  // 잠금 기준: originalStatus === 'published' 만 readOnly (draft/submitted는 수정 허용)
+  const [slug, setSlug] = useState('')
   const [reporter, setReporter] = useState('')
   const [tagInput, setTagInput] = useState('')
   const [tags, setTags] = useState([])
@@ -427,6 +430,8 @@ export default function ArticleEditor() {
         return
       }
       setTitle(data.title || '')
+      // 기존 slug를 필드에 채워 세연이 수정 가능하게 (published면 UI에서 readOnly 처리)
+      setSlug(data.slug || '')
       setChannel(ID_TO_CHANNEL[data.channel_id] || '')
       setContent(data.content || '')
       setSummary(data.summary || '')
@@ -722,6 +727,37 @@ export default function ArticleEditor() {
   // Math.random 기반 fallback (안전)
   const generateSlug = () => `article-${Math.random().toString(36).slice(2, 10)}`
 
+  // 사용자 입력 slug 정리:
+  //   · 소문자화 (한글 영향 없음, 영문만 lowercase)
+  //   · 공백 → 하이픈
+  //   · 한글·영문소문자·숫자·하이픈만 허용, 나머지 특수문자 제거
+  //   · 연속 하이픈 1개로, 앞뒤 하이픈 제거
+  const cleanSlug = (raw) => {
+    if (!raw) return ''
+    let s = String(raw).toLowerCase().trim()
+    s = s.replace(/\s+/g, '-')
+    s = s.replace(/[^가-힣a-z0-9-]/g, '')
+    s = s.replace(/-+/g, '-')
+    s = s.replace(/^-+|-+$/g, '')
+    return s
+  }
+
+  // slug 잠금 여부 — 발행된 기사만 잠금 (draft/submitted는 수정 허용)
+  const isSlugLocked = !!editId && originalStatus === 'published'
+
+  // 저장 직전 중복 slug 검사 (자기 자신 제외)
+  //   · 잠금 상태거나 slug가 비어있으면 검사 스킵
+  //   · 있으면 { duplicate: true }, 오류면 { error: msg }, 이상 없으면 null
+  const checkSlugDuplicate = async (targetSlug) => {
+    if (!targetSlug) return null
+    let q = supabase.from('articles').select('id').eq('slug', targetSlug)
+    if (editId) q = q.neq('id', editId)
+    const { data, error } = await q.maybeSingle()
+    if (error && error.code !== 'PGRST116') return { error: error.message }
+    if (data) return { duplicate: true }
+    return null
+  }
+
   const buildPayload = (status) => {
     // 저장 직전 백업 — tagInput에 미등록 텍스트가 남아 있으면 tags에 흡수
     // (Enter도 안 누르고 input blur 이벤트도 못 받았을 때 마지막 안전망)
@@ -769,19 +805,44 @@ export default function ArticleEditor() {
       citizen_checks: allChecks,
       citizen_complete: totalDone,
     }
-    // 신규 작성 시에만 author_id + slug 설정.
-    // editId 모드(기존 수정)면 둘 다 미포함 → DB의 기존 값 보존 (원래 기자·URL 유지).
+    // author_id: 신규 작성만 세팅. editId 모드는 DB의 기존 author_id 보존.
     if (!editId) {
       payload.author_id = user.id
-      payload.slug = generateSlug()
+    }
+    // slug 결정 규칙:
+    //   · 잠금(published editId) → payload에 slug 미포함 → DB 값 그대로 보존
+    //   · 잠금 아님 + 사용자 입력값 있음 → 정리된 값 사용
+    //   · 잠금 아님 + 비었음 + 신규 → 자동 생성
+    //   · 잠금 아님 + 비었음 + editId(draft/submitted) → payload 미포함 → 기존 slug 보존
+    if (!isSlugLocked) {
+      const cleaned = cleanSlug(slug)
+      if (cleaned) {
+        payload.slug = cleaned
+      } else if (!editId) {
+        payload.slug = generateSlug()
+      }
     }
     return payload
+  }
+
+  // 저장 액션 3종(handleDraft/handleSubmit/handlePublishUpdate) 공통 slug 사전 검증
+  // 성공하면 null, 실패하면 { alert }를 반환. 사용측에서 alert 후 return.
+  const preSaveSlugCheck = async () => {
+    if (isSlugLocked) return null
+    const cleaned = cleanSlug(slug)
+    if (!cleaned) return null
+    const check = await checkSlugDuplicate(cleaned)
+    if (check?.error) return { alert: `주소 중복 검사 오류: ${check.error}` }
+    if (check?.duplicate) return { alert: `이미 쓰는 주소입니다: "${cleaned}"\n다른 주소로 바꿔주세요.` }
+    return null
   }
 
   const handleDraft = async () => {
     if (submitting) return
     if (!title.trim()) { alert('제목을 입력해주세요.'); return }
     if (!user) { alert('로그인이 필요합니다.'); return }
+    const slugErr = await preSaveSlugCheck()
+    if (slugErr) { alert(slugErr.alert); return }
     setSubmitting(true)
     try {
       const payload = buildPayload('draft')
@@ -818,6 +879,8 @@ export default function ArticleEditor() {
       alert(`자동 항목 ${autoCheckedCount}/7 채워졌습니다.\n자동 항목 4개 이상이 완료되면 편집국장에게 전달할 수 있어요.\n(나머지는 편집국장이 검토하며 채웁니다)`)
       return
     }
+    const slugErr = await preSaveSlugCheck()
+    if (slugErr) { alert(slugErr.alert); return }
     setSubmitting(true)
     try {
       const payload = buildPayload('submitted')
@@ -864,6 +927,9 @@ export default function ArticleEditor() {
   const handlePublishUpdate = async () => {
     if (submitting) return
     if (!user || !editId) return
+    // published 편집은 isSlugLocked=true라 preSaveSlugCheck가 즉시 null 반환 (안전 넷)
+    const slugErr = await preSaveSlugCheck()
+    if (slugErr) { alert(slugErr.alert); return }
     setSubmitting(true)
     try {
       const payload = buildPayload('published')
@@ -889,7 +955,7 @@ export default function ArticleEditor() {
   }
 
   const resetForm = () => {
-    setChannel(''); setTitle(''); setReporter(''); setTagInput(''); setTags([])
+    setChannel(''); setTitle(''); setSlug(''); setReporter(''); setTagInput(''); setTags([])
     setSummary(''); setThumbnailUrl(''); setImageAlt(''); setVideoUrl('')
     setShowInArticle(false); setShowInGallery(false); setContent('')
     setExternalUrl(''); setInlineAdImage(''); setInlineAdLink(''); setInlineAdTitle(''); setInlineAdSubtitle('')
@@ -1198,6 +1264,52 @@ export default function ArticleEditor() {
               }}>
                 {title.length}자{title.length > 30 ? ' (30자 권장)' : ''}
               </div>
+            </div>
+
+            {/* 2.5 기사 주소 (slug) — published는 잠금, draft/submitted는 수정 허용 */}
+            <div style={card}>
+              <label style={lbl}>
+                기사 주소 (선택)
+                {isSlugLocked && (
+                  <span style={{ color: '#888', fontSize: 13, fontWeight: 500, marginLeft: 10 }}>
+                    🔒 발행된 기사는 주소 변경 불가
+                  </span>
+                )}
+              </label>
+              <input
+                style={{
+                  ...inp({ height: 52 }),
+                  background: isSlugLocked ? '#f5f5f5' : '#fff',
+                  color: isSlugLocked ? '#888' : '#1a1a1a',
+                  cursor: isSlugLocked ? 'not-allowed' : 'text',
+                }}
+                value={slug}
+                onChange={e => setSlug(cleanSlug(e.target.value))}
+                readOnly={isSlugLocked}
+                placeholder="예: 방송스피치사관학교-졸업식 (한글 가능, 비우면 자동 생성)"
+              />
+              <div style={{
+                marginTop: 10, padding: '10px 14px', background: '#f7f9fc',
+                borderRadius: 6, fontSize: 13, color: '#555', fontFamily: SANS,
+                wordBreak: 'break-all', lineHeight: 1.6,
+              }}>
+                <span style={{ color: '#888', marginRight: 6 }}>📍 미리보기:</span>
+                {cleanSlug(slug)
+                  ? <span style={{ color: NAVY, fontWeight: 700 }}>eummedia.kr/article/{cleanSlug(slug)}</span>
+                  : <span style={{ color: '#aaa' }}>eummedia.kr/article/(비워두면 자동 생성)</span>
+                }
+              </div>
+              {!isSlugLocked && (
+                <div style={{ marginTop: 10, fontSize: 12, color: '#888', lineHeight: 1.7 }}>
+                  💡 비워두면 자동으로 만들어집니다. 한글로 넣으면 주소가 읽기 쉬워집니다.<br />
+                  공백은 자동으로 하이픈(-)이 되고, 특수문자(?, &amp;, / 등)는 제거됩니다.
+                </div>
+              )}
+              {isSlugLocked && (
+                <div style={{ marginTop: 10, fontSize: 12, color: '#c45c0a', lineHeight: 1.7 }}>
+                  ⚠️ 발행 후 주소가 바뀌면 검색·SNS 공유 링크에서 사라지므로 잠겨 있습니다.
+                </div>
+              )}
             </div>
 
             {/* 3. 기자 이름 */}
