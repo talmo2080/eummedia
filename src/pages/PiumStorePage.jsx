@@ -896,8 +896,19 @@ export default function PiumStorePage() {
       users:         { nickname: "이광우" },
     },
   ];
-  // 갓 피어난 앱: 최근 4개 (카테고리 필터 미적용)
-  const recentApps  = allApps.slice(0, 4);
+  // 갓 피어난 앱: 하드코딩 선두 + DB 최근 순
+  const recentFeatured = [
+    {
+      slug:          "leekwangwoo",
+      title:         "이광우",
+      summary:       "힐링숲라파 대표 · 건강경영·힐링경영 전문가",
+      thumbnail_url: "/leekwangwoo-og.jpg",
+      category:      "expert_tool",
+      price_model:   "free",
+      users:         { nickname: "이광우" },
+    },
+  ];
+  const recentApps = [...recentFeatured, ...allApps].slice(0, 4);
 
   return (
     <div style={{ minHeight: "100vh", background: "transparent", fontFamily: font }}>
