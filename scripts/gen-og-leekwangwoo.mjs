@@ -71,7 +71,7 @@ body { width:1200px; height:630px; overflow:hidden; font-family: 'Malgun Gothic'
       <div class="name">이광우</div>
       <div class="name-en">Lee Kwangwoo</div>
       <div class="divider"></div>
-      <div class="title">힐링숲라파 대표<br>전 국가보훈부 과장 · 건강경영 전문가</div>
+      <div class="title">힐링숲라파 대표<br>건강경영 · 힐링경영 전문가</div>
       <div class="tags">
         <span class="tag">힐링경영</span>
         <span class="tag">족욕 · 이완</span>
