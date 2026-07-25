@@ -886,6 +886,15 @@ export default function PiumStorePage() {
       price_model:   "free",
       users:         { nickname: "오행자" },
     },
+    {
+      slug:          "leekwangwoo",
+      title:         "이광우",
+      summary:       "힐링숲라파 대표 · 건강경영·힐링경영 전문가",
+      thumbnail_url: "/leekwangwoo-og.jpg",
+      category:      "expert_tool",
+      price_model:   "free",
+      users:         { nickname: "이광우" },
+    },
   ];
   // 갓 피어난 앱: 최근 4개 (카테고리 필터 미적용)
   const recentApps  = allApps.slice(0, 4);
