@@ -1406,12 +1406,507 @@ function NotFound() {
   );
 }
 
+/* ══════════════════════════════════════
+   이광우 대표 프로필 — /pium-app/leekwangwoo
+══════════════════════════════════════ */
+const LWK_IMG = '/pium/profile/leekwangwoo/';
+
+const LWK_SLIDES = [
+  { src: LWK_IMG + '04-biz-slide1.jpg', alt: '힐링숲라파 브랜드' },
+  { src: LWK_IMG + '05-biz-slide2.jpg', alt: '이징캉 족욕기 7세대' },
+  { src: null, label: '이징캉 사진 3\n(추후 교체)' },
+  { src: null, label: '이징캉 사진 4\n(추후 교체)' },
+];
+
+const LWK_SHORTS = [
+  { id: '4YJgtjxb060', title: '종합병원이었던 아내를 살린 5개월의 기적!!!' },
+  { id: 'vilFDauqvwM', title: '내 몸이 말을 해요!' },
+  { id: 'MVFqLs1pXwI', title: '내 몸이 쓰레기통이 되는 이유, 아세요?' },
+  { id: 'GH6akNNv9RQ', title: '내 몸속 치명적인 원인 2가지!? - 2' },
+  { id: 'MDDaaGl_S3A', title: '활성산소 악행을 고발합니다!? - 1' },
+];
+
+const LWK_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,600;1,600&display=swap');
+  .lwk { --lwk-navy:#0f1b2d; --lwk-charcoal:#1c2430; --lwk-deep:#0a1420;
+         --lwk-bronze:#a97142; --lwk-amber:#d4a24c; --lwk-amber-l:#f0cf8a;
+         --lwk-ivory:#f6f3ec; --lwk-gray:#8b93a1;
+         font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
+         background:var(--lwk-deep); color:var(--lwk-ivory); line-height:1.6;
+         min-height:100vh; }
+
+  /* Back button */
+  .lwk-back { display:inline-flex; align-items:center; gap:6px;
+    color:var(--lwk-amber); font-size:14px; font-weight:700;
+    text-decoration:none; padding:16px 20px; }
+  .lwk-back:hover { opacity:.8; }
+
+  /* Hero */
+  .lwk-hero { background:linear-gradient(160deg,var(--lwk-navy) 0%,var(--lwk-charcoal) 55%,var(--lwk-deep) 100%);
+    padding:80px 24px 80px; text-align:center; position:relative; overflow:hidden; }
+  .lwk-hero::after { content:""; position:absolute; bottom:0; left:0; right:0;
+    height:3px; background:linear-gradient(90deg,transparent,var(--lwk-amber),transparent); }
+  .lwk-hero-logo { width:200px; max-width:58%; height:auto; display:block;
+    margin:0 auto 20px; opacity:.96; filter:drop-shadow(0 4px 14px rgba(0,0,0,.4)); }
+  .lwk-brand-tag { font-family:'Poppins',sans-serif; font-size:12px; font-weight:300;
+    letter-spacing:5px; text-transform:uppercase; color:var(--lwk-amber-l); margin-bottom:16px; }
+  .lwk-brand-tag .name { display:block; font-size:36px; font-weight:700; font-style:italic;
+    transform:skewX(-10deg); letter-spacing:.5px; text-transform:none; color:#fff; margin-top:12px; }
+  .lwk-hero-photo { width:168px; height:168px; border-radius:50%; margin:0 auto 28px;
+    background:linear-gradient(135deg,#2a3446,#111925); border:3px solid var(--lwk-amber);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 8px rgba(212,162,76,.08); overflow:hidden; }
+  .lwk-hero-photo img { width:100%; height:100%; object-fit:cover; object-position:center 20%; }
+  .lwk-eyebrow { color:var(--lwk-amber); letter-spacing:3px; font-size:12px; font-weight:700;
+    text-transform:uppercase; margin-bottom:14px; }
+  .lwk-hero h1 { font-size:38px; font-weight:800; color:#fff; margin-bottom:10px; }
+  .lwk-hero .role { color:var(--lwk-gray); font-size:15px; font-weight:400; margin-bottom:26px; }
+  .lwk-hero .catch { font-size:20px; font-weight:800; color:var(--lwk-amber-l);
+    max-width:520px; margin:0 auto; line-height:1.5; }
+
+  /* Section common */
+  .lwk-sec { padding:80px 24px; }
+  .lwk-wrap { max-width:920px; margin:0 auto; }
+  .lwk-sec-title { font-size:12px; font-weight:700; letter-spacing:3px; text-transform:uppercase;
+    color:var(--lwk-amber); text-align:center; margin-bottom:8px; }
+  .lwk-sec-heading { font-size:26px; font-weight:800; color:#fff;
+    text-align:center; margin-bottom:56px; }
+
+  /* Timeline */
+  .lwk-timeline { position:relative; padding-left:32px; }
+  .lwk-timeline::before { content:""; position:absolute; left:7px; top:6px; bottom:6px;
+    width:2px; background:linear-gradient(180deg,var(--lwk-amber),var(--lwk-bronze) 70%,transparent); }
+  .lwk-t-item { position:relative; padding-bottom:44px; }
+  .lwk-t-item:last-child { padding-bottom:0; }
+  .lwk-t-item::before { content:""; position:absolute; left:-32px; top:4px;
+    width:16px; height:16px; border-radius:50%; background:var(--lwk-deep);
+    border:3px solid var(--lwk-amber); }
+  .lwk-t-year { color:var(--lwk-amber); font-weight:700; font-size:14px; margin-bottom:6px; }
+  .lwk-t-title { font-size:19px; font-weight:800; color:#fff; margin-bottom:6px; }
+  .lwk-t-desc { color:var(--lwk-gray); font-size:14px; }
+
+  /* Business */
+  .lwk-biz { background:var(--lwk-charcoal); border-radius:20px; padding:56px 40px; }
+  @media(max-width:560px){ .lwk-biz{padding:36px 20px;} }
+  .lwk-biz-brandhead { display:flex; align-items:center; gap:15px; margin-bottom:12px; }
+  .lwk-biz-emblem { width:62px; height:62px; flex:none; border-radius:50%;
+    box-shadow:0 0 0 2px rgba(212,162,76,.45),0 6px 18px rgba(0,0,0,.35); }
+  @media(max-width:520px){ .lwk-biz-emblem{width:52px;height:52px;} .lwk-biz-brandhead{gap:12px;} }
+  .lwk-biz-h3 { font-size:24px; font-weight:800; color:#fff; }
+  .lwk-biz-italic { font-style:italic; color:var(--lwk-amber-l); font-size:15px; margin-bottom:20px; }
+  .lwk-biz p { color:#c7cdd8; font-size:15px; margin-bottom:14px; }
+  .lwk-biz p:last-of-type { margin-bottom:0; }
+
+  /* Carousel — overflow:hidden은 반드시 바깥 wrapper에만 */
+  .lwk-carousel { position:relative; margin-bottom:14px;
+    overflow:hidden; border-radius:14px; border:1px solid rgba(212,162,76,.25); }
+  .lwk-carousel-track { display:flex; aspect-ratio:2.6/1; transition:transform .35s ease; }
+  .lwk-slide { min-width:100%; height:100%; flex-shrink:0;
+    background:linear-gradient(135deg,#243044,#141b26);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--lwk-gray); font-size:13px; text-align:center; }
+  .lwk-slide img { width:100%; height:100%; object-fit:cover; }
+  .lwk-car-btn { position:absolute; top:50%; transform:translateY(-50%);
+    width:36px; height:36px; border-radius:50%; background:rgba(0,0,0,.55);
+    color:#fff; border:none; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:18px; z-index:2; }
+  .lwk-car-btn.prev { left:10px; }
+  .lwk-car-btn.next { right:10px; }
+  .lwk-dots { display:flex; justify-content:center; gap:8px; margin-bottom:32px; }
+  .lwk-dot { width:7px; height:7px; border-radius:50%;
+    background:rgba(255,255,255,.25); cursor:pointer; border:none;
+    padding:0; transition:background .2s,width .2s; }
+  .lwk-dot.active { background:var(--lwk-amber); width:18px; border-radius:4px; }
+
+  /* Brand strip link */
+  .lwk-brand-strip { display:flex; align-items:center; gap:18px; margin:28px 0 6px;
+    padding:16px 18px; text-decoration:none; color:inherit;
+    background:linear-gradient(135deg,rgba(169,113,66,.18),rgba(212,162,76,.05));
+    border:1px solid rgba(212,162,76,.28); border-radius:16px;
+    transition:border-color .2s,transform .2s,box-shadow .2s; }
+  .lwk-brand-strip:hover { border-color:rgba(212,162,76,.6);
+    transform:translateY(-2px); box-shadow:0 10px 26px rgba(0,0,0,.38); }
+  .lwk-brand-strip > img { width:80px; height:80px; flex:none;
+    border-radius:14px; box-shadow:0 6px 16px rgba(0,0,0,.38); }
+  @media(max-width:520px){ .lwk-brand-strip{gap:14px;padding:14px;}
+    .lwk-brand-strip > img{width:64px;height:64px;} }
+  .lwk-bs-en { font-family:'Poppins',sans-serif; font-size:11px; letter-spacing:3px;
+    text-transform:uppercase; color:var(--lwk-amber); }
+  .lwk-bs-ko { font-size:18px; font-weight:800; color:#fff; margin:3px 0 6px; }
+  @media(max-width:520px){ .lwk-bs-ko{font-size:16px;} }
+  .lwk-bs-desc { font-size:13px; color:var(--lwk-gray); line-height:1.6; word-break:keep-all; }
+  .lwk-bs-link { margin-top:8px; font-size:12.5px; font-weight:700; color:var(--lwk-amber);
+    display:inline-flex; align-items:center; gap:6px; }
+  .lwk-bs-link span { transition:transform .2s; display:inline-block; }
+  .lwk-brand-strip:hover .lwk-bs-link span { transform:translateX(4px); }
+
+  .lwk-tags { display:flex; gap:10px; flex-wrap:wrap; margin-top:24px; }
+  .lwk-tag { background:rgba(212,162,76,.12); color:var(--lwk-amber-l);
+    border:1px solid rgba(212,162,76,.3); padding:7px 16px;
+    border-radius:100px; font-size:13px; font-weight:700; }
+  .lwk-disclaimer { margin-top:22px; font-size:12px; color:var(--lwk-gray);
+    border-top:1px solid rgba(255,255,255,.08); padding-top:16px; }
+
+  /* Philosophy */
+  .lwk-phil-card { position:relative; max-width:600px; margin:48px auto 0;
+    border-radius:24px; overflow:hidden; background:#05080d; }
+  .lwk-phil-card img { width:100%; display:block; opacity:.95; }
+  .lwk-phil-card::after { content:""; position:absolute; left:0; right:0; bottom:0;
+    height:78%; background:linear-gradient(0deg,rgba(2,4,7,.98) 0%,rgba(2,4,7,.94) 26%,rgba(2,4,7,.55) 55%,transparent 100%);
+    pointer-events:none; z-index:1; }
+  .lwk-phil-overlay { position:absolute; left:0; right:10%; bottom:0;
+    padding:10px 20px 38px 32px; text-align:left; z-index:2; }
+  .lwk-quote-mark { font-size:44px; color:var(--lwk-amber); opacity:.85;
+    font-weight:800; line-height:1; margin-bottom:2px; font-family:Georgia,serif; }
+  .lwk-quote { font-size:20px; font-weight:800; color:#fff; line-height:1.5;
+    text-shadow:0 2px 14px rgba(0,0,0,.6); }
+  @media(max-width:560px){ .lwk-quote{font-size:17px;} .lwk-phil-overlay{right:8%;padding:10px 16px 24px 22px;} }
+  .lwk-phil-sup { max-width:600px; margin:28px auto 0; }
+  .lwk-quote-sub { color:#c7cdd8; font-size:14.5px; background:var(--lwk-charcoal);
+    border-radius:16px; padding:26px 28px; text-align:left; }
+  .lwk-quote-sub p { margin-bottom:12px; }
+  .lwk-quote-sub p:last-child { margin-bottom:0; }
+
+  /* Channels */
+  .lwk-channels { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+  .lwk-ch-card { background:var(--lwk-charcoal); border:1px solid rgba(212,162,76,.2);
+    border-radius:16px; padding:28px 30px; width:230px; text-align:center;
+    text-decoration:none; transition:border-color .2s; display:block; }
+  .lwk-ch-card:hover { border-color:var(--lwk-amber); }
+  .lwk-ch-icon { width:52px; height:52px; border-radius:14px;
+    background:rgba(212,162,76,.12); display:flex; align-items:center; justify-content:center;
+    margin:0 auto 16px; font-size:22px; }
+  .lwk-ch-title { color:#fff; font-weight:800; font-size:16px; margin-bottom:6px; }
+  .lwk-ch-desc { color:var(--lwk-gray); font-size:12.5px; }
+
+  /* Videos */
+  .lwk-yt-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media(max-width:560px){ .lwk-yt-grid{grid-template-columns:1fr;} }
+  .lwk-yt-card { background:var(--lwk-charcoal); border-radius:16px; overflow:hidden;
+    border:1px solid rgba(255,255,255,.06); text-decoration:none; display:block; }
+  .lwk-yt-thumb { width:100%; aspect-ratio:16/9; background:linear-gradient(135deg,#243044,#141b26);
+    position:relative; display:flex; align-items:center; justify-content:center; }
+  .lwk-yt-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+  .lwk-yt-shade { position:absolute; inset:0; background:linear-gradient(0deg,rgba(0,0,0,.35),rgba(0,0,0,.05)); z-index:1; }
+  .lwk-yt-play { width:52px; height:52px; border-radius:50%; background:rgba(255,77,77,.9);
+    display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px; z-index:2; position:absolute; }
+  .lwk-yt-card .v-title { padding:14px 16px 16px; font-size:14px; font-weight:700; color:#fff; line-height:1.5; word-break:keep-all; }
+
+  /* Shorts */
+  .lwk-shorts-row { display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory;
+    padding:4px 4px 12px; scrollbar-width:thin; }
+  .lwk-shorts-row::-webkit-scrollbar { height:6px; }
+  .lwk-shorts-row::-webkit-scrollbar-thumb { background:rgba(212,162,76,.35); border-radius:10px; }
+  .lwk-short-card { scroll-snap-align:start; flex:0 0 148px; text-decoration:none; display:block; }
+  .lwk-short-thumb { width:148px; aspect-ratio:9/16; border-radius:14px;
+    background:linear-gradient(135deg,#243044,#141b26); border:1px solid rgba(212,162,76,.25);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--lwk-gray); font-size:12px; position:relative; text-align:center; overflow:hidden; }
+  .lwk-short-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:14px; display:block; }
+  .lwk-shorts-play { width:38px; height:38px; border-radius:50%; background:rgba(255,77,77,.9);
+    display:flex; align-items:center; justify-content:center; color:#fff; font-size:15px; position:absolute; z-index:2; }
+  .lwk-short-title { margin-top:8px; font-size:12px; color:#fff; text-align:center;
+    line-height:1.45; word-break:keep-all; padding:0 2px; }
+  .lwk-shorts-nav { display:flex; justify-content:center; gap:10px; margin-top:14px; }
+  .lwk-shorts-nav button { width:32px; height:32px; border-radius:50%;
+    border:1px solid rgba(212,162,76,.35); background:transparent;
+    color:var(--lwk-amber-l); cursor:pointer; font-size:15px; }
+
+  /* Contact */
+  .lwk-cta-heading { text-align:center; margin-bottom:40px; }
+  .lwk-cta-heading h2 { font-size:26px; font-weight:800; color:#fff; margin-bottom:10px; }
+  .lwk-cta-heading p { color:var(--lwk-gray); font-size:15px; }
+  .lwk-contact-actions { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:28px; }
+  .lwk-call-btn { display:inline-flex; align-items:center; gap:10px;
+    padding:16px 30px; border-radius:12px; text-decoration:none;
+    background:linear-gradient(120deg,var(--lwk-amber),var(--lwk-bronze));
+    color:#1a1206; font-weight:800; font-size:16px; }
+  .lwk-divider { display:flex; align-items:center; gap:14px;
+    max-width:520px; margin:0 auto 28px; color:var(--lwk-gray); font-size:12.5px; }
+  .lwk-divider::before, .lwk-divider::after { content:""; flex:1; height:1px; background:rgba(255,255,255,.1); }
+  .lwk-form-wrap { background:var(--lwk-charcoal); border-radius:20px;
+    padding:48px 40px; max-width:520px; margin:0 auto; }
+  @media(max-width:560px){ .lwk-form-wrap{padding:32px 20px;} }
+  .lwk-form-row { margin-bottom:16px; text-align:left; }
+  .lwk-form-row label { display:block; font-size:13px; color:var(--lwk-gray); margin-bottom:6px; font-weight:700; }
+  .lwk-form-row input, .lwk-form-row textarea {
+    width:100%; background:var(--lwk-deep); border:1px solid rgba(255,255,255,.1);
+    border-radius:10px; padding:12px 14px; color:#fff; font-family:inherit; font-size:14px; }
+  .lwk-form-row textarea { min-height:90px; resize:vertical; }
+  .lwk-submit-btn { width:100%; padding:16px; border-radius:12px; border:1.5px solid var(--lwk-amber);
+    background:transparent; color:var(--lwk-amber-l); font-weight:800; font-size:15px; cursor:pointer; margin-top:8px; }
+  .lwk-tg-note { text-align:center; color:var(--lwk-gray); font-size:12.5px; margin-top:18px; }
+
+  /* Footer */
+  .lwk-footer { text-align:center; padding:30px; color:#4a5162; font-size:12px; }
+  .lwk-foot-emblem { width:36px; height:36px; display:block; margin:0 auto 12px; opacity:.9; }
+`;
+
+function LeekwangwooPage() {
+  const [bizIdx, setBizIdx] = useState(0);
+  const [form, setForm] = useState({ name: '', phone: '', message: '' });
+  const shortsRef = useRef(null);
+
+  const bizPrev = () => setBizIdx(i => (i - 1 + LWK_SLIDES.length) % LWK_SLIDES.length);
+  const bizNext = () => setBizIdx(i => (i + 1) % LWK_SLIDES.length);
+  const shortsPrev = () => shortsRef.current?.scrollBy({ left: -170, behavior: 'smooth' });
+  const shortsNext = () => shortsRef.current?.scrollBy({ left: 170, behavior: 'smooth' });
+
+  return (
+    <div className="lwk">
+      <style>{LWK_CSS}</style>
+
+      {/* 뒤로가기 */}
+      <Link to="/pium-store" className="lwk-back">← 스토어로 돌아가기</Link>
+
+      {/* 1. 히어로 */}
+      <section className="lwk-hero">
+        <img className="lwk-hero-logo" src={LWK_IMG + '01-hero-logo.png'} alt="Healingsoop LAFA 힐링숲라파" />
+        <div className="lwk-brand-tag"><span className="name">Lee Kwangwoo</span></div>
+        <div className="lwk-hero-photo">
+          <img src={LWK_IMG + '02-hero-photo.jpg'} alt="이광우 대표" />
+        </div>
+        <div className="lwk-eyebrow">HEALER · ENTREPRENEUR</div>
+        <h1 className="lwk-hero">이광우 대표</h1>
+        <div className="role">현재 ㈜YJK코리아 대표</div>
+        <div className="catch">"원칙을 지켜온 시간이,<br/>지금의 신뢰를 만듭니다."</div>
+      </section>
+
+      {/* 2. 커리어 타임라인 */}
+      <section className="lwk-sec">
+        <div className="lwk-wrap">
+          <div className="lwk-sec-title">Career</div>
+          <div className="lwk-sec-heading">커리어 타임라인</div>
+          <div className="lwk-timeline">
+            {[
+              { year: '1983년 2월', title: '서울대학교 경영대학 졸업', desc: '체계와 원칙을 배운 시작점' },
+              { year: '1983년 ~ 2013년 12월', title: '공직 재직', desc: '30년간 몸에 익힌 원칙과 성실함' },
+              { year: '2017년 늦가을 ~ 현재', title: '㈜YJK코리아 대표 (서울 구로구에서 시작)', desc: '이징캉 족욕기 한국 공식 판매 · 공직에서 쌓은 신뢰를 바탕으로 새로운 도전을 시작하다' },
+              { year: '최근', title: "유튜브 채널 '헬시천국tv' 운영", desc: '건강 정보와 이징캉 이야기를 직접 전하고 있습니다' },
+            ].map((item, i) => (
+              <div key={i} className="lwk-t-item">
+                <div className="lwk-t-year">{item.year}</div>
+                <div className="lwk-t-title">{item.title}</div>
+                <div className="lwk-t-desc">{item.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Business */}
+      <section className="lwk-sec" style={{paddingTop:0}}>
+        <div className="lwk-wrap">
+          <div className="lwk-biz">
+            <div className="lwk-sec-title" style={{textAlign:'left',marginBottom:'6px'}}>Business</div>
+            <div className="lwk-biz-brandhead">
+              <img className="lwk-biz-emblem" src={LWK_IMG + '03-biz-emblem.png'} alt="힐링숲라파 엠블럼" />
+              <div className="lwk-biz-h3">이징캉, 신뢰로 전하는 제품</div>
+            </div>
+            <p className="lwk-biz-italic">
+              "아프면서 살 것인가, 아프지 않고 건강하게 살 것인가 — 그 답을 찾는 여정에 함께하고 있습니다."
+            </p>
+
+            {/* 캐러셀 */}
+            <div className="lwk-carousel">
+              <div className="lwk-carousel-track" style={{transform:`translateX(-${bizIdx * 100}%)`}}>
+                {LWK_SLIDES.map((slide, i) => (
+                  <div key={i} className="lwk-slide" style={slide.src ? {padding:0} : {}}>
+                    {slide.src
+                      ? <img src={slide.src} alt={slide.alt} />
+                      : <span style={{whiteSpace:'pre-line'}}>{slide.label}</span>
+                    }
+                  </div>
+                ))}
+              </div>
+              <button className="lwk-car-btn prev" onClick={bizPrev} aria-label="이전 사진">‹</button>
+              <button className="lwk-car-btn next" onClick={bizNext} aria-label="다음 사진">›</button>
+            </div>
+            <div className="lwk-dots">
+              {LWK_SLIDES.map((_, i) => (
+                <button key={i} className={`lwk-dot${bizIdx === i ? ' active' : ''}`}
+                  onClick={() => setBizIdx(i)} aria-label={`슬라이드 ${i + 1}`} />
+              ))}
+            </div>
+
+            <p>
+              2017년 늦가을, 서울 구로구에서 첫걸음을 뗀 이후 지금까지 전국의 많은 고객들을 만나왔습니다.
+              오랜 공직 생활 동안 몸에 익힌 원칙과 성실함이, 지금도 한 분 한 분을 대하는 기준이 되고 있습니다.
+            </p>
+            <p>
+              하루의 마무리, 몸과 마음을 편안히 내려놓는 시간을 소중히 여기는 분들에게
+              어울리는 제품을 소개합니다. 브랜드명은 '힐링숲라파' — 힐링과 건강을 함께 느낄 수 있는
+              가족형 족욕 브랜드입니다.
+            </p>
+
+            <a className="lwk-brand-strip" href="https://www.eummedia.kr/article/article-xsfsn0ug" target="_blank" rel="noopener noreferrer">
+              <img src={LWK_IMG + '06-brand-tile.png'} alt="Healingsoop LAFA" />
+              <div>
+                <div className="lwk-bs-en">Healingsoop LAFA</div>
+                <div className="lwk-bs-ko">힐링숲라파</div>
+                <div className="lwk-bs-desc">힐링과 건강을 함께 느낄 수 있는 가족형 족욕 브랜드입니다.</div>
+                <div className="lwk-bs-link">이음미디어 인물기사 보기 <span>→</span></div>
+              </div>
+            </a>
+
+            <div className="lwk-tags">
+              {['힐링숲라파', '신뢰 경영', '라이프스타일', '꾸준함'].map(t => (
+                <span key={t} className="lwk-tag">{t}</span>
+              ))}
+            </div>
+            <div className="lwk-disclaimer">
+              ※ 이징캉 족욕기는 의료기기가 아닌 공산품이며, 특정 질병의 치료·예방·완화 효과를 표방하지 않습니다.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Philosophy */}
+      <section className="lwk-sec">
+        <div className="lwk-wrap">
+          <div className="lwk-sec-title">Philosophy</div>
+          <div className="lwk-sec-heading">이광우 대표의 건강철학</div>
+          <div className="lwk-phil-card">
+            <img src={LWK_IMG + '07-philosophy.jpg'} alt="이광우 대표 - 건강철학" />
+            <div className="lwk-phil-overlay">
+              <div className="lwk-quote-mark">"</div>
+              <div className="lwk-quote">내 몸속이 어떻게 돌아가는지를 알면,<br/>조심조심 살게 됩니다.</div>
+            </div>
+          </div>
+          <div className="lwk-phil-sup">
+            <div className="lwk-quote-sub">
+              <p>내가 지금 무엇을 먹느냐에 따라 5년 후, 10년 후의 건강이 결정되기 때문에, 먹는 것을 아무렇게나 막 먹으면 안 됩니다.</p>
+              <p>우리 몸을 구성하는 60조 개의 세포가 다 건강하면 몸은 저절로 건강해집니다. 그래서 세포 하나하나의 환경, 그리고 그 세포를 둘러싼 모세혈관의 건강에 집중해야 합니다.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Channels */}
+      <section className="lwk-sec">
+        <div className="lwk-wrap">
+          <div className="lwk-sec-title">Channels</div>
+          <div className="lwk-sec-heading">바로가기</div>
+          <div className="lwk-channels">
+            <a className="lwk-ch-card" href="http://yijingkangkorea.com" target="_blank" rel="noopener noreferrer">
+              <div className="lwk-ch-icon">🏠</div>
+              <div className="lwk-ch-title">홈페이지</div>
+              <div className="lwk-ch-desc">yijingkangkorea.com</div>
+            </a>
+            <a className="lwk-ch-card" href="https://www.youtube.com/@%EC%9D%B4%EC%A7%95%EC%BA%89%EC%A1%B1%EC%9A%95%EA%B8%B0" target="_blank" rel="noopener noreferrer">
+              <div className="lwk-ch-icon">▶️</div>
+              <div className="lwk-ch-title">유튜브</div>
+              <div className="lwk-ch-desc">헬시천국tv</div>
+            </a>
+            <a className="lwk-ch-card" href="https://blog.naver.com/heelingforestlafa" target="_blank" rel="noopener noreferrer">
+              <div className="lwk-ch-icon">📝</div>
+              <div className="lwk-ch-title">공식 블로그</div>
+              <div className="lwk-ch-desc">이징캉(YJK)코리아 · 힐링숲라파</div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. 대표 영상 + 숏츠 */}
+      <section className="lwk-sec">
+        <div className="lwk-wrap">
+          <div className="lwk-sec-title">Featured Videos</div>
+          <div className="lwk-sec-heading">대표 영상</div>
+          <div className="lwk-yt-grid">
+            <a className="lwk-yt-card" href="https://www.youtube.com/watch?v=HhVduBroiYg" target="_blank" rel="noopener noreferrer">
+              <div className="lwk-yt-thumb">
+                <img src="https://i.ytimg.com/vi/HhVduBroiYg/hqdefault.jpg" alt="" onError={e => { e.currentTarget.style.display = 'none'; }} />
+                <div className="lwk-yt-shade" />
+                <div className="lwk-yt-play">▶</div>
+              </div>
+              <div className="v-title">내 눈으로 직접 목격한 혈액순환의 비밀!?</div>
+            </a>
+            <a className="lwk-yt-card" href="https://youtu.be/HWW-_fKW2EE" target="_blank" rel="noopener noreferrer">
+              <div className="lwk-yt-thumb">
+                <img src="https://i.ytimg.com/vi/HWW-_fKW2EE/hqdefault.jpg" alt="" onError={e => { e.currentTarget.style.display = 'none'; }} />
+                <div className="lwk-yt-shade" />
+                <div className="lwk-yt-play">▶</div>
+              </div>
+              <div className="v-title">30년 공무원이 퇴직금 털어, 족욕기 사업에 뛰어든 이유?!</div>
+            </a>
+          </div>
+
+          <div style={{height:'56px'}} />
+
+          <div className="lwk-sec-title">Shorts</div>
+          <div className="lwk-sec-heading" style={{marginBottom:'24px'}}>유튜브 숏츠</div>
+          <div>
+            <div className="lwk-shorts-row" ref={shortsRef}>
+              {LWK_SHORTS.map(s => (
+                <a key={s.id} className="lwk-short-card" href={`https://youtube.com/shorts/${s.id}`} target="_blank" rel="noopener noreferrer">
+                  <div className="lwk-short-thumb">
+                    <img src={`https://i.ytimg.com/vi/${s.id}/oardefault.jpg`} alt="" onError={e => { e.currentTarget.style.display = 'none'; }} />
+                    <div className="lwk-yt-shade" />
+                    <div className="lwk-shorts-play">▶</div>
+                  </div>
+                  <div className="lwk-short-title">{s.title}</div>
+                </a>
+              ))}
+            </div>
+            <div className="lwk-shorts-nav">
+              <button onClick={shortsPrev} aria-label="이전 숏츠">‹</button>
+              <button onClick={shortsNext} aria-label="다음 숏츠">›</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. 문의 */}
+      <section className="lwk-sec">
+        <div className="lwk-wrap">
+          <div className="lwk-cta-heading">
+            <h2>이광우 대표와 연결되고 싶으신가요?</h2>
+            <p>바로 전화로 문의하시거나, 폼으로 남겨주시면 확인 후 답변드립니다.</p>
+          </div>
+          <div className="lwk-contact-actions">
+            <a className="lwk-call-btn" href="tel:01053160087">📞 010-5316-0087 전화 연결</a>
+          </div>
+          <div className="lwk-divider">또는 폼으로 문의하기</div>
+          <div className="lwk-form-wrap">
+            <div className="lwk-form-row">
+              <label>이름</label>
+              <input type="text" placeholder="성함을 입력해주세요"
+                value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} />
+            </div>
+            <div className="lwk-form-row">
+              <label>연락처</label>
+              <input type="text" placeholder="연락 가능한 번호를 입력해주세요"
+                value={form.phone} onChange={e => setForm(f => ({...f, phone: e.target.value}))} />
+            </div>
+            <div className="lwk-form-row">
+              <label>문의 내용</label>
+              <textarea placeholder="궁금한 점을 남겨주세요"
+                value={form.message} onChange={e => setForm(f => ({...f, message: e.target.value}))} />
+            </div>
+            <button className="lwk-submit-btn" type="button">문의 보내기</button>
+            <div className="lwk-tg-note">
+              📨 전송 시 이광우 대표님 텔레그램으로 알림이 발송됩니다 (텔레그램 연결은 페이지 완성 후 진행 예정)
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 8. 푸터 */}
+      <footer className="lwk-footer">
+        <img className="lwk-foot-emblem" src={LWK_IMG + '08-footer-mark.png'} alt="" />
+        © 이음미디어 · PIUM
+      </footer>
+    </div>
+  );
+}
+
 /* ── 메인 컴포넌트 ── */
 export default function PiumAppDetailPage() {
   const { slug } = useParams();
 
   if (slug === "sungchangwoon") return <SungchangwoonPage />;
   if (slug === "ohaengja")     return <OhaengjaPage />;
+  if (slug === "leekwangwoo")  return <LeekwangwooPage />;
 
   const app = APPS[slug];
 
