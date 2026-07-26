@@ -1697,7 +1697,7 @@ function LeekwangwooPage() {
           <img src={LWK_IMG + '02-hero-photo.jpg'} alt="이광우 대표" />
         </div>
         <div className="lwk-eyebrow">HEALER · ENTREPRENEUR</div>
-        <h1 className="lwk-hero">이광우 대표</h1>
+        <h1 className="lwk-hero">힐링숲라파 이징캉코리아 이광우 대표</h1>
         <div className="role">현재 ㈜YJK코리아 대표</div>
         <div className="catch">"원칙을 지켜온 시간이,<br/>지금의 신뢰를 만듭니다."</div>
       </section>
