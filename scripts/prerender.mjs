@@ -80,7 +80,7 @@ const PIUM_APP_PROFILES = {
   },
   '/pium-app/leekwangwoo': {
     title: '이광우 · 힐링숲라파 대표 | 이음미디어',
-    desc: '힐링숲라파 대표 · 건강경영·힐링경영 전문가. 강의·섭외 문의 010-5069-0314',
+    desc: '힐링숲라파 이징캉코리아 이광우 대표. 문의 010-5069-0314',
     image: `${SITE_URL}/leekwangwoo-og.jpg`,
   },
 };
