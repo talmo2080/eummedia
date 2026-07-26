@@ -227,6 +227,19 @@ export default function Footer() {
             <p>청소년보호책임자: 정세연</p>
           </div>
 
+          {/* 섹션 6.5 RSS 구독 링크 — 뉴스 수집기·크롤러 노출 유도 */}
+          <div className="text-xs mb-4">
+            <a
+              href="/rss.xml"
+              target="_blank"
+              rel="noopener"
+              className="text-neutral-500 hover:text-[#0d2d52] transition-colors inline-flex items-center gap-1"
+              title="이음미디어 RSS 피드 구독"
+            >
+              📡 RSS 구독
+            </a>
+          </div>
+
           {/* 섹션 7. 저작권 */}
           <div className="text-xs leading-relaxed text-neutral-500">
             <p>Copyright © 2026 eummedia.kr</p>

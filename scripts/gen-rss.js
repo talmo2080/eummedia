@@ -43,7 +43,8 @@ async function fetchArticles() {
   if (!url || !key) {
     throw new Error('VITE_SUPABASE_URL 또는 VITE_SUPABASE_ANON_KEY 환경변수 누락');
   }
-  const endpoint = `${url}/rest/v1/articles?select=slug,title,summary,published_at&status=eq.published&order=published_at.desc&limit=${FEED_LIMIT}`;
+  // channels(name) 조인 — RSS <category> 태그에 채널명 사용 (이음매거진/이음피플 등)
+  const endpoint = `${url}/rest/v1/articles?select=slug,title,summary,published_at,channels(name)&status=eq.published&order=published_at.desc&limit=${FEED_LIMIT}`;
   const res = await fetch(endpoint, {
     headers: {
       apikey: key,
@@ -77,17 +78,21 @@ function rfc822(iso) {
 }
 
 // ───────── item XML 빌더 ─────────
-function itemXml({ slug, title, summary, published_at }) {
+function itemXml({ slug, title, summary, published_at, channels }) {
   const link = `${SITE_URL}/article/${slug}`;
-  return [
+  // channels는 조인 결과 객체(embed) — 예: { name: '이음매거진' }, 조인 실패 시 null
+  const categoryName = channels?.name;
+  const lines = [
     '    <item>',
     `      <title>${esc(title)}</title>`,
     `      <link>${esc(link)}</link>`,
     `      <description>${esc(summary)}</description>`,
     `      <pubDate>${rfc822(published_at)}</pubDate>`,
     `      <guid>${esc(link)}</guid>`,
-    '    </item>',
-  ].join('\n');
+  ];
+  if (categoryName) lines.push(`      <category>${esc(categoryName)}</category>`);
+  lines.push('    </item>');
+  return lines.join('\n');
 }
 
 // ───────── 메인 ─────────
