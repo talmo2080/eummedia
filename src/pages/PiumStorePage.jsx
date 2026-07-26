@@ -888,8 +888,8 @@ export default function PiumStorePage() {
     },
     {
       slug:          "leekwangwoo",
-      title:         "이광우",
-      summary:       "힐링숲라파 대표 · 건강경영·힐링경영 전문가",
+      title:         "힐링숲라파 이징캉코리아 이광우 대표",
+      summary:       "문의 010-5069-0314",
       thumbnail_url: "/leekwangwoo-og.jpg",
       category:      "expert_tool",
       price_model:   "free",
@@ -900,8 +900,8 @@ export default function PiumStorePage() {
   const recentFeatured = [
     {
       slug:          "leekwangwoo",
-      title:         "이광우",
-      summary:       "힐링숲라파 대표 · 건강경영·힐링경영 전문가",
+      title:         "힐링숲라파 이징캉코리아 이광우 대표",
+      summary:       "문의 010-5069-0314",
       thumbnail_url: "/leekwangwoo-og.jpg",
       category:      "expert_tool",
       price_model:   "free",
