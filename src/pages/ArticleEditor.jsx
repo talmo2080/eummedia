@@ -281,7 +281,18 @@ export default function ArticleEditor() {
   const [title, setTitle] = useState('')
   // 기사 주소 (slug) — 사용자가 한글로 입력 가능. 비우면 기존/자동 생성값 사용.
   // 잠금 기준: originalStatus === 'published' 만 readOnly (draft/submitted는 수정 허용)
+  //
+  // ★ uncontrolled 전환: input에 value prop을 걸지 않는다.
+  //   controlled(value={slug})면 매 리렌더마다 React가 DOM 값을 slug로 강제 동기화 →
+  //   한글 IME 조합 중 텍스트가 계속 덮어써져 조합 취소됨.
+  //   해결: defaultValue만 사용, 실제 값은 slugInputRef로 직접 읽음.
+  //   slug state는 미리보기·저장 payload용으로만 유지.
   const [slug, setSlug] = useState('')
+  const slugInputRef = useRef(null)
+  // 미리보기 debounce timer — 타이핑 잠시 멈춘 뒤 300ms 후에만 setSlug 호출
+  // (매 키 입력마다 setSlug 하면 리렌더 발생하지만 uncontrolled라 input 자체는 방해 안 받음.
+  //  다만 미리보기 span의 잦은 재계산 방지 및 CPU 절약 목적)
+  const slugPreviewTimerRef = useRef(null)
   const [reporter, setReporter] = useState('')
   const [tagInput, setTagInput] = useState('')
   const [tags, setTags] = useState([])
@@ -431,7 +442,11 @@ export default function ArticleEditor() {
       }
       setTitle(data.title || '')
       // 기존 slug를 필드에 채워 세연이 수정 가능하게 (published면 UI에서 readOnly 처리)
+      // ★ uncontrolled input이라 defaultValue는 최초 마운트 시점에만 반영됨.
+      //   데이터 fetch는 마운트 후 async라 defaultValue는 '' 상태였음 →
+      //   state와 DOM value 모두 명시적으로 세팅해야 편집 진입 시 기존 slug가 필드에 나타남.
       setSlug(data.slug || '')
+      if (slugInputRef.current) slugInputRef.current.value = data.slug || ''
       setChannel(ID_TO_CHANNEL[data.channel_id] || '')
       setContent(data.content || '')
       setSummary(data.summary || '')
@@ -815,7 +830,10 @@ export default function ArticleEditor() {
     //   · 잠금 아님 + 비었음 + 신규 → 자동 생성
     //   · 잠금 아님 + 비었음 + editId(draft/submitted) → payload 미포함 → 기존 slug 보존
     if (!isSlugLocked) {
-      const cleaned = cleanSlug(slug)
+      // uncontrolled input이라 slug state는 debounce로 뒤늦게 갱신될 수 있음.
+      // 저장 시점엔 DOM value(ref)에서 직접 읽어 즉시성 확보.
+      const raw = slugInputRef.current?.value ?? slug
+      const cleaned = cleanSlug(raw)
       if (cleaned) {
         payload.slug = cleaned
       } else if (!editId) {
@@ -829,7 +847,9 @@ export default function ArticleEditor() {
   // 성공하면 null, 실패하면 { alert }를 반환. 사용측에서 alert 후 return.
   const preSaveSlugCheck = async () => {
     if (isSlugLocked) return null
-    const cleaned = cleanSlug(slug)
+    // buildPayload와 동일 이유 — 저장 시점엔 ref 우선
+    const raw = slugInputRef.current?.value ?? slug
+    const cleaned = cleanSlug(raw)
     if (!cleaned) return null
     const check = await checkSlugDuplicate(cleaned)
     if (check?.error) return { alert: `주소 중복 검사 오류: ${check.error}` }
@@ -1277,14 +1297,41 @@ export default function ArticleEditor() {
                 )}
               </label>
               <input
+                ref={slugInputRef}
                 style={{
                   ...inp({ height: 52 }),
                   background: isSlugLocked ? '#f5f5f5' : '#fff',
                   color: isSlugLocked ? '#888' : '#1a1a1a',
                   cursor: isSlugLocked ? 'not-allowed' : 'text',
                 }}
-                value={slug}
-                onChange={e => setSlug(cleanSlug(e.target.value))}
+                defaultValue={slug}
+                // ─── 🔍 임시 진단 로그 (원인 확정용, 확정 후 제거) ────────────────
+                onKeyDown={e => {
+                  console.log('[slug:keydown]', 'key=', e.key, 'code=', e.code)
+                }}
+                onCompositionStart={() => {
+                  console.log('[slug:compStart]')
+                }}
+                onCompositionEnd={e => {
+                  console.log('[slug:compEnd]', 'data=', e.data, 'value=', e.target.value)
+                }}
+                // ────────────────────────────────────────────────────────────────
+                onChange={e => {
+                  // 🔍 진단 로그
+                  const focused = document.activeElement === slugInputRef.current
+                  console.log('[slug:change]', 'value=', e.target.value, 'focused=', focused)
+
+                  const raw = e.target.value
+                  if (slugPreviewTimerRef.current) clearTimeout(slugPreviewTimerRef.current)
+                  slugPreviewTimerRef.current = setTimeout(() => setSlug(raw), 300)
+                }}
+                onBlur={e => {
+                  console.log('[slug:blur]', 'value=', e.target.value)
+                  if (slugPreviewTimerRef.current) clearTimeout(slugPreviewTimerRef.current)
+                  const cleaned = cleanSlug(e.target.value)
+                  setSlug(cleaned)
+                  e.target.value = cleaned
+                }}
                 readOnly={isSlugLocked}
                 placeholder="예: 방송스피치사관학교-졸업식 (한글 가능, 비우면 자동 생성)"
               />
