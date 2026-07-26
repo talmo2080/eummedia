@@ -79,8 +79,8 @@ const PIUM_APP_PROFILES = {
     image: `${SITE_URL}/ohaengja-og.jpg`,
   },
   '/pium-app/leekwangwoo': {
-    title: '힐링숲라파 이징캉코리아 이광우 대표. 문의 010-5069-0314',
-    desc: '힐링숲라파 이징캉코리아 이광우 대표. 문의 010-5069-0314',
+    title: '힐링숲라파 이징캉코리아 이광우 대표',
+    desc: '문의 010-5069-0314',
     image: `${SITE_URL}/leekwangwoo-og.jpg`,
   },
 };
