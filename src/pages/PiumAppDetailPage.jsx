@@ -1645,7 +1645,37 @@ const LWK_CSS = `
 function LeekwangwooPage() {
   const [bizIdx, setBizIdx] = useState(0);
   const [form, setForm] = useState({ name: '', phone: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted,  setSubmitted]  = useState(false);
+  const [submitErr,  setSubmitErr]  = useState('');
   const shortsRef = useRef(null);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!form.name || !form.phone || !form.message) {
+      setSubmitErr('이름, 연락처, 문의 내용을 모두 입력해 주세요.');
+      return;
+    }
+    setSubmitting(true);
+    setSubmitErr('');
+    try {
+      const res = await fetch('/api/lwk-lecture-inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setSubmitted(true);
+        setForm({ name: '', phone: '', message: '' });
+      } else {
+        setSubmitErr(data.error || '제출 중 오류가 발생했습니다. 다시 시도해 주세요.');
+      }
+    } catch {
+      setSubmitErr('네트워크 오류가 발생했습니다. 다시 시도해 주세요.');
+    }
+    setSubmitting(false);
+  }
 
   const bizPrev = () => setBizIdx(i => (i - 1 + LWK_SLIDES.length) % LWK_SLIDES.length);
   const bizNext = () => setBizIdx(i => (i + 1) % LWK_SLIDES.length);
@@ -1867,27 +1897,43 @@ function LeekwangwooPage() {
             <a className="lwk-call-btn" href="tel:01053160087">📞 010-5316-0087 전화 연결</a>
           </div>
           <div className="lwk-divider">또는 폼으로 문의하기</div>
-          <div className="lwk-form-wrap">
-            <div className="lwk-form-row">
-              <label>이름</label>
-              <input type="text" placeholder="성함을 입력해주세요"
-                value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} />
-            </div>
-            <div className="lwk-form-row">
-              <label>연락처</label>
-              <input type="text" placeholder="연락 가능한 번호를 입력해주세요"
-                value={form.phone} onChange={e => setForm(f => ({...f, phone: e.target.value}))} />
-            </div>
-            <div className="lwk-form-row">
-              <label>문의 내용</label>
-              <textarea placeholder="궁금한 점을 남겨주세요"
-                value={form.message} onChange={e => setForm(f => ({...f, message: e.target.value}))} />
-            </div>
-            <button className="lwk-submit-btn" type="button">문의 보내기</button>
-            <div className="lwk-tg-note">
-              📨 전송 시 이광우 대표님 텔레그램으로 알림이 발송됩니다 (텔레그램 연결은 페이지 완성 후 진행 예정)
-            </div>
-          </div>
+          <form className="lwk-form-wrap" onSubmit={handleSubmit}>
+            {submitted ? (
+              <div style={{ textAlign:'center', padding:'32px 0', color:'var(--lwk-amber-l)', fontSize:16 }}>
+                ✅ 문의가 전송됐습니다.<br/>
+                <span style={{ fontSize:13, color:'var(--lwk-gray)', marginTop:8, display:'block' }}>
+                  이광우 대표님이 확인 후 연락드립니다.
+                </span>
+              </div>
+            ) : (
+              <>
+                <div className="lwk-form-row">
+                  <label>이름</label>
+                  <input type="text" placeholder="성함을 입력해주세요"
+                    value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} />
+                </div>
+                <div className="lwk-form-row">
+                  <label>연락처</label>
+                  <input type="text" placeholder="연락 가능한 번호를 입력해주세요"
+                    value={form.phone} onChange={e => setForm(f => ({...f, phone: e.target.value}))} />
+                </div>
+                <div className="lwk-form-row">
+                  <label>문의 내용</label>
+                  <textarea placeholder="궁금한 점을 남겨주세요"
+                    value={form.message} onChange={e => setForm(f => ({...f, message: e.target.value}))} />
+                </div>
+                {submitErr && (
+                  <p style={{ fontSize:13, color:'#f87171', margin:'0 0 10px' }}>{submitErr}</p>
+                )}
+                <button className="lwk-submit-btn" type="submit" disabled={submitting}>
+                  {submitting ? '전송 중...' : '문의 보내기'}
+                </button>
+                <div className="lwk-tg-note">
+                  📨 전송 시 이광우 대표님 텔레그램으로 알림이 발송됩니다
+                </div>
+              </>
+            )}
+          </form>
         </div>
       </section>
 
