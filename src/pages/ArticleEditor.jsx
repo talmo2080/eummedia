@@ -1304,29 +1304,17 @@ export default function ArticleEditor() {
                   color: isSlugLocked ? '#888' : '#1a1a1a',
                   cursor: isSlugLocked ? 'not-allowed' : 'text',
                 }}
+                // ★ uncontrolled: defaultValue만 사용. React 리렌더가 DOM value를 안 건드림 → 한글 IME 안전.
+                //   실제 값은 slugInputRef로 직접 읽는다.
                 defaultValue={slug}
-                // ─── 🔍 임시 진단 로그 (원인 확정용, 확정 후 제거) ────────────────
-                onKeyDown={e => {
-                  console.log('[slug:keydown]', 'key=', e.key, 'code=', e.code)
-                }}
-                onCompositionStart={() => {
-                  console.log('[slug:compStart]')
-                }}
-                onCompositionEnd={e => {
-                  console.log('[slug:compEnd]', 'data=', e.data, 'value=', e.target.value)
-                }}
-                // ────────────────────────────────────────────────────────────────
+                // 미리보기용 debounce (300ms) — 매 키 입력마다 setState 안 함.
                 onChange={e => {
-                  // 🔍 진단 로그
-                  const focused = document.activeElement === slugInputRef.current
-                  console.log('[slug:change]', 'value=', e.target.value, 'focused=', focused)
-
                   const raw = e.target.value
                   if (slugPreviewTimerRef.current) clearTimeout(slugPreviewTimerRef.current)
                   slugPreviewTimerRef.current = setTimeout(() => setSlug(raw), 300)
                 }}
+                // 포커스 나갈 때 1회 정리 — DOM value 직접 갱신 + state 반영
                 onBlur={e => {
-                  console.log('[slug:blur]', 'value=', e.target.value)
                   if (slugPreviewTimerRef.current) clearTimeout(slugPreviewTimerRef.current)
                   const cleaned = cleanSlug(e.target.value)
                   setSlug(cleaned)
