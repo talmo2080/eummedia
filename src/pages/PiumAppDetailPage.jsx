@@ -1885,7 +1885,7 @@ function ChoiilryePage() {
           <textarea placeholder="문의 내용을 남겨주세요" />
           <button type="submit">문의 남기기</button>
         </form>
-        <div className="cir-note">📨 전송 시 최일례 대표님께 알림이 발송됩니다<br />(알림 연결은 페이지 완성 후 진행 예정)</div>
+        <div className="cir-note">📨 전송 시 최일례 대표님께 알림이 발송됩니다</div>
       </section>
 
       <footer className="cir-footer">
