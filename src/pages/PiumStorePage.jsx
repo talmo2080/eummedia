@@ -869,15 +869,6 @@ export default function PiumStorePage() {
       users:         { nickname: "정세연" },
     },
     {
-      slug:          "choiilrye",
-      title:         "최일례 프로필",
-      summary:       "전문가 프로필 페이지",
-      thumbnail_url: "/pium-app/choiilrye/card.jpg",
-      category:      "expert_tool",
-      price_model:   "free",
-      users:         { nickname: "최일례" },
-    },
-    {
       slug:          "sungchangwoon",
       title:         "성창운",
       summary:       "봉숭아학당문화혁신학교 총장 · 웃음레크·힐링 스피치 전문가",
@@ -903,6 +894,15 @@ export default function PiumStorePage() {
       category:      "expert_tool",
       price_model:   "free",
       users:         { nickname: "이광우" },
+    },
+    {
+      slug:          "choiilrye",
+      title:         "최일례 프로필",
+      summary:       "전문가 프로필 페이지",
+      thumbnail_url: "/pium-app/choiilrye/card.jpg",
+      category:      "expert_tool",
+      price_model:   "free",
+      users:         { nickname: "최일례" },
     },
   ];
   // 갓 피어난 앱: 하드코딩 선두 + DB 최근 순
