@@ -81,7 +81,7 @@ body { width:1200px; height:630px; overflow:hidden; font-family: 'Malgun Gothic'
     </div>
     <div class="footer">
       <span class="pium">피움 전문가 프로필</span>
-      <span class="contact">010-5069-0314</span>
+      <span class="contact">010-5316-0087</span>
     </div>
   </div>
   <div class="bar"></div>

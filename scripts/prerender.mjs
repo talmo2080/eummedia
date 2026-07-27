@@ -80,7 +80,7 @@ const PIUM_APP_PROFILES = {
   },
   '/pium-app/leekwangwoo': {
     title: '힐링숲라파 이징캉코리아 이광우 대표',
-    desc: '문의 010-5069-0314',
+    desc: '문의 010-5316-0087',
     image: `${SITE_URL}/leekwangwoo-og-v2.jpg`,
   },
 };

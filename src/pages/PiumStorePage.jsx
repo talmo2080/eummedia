@@ -889,7 +889,7 @@ export default function PiumStorePage() {
     {
       slug:          "leekwangwoo",
       title:         "힐링숲라파 이징캉코리아 이광우 대표",
-      summary:       "문의 010-5069-0314",
+      summary:       "문의 010-5316-0087",
       thumbnail_url: "/leekwangwoo-og.jpg",
       category:      "expert_tool",
       price_model:   "free",
@@ -901,7 +901,7 @@ export default function PiumStorePage() {
     {
       slug:          "leekwangwoo",
       title:         "힐링숲라파 이징캉코리아 이광우 대표",
-      summary:       "문의 010-5069-0314",
+      summary:       "문의 010-5316-0087",
       thumbnail_url: "/leekwangwoo-og.jpg",
       category:      "expert_tool",
       price_model:   "free",
