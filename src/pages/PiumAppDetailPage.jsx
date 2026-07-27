@@ -1794,7 +1794,7 @@ function ChoiilryePage() {
             <div className="cir-awardbar"><i>🏅</i><div><b>2026년 효부대상</b><span>수상 <span className="cir-need">주최 기관 확인</span></span></div></div>
             <div className="cir-cards">
               <div className="cir-card"><b>이음미디어 대표</b><p>소외된 가치를 발굴해 세상과 잇습니다. 월간 매거진을 함께 펴냅니다.</p></div>
-              <div className="cir-card"><b>한국디지털교육원 책쓰기 전임교수</b><p>전자책 작가 <b>150여 명</b>을 배출했습니다. <span className="cir-need">이사장 겸직 표기 확인</span></p></div>
+              <div className="cir-card"><b>한국디지털교육원 책쓰기 전임교수</b><p>전자책 작가 <b>150여 명</b>을 배출했습니다.</p></div>
               <div className="cir-card"><b>봉숭아학당 문화혁신학교 책쓰기 교수 · 방송스피치 총동문회장</b><p>대표님이 방송 스피치를 배운 곳에서, 이제는 가르치고 이끄는 자리에 섰습니다.</p></div>
               <div className="cir-card"><b>유튜브 전문 강사 · 시니어 디지털 교육</b><p>시니어에게 유튜브와 AI 도구를 가르칩니다.</p></div>
               <div className="cir-card"><b>실버 레크리에이션 · 실버 전래놀이 강사</b><p>현장에서 어르신들과 직접 만나 웃음을 나눕니다.</p></div>
