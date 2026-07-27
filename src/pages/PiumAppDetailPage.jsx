@@ -1444,6 +1444,7 @@ function ChoiilryePage() {
 .cir-hero-figure{position:relative;margin:30px -26px 0;border-top:2px solid rgba(224,169,31,.55);overflow:hidden}
 .cir-hero-photo{width:100%;display:block}
 .cir-hero-figure::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(20,16,25,.38) 0%,rgba(20,16,25,0) 26%,rgba(20,16,25,0) 58%,rgba(20,16,25,.92) 100%)}
+.cir-sig{position:absolute;z-index:2;left:50%;bottom:14px;transform:translateX(-50%);width:78%;pointer-events:none;filter:drop-shadow(0 3px 7px rgba(0,0,0,.9)) drop-shadow(0 0 16px rgba(0,0,0,.75))}
 /* stats */
 .cir-hero-stats{display:flex;gap:10px;margin-top:22px}
 .cir-stat{flex:1;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:14px;padding:15px 8px;text-align:center}
@@ -1634,13 +1635,14 @@ function ChoiilryePage() {
       {/* 히어로 */}
       <header className="cir-hero">
         <div className="cir-hero-brand">PIUM 전문가 프로필</div>
-        <div className="cir-hero-en">CHOI IL RYE</div>
+        <div className="cir-hero-en">CHOI IL RYUE</div>
         <div className="cir-hero-div" />
         <h1>최일례</h1>
-        <div className="cir-hero-sub">이음미디어 대표 · 소통공감박사 · 책쓰기 전임교수</div>
+        <div className="cir-hero-sub">이음미디어 대표 · 소통공감박사<br />책쓰기 전임교수 · 마이금융파트너 지점장</div>
         <div className="cir-hero-tag">하는 일마다 일내는 여자,<br /><em>"오라이!"</em>로 길을 여는 사람</div>
         <figure className="cir-hero-figure">
           <img className="cir-hero-photo" src="/pium-app/choiilrye/hero.jpg" alt="최일례 대표" />
+          <svg className="cir-sig" viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg" aria-label="Choi il-ryue"><defs><linearGradient id="sigG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#fff6dd"/><stop offset="55%" stopColor="#f2cb63"/><stop offset="100%" stopColor="#e0a91f"/></linearGradient></defs><path d="M 250 88 C 238 60, 188 44, 146 62 C 96 83, 74 146, 92 186 C 110 226, 168 242, 210 226 C 228 219, 238 209, 244 198" fill="none" stroke="url(#sigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M 284 214 C 292 178, 300 122, 302 96 C 303 74, 296 62, 286 66 C 274 71, 274 100, 282 132 C 291 168, 300 192, 302 212 C 306 184, 318 164, 336 162 C 356 160, 366 178, 364 198 L 363 212" fill="none" stroke="url(#sigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M 428 170 C 410 148, 374 150, 364 176 C 354 200, 368 218, 392 218 C 412 218, 428 204, 428 188 C 428 180, 428 174, 428 170" fill="none" stroke="url(#sigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M 428 190 C 440 188, 452 183, 462 176" fill="none" stroke="url(#sigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M 470 200 C 476 182, 484 166, 490 158 C 486 176, 482 194, 486 204 C 490 212, 500 210, 508 202" fill="none" stroke="url(#sigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M 556 200 C 562 182, 570 166, 576 158 C 572 176, 568 194, 572 204 C 576 212, 586 210, 594 202" fill="none" stroke="url(#sigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M 602 202 C 610 170, 622 118, 628 88 C 632 66, 626 56, 616 60 C 606 64, 606 92, 614 124 C 622 158, 630 186, 632 202 C 634 210, 642 212, 650 204" fill="none" stroke="url(#sigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M 660 180 L 700 176" fill="none" stroke="url(#sigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M 708 206 C 714 186, 720 168, 724 158 C 722 174, 720 188, 722 196 C 730 178, 744 164, 758 166 C 766 167, 770 172, 770 178" fill="none" stroke="url(#sigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M 778 160 C 782 180, 788 196, 796 204 C 804 212, 812 206, 818 192 C 824 176, 828 164, 830 158 C 826 188, 820 226, 810 252 C 802 272, 788 280, 778 274 C 770 269, 770 260, 778 256" fill="none" stroke="url(#sigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M 840 160 C 836 182, 836 200, 844 208 C 854 216, 868 206, 874 188 C 878 176, 880 166, 881 160 C 877 180, 874 196, 876 204 C 878 210, 884 210, 890 204" fill="none" stroke="url(#sigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M 892 192 C 904 186, 918 184, 926 178 C 932 173, 928 162, 918 162 C 904 162, 892 178, 894 196 C 896 212, 912 218, 928 208" fill="none" stroke="url(#sigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M 928 208 C 958 218, 964 244, 932 254 C 875 268, 420 268, 300 252 C 274 248, 272 236, 296 230" fill="none" stroke="url(#sigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="486" cy="128" r="5.5" fill="url(#sigG)"/><circle cx="572" cy="128" r="5.5" fill="url(#sigG)"/></svg>
         </figure>
       </header>
 
@@ -1796,7 +1798,7 @@ function ChoiilryePage() {
               <div className="cir-card"><b>봉숭아학당 문화혁신학교 책쓰기 교수 · 방송스피치 총동문회장</b><p>대표님이 방송 스피치를 배운 곳에서, 이제는 가르치고 이끄는 자리에 섰습니다.</p></div>
               <div className="cir-card"><b>유튜브 전문 강사 · 시니어 디지털 교육</b><p>시니어에게 유튜브와 AI 도구를 가르칩니다.</p></div>
               <div className="cir-card"><b>실버 레크리에이션 · 실버 전래놀이 강사</b><p>현장에서 어르신들과 직접 만나 웃음을 나눕니다.</p></div>
-              <div className="cir-card"><b>(주)인카금융서비스 마이다스 사업단 지점장</b><p>보험 · 재무 서비스 <span className="cir-need">게재 여부 확인</span></p></div>
+              <div className="cir-card"><b>마이금융파트너 비에프본부 지점장</b><p>(주)현대해상 판매자회사. 보험 · 재무 상담으로 사람들의 살림을 지킵니다.</p></div>
             </div>
             <div className="cir-tagwrap">
               {['소통공감박사','AI 디지털 리터러시 1급 지도사','AI 디지털 리터러시 강사','AI 코에디터 책쓰기 강사','AI 책쓰기 1급 지도사 강사','방송스피치지도사 1급','웃음건강지도사 1급','스마트폰활용 전문강사 1급','건강지도사 1급','웰다잉지도사 전문강사'].map(t => (
