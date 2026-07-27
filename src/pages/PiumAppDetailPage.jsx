@@ -1407,6 +1407,496 @@ function NotFound() {
 }
 
 /* ══════════════════════════════════════
+   최일례 대표 프로필 — /pium-app/choiilrye
+══════════════════════════════════════ */
+function ChoiilryePage() {
+  const [libIdx, setLibIdx] = useState(0);
+  const libTotal = 3;
+
+  function goLib(k) {
+    setLibIdx(((k % libTotal) + libTotal) % libTotal);
+  }
+
+  const [touchX, setTouchX] = useState(null);
+
+  const css = `
+:root{
+  --ink:#141019;--gold:#e0a91f;--gold-l:#f7d777;--coral:#e2593f;
+  --ivory:#faf6ee;--paper:#fffdf8;--gray:#8d8697;--line:rgba(255,255,255,.10);
+  --wood:#6b4526;--wood-d:#3d2614;
+}
+.cir-wrap{max-width:480px;margin:0 auto;background:var(--ink);overflow:hidden;font-family:'Pretendard',-apple-system,sans-serif;color:var(--ivory);line-height:1.72;word-break:keep-all}
+.cir-wrap *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+.cir-wrap section{padding:52px 26px}
+.cir-wrap .eyebrow{font-size:11px;letter-spacing:.22em;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:10px}
+.cir-wrap h2{font-size:23px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px}
+.cir-wrap .sub{font-size:13.5px;color:var(--gray);font-weight:400;margin-bottom:26px}
+.cir-wrap .rule{width:34px;height:3px;background:var(--gold);border-radius:2px;margin-bottom:22px}
+/* hero */
+.cir-hero{position:relative;padding:56px 26px 48px;text-align:center;background:radial-gradient(120% 80% at 50% 0%,#4a2f1a 0%,transparent 60%),linear-gradient(180deg,#241a12 0%,var(--ink) 100%)}
+.cir-hero-brand{font-size:11.5px;letter-spacing:.28em;color:var(--gold-l);font-weight:700;margin-bottom:30px;opacity:.9}
+.cir-hero-en{font-family:'Georgia',serif;font-weight:700;font-size:44px;line-height:1;letter-spacing:.16em;color:var(--gold-l);margin-top:4px;text-shadow:0 2px 18px rgba(0,0,0,.5)}
+.cir-hero-div{width:44px;height:3px;background:var(--gold);border-radius:2px;margin:18px auto}
+.cir-hero h1{font-size:46px;font-weight:800;letter-spacing:-.04em;line-height:1.1}
+.cir-hero-sub{margin-top:11px;font-size:14px;font-weight:600;color:var(--gold-l);letter-spacing:.01em}
+.cir-hero-tag{margin-top:16px;font-size:16.5px;font-weight:700;color:var(--paper);line-height:1.55}
+.cir-hero-tag em{font-style:normal;color:var(--gold)}
+.cir-hero-figure{position:relative;margin:30px -26px 0;border-top:2px solid rgba(224,169,31,.55);overflow:hidden}
+.cir-hero-photo{width:100%;display:block}
+.cir-hero-figure::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(20,16,25,.38) 0%,rgba(20,16,25,0) 26%,rgba(20,16,25,0) 58%,rgba(20,16,25,.92) 100%)}
+/* stats */
+.cir-hero-stats{display:flex;gap:10px;margin-top:22px}
+.cir-stat{flex:1;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:14px;padding:15px 8px;text-align:center}
+.cir-stat b{display:block;font-size:21px;font-weight:800;color:var(--gold);letter-spacing:-.02em}
+.cir-stat span{display:block;font-size:10.5px;color:var(--gray);margin-top:3px;line-height:1.45}
+.cir-stat-wide{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;background:rgba(224,169,31,.10);border:1px solid rgba(224,169,31,.35);border-radius:14px;padding:14px 10px}
+.cir-stat-wide b{font-size:21px;font-weight:800;color:var(--gold);letter-spacing:-.02em}
+.cir-stat-wide span{font-size:12.5px;color:var(--paper);font-weight:600}
+/* press */
+.cir-press{padding:0 26px 52px;margin-top:-14px}
+.cir-press-card{background:linear-gradient(135deg,rgba(224,169,31,.14),rgba(255,255,255,.04));border:1px solid rgba(224,169,31,.30);border-radius:18px;padding:22px 20px}
+.cir-press-card .badge{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.14em;background:var(--gold);color:#241a12;border-radius:6px;padding:3px 9px;margin-bottom:12px}
+.cir-press-card h3{font-size:17.5px;font-weight:800;line-height:1.45;letter-spacing:-.02em}
+.cir-press-card p{font-size:13.5px;color:var(--gray);margin-top:8px}
+.cir-press-card a{display:block;text-align:center;margin-top:16px;text-decoration:none;background:rgba(255,255,255,.10);border:1px solid rgba(224,169,31,.45);color:var(--gold-l);font-weight:700;font-size:14px;border-radius:11px;padding:13px}
+/* library */
+.cir-library{background:radial-gradient(100% 60% at 50% 0%,rgba(224,169,31,.07),transparent 70%),linear-gradient(180deg,#191218,#141019)}
+.woodH{background-image:repeating-linear-gradient(180deg,rgba(255,255,255,.10) 0 1px,rgba(0,0,0,.17) 1px 2px,rgba(0,0,0,0) 2px 5px),repeating-linear-gradient(178.8deg,rgba(0,0,0,.13) 0 2px,rgba(255,255,255,.05) 2px 5px,rgba(0,0,0,.06) 5px 9px,rgba(255,255,255,.02) 9px 13px),linear-gradient(180deg,#b07c46 0%,#94612f 30%,#6b4423 66%,#3a2612 100%)}
+.woodV{background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.085) 0 1px,rgba(0,0,0,.19) 1px 2px,rgba(0,0,0,0) 2px 6px),repeating-linear-gradient(89.4deg,rgba(0,0,0,.14) 0 3px,rgba(255,255,255,.045) 3px 7px,rgba(0,0,0,.06) 7px 12px,rgba(255,255,255,.02) 12px 18px),linear-gradient(90deg,#96683a 0%,#734829 22%,#5a361c 50%,#734829 78%,#8a5e34 100%)}
+.cir-case{border-radius:15px;overflow:hidden;border:1px solid #170d06;box-shadow:inset 0 0 40px rgba(0,0,0,.55),0 14px 32px rgba(0,0,0,.5)}
+.cir-case-top{height:20px;border-bottom:1px solid rgba(0,0,0,.62);box-shadow:inset 0 2px 0 rgba(255,255,255,.16)}
+.cir-case-body{position:relative;padding:0 13px}
+.cir-shelf-carousel{overflow:hidden;position:relative;background:repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,rgba(0,0,0,.16) 1px 3px,rgba(0,0,0,.05) 3px 34px,rgba(0,0,0,.20) 34px 36px),linear-gradient(180deg,#1a120c,#0d0806);box-shadow:inset 0 0 30px rgba(0,0,0,.9),inset 0 3px 8px rgba(0,0,0,.8)}
+.cir-shelf-track{display:flex;transition:transform .42s cubic-bezier(.4,0,.2,1)}
+.cir-shelf-slide{flex:0 0 100%;min-width:0;max-width:100%;padding:14px 12px 6px}
+.cir-shelf{margin-bottom:14px}
+.cir-shelf:last-child{margin-bottom:6px}
+.cir-shelf-row{display:flex;gap:9px;align-items:flex-end;padding:0 5px}
+.cir-book{flex:1 1 0;min-width:0;aspect-ratio:.667;position:relative;border-radius:2px 5px 5px 2px;background:#241a12;box-shadow:0 6px 12px rgba(0,0,0,.55),0 1px 3px rgba(0,0,0,.7);overflow:hidden}
+.cir-book img{width:100%;height:100%;object-fit:cover;display:block}
+.cir-book-band{position:absolute;left:0;top:0;bottom:0;width:7%;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.42),rgba(0,0,0,.12) 45%,rgba(0,0,0,0))}
+.cir-book-gloss{position:absolute;inset:0;pointer-events:none;background:linear-gradient(102deg,rgba(255,255,255,.20) 0%,rgba(255,255,255,.04) 16%,rgba(255,255,255,0) 34%,rgba(0,0,0,0) 74%,rgba(0,0,0,.26) 100%)}
+.cir-plank{height:17px;margin-top:-3px;border-radius:2px;margin-left:-6px;margin-right:-6px;box-shadow:0 8px 16px rgba(0,0,0,.65),inset 0 1.5px 0 rgba(255,255,255,.32),inset 0 -3px 4px rgba(0,0,0,.55)}
+.cir-case-bot{height:22px;border-top:1px solid rgba(0,0,0,.55);box-shadow:inset 0 2px 0 rgba(255,255,255,.12)}
+.cir-lib-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:18px}
+.cir-lib-btn{width:38px;height:38px;border-radius:50%;border:1px solid rgba(224,169,31,.45);background:rgba(255,255,255,.06);color:var(--gold-l);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.cir-dots{display:flex;gap:7px}
+.cir-dot{width:8px;height:8px;border-radius:50%;border:0;padding:0;cursor:pointer;background:rgba(255,255,255,.22)}
+.cir-dot.on{background:var(--gold);width:20px;border-radius:4px}
+.cir-lib-count{text-align:center;font-size:12px;color:var(--gray);margin-top:12px}
+/* fold */
+.cir-fold{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.035);margin-bottom:11px;overflow:hidden}
+.cir-fold summary{list-style:none;cursor:pointer;padding:17px 19px;display:flex;align-items:center;gap:12px}
+.cir-fold summary::-webkit-details-marker{display:none}
+.cir-fold .f-k{font-size:10.5px;letter-spacing:.2em;color:var(--gold);font-weight:700;text-transform:uppercase;display:block}
+.cir-fold .f-t{font-size:17px;font-weight:800;letter-spacing:-.02em;display:block;margin-top:2px}
+.cir-fold .f-arw{margin-left:auto;flex:0 0 26px;height:26px;border-radius:50%;border:1px solid rgba(224,169,31,.45);color:var(--gold-l);display:flex;align-items:center;justify-content:center;font-size:11px;transition:transform .25s}
+.cir-fold[open] .f-arw{transform:rotate(180deg);background:rgba(224,169,31,.16)}
+.cir-fold[open] summary{border-bottom:1px solid var(--line)}
+.cir-fold .f-body{padding:20px 19px 22px}
+/* timeline */
+.cir-tl{position:relative;padding-left:26px}
+.cir-tl:before{content:'';position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,var(--gold),rgba(224,169,31,.12))}
+.cir-tl-item{position:relative;padding-bottom:26px}
+.cir-tl-item:last-child{padding-bottom:0}
+.cir-tl-item:before{content:'';position:absolute;left:-26px;top:7px;width:13px;height:13px;border-radius:50%;background:var(--ink);border:3px solid var(--gold)}
+.cir-tl-when{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:.08em}
+.cir-tl-what{font-size:15.5px;font-weight:700;margin-top:3px}
+.cir-tl-note{font-size:13px;color:var(--gray);margin-top:5px}
+/* quote */
+.cir-quote{background:rgba(255,255,255,.045);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 14px 14px 0;padding:18px 16px;margin-bottom:12px}
+.cir-quote p{font-size:14.5px;font-weight:600;line-height:1.7}
+.cir-quote cite{display:block;font-style:normal;font-size:12px;color:var(--gray);margin-top:9px}
+.cir-hhcc{text-align:center;border:1px dashed rgba(224,169,31,.45);border-radius:16px;padding:22px 16px;margin-top:8px;background:rgba(224,169,31,.05)}
+.cir-hhcc b{font-size:32px;font-weight:800;color:var(--gold);letter-spacing:.06em;display:block}
+.cir-hhcc span{font-size:13.5px;color:var(--ivory);display:block;margin-top:8px}
+.cir-guide{margin-top:22px;display:grid;gap:10px}
+.cir-guide-row{display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,.04);border-radius:13px;padding:15px 16px}
+.cir-guide-row i{font-style:normal;flex:0 0 26px;height:26px;border-radius:50%;background:var(--gold);color:#241a12;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+.cir-guide-row b{display:block;font-size:14.5px;font-weight:700}
+.cir-guide-row p{font-size:13px;color:var(--gray);margin-top:2px}
+/* cards */
+.cir-cards{display:grid;gap:11px}
+.cir-card{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:15px;padding:16px 17px}
+.cir-card b{font-size:14.5px;font-weight:700;display:block}
+.cir-card p{font-size:13px;color:var(--gray);margin-top:4px}
+.cir-awardbar{display:flex;align-items:center;gap:12px;margin-bottom:11px;background:rgba(224,169,31,.10);border:1px solid rgba(224,169,31,.35);border-radius:15px;padding:16px 17px}
+.cir-awardbar i{font-style:normal;font-size:24px}
+.cir-awardbar b{display:block;font-size:15px;font-weight:800;color:var(--gold-l)}
+.cir-awardbar span{font-size:12.5px;color:var(--gray)}
+.cir-tagwrap{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.cir-tag{font-size:12px;padding:6px 12px;border-radius:8px;background:rgba(255,255,255,.06);color:var(--ivory);font-weight:500}
+/* channels */
+.cir-ch{display:grid;gap:10px}
+.cir-ch a{display:flex;align-items:center;gap:13px;text-decoration:none;color:var(--ivory);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:15px 17px}
+.cir-ch a i{font-style:normal;font-size:19px;width:24px;text-align:center}
+.cir-ch a b{font-size:14.5px;font-weight:700;display:block}
+.cir-ch a span{font-size:12px;color:var(--gray)}
+.cir-ch a em{margin-left:auto;font-style:normal;color:var(--gray);font-size:17px}
+/* video */
+.cir-vids{display:flex;flex-direction:column;gap:14px}
+.cir-vid{display:block;border-radius:14px;overflow:hidden;background:#15121c;border:1px solid rgba(255,255,255,.09);text-decoration:none}
+.cir-vid-thumb{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#2a2233,#171320);display:flex;align-items:center;justify-content:center}
+.cir-vid-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.cir-vid-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.55) 100%)}
+.cir-play{position:absolute;z-index:2;width:54px;height:54px;border-radius:50%;background:rgba(226,45,45,.92);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+.cir-play::before{content:'';border-left:17px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px}
+.cir-vid-body{padding:13px 15px 15px}
+.cir-vid-body b{display:block;font-size:14.5px;color:var(--ivory);font-weight:700;line-height:1.45}
+.cir-vid-body>span{display:block;font-size:11.5px;color:var(--gray);margin-top:5px}
+/* shorts */
+.cir-shorts{display:flex;gap:11px;overflow-x:auto;padding:2px 26px 12px;margin:0 -26px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.cir-shorts::-webkit-scrollbar{display:none}
+.cir-short{flex:0 0 132px;scroll-snap-align:start;text-decoration:none;border-radius:12px;overflow:hidden;position:relative;background:linear-gradient(150deg,#2a2233,#171320);border:1px solid rgba(255,255,255,.09)}
+.cir-short-thumb{position:relative;aspect-ratio:9/16;display:flex;align-items:center;justify-content:center}
+.cir-short-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.cir-short-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 50%,rgba(0,0,0,.62) 100%)}
+.cir-short-n{position:absolute;z-index:2;top:8px;left:8px;font-size:10.5px;font-weight:800;color:#fff;background:rgba(0,0,0,.55);border-radius:5px;padding:2px 6px}
+.cir-short-play{position:absolute;z-index:2;width:38px;height:38px;border-radius:50%;background:rgba(226,45,45,.9);display:flex;align-items:center;justify-content:center}
+.cir-short-play::before{content:'';border-left:12px solid #fff;border-top:7px solid transparent;border-bottom:7px solid transparent;margin-left:3px}
+.cir-short-cap{padding:9px 10px 11px;font-size:11.5px;color:var(--paper);font-weight:600;line-height:1.4}
+.cir-swipehint{font-size:11.5px;color:var(--gray);margin-top:-2px}
+.cir-vhead{display:flex;align-items:center;gap:16px;justify-content:space-between}
+.cir-vhead-txt{flex:1 1 auto;min-width:0}
+.cir-vhead-pic{flex:0 0 auto;margin:0;text-align:center}
+.cir-vhead-pic img{width:92px;height:92px;border-radius:50%;object-fit:cover;display:block;border:2px solid rgba(224,169,31,.55);box-shadow:0 8px 20px rgba(0,0,0,.5),0 0 0 6px rgba(224,169,31,.08)}
+.cir-vhead-pic figcaption{margin-top:8px;font-size:10.5px;line-height:1.4;color:var(--gold-l);font-weight:700;letter-spacing:.01em}
+/* cta */
+.cir-cta{background:linear-gradient(180deg,#241a12,#141019);text-align:center}
+.cir-call{display:block;text-decoration:none;background:var(--gold);color:#241a12;font-weight:800;font-size:17.5px;border-radius:14px;padding:17px;box-shadow:0 10px 26px rgba(224,169,31,.28)}
+.cir-form{margin-top:14px;text-align:left;display:grid;gap:10px}
+.cir-form input,.cir-form textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:12px;padding:14px 15px;color:var(--ivory);font-size:14.5px;font-family:inherit}
+.cir-form textarea{min-height:96px;resize:vertical}
+.cir-form input::placeholder,.cir-form textarea::placeholder{color:#6f6879}
+.cir-form button{background:rgba(255,255,255,.10);border:1px solid rgba(224,169,31,.45);color:var(--gold-l);font-weight:700;font-size:15.5px;border-radius:12px;padding:15px;font-family:inherit;cursor:pointer;width:100%}
+.cir-note{font-size:11.5px;color:var(--gray);margin-top:12px;line-height:1.6}
+.cir-footer{text-align:center;padding:34px 26px 44px;font-size:11.5px;color:#5f5a6b;border-top:1px solid rgba(255,255,255,.06)}
+.cir-needbox{margin-top:16px;border:1px solid rgba(226,89,63,.5);background:rgba(226,89,63,.10);border-radius:12px;padding:14px 16px;font-size:12.5px;color:#ffd9d1;line-height:1.65}
+.cir-needbox b{color:#ff9d86;font-size:12.5px}
+.cir-needbox b.h{display:block;margin-bottom:5px}
+.cir-need{display:inline-block;font-size:10.5px;font-weight:700;background:#e2593f;color:#fff;border-radius:5px;padding:2px 7px;margin-left:6px;vertical-align:2px}
+`;
+
+  function Book({ src, alt }) {
+    return (
+      <div className="cir-book">
+        <img src={src} alt={alt} loading="lazy" />
+        <span className="cir-book-band" />
+        <span className="cir-book-gloss" />
+      </div>
+    );
+  }
+
+  function ShelfSlide({ books, ghostShelf }) {
+    const rows = [];
+    for (let i = 0; i < books.length; i += 3) {
+      rows.push(books.slice(i, i + 3));
+    }
+    return (
+      <div className="cir-shelf-slide">
+        {rows.map((row, ri) => (
+          <div key={ri} className="cir-shelf">
+            <div className="cir-shelf-row">
+              {row.map((b, bi) => <Book key={bi} src={b.src} alt={b.alt} />)}
+            </div>
+            <div className="cir-plank woodH" />
+          </div>
+        ))}
+        {ghostShelf && (
+          <div className="cir-shelf" style={{ marginBottom: 6 }}>
+            <div className="cir-shelf-row">
+              <div className="book book-ghost" />
+              <div className="book book-ghost" />
+              <div className="book book-ghost" />
+            </div>
+            <div className="cir-plank woodH" />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  const allBooks = Array.from({ length: 42 }, (_, i) => ({
+    src: `/pium-app/choiilrye/books/book-${String(i + 1).padStart(2, '0')}.jpg`,
+    alt: `최일례 전자책 ${i + 1}`,
+  }));
+
+  const slides = [
+    allBooks.slice(0, 15),
+    allBooks.slice(15, 30),
+    allBooks.slice(30, 42),
+  ];
+
+  return (
+    <div className="cir-wrap">
+      <style>{css}</style>
+
+      {/* 히어로 */}
+      <header className="cir-hero">
+        <div className="cir-hero-brand">PIUM 전문가 프로필</div>
+        <div className="cir-hero-en">CHOI IL RYE</div>
+        <div className="cir-hero-div" />
+        <h1>최일례</h1>
+        <div className="cir-hero-sub">이음미디어 대표 · 소통공감박사 · 책쓰기 전임교수</div>
+        <div className="cir-hero-tag">하는 일마다 일내는 여자,<br /><em>"오라이!"</em>로 길을 여는 사람</div>
+        <figure className="cir-hero-figure">
+          <img className="cir-hero-photo" src="/pium-app/choiilrye/hero.jpg" alt="최일례 대표" />
+        </figure>
+      </header>
+
+      {/* 스탯 */}
+      <div className="cir-press" style={{ marginTop: 0, paddingBottom: 34 }}>
+        <div className="cir-hero-stats">
+          <div className="cir-stat"><b>670회</b><span>아침 7시<br />유산소운동<br />최일례TV</span></div>
+          <div className="cir-stat"><b>60여 권</b><span>펴낸 전자책</span></div>
+          <div className="cir-stat"><b>2026</b><span>효부대상</span></div>
+        </div>
+        <div className="cir-stat-wide"><b>150여 명</b><span>전자책 작가 배출</span></div>
+      </div>
+
+      {/* 기사 배너 */}
+      <div className="cir-press">
+        <div className="cir-press-card">
+          <span className="badge">PRESS</span>
+          <h3>절망의 벼랑 끝에서 '오라이!'를 외치다</h3>
+          <p>"갑상선암과 강직성 척추염도 꺾지 못한, 똑순이의 500회 기적"<br />— 이음미디어 Special Issue</p>
+          <a href="https://www.eummedia.kr/article/169997947" target="_blank" rel="noopener noreferrer">기사 전문 보기 →</a>
+        </div>
+      </div>
+
+      {/* 서재 */}
+      <section className="cir-library">
+        <div className="eyebrow">Library</div>
+        <h2>최일례의 서재</h2>
+        <div className="sub">지금까지 펴낸 전자책 60여 권. 그중 표지를 받은 42권을 꽂았습니다. 좌우로 넘겨서 보세요.</div>
+        <div className="rule" />
+
+        <div className="cir-case">
+          <div className="cir-case-top woodH" />
+          <div className="cir-case-body woodV">
+            <div className="cir-shelf-carousel">
+              <div
+                className="cir-shelf-track"
+                style={{ transform: `translateX(-${libIdx * 100}%)` }}
+                onTouchStart={e => setTouchX(e.touches[0].clientX)}
+                onTouchEnd={e => {
+                  if (touchX === null) return;
+                  const dx = e.changedTouches[0].clientX - touchX;
+                  if (Math.abs(dx) > 40) goLib(dx < 0 ? libIdx + 1 : libIdx - 1);
+                  setTouchX(null);
+                }}
+              >
+                {slides.map((books, si) => <ShelfSlide key={si} books={books} ghostShelf={si === slides.length - 1} />)}
+              </div>
+            </div>
+          </div>
+          <div className="cir-case-bot woodH" />
+        </div>
+
+        <div className="cir-lib-nav">
+          <button className="cir-lib-btn" onClick={() => goLib(libIdx - 1)} aria-label="이전">‹</button>
+          <div className="cir-dots">
+            {[0, 1, 2].map(i => (
+              <button key={i} className={`cir-dot${libIdx === i ? ' on' : ''}`} onClick={() => goLib(i)} aria-label={`${i + 1}쪽`} />
+            ))}
+          </div>
+          <button className="cir-lib-btn" onClick={() => goLib(libIdx + 1)} aria-label="다음">›</button>
+        </div>
+        <div className="cir-lib-count">{libIdx + 1} / 3 쪽 · 표지를 받은 42권</div>
+      </section>
+
+      {/* 더 알아보기 */}
+      <section>
+        <div className="eyebrow">More</div>
+        <h2>더 알아보기</h2>
+        <div className="sub">평소엔 접혀 있습니다. 눌러서 펼쳐 보세요.</div>
+        <div className="rule" />
+
+        <details className="cir-fold">
+          <summary>
+            <span><span className="f-k">Career</span><span className="f-t">걸어온 길</span></span>
+            <span className="f-arw">▾</span>
+          </summary>
+          <div className="f-body">
+            <div className="sub">기사에 실린 내용만 담았습니다. 연도는 대표님 확인 후 채웁니다.</div>
+            <div className="cir-tl">
+              <div className="cir-tl-item">
+                <div className="cir-tl-when">시작 <span className="cir-need">연도 확인</span></div>
+                <div className="cir-tl-what">학교 앞에서 신문을 팔던 소녀</div>
+                <div className="cir-tl-note">가난 때문에 남들보다 일찍 사회로 나섰습니다. 작은 몸에 잘 웃는 그에게 많은 사람이 신문을 샀습니다.</div>
+              </div>
+              <div className="cir-tl-item">
+                <div className="cir-tl-when">청년기 <span className="cir-need">연도 확인</span></div>
+                <div className="cir-tl-what">버스 안내양 — "오라이!"의 시작</div>
+                <div className="cir-tl-note">야간 고등학교를 다니기 위해 버스 안내양으로 일하며 세상을 몸으로 배웠습니다.</div>
+              </div>
+              <div className="cir-tl-item">
+                <div className="cir-tl-when">시련 <span className="cir-need">연도 확인</span></div>
+                <div className="cir-tl-what">갑상선암 수술, 그리고 강직성 척추염</div>
+                <div className="cir-tl-note">큰 고비를 넘기자마자 자가면역질환이 찾아왔습니다. 그 병상에서 "입을 열면 살 수 있다"는 것을 깨달았습니다.</div>
+              </div>
+              <div className="cir-tl-item">
+                <div className="cir-tl-when">전환 <span className="cir-need">연도 확인</span></div>
+                <div className="cir-tl-what">봉숭아학당 문화혁신학교에서 방송 스피치를 배우다</div>
+                <div className="cir-tl-note">내면의 응어리를 목소리로 뱉어내기 시작했습니다. 지금은 같은 학교의 방송스피치 총동문회장이자 책쓰기 교수로 서 있습니다.</div>
+              </div>
+              <div className="cir-tl-item">
+                <div className="cir-tl-when">기록 <span className="cir-need">연도 확인</span></div>
+                <div className="cir-tl-what">최일례TV — 매일 아침 7시, 670회</div>
+                <div className="cir-tl-note">비가 오나 눈이 오나 아침 7시 약속을 지켰습니다. 이 숫자는 영상 개수가 아니라 버텨낸 날의 수입니다.</div>
+              </div>
+              <div className="cir-tl-item">
+                <div className="cir-tl-when">2026</div>
+                <div className="cir-tl-what">효부대상 수상</div>
+                <div className="cir-tl-note">가족을 지켜온 시간에 대한 상입니다. <span className="cir-need">주최 기관 확인</span></div>
+              </div>
+              <div className="cir-tl-item">
+                <div className="cir-tl-when">현재</div>
+                <div className="cir-tl-what">이음미디어 대표</div>
+                <div className="cir-tl-note">소외된 가치를 발굴하고, 다시 시작하려는 사람들에게 '마당'을 깔아주는 일을 합니다.</div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details className="cir-fold">
+          <summary>
+            <span><span className="f-k">Philosophy</span><span className="f-t">일하는 원칙</span></span>
+            <span className="f-arw">▾</span>
+          </summary>
+          <div className="f-body">
+            <div className="sub">기사에서 대표님이 직접 하신 말씀입니다.</div>
+            <div className="cir-quote"><p>"버스 문을 두드리며 외치던 '오라이!'는 제 앞길을 막아선 가난을 향해<br />'비켜라, 내가 간다!'라고 외치는 제 나름의 선포였던 셈이죠."</p><cite>— 최일례</cite></div>
+            <div className="cir-quote"><p>"가만히 있으면 죽지만, 입을 열고 세상을 향해 말을 하면 살 수 있다는 것을요."</p><cite>— 병상에서의 깨달음</cite></div>
+            <div className="cir-quote"><p>"입을 여니 인생의 문이 열렸습니다. 발성(發聲)이 곧 발복(發福)이 되더군요."</p><cite>— 방송 스피치를 배우고 나서</cite></div>
+            <div className="cir-hhcc">
+              <b>HHCC</b>
+              <span>하라면 하라는 대로, 시키면 시키는 대로</span>
+              <span style={{ color: '#8d8697', fontSize: '12.5px', marginTop: 6 }}>분석하느라 시간을 허비하지 않는다. 일단 저지르고 반응을 보며 고쳐 나간다.</span>
+            </div>
+            <div className="cir-guide">
+              <div className="cir-guide-row"><i>1</i><div><b>과거를 훈장으로 삼으라</b><p>고단했던 시절이 지금 당신의 근육이 됩니다.</p></div></div>
+              <div className="cir-guide-row"><i>2</i><div><b>배운 즉시 저질러라</b><p>완벽주의는 실패의 지름길. 서툴더라도 오늘 "오라이!"를 외치세요.</p></div></div>
+              <div className="cir-guide-row"><i>3</i><div><b>도구로 자신을 무장하라</b><p>AI와 책 쓰기는 당신의 목소리를 증폭시킬 가장 강력한 무기입니다.</p></div></div>
+            </div>
+          </div>
+        </details>
+
+        <details className="cir-fold">
+          <summary>
+            <span><span className="f-k">Work</span><span className="f-t">하는 일</span></span>
+            <span className="f-arw">▾</span>
+          </summary>
+          <div className="f-body">
+            <div className="sub">보내주신 프로필 자료에 적힌 직함을 그대로 옮겼습니다.</div>
+            <div className="cir-awardbar"><i>🏅</i><div><b>2026년 효부대상</b><span>수상 <span className="cir-need">주최 기관 확인</span></span></div></div>
+            <div className="cir-cards">
+              <div className="cir-card"><b>이음미디어 대표</b><p>소외된 가치를 발굴해 세상과 잇습니다. 월간 매거진을 함께 펴냅니다.</p></div>
+              <div className="cir-card"><b>한국디지털교육원 책쓰기 전임교수</b><p>전자책 작가 <b>150여 명</b>을 배출했습니다. <span className="cir-need">이사장 겸직 표기 확인</span></p></div>
+              <div className="cir-card"><b>봉숭아학당 문화혁신학교 책쓰기 교수 · 방송스피치 총동문회장</b><p>대표님이 방송 스피치를 배운 곳에서, 이제는 가르치고 이끄는 자리에 섰습니다.</p></div>
+              <div className="cir-card"><b>유튜브 전문 강사 · 시니어 디지털 교육</b><p>시니어에게 유튜브와 AI 도구를 가르칩니다.</p></div>
+              <div className="cir-card"><b>실버 레크리에이션 · 실버 전래놀이 강사</b><p>현장에서 어르신들과 직접 만나 웃음을 나눕니다.</p></div>
+              <div className="cir-card"><b>(주)인카금융서비스 마이다스 사업단 지점장</b><p>보험 · 재무 서비스 <span className="cir-need">게재 여부 확인</span></p></div>
+            </div>
+            <div className="cir-tagwrap">
+              {['소통공감박사','AI 디지털 리터러시 1급 지도사','AI 디지털 리터러시 강사','AI 코에디터 책쓰기 강사','AI 책쓰기 1급 지도사 강사','방송스피치지도사 1급','웃음건강지도사 1급','스마트폰활용 전문강사 1급','건강지도사 1급','웰다잉지도사 전문강사'].map(t => (
+                <span key={t} className="cir-tag">{t}</span>
+              ))}
+            </div>
+          </div>
+        </details>
+      </section>
+
+      {/* 영상 — B-2: 채널보다 앞으로 */}
+      <section>
+        <div className="eyebrow">Video</div>
+        <div className="cir-vhead">
+          <div className="cir-vhead-txt">
+            <h2>대표 영상</h2>
+            <div className="sub">최일례TV에서 바로 재생됩니다.</div>
+          </div>
+          <figure className="cir-vhead-pic">
+            <img src="/pium-app/choiilrye/cardio.jpg" alt="최일례 대표" />
+            <figcaption>'청바지' 회원과<br />아침 7시 유산소운동</figcaption>
+          </figure>
+        </div>
+        <div className="rule" />
+        <div className="cir-vids">
+          <a className="cir-vid" href="https://youtu.be/UfurejLigt8" target="_blank" rel="noopener noreferrer">
+            <div className="cir-vid-thumb">
+              <img src="https://i.ytimg.com/vi/UfurejLigt8/hqdefault.jpg" alt="나의 AI 친구, 책 쓰는 삶을 바꾸다" loading="lazy" />
+              <span className="cir-play" />
+            </div>
+            <div className="cir-vid-body"><b>나의 AI 친구, 책 쓰는 삶을 바꾸다 <span className="cir-need">제목 확인</span></b><span>최일례TV · 유튜브에서 보기</span></div>
+          </a>
+          <a className="cir-vid" href="https://youtu.be/-sXnNqDpRN8" target="_blank" rel="noopener noreferrer">
+            <div className="cir-vid-thumb">
+              <img src="https://i.ytimg.com/vi/-sXnNqDpRN8/hqdefault.jpg" alt="6시간 만에 책 쓰고 출판하기" loading="lazy" />
+              <span className="cir-play" />
+            </div>
+            <div className="cir-vid-body"><b>6시간 만에 책 쓰고 출판하기 <span className="cir-need">제목 확인</span></b><span>최일례TV · 유튜브에서 보기</span></div>
+          </a>
+        </div>
+
+        <h2 style={{ marginTop: 34 }}>숏츠</h2>
+        <div className="cir-swipehint">좌우로 밀어서 보세요 · 6편</div>
+        <div className="cir-shorts">
+          {[
+            { id: 'MOue21fusSU', cap: '펀하게 살거야' },
+            { id: 'xQyEb5E_EsE', cap: '보고 또 보고 또 보고 싶은 아령 들고 팔운동' },
+            { id: '8I7lMYdPwWs', cap: '뭐가 포인트일까요?' },
+            { id: 'Q04Itoos1Lc', cap: '고관절 운동, 매일 따라해 보세요' },
+            { id: 'Q0HZUvYxyv0', cap: '60대여 운동하자, 아령 들고 팔운동' },
+            { id: 'YI4IO_3s9Vg', cap: '60대의 취미생활, 어설픈 장구' },
+          ].map((s, i) => (
+            <a key={s.id} className="cir-short" href={`https://www.youtube.com/shorts/${s.id}`} target="_blank" rel="noopener noreferrer">
+              <div className="cir-short-thumb">
+                <img src={`https://i.ytimg.com/vi/${s.id}/hqdefault.jpg`} alt={`숏츠 ${i + 1}`} loading="lazy" />
+                <span className="cir-short-n">SHORTS {i + 1}</span>
+                <span className="cir-short-play" />
+              </div>
+              <div className="cir-short-cap">{s.cap}</div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* 채널 — B-2: 영상 뒤로 */}
+      <section>
+        <div className="eyebrow">Channel</div>
+        <h2>채널 바로가기</h2>
+        <div className="sub">두 곳으로 연결됩니다.</div>
+        <div className="rule" />
+        <div className="cir-ch">
+          <a href="https://www.youtube.com/@%EC%B5%9C%EC%9D%BC%EB%A1%80tv" target="_blank" rel="noopener noreferrer"><i>▶</i><div><b>최일례TV</b><span>유튜브 · 아침 7시 유산소운동 670회</span></div><em>›</em></a>
+          <a href="https://www.eummedia.kr" target="_blank" rel="noopener noreferrer"><i>📰</i><div><b>이음미디어</b><span>인터넷신문 · 최일례 대표</span></div><em>›</em></a>
+        </div>
+      </section>
+
+      {/* 문의 */}
+      <section className="cir-cta">
+        <div className="eyebrow">Contact</div>
+        <h2>최일례 대표와 연결되고 싶으신가요?</h2>
+        <div className="sub">강의 · 책쓰기 · 매거진 문의를 남겨주시면 확인 후 답변드립니다.</div>
+        <a className="cir-call" href="tel:01085021960">📞 010-8502-1960 전화 연결</a>
+        <form className="cir-form" onSubmit={e => e.preventDefault()}>
+          <input type="text" placeholder="성함" />
+          <input type="tel" placeholder="연락처" />
+          <textarea placeholder="문의 내용을 남겨주세요" />
+          <button type="submit">문의 남기기</button>
+        </form>
+        <div className="cir-note">📨 전송 시 최일례 대표님께 알림이 발송됩니다<br />(알림 연결은 페이지 완성 후 진행 예정)</div>
+      </section>
+
+      <footer className="cir-footer">
+        © PIUM · 최일례 대표 프로필 시안 v3 — 세연님 확인 전용<br />
+        걸어온 길 · 일하는 원칙 · 하는 일은 '더 알아보기'에서 펼쳐집니다
+      </footer>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════
    이광우 대표 프로필 — /pium-app/leekwangwoo
 ══════════════════════════════════════ */
 const LWK_IMG = '/pium/profile/leekwangwoo/';
@@ -1953,6 +2443,7 @@ export default function PiumAppDetailPage() {
   if (slug === "sungchangwoon") return <SungchangwoonPage />;
   if (slug === "ohaengja")     return <OhaengjaPage />;
   if (slug === "leekwangwoo")  return <LeekwangwooPage />;
+  if (slug === "choiilrye")    return <ChoiilryePage />;
 
   const app = APPS[slug];
 

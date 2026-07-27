@@ -83,6 +83,11 @@ const PIUM_APP_PROFILES = {
     desc: '문의 010-5316-0087',
     image: `${SITE_URL}/leekwangwoo-og-v2.jpg`,
   },
+  '/pium-app/choiilrye': {
+    title: '최일례 대표 | 소통공감박사 · 책쓰기 전임교수',
+    desc: '이음미디어 대표 · 전자책 작가 150여 명 배출 · 강의·책쓰기 문의 010-8502-1960',
+    image: `${SITE_URL}/choiilrye-og.jpg`,
+  },
 };
 
 // 피움앱 프로필 페이지의 <title> + og/twitter/description 메타를 프로필별 값으로 교체
