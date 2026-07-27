@@ -1409,6 +1409,60 @@ function NotFound() {
 /* ══════════════════════════════════════
    최일례 대표 프로필 — /pium-app/choiilrye
 ══════════════════════════════════════ */
+function CirContactForm() {
+  const [form, setForm] = useState({ name: '', phone: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [err, setErr] = useState('');
+
+  const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.name || !form.phone || !form.message) {
+      setErr('성함, 연락처, 문의 내용을 모두 입력해 주세요.');
+      return;
+    }
+    setSubmitting(true); setErr('');
+    try {
+      const res = await fetch('/api/cir-lecture-inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data.ok) {
+        setSubmitted(true);
+      } else {
+        setErr(data.error || '전송 중 오류가 발생했습니다. 다시 시도해 주세요.');
+      }
+    } catch {
+      setErr('네트워크 오류가 발생했습니다. 다시 시도해 주세요.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (submitted) {
+    return (
+      <div style={{ textAlign: 'center', padding: '28px 0', color: '#c8a04a', fontSize: 15 }}>
+        ✅ 문의가 전송됐습니다.<br />
+        <span style={{ fontSize: 13, color: '#8d8697', marginTop: 6, display: 'block' }}>최일례 대표님께 알림이 발송됐습니다.</span>
+      </div>
+    );
+  }
+
+  return (
+    <form className="cir-form" onSubmit={handleSubmit}>
+      <input type="text" placeholder="성함" value={form.name} onChange={set('name')} />
+      <input type="tel" placeholder="연락처" value={form.phone} onChange={set('phone')} />
+      <textarea placeholder="문의 내용을 남겨주세요" value={form.message} onChange={set('message')} />
+      {err && <div style={{ fontSize: 12.5, color: '#ff9d86' }}>{err}</div>}
+      <button type="submit" disabled={submitting}>{submitting ? '전송 중…' : '문의 남기기'}</button>
+    </form>
+  );
+}
+
 function ChoiilryePage() {
   const [libIdx, setLibIdx] = useState(0);
   const libTotal = 3;
@@ -1881,12 +1935,7 @@ function ChoiilryePage() {
         <h2>최일례 대표와 연결되고 싶으신가요?</h2>
         <div className="sub">강의 · 책쓰기 · 매거진 문의를 남겨주시면 확인 후 답변드립니다.</div>
         <a className="cir-call" href="tel:01085021960">📞 010-8502-1960 전화 연결</a>
-        <form className="cir-form" onSubmit={e => e.preventDefault()}>
-          <input type="text" placeholder="성함" />
-          <input type="tel" placeholder="연락처" />
-          <textarea placeholder="문의 내용을 남겨주세요" />
-          <button type="submit">문의 남기기</button>
-        </form>
+        <CirContactForm />
         <div className="cir-note">📨 전송 시 최일례 대표님께 알림이 발송됩니다</div>
       </section>
 
