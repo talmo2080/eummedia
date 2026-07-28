@@ -62,8 +62,7 @@ export default async function handler(req, res) {
   const supabaseUrl    = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const tgToken        = process.env.TELEGRAM_BOT_TOKEN;
-  const tgChatId       = process.env.TELEGRAM_CIR_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
-  console.log('[cir] tgChatId:', JSON.stringify(tgChatId));
+  const tgChatId       = (process.env.TELEGRAM_CIR_CHAT_ID || process.env.TELEGRAM_CHAT_ID || '').replace(/^﻿/, '').trim();
 
   // (1) Supabase insert
   let insertOk = false;
