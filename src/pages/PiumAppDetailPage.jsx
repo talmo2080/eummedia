@@ -2591,8 +2591,8 @@ const LMT_CSS=`
 .lmt-wrap .photo{width:390px;height:490px;border-radius:16px;position:relative;overflow:hidden}
 .lmt-wrap .photo img{width:100%;height:100%;object-fit:cover;display:block;border-radius:16px}
 .lmt-wrap .photo::before{content:'';position:absolute;inset:0;z-index:1;border-radius:16px;pointer-events:none;background:linear-gradient(180deg,rgba(10,14,26,.10) 0%,transparent 34%,rgba(10,14,26,.40) 86%,rgba(10,14,26,.62) 100%)}
-.lmt-wrap .photo::after{content:'';position:absolute;inset:0;border-radius:16px;box-shadow:inset 0 0 0 1px rgba(240,168,48,.30),0 0 70px rgba(240,168,48,.13)}
-.lmt-wrap .sigwrap{width:340px;margin-top:30px;opacity:.95}
+.lmt-wrap .photo::after{content:'';position:absolute;inset:0;border-radius:16px;z-index:3;box-shadow:inset 0 0 0 1px rgba(240,168,48,.30),0 0 70px rgba(240,168,48,.13);pointer-events:none}
+.lmt-wrap .sigwrap{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);width:82%;z-index:2;opacity:.92;pointer-events:none}
 .lmt-wrap .sig{width:100%;height:auto;display:block}
 .lmt-wrap .car{overflow:hidden;position:relative}
 .lmt-wrap .track{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1)}
@@ -2720,7 +2720,7 @@ const LMT_CSS=`
  .lmt-wrap .nm{font-size:72px}
  .lmt-wrap .hero-R{width:320px}
  .lmt-wrap .photo{width:320px;height:410px}
- .lmt-wrap .sigwrap{width:280px}
+ .lmt-wrap .sigwrap{width:78%}
  .lmt-wrap .lib-head,.lmt-wrap .onsite-h{flex-direction:column;align-items:flex-start;gap:16px}
  .lmt-wrap .lib-head .sec-d,.lmt-wrap .onsite-h .sec-d{max-width:none!important}
  .lmt-wrap .big{font-size:40px}
@@ -2748,7 +2748,7 @@ const LMT_CSS=`
  .lmt-wrap .tag small{font-size:15px}
  .lmt-wrap .pills{order:7}
  .lmt-wrap .pill{font-size:13px;padding:7px 14px}
- .lmt-wrap .sigwrap{order:8;width:230px;margin-top:24px}
+ .lmt-wrap .sigwrap{width:74%;bottom:16px}
  .lmt-wrap .photo{width:100%;height:400px}
  .lmt-wrap .stage{max-width:none}
  .lmt-wrap .floor{margin-bottom:32px}
@@ -2972,36 +2972,36 @@ function LeeMoontaePage() {
               <span className="pill">전자책 14권</span>
               <span className="pill">서울</span>
             </div>
-            <div className="sigwrap">
-              <svg className="sig" viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg" aria-label="Lee Moon Tae">
-                <defs>
-                  <linearGradient id="lmtSigG" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#fdf3e0"/>
-                    <stop offset="52%" stopColor="#f0a830"/>
-                    <stop offset="100%" stopColor="#d08a12"/>
-                  </linearGradient>
-                </defs>
-                <path d="M 96 200 C 118 178, 150 130, 162 96 C 170 72, 162 58, 148 62 C 132 67, 128 96, 132 128 C 137 166, 146 196, 152 210 C 158 222, 178 216, 196 196" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M 196 196 C 208 188, 222 185, 230 178 C 236 173, 232 162, 222 162 C 208 162, 196 178, 198 196 C 200 212, 216 218, 232 208" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M 232 208 C 244 198, 258 190, 266 182 C 272 176, 268 164, 258 164 C 244 164, 232 180, 234 198 C 236 214, 252 220, 268 210" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M 310 214 C 316 178, 326 118, 336 92 C 342 74, 354 70, 358 86 C 362 104, 356 160, 352 214 C 358 172, 368 130, 380 112 C 388 100, 398 104, 398 124 C 398 152, 394 186, 392 214 C 398 176, 408 140, 420 124 C 428 113, 438 117, 438 136 C 438 162, 434 192, 432 212 C 431 222, 442 226, 456 214" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M 500 174 C 492 158, 468 156, 458 172 C 448 188, 452 210, 470 214 C 486 218, 500 206, 500 190 C 500 182, 500 177, 500 174" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M 500 190 C 508 194, 516 192, 524 184" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M 570 176 C 562 160, 538 158, 528 174 C 518 190, 522 212, 540 216 C 556 220, 570 208, 570 192 C 570 184, 570 179, 570 176" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M 570 192 C 578 194, 586 192, 592 186" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M 592 188 C 596 198, 598 206, 599 212 C 603 188, 613 170, 627 168 C 641 166, 649 178, 649 194 C 649 204, 648 209, 648 212 C 650 220, 660 220, 670 208" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M 704 92 C 726 74, 768 66, 806 72 C 818 74, 822 82, 814 88" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M 770 72 C 762 108, 752 160, 748 190 C 746 206, 754 216, 768 212 C 778 209, 784 202, 788 196" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M 826 170 C 818 158, 798 158, 790 172 C 782 186, 786 206, 802 210 C 814 213, 824 204, 826 190 C 828 176, 828 166, 828 160 C 826 178, 824 196, 826 204 C 828 212, 838 210, 846 200" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M 846 200 C 858 192, 872 188, 880 181 C 886 176, 882 164, 872 164 C 858 164, 846 180, 848 198 C 850 214, 866 220, 882 210" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M 882 210 C 918 220, 926 248, 892 258 C 830 270, 300 268, 190 250 C 160 245, 158 232, 184 226" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
           </div>
           <div className="hero-R">
             <div className="photo">
               <img src="/pium-app/leemoontae/hero.jpg" alt="이문태 소장"
                 onError={e => { e.currentTarget.style.display='none'; }} />
+              <div className="sigwrap">
+                <svg className="sig" viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg" aria-label="Lee Moon Tae">
+                  <defs>
+                    <linearGradient id="lmtSigG" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#fdf3e0"/>
+                      <stop offset="52%" stopColor="#f0a830"/>
+                      <stop offset="100%" stopColor="#d08a12"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M 96 200 C 118 178, 150 130, 162 96 C 170 72, 162 58, 148 62 C 132 67, 128 96, 132 128 C 137 166, 146 196, 152 210 C 158 222, 178 216, 196 196" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M 196 196 C 208 188, 222 185, 230 178 C 236 173, 232 162, 222 162 C 208 162, 196 178, 198 196 C 200 212, 216 218, 232 208" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M 232 208 C 244 198, 258 190, 266 182 C 272 176, 268 164, 258 164 C 244 164, 232 180, 234 198 C 236 214, 252 220, 268 210" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M 310 214 C 316 178, 326 118, 336 92 C 342 74, 354 70, 358 86 C 362 104, 356 160, 352 214 C 358 172, 368 130, 380 112 C 388 100, 398 104, 398 124 C 398 152, 394 186, 392 214 C 398 176, 408 140, 420 124 C 428 113, 438 117, 438 136 C 438 162, 434 192, 432 212 C 431 222, 442 226, 456 214" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M 500 174 C 492 158, 468 156, 458 172 C 448 188, 452 210, 470 214 C 486 218, 500 206, 500 190 C 500 182, 500 177, 500 174" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M 500 190 C 508 194, 516 192, 524 184" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M 570 176 C 562 160, 538 158, 528 174 C 518 190, 522 212, 540 216 C 556 220, 570 208, 570 192 C 570 184, 570 179, 570 176" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M 570 192 C 578 194, 586 192, 592 186" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M 592 188 C 596 198, 598 206, 599 212 C 603 188, 613 170, 627 168 C 641 166, 649 178, 649 194 C 649 204, 648 209, 648 212 C 650 220, 660 220, 670 208" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M 704 92 C 726 74, 768 66, 806 72 C 818 74, 822 82, 814 88" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M 770 72 C 762 108, 752 160, 748 190 C 746 206, 754 216, 768 212 C 778 209, 784 202, 788 196" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M 826 170 C 818 158, 798 158, 790 172 C 782 186, 786 206, 802 210 C 814 213, 824 204, 826 190 C 828 176, 828 166, 828 160 C 826 178, 824 196, 826 204 C 828 212, 838 210, 846 200" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M 846 200 C 858 192, 872 188, 880 181 C 886 176, 882 164, 872 164 C 858 164, 846 180, 848 198 C 850 214, 866 220, 882 210" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M 882 210 C 918 220, 926 248, 892 258 C 830 270, 300 268, 190 250 C 160 245, 158 232, 184 226" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
             </div>
           </div>
         </div>
