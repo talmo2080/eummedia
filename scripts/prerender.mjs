@@ -88,6 +88,11 @@ const PIUM_APP_PROFILES = {
     desc: '이음미디어 대표 · 마이금융파트너 지점장 · 전자책 작가 150여 명 배출 · 책쓰기 강의',
     image: `${SITE_URL}/choiilrye-og.jpg`,
   },
+  '/pium-app/leemoontae': {
+    title: '이문태 소장 · 봉숭아학당문화혁신학교 · AI 라이프 코치 | 이음미디어',
+    desc: '사람이 사랑입니다. 행복 나눔 휴머니스트 이문태 소장의 PIUM 전문가 프로필',
+    image: `${SITE_URL}/pium-app/leemoontae/leemoontae-og.jpg`,
+  },
 };
 
 // 피움앱 프로필 페이지의 <title> + og/twitter/description 메타를 프로필별 값으로 교체

@@ -1,4 +1,4 @@
-﻿import { useState, useRef } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Award, Sparkles, Heart, MessageCircle, Users, Tv, ArrowRight, TrendingUp, Phone, Quote, BookOpen, X, Send, CheckCircle, Newspaper, Smile, Mic, Building2, Coffee } from "lucide-react";
 
@@ -2538,7 +2538,7 @@ const LMT_CSS=`
  --bg:#0a0e1a;--card:#141a2b;--line:#232c44;
  --am:#f0a830;--am2:#e6b45c;--amd:#6a5424;
  --tx:#fdf8ee;--sub:#98a0b4;--dim:#6e768c;
- --bkgap:32px;--actgap:22px;
+ --shgap:18px;--bkgap:32px;--actgap:22px;
  background:var(--bg);color:var(--tx);font-family:'Noto Sans CJK KR','Noto Sans KR',sans-serif;
  -webkit-font-smoothing:antialiased;
 }
@@ -2654,7 +2654,8 @@ const LMT_CSS=`
 .lmt-wrap .vid .pl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(10,14,26,.06),rgba(10,14,26,.52))}
 .lmt-wrap .vid .pl i{width:66px;height:66px;border-radius:50%;background:rgba(240,168,48,.93);display:flex;align-items:center;justify-content:center;color:#1a1204;font-size:23px;font-style:normal;padding-left:5px;box-shadow:0 12px 34px rgba(0,0,0,.5)}
 .lmt-wrap .vid .tt{padding:22px 24px;font-size:17px;font-weight:800;line-height:1.55}
-.lmt-wrap .shorts{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;margin-top:44px}
+.lmt-wrap #shCar{margin-top:44px}
+.lmt-wrap .shorts{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--shgap)}
 .lmt-wrap .sh{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:block;transition:.25s}
 .lmt-wrap .sh:hover{border-color:var(--amd);transform:translateY(-3px)}
 .lmt-wrap .sh .th{position:relative;width:100%;aspect-ratio:9/16;overflow:hidden;background:#0b0f1c}
@@ -2722,40 +2723,50 @@ const LMT_CSS=`
  .lmt-wrap .sigwrap{width:280px}
  .lmt-wrap .lib-head,.lmt-wrap .onsite-h{flex-direction:column;align-items:flex-start;gap:16px}
  .lmt-wrap .lib-head .sec-d,.lmt-wrap .onsite-h .sec-d{max-width:none!important}
+ .lmt-wrap .big{font-size:40px}
+ .lmt-wrap .qmark{font-size:88px}
  .lmt-wrap .shorts{grid-template-columns:repeat(3,1fr)}
  .lmt-wrap .chs{grid-template-columns:repeat(2,1fr)}
  .lmt-wrap .ctwrap{grid-template-columns:1fr;gap:32px}
 }
 @media(max-width:640px){
- .lmt-wrap{--bkgap:14px;--actgap:14px}
+ .lmt-wrap{--bkgap:14px;--actgap:14px;--shgap:12px}
  .lmt-wrap .wrap{padding:0 20px}
  .lmt-wrap .sec{padding:58px 0}
  .lmt-wrap .sec-h{font-size:11px;margin-bottom:11px}
  .lmt-wrap .sec-t{font-size:25px}
  .lmt-wrap .sec-d{font-size:15px}
  .lmt-wrap .hero{padding:64px 0 54px}
- .lmt-wrap .hero-in{flex-direction:column;align-items:flex-start;gap:32px}
- .lmt-wrap .hero-R{width:100%}
- .lmt-wrap .photo{width:100%;height:400px}
- .lmt-wrap .nm{font-size:52px;margin-top:14px}
- .lmt-wrap .en{font-size:15px;letter-spacing:.22em}
- .lmt-wrap .rule{margin:20px 0}
- .lmt-wrap .tag{font-size:19px}
+ .lmt-wrap .hero-in{flex-direction:column;align-items:stretch;gap:0}
+ .lmt-wrap .hero-L{display:contents}
+ .lmt-wrap .kick{order:1}
+ .lmt-wrap .nm{order:2;font-size:52px;margin-top:14px}
+ .lmt-wrap .en{order:3;font-size:15px;letter-spacing:.22em}
+ .lmt-wrap .hero-R{order:4;width:100%;margin-top:24px}
+ .lmt-wrap .rule{order:5;margin:20px 0}
+ .lmt-wrap .tag{order:6;font-size:19px}
  .lmt-wrap .tag small{font-size:15px}
+ .lmt-wrap .pills{order:7}
  .lmt-wrap .pill{font-size:13px;padding:7px 14px}
- .lmt-wrap .sigwrap{width:230px;margin-top:24px}
+ .lmt-wrap .sigwrap{order:8;width:230px;margin-top:24px}
+ .lmt-wrap .photo{width:100%;height:400px}
  .lmt-wrap .stage{max-width:none}
  .lmt-wrap .floor{margin-bottom:32px}
  .lmt-wrap .books{min-height:0}
  .lmt-wrap .bk .ttl{font-size:10.5px;margin-top:9px;line-height:1.45}
  .lmt-wrap .floor-tag{font-size:10px;top:-20px}
  .lmt-wrap .shelf{margin-top:12px}
+ .lmt-wrap .qmark{font-size:62px}
+ .lmt-wrap .big{font-size:28px;margin-top:12px;word-break:keep-all;line-height:1.3}
+ .lmt-wrap .qbody{font-size:16px;line-height:1.9;margin-top:26px}
+ .lmt-wrap .qby{margin-top:24px;font-size:12.5px}
  .lmt-wrap .actgrid{grid-template-columns:1fr!important}
  .lmt-wrap .act .cp{font-size:13px}
  .lmt-wrap .onsite{margin-top:52px}
  .lmt-wrap .vids{grid-template-columns:1fr;gap:18px;margin-top:32px}
  .lmt-wrap .vid .tt{padding:17px 18px;font-size:15px}
- .lmt-wrap .shorts{grid-template-columns:repeat(2,1fr);gap:12px;margin-top:32px}
+ .lmt-wrap #shCar{margin-top:30px}
+ .lmt-wrap .shorts{grid-template-columns:repeat(2,1fr)}
  .lmt-wrap .cards{grid-template-columns:1fr;gap:16px;margin-top:34px}
  .lmt-wrap .chs{grid-template-columns:1fr;gap:12px;margin-top:32px}
  .lmt-wrap .acc{margin-top:32px}
@@ -2785,10 +2796,23 @@ const LMT_CSS=`
 function LeeMoontaePage() {
   const [libIdx, setLibIdx] = useState(0);
   const [actIdx, setActIdx] = useState(0);
+  const [shIdx,  setShIdx]  = useState(0);
+  const [isMob,  setIsMob]  = useState(() => window.matchMedia('(max-width:640px)').matches);
+  const [isTab,  setIsTab]  = useState(() => window.matchMedia('(max-width:1024px)').matches);
   const [lmtForm, setLmtForm] = useState({name:'',phone:'',message:''});
   const [lmtSubmitting, setLmtSubmitting] = useState(false);
   const [lmtSubmitted, setLmtSubmitted] = useState(false);
   const [lmtErr, setLmtErr] = useState('');
+
+  useEffect(() => {
+    const mq1 = window.matchMedia('(max-width:640px)');
+    const mq2 = window.matchMedia('(max-width:1024px)');
+    const h1 = e => { setIsMob(e.matches); setActIdx(0); setShIdx(0); };
+    const h2 = e => { setIsTab(e.matches); setActIdx(0); setShIdx(0); };
+    mq1.addEventListener('change', h1);
+    mq2.addEventListener('change', h2);
+    return () => { mq1.removeEventListener('change', h1); mq2.removeEventListener('change', h2); };
+  }, []);
 
   async function handleLmtSubmit(e) {
     e.preventDefault();
@@ -2869,8 +2893,9 @@ function LeeMoontaePage() {
   }
 
   /* 활동 현장 슬라이드 */
+  const actPageSizes = isMob ? LMT_ACTS.map(() => 1) : LMT_APAGE;
   let _actOffset = 0;
-  const actSlides = LMT_APAGE.map((cnt, si) => {
+  const actSlides = actPageSizes.map((cnt, si) => {
     const slice = LMT_ACTS.slice(_actOffset, _actOffset + cnt);
     _actOffset += cnt;
     const gridStyle = cnt < 3
@@ -2891,6 +2916,10 @@ function LeeMoontaePage() {
       </div>
     );
   });
+
+  /* 숏츠 캐러셀 */
+  const SPER = isMob ? 2 : isTab ? 3 : 5;
+  const shSlides = Math.ceil(LMT_SHORTS.length / SPER);
 
   return (
     <div className="lmt-wrap">
@@ -3007,13 +3036,13 @@ function LeeMoontaePage() {
               </div>
             </div>
             <div className="nav">
-              <button className="arw" onClick={() => setActIdx(i => (i - 1 + LMT_APAGE.length) % LMT_APAGE.length)}>‹</button>
+              <button className="arw" onClick={() => setActIdx(i => (i - 1 + actPageSizes.length) % actPageSizes.length)}>‹</button>
               <div className="dots">
-                {LMT_APAGE.map((_,i) => (
+                {actPageSizes.map((_,i) => (
                   <button key={i} className={`dot${i===actIdx?' on':''}`} onClick={() => setActIdx(i)}/>
                 ))}
               </div>
-              <button className="arw" onClick={() => setActIdx(i => (i + 1) % LMT_APAGE.length)}>›</button>
+              <button className="arw" onClick={() => setActIdx(i => (i + 1) % actPageSizes.length)}>›</button>
             </div>
           </div>
 
@@ -3214,17 +3243,42 @@ function LeeMoontaePage() {
           <div className="sec-h">SHORTS</div>
           <div className="sec-t">1분 안에 만나는 이야기</div>
           <div className="sec-d">짧지만 하고 싶은 말은 다 들어 있습니다.</div>
-          <div className="shorts">
-            {LMT_SHORTS.map(id => (
-              <a key={id} className="sh" href={`https://youtube.com/shorts/${id}`} target="_blank" rel="noopener noreferrer">
-                <div className="th">
-                  <img src={`https://i.ytimg.com/vi/${id}/oardefault.jpg`} alt=""
-                    onError={ev => { ev.currentTarget.src=`https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }}/>
-                  <div className="pl"><i>&#9654;</i></div>
-                </div>
-              </a>
-            ))}
+          <div id="shCar" className="car">
+            <div className="track" style={{transform:`translateX(${-100*shIdx}%)`}}>
+              {Array.from({length:shSlides}, (_,si) => {
+                const slice = LMT_SHORTS.slice(si*SPER, (si+1)*SPER);
+                const shGridStyle = slice.length < SPER
+                  ? {gridTemplateColumns:`repeat(${slice.length},calc((100% - ${SPER-1}*var(--shgap))/${SPER}))`,justifyContent:'center'}
+                  : {};
+                return (
+                  <div key={si} className="slide">
+                    <div className="shorts" style={shGridStyle}>
+                      {slice.map(id => (
+                        <a key={id} className="sh" href={`https://youtube.com/shorts/${id}`} target="_blank" rel="noopener noreferrer">
+                          <div className="th">
+                            <img src={`https://i.ytimg.com/vi/${id}/oardefault.jpg`} alt=""
+                              onError={ev => { ev.currentTarget.src=`https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }}/>
+                            <div className="pl"><i>&#9654;</i></div>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
+          {shSlides > 1 && (
+            <div className="nav">
+              <button className="arw" onClick={() => setShIdx(i => (i-1+shSlides)%shSlides)}>‹</button>
+              <div className="dots">
+                {Array.from({length:shSlides}, (_,i) => (
+                  <button key={i} className={`dot${i===shIdx?' on':''}`} onClick={() => setShIdx(i)}/>
+                ))}
+              </div>
+              <button className="arw" onClick={() => setShIdx(i => (i+1)%shSlides)}>›</button>
+            </div>
+          )}
         </div>
       </section>
 

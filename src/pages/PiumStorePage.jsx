@@ -904,6 +904,15 @@ export default function PiumStorePage() {
       price_model:   "free",
       users:         { nickname: "최일례" },
     },
+    {
+      slug:          "leemoontae",
+      title:         "이문태 소장",
+      summary:       "봉숭아학당문화혁신학교 · AI 라이프 코치 · 행복 나눔 휴머니스트",
+      thumbnail_url: "/pium-app/leemoontae/leemoontae-card.jpg",
+      category:      "expert_tool",
+      price_model:   "free",
+      users:         { nickname: "이문태" },
+    },
   ];
   // 갓 피어난 앱: 하드코딩 선두 + DB 최근 순
   const recentFeatured = [
