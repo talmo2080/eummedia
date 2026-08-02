@@ -2487,6 +2487,804 @@ function LeekwangwooPage() {
   );
 }
 
+/* ══════════════════════════════════════
+   이문태 소장 프로필 — /pium-app/leemoontae
+══════════════════════════════════════ */
+const LMT_PAL=[['#3a2f18','#7a5f22'],['#22304a','#3f5a7f'],['#3a2626','#6b4030'],['#233a3a','#3f6b66'],
+ ['#33283f','#5a4070'],['#2a3326','#4a5f3a'],['#3f3320','#7a6030'],['#2b2438','#4f4066'],
+ ['#1f3040','#3a5f7a'],['#3a2b1f','#6b4f2a'],['#26333f','#456070'],['#332a26','#5f4a3a'],
+ ['#2a3140','#4a5a75'],['#3f2f2a','#70503f']];
+const LMT_TOTAL=14,LMT_PER_SHELF=3,LMT_SHELVES=2,LMT_PER_SLIDE=6,LMT_SLIDES=3;
+const LMT_BOOKIMG=[
+ '/pium-app/leemoontae/book01.jpg','/pium-app/leemoontae/book02.jpg',
+ '/pium-app/leemoontae/book03.jpg','/pium-app/leemoontae/book04.jpg',
+ '/pium-app/leemoontae/book05.jpg','/pium-app/leemoontae/book06.jpg',
+ '/pium-app/leemoontae/book07.jpg','/pium-app/leemoontae/book08.jpg',
+ '/pium-app/leemoontae/book09.jpg','/pium-app/leemoontae/book10.jpg',
+ '/pium-app/leemoontae/book11.jpg','/pium-app/leemoontae/book12.jpg',
+ '/pium-app/leemoontae/book13.jpg','/pium-app/leemoontae/book14.jpg'];
+const LMT_BOOKT=[
+ '1시간 만에 뚝딱!<br/>클로드로 완성하는 나만의 AI 도구 제작 실전',
+ '코딩 몰라도 괜찮아,<br/>바이브코딩',
+ '내 손안의 AI 비서<br/>제미나이 3.0 완전 정복',
+ '콘텐츠 크리에이터를 위한<br/>AI 마스터 클래스',
+ 'AI는 시니어를<br/>은퇴시키지 못한다',
+ '카톡 쓰듯이 편하게!<br/>50+ 시니어를 위한 AI 활용법',
+ '시니어 세대를 위한<br/>생성형 AI 활용 꿀팁',
+ 'AI를 부리는 마케터<br/>VS AI에 밀리는 마케터',
+ 'AI의 선택을 받은,<br/>AI 소비자가 찾는 마케팅',
+ '퇴근 후 1시간, AI 전문가의<br/>‘수익화 뇌’를 훔쳐라',
+ '얼굴 없는 유튜버가<br/>"찐"이다',
+ '인생을 바꾸는<br/>감사 스위치',
+ '꿈은 늙지 않는다,<br/>다만 현실이 될 뿐',
+ '100세 시대 최고의 투자,<br/>‘자연치유 건강재테크’'];
+const LMT_ACTS=[
+ {s:'/pium-app/leemoontae/act01.jpg',c:'마이크를 들면, 늘 웃습니다'},
+ {s:'/pium-app/leemoontae/act02.jpg',c:'수강생 곁에서 한 사람씩'},
+ {s:'/pium-app/leemoontae/act03.jpg',c:'대강당을 가득 채운 자리'},
+ {s:'/pium-app/leemoontae/act04.jpg',c:'행복 인문학의 향연 · 행복누리 아카데미'},
+ {s:'/pium-app/leemoontae/act05.jpg',c:'웃음이 번지는 강의실'},
+ {s:'/pium-app/leemoontae/act06.jpg',c:'작은 강의실에서도 같은 마음으로'},
+ {s:'/pium-app/leemoontae/act07.jpg',c:'2005. 12. 26 · 강사 이문태'}];
+const LMT_APAGE=[3,2,2];
+const LMT_VIDS=[
+ {id:'KsT-bhTZAko',t:'왜 일을 하는가'},
+ {id:'RSK4qnPK7W0',t:'인생 후반전 아직 끝나지 않았어'}];
+const LMT_SHORTS=['ea5k_EcpVOs','n1O7teOXjWc','jGs_rfA8atE','m-oV44ixdXg','pSOvMetRbzw'];
+
+const LMT_CSS=`
+.lmt-wrap *{margin:0;padding:0;box-sizing:border-box}
+.lmt-wrap{
+ --bg:#0a0e1a;--card:#141a2b;--line:#232c44;
+ --am:#f0a830;--am2:#e6b45c;--amd:#6a5424;
+ --tx:#fdf8ee;--sub:#98a0b4;--dim:#6e768c;
+ --bkgap:32px;--actgap:22px;
+ background:var(--bg);color:var(--tx);font-family:'Noto Sans CJK KR','Noto Sans KR',sans-serif;
+ -webkit-font-smoothing:antialiased;
+}
+.lmt-wrap .aibg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.lmt-wrap .aibg .mesh{position:absolute;inset:0;
+ background-image:linear-gradient(rgba(240,168,48,.075) 1px,transparent 1px),linear-gradient(90deg,rgba(240,168,48,.075) 1px,transparent 1px);
+ background-size:64px 64px;
+ mask-image:radial-gradient(1100px 900px at 50% 20%,#000 0%,rgba(0,0,0,.35) 55%,transparent 85%)}
+.lmt-wrap .aibg .fine{position:absolute;inset:0;
+ background-image:linear-gradient(rgba(124,159,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(124,159,255,.06) 1px,transparent 1px);
+ background-size:16px 16px;
+ mask-image:radial-gradient(700px 520px at 82% 68%,#000,transparent 72%)}
+.lmt-wrap .aibg svg{position:absolute;inset:0;width:100%;height:100%}
+.lmt-wrap .aibg .ln{stroke:rgba(240,168,48,.30);stroke-width:1;fill:none;stroke-dasharray:5 9;animation:lmt-flow 9s linear infinite}
+.lmt-wrap .aibg .ln.b{stroke:rgba(124,159,255,.26);animation-duration:13s}
+@keyframes lmt-flow{to{stroke-dashoffset:-140}}
+.lmt-wrap .aibg .nd{fill:rgba(240,168,48,.75);animation:lmt-pulse 4.2s ease-in-out infinite}
+.lmt-wrap .aibg .nd.b{fill:rgba(124,159,255,.65)}
+@keyframes lmt-pulse{0%,100%{opacity:.25;r:2.4}50%{opacity:.95;r:4}}
+.lmt-wrap .aibg .halo{position:absolute;border-radius:50%;filter:blur(70px)}
+.lmt-wrap .aibg .h1{width:640px;height:640px;left:-180px;top:8%;background:radial-gradient(circle,rgba(240,168,48,.16),transparent 64%);animation:lmt-drift 24s ease-in-out infinite}
+.lmt-wrap .aibg .h2{width:560px;height:560px;right:-160px;top:46%;background:radial-gradient(circle,rgba(124,159,255,.15),transparent 64%);animation:lmt-drift 31s ease-in-out infinite reverse}
+@keyframes lmt-drift{0%,100%{transform:translate(0,0)}50%{transform:translate(46px,-58px)}}
+.lmt-wrap .aibg .scan{position:absolute;left:0;right:0;height:200px;background:linear-gradient(180deg,transparent,rgba(240,168,48,.05),transparent);animation:lmt-scan 15s linear infinite}
+@keyframes lmt-scan{0%{top:-20%}100%{top:110%}}
+@media(prefers-reduced-motion:reduce){.lmt-wrap .aibg *{animation:none!important}}
+.lmt-wrap section{position:relative;z-index:1}
+.lmt-wrap .wrap{max-width:1180px;margin:0 auto;padding:0 44px}
+.lmt-wrap .need{display:inline-block;background:#c0392b;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;margin-left:6px;vertical-align:middle}
+.lmt-wrap .slot{background:repeating-linear-gradient(135deg,#1a2133 0 10px,#161d2e 10px 20px);border:1.5px dashed #3a4666;display:flex;align-items:center;justify-content:center;color:#66718c;font-size:13px;font-weight:700;text-align:center;line-height:1.55}
+.lmt-wrap .sec{padding:100px 0}
+.lmt-wrap .sec-h{font-size:12px;font-weight:800;letter-spacing:.24em;color:var(--am);margin-bottom:14px}
+.lmt-wrap .sec-t{font-size:38px;font-weight:900;letter-spacing:-.02em;line-height:1.25}
+.lmt-wrap .sec-d{font-size:16px;color:var(--sub);margin-top:14px;line-height:1.75}
+.lmt-wrap .hero{position:relative;min-height:740px;display:flex;align-items:center;overflow:hidden;background:radial-gradient(1200px 720px at 76% -12%,#1d2438 0%,#0a0e1a 62%)}
+.lmt-wrap .hero .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(240,168,48,.085) 1px,transparent 1px),linear-gradient(90deg,rgba(240,168,48,.085) 1px,transparent 1px);background-size:52px 52px;mask-image:radial-gradient(900px 620px at 72% 30%,#000,transparent 78%)}
+.lmt-wrap .hero .orb{position:absolute;right:-160px;top:-120px;width:720px;height:720px;border-radius:50%;background:radial-gradient(circle,rgba(240,168,48,.16),transparent 62%);filter:blur(30px)}
+.lmt-wrap .hero-in{position:relative;z-index:2;display:flex;gap:60px;align-items:center;width:100%}
+.lmt-wrap .hero-L{flex:1;min-width:0}
+.lmt-wrap .kick{font-size:13px;font-weight:800;letter-spacing:.22em;color:var(--am)}
+.lmt-wrap .nm{font-size:96px;font-weight:900;letter-spacing:-.03em;line-height:1;margin-top:18px}
+.lmt-wrap .en{font-size:18px;font-weight:500;letter-spacing:.3em;color:var(--sub);margin-top:16px}
+.lmt-wrap .rule{width:64px;height:3px;background:var(--am);border-radius:2px;margin:26px 0}
+.lmt-wrap .tag{font-size:23px;font-weight:700;line-height:1.55;color:#e8e2d4}
+.lmt-wrap .tag em{font-style:normal;color:var(--am)}
+.lmt-wrap .tag small{display:block;font-size:17px;font-weight:500;color:var(--sub);margin-top:8px}
+.lmt-wrap .pills{display:flex;gap:9px;flex-wrap:wrap;margin-top:26px}
+.lmt-wrap .pill{border:1.2px solid var(--amd);color:var(--am2);border-radius:999px;padding:8px 17px;font-size:14px;font-weight:600}
+.lmt-wrap .hero-R{width:390px;flex-shrink:0}
+.lmt-wrap .photo{width:390px;height:490px;border-radius:16px;position:relative;overflow:hidden}
+.lmt-wrap .photo img{width:100%;height:100%;object-fit:cover;display:block;border-radius:16px}
+.lmt-wrap .photo::before{content:'';position:absolute;inset:0;z-index:1;border-radius:16px;pointer-events:none;background:linear-gradient(180deg,rgba(10,14,26,.10) 0%,transparent 34%,rgba(10,14,26,.40) 86%,rgba(10,14,26,.62) 100%)}
+.lmt-wrap .photo::after{content:'';position:absolute;inset:0;border-radius:16px;box-shadow:inset 0 0 0 1px rgba(240,168,48,.30),0 0 70px rgba(240,168,48,.13)}
+.lmt-wrap .sigwrap{width:340px;margin-top:30px;opacity:.95}
+.lmt-wrap .sig{width:100%;height:auto;display:block}
+.lmt-wrap .car{overflow:hidden;position:relative}
+.lmt-wrap .track{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.lmt-wrap .slide{flex:0 0 100%;min-width:0;max-width:100%}
+.lmt-wrap .nav{display:flex;align-items:center;justify-content:center;gap:20px;margin-top:34px}
+.lmt-wrap .arw{width:44px;height:44px;border-radius:50%;border:1.4px solid var(--amd);background:transparent;color:var(--am2);font-size:17px;cursor:pointer;font-family:inherit;flex-shrink:0}
+.lmt-wrap .dots{display:flex;gap:9px}
+.lmt-wrap .dot{width:9px;height:9px;border-radius:50%;background:#2f3a55;cursor:pointer;border:0;padding:0}
+.lmt-wrap .dot.on{background:var(--am);width:26px;border-radius:5px}
+.lmt-wrap .lib{background:linear-gradient(180deg,transparent,rgba(13,18,32,.5) 42%,transparent)}
+.lmt-wrap .lib-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:46px}
+.lmt-wrap .stage{max-width:840px;margin:0 auto}
+.lmt-wrap .floor{position:relative;margin-bottom:46px}
+.lmt-wrap .floor:last-child{margin-bottom:0}
+.lmt-wrap .floor-tag{position:absolute;left:0;top:-26px;font-size:11px;font-weight:900;letter-spacing:.2em;color:var(--amd)}
+.lmt-wrap .books{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--bkgap);align-items:end;min-height:322px}
+.lmt-wrap .bk{position:relative;min-width:0}
+.lmt-wrap .bk .cv{width:100%;aspect-ratio:3/4.25;border-radius:5px 9px 9px 5px;position:relative;overflow:hidden;box-shadow:0 18px 38px rgba(0,0,0,.6),0 0 30px rgba(240,168,48,.13)}
+.lmt-wrap .bk .cv img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover;display:block}
+.lmt-wrap .bk .cv::before{content:'';position:absolute;left:0;top:0;bottom:0;width:9px;z-index:2;background:linear-gradient(90deg,rgba(0,0,0,.5),rgba(255,255,255,.10))}
+.lmt-wrap .bk .cv::after{content:'';position:absolute;inset:0;z-index:2;background:linear-gradient(115deg,rgba(255,255,255,.13),transparent 44%)}
+.lmt-wrap .bk .ttl{font-size:13px;font-weight:700;color:var(--sub);margin-top:13px;line-height:1.5;text-align:center}
+.lmt-wrap .shelf{height:6px;border-radius:4px;margin-top:18px;background:linear-gradient(90deg,#2a2213,var(--am) 45%,var(--am) 55%,#2a2213)}
+.lmt-wrap .shelf-glow{height:32px;margin-top:-2px;border-radius:0 0 60px 60px;background:linear-gradient(180deg,rgba(240,168,48,.24),transparent 78%)}
+.lmt-wrap .endcap{display:flex;align-items:center;justify-content:center;min-height:322px}
+.lmt-wrap .ec{text-align:center;border:1.4px dashed rgba(240,168,48,.28);border-radius:16px;padding:44px 56px;background:rgba(240,168,48,.045)}
+.lmt-wrap .ecsvg{width:220px;height:90px;fill:var(--am);stroke:rgba(240,168,48,.55);stroke-width:1.4;opacity:.85}
+.lmt-wrap .ecsvg path{fill:none;stroke-dasharray:4 7;animation:lmt-flow 8s linear infinite}
+.lmt-wrap .ect{font-size:24px;font-weight:900;color:var(--am);margin-top:10px;letter-spacing:-.01em}
+.lmt-wrap .ecs{font-size:15px;color:var(--sub);margin-top:12px;line-height:1.75}
+.lmt-wrap .phil{background:radial-gradient(760px 520px at 50% 38%,rgba(240,168,48,.10),transparent 70%);text-align:center}
+.lmt-wrap .qmark{font-size:110px;font-weight:900;color:var(--amd);line-height:.7;font-family:Georgia,serif}
+.lmt-wrap .big{font-size:52px;font-weight:900;letter-spacing:-.02em;margin-top:20px;color:var(--am)}
+.lmt-wrap .qbody{max-width:760px;margin:38px auto 0;font-size:19px;line-height:2.05;color:#ddd6c8;text-align:left;font-weight:400}
+.lmt-wrap .qbody b{color:var(--tx);font-weight:700}
+.lmt-wrap .qby{margin-top:32px;font-size:14px;letter-spacing:.14em;color:var(--dim);font-weight:700}
+.lmt-wrap .art{max-width:760px;margin:52px auto 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 30px;display:flex;align-items:center;gap:22px;text-align:left}
+.lmt-wrap .art .ic{width:52px;height:52px;border-radius:12px;background:rgba(240,168,48,.13);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--am)}
+.lmt-wrap .art .tx{flex:1;min-width:0}
+.lmt-wrap .art .k{font-size:11px;font-weight:800;letter-spacing:.18em;color:var(--am)}
+.lmt-wrap .art .t{font-size:18px;font-weight:800;margin-top:6px}
+.lmt-wrap .art{text-decoration:none;color:inherit;transition:.22s}
+.lmt-wrap a.art:hover{border-color:var(--amd)}
+.lmt-wrap .art .s{font-size:14px;color:var(--dim);margin-top:5px}
+.lmt-wrap .art .go{border:1.3px solid var(--amd);color:var(--am2);border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;flex-shrink:0}
+.lmt-wrap .onsite{margin-top:72px}
+.lmt-wrap .onsite-h{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:30px}
+.lmt-wrap .actgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--actgap)}
+.lmt-wrap .act{min-width:0}
+.lmt-wrap .act .im{width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;position:relative;background:#0b0f1c;box-shadow:0 14px 32px rgba(0,0,0,.5)}
+.lmt-wrap .act .im img{width:100%;height:100%;object-fit:cover;display:block}
+.lmt-wrap .act .im::after{content:'';position:absolute;inset:0;border-radius:14px;box-shadow:inset 0 0 0 1px rgba(240,168,48,.20)}
+.lmt-wrap .act .cp{font-size:14px;color:var(--sub);margin-top:12px;line-height:1.55;text-align:center}
+.lmt-wrap .vids{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:44px}
+.lmt-wrap .vid{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:block;transition:.25s}
+.lmt-wrap .vid:hover{border-color:var(--amd);transform:translateY(-3px)}
+.lmt-wrap .vid .th{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#0b0f1c}
+.lmt-wrap .vid .th img{width:100%;height:100%;object-fit:cover;display:block}
+.lmt-wrap .vid .pl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(10,14,26,.06),rgba(10,14,26,.52))}
+.lmt-wrap .vid .pl i{width:66px;height:66px;border-radius:50%;background:rgba(240,168,48,.93);display:flex;align-items:center;justify-content:center;color:#1a1204;font-size:23px;font-style:normal;padding-left:5px;box-shadow:0 12px 34px rgba(0,0,0,.5)}
+.lmt-wrap .vid .tt{padding:22px 24px;font-size:17px;font-weight:800;line-height:1.55}
+.lmt-wrap .shorts{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;margin-top:44px}
+.lmt-wrap .sh{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:block;transition:.25s}
+.lmt-wrap .sh:hover{border-color:var(--amd);transform:translateY(-3px)}
+.lmt-wrap .sh .th{position:relative;width:100%;aspect-ratio:9/16;overflow:hidden;background:#0b0f1c}
+.lmt-wrap .sh .th img{width:100%;height:100%;object-fit:cover;display:block}
+.lmt-wrap .sh .pl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(10,14,26,.02),rgba(10,14,26,.5))}
+.lmt-wrap .sh .pl i{width:44px;height:44px;border-radius:50%;background:rgba(240,168,48,.9);display:flex;align-items:center;justify-content:center;color:#1a1204;font-size:15px;font-style:normal;padding-left:3px}
+.lmt-wrap .sh .tt{padding:14px 14px 17px;font-size:13px;color:var(--sub);line-height:1.55}
+.lmt-wrap .acc{margin-top:44px;border-top:1px solid #1b2338}
+.lmt-wrap details{border-bottom:1px solid #1b2338}
+.lmt-wrap summary{list-style:none;cursor:pointer;padding:26px 4px;display:flex;align-items:center;gap:18px}
+.lmt-wrap summary::-webkit-details-marker{display:none}
+.lmt-wrap summary .no{font-size:12px;font-weight:900;letter-spacing:.14em;color:var(--amd);width:34px;flex-shrink:0}
+.lmt-wrap summary .h{font-size:21px;font-weight:800;flex:1}
+.lmt-wrap summary .sm{font-size:14px;color:var(--dim);font-weight:600}
+.lmt-wrap summary .pm{width:32px;height:32px;border-radius:50%;border:1.3px solid var(--amd);color:var(--am2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:.25s}
+.lmt-wrap details[open] summary .pm{transform:rotate(45deg);background:rgba(240,168,48,.14)}
+.lmt-wrap .body{padding:4px 4px 32px 52px}
+.lmt-wrap .tl{position:relative;padding-left:30px}
+.lmt-wrap .tl::before{content:'';position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:linear-gradient(180deg,transparent,var(--amd) 12%,var(--amd) 88%,transparent)}
+.lmt-wrap .ev{position:relative;padding:0 0 32px 26px}
+.lmt-wrap .ev:last-child{padding-bottom:4px}
+.lmt-wrap .ev::before{content:'';position:absolute;left:-28px;top:5px;width:15px;height:15px;border-radius:50%;background:var(--bg);border:2.5px solid var(--amd)}
+.lmt-wrap .ev.on::before{border-color:var(--am);box-shadow:0 0 0 6px rgba(240,168,48,.16)}
+.lmt-wrap .ev .yr{font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--am2)}
+.lmt-wrap .ev .ti{font-size:19px;font-weight:800;margin-top:5px}
+.lmt-wrap .ev .de{font-size:15px;color:var(--sub);margin-top:5px;line-height:1.7}
+.lmt-wrap .rows li{list-style:none;font-size:16px;color:#cfd4e0;padding:13px 0;border-bottom:1px dashed #202940;display:flex;gap:20px}
+.lmt-wrap .rows li:last-child{border:0}
+.lmt-wrap .rows li b{color:var(--am2);font-weight:800;font-size:14px;width:92px;flex-shrink:0;padding-top:2px}
+.lmt-wrap .chips{display:flex;flex-wrap:wrap;gap:10px}
+.lmt-wrap .chip{border:1.2px solid #2f3a55;color:#cfd4e0;border-radius:999px;padding:9px 18px;font-size:15px;font-weight:600}
+.lmt-wrap .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:48px}
+.lmt-wrap .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:32px 28px}
+.lmt-wrap .card .ic{width:46px;height:46px;border-radius:12px;background:rgba(240,168,48,.13);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--am)}
+.lmt-wrap .card b{display:block;font-size:19px;margin-top:20px}
+.lmt-wrap .card p{font-size:15px;color:var(--sub);margin-top:10px;line-height:1.75}
+.lmt-wrap .chs{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:44px}
+.lmt-wrap .ch{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 22px;display:flex;align-items:center;gap:14px}
+.lmt-wrap .ch .d{width:38px;height:38px;border-radius:10px;background:rgba(240,168,48,.13);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--am)}
+.lmt-wrap .ch{text-decoration:none;color:inherit;transition:.22s}
+.lmt-wrap a.ch:hover{border-color:var(--amd);transform:translateY(-2px)}
+.lmt-wrap .ch b{font-size:16px;display:block}
+.lmt-wrap .ch span{font-size:13px;color:var(--dim)}
+.lmt-wrap .ct{background:linear-gradient(180deg,#0d1220,#0a0e1a)}
+.lmt-wrap .ctwrap{display:grid;grid-template-columns:1fr 1.05fr;gap:56px;margin-top:44px}
+.lmt-wrap .info li{list-style:none;display:flex;gap:14px;padding:16px 0;border-bottom:1px solid #1b2338;font-size:16px}
+.lmt-wrap .info li span{color:var(--dim);width:76px;flex-shrink:0;font-size:14px;font-weight:700}
+.lmt-wrap .form{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:32px}
+.lmt-wrap .form label{display:block;font-size:13px;font-weight:700;color:var(--sub);margin:16px 0 7px}
+.lmt-wrap .form label:first-child{margin-top:0}
+.lmt-wrap .inp{width:100%;background:#0d1220;border:1px solid #253052;border-radius:10px;padding:13px 15px;color:var(--tx);font-size:15px;font-family:inherit}
+.lmt-wrap textarea.inp{height:104px;resize:none}
+.lmt-wrap .btn{width:100%;margin-top:24px;background:var(--am);color:#0a0e1a;border:0;border-radius:11px;padding:16px;font-size:17px;font-weight:900;font-family:inherit;cursor:pointer}
+.lmt-wrap .note{text-align:center;font-size:13px;color:var(--dim);margin-top:14px}
+.lmt-wrap .ft{padding:42px 0 60px;text-align:center;font-size:13px;color:#4d5568;border-top:1px solid #161d2e}
+@media(max-width:1024px){
+ .lmt-wrap .wrap{padding:0 28px}
+ .lmt-wrap .sec{padding:76px 0}
+ .lmt-wrap .sec-t{font-size:31px}
+ .lmt-wrap .hero{min-height:0;padding:84px 0 66px}
+ .lmt-wrap .hero-in{gap:38px}
+ .lmt-wrap .nm{font-size:72px}
+ .lmt-wrap .hero-R{width:320px}
+ .lmt-wrap .photo{width:320px;height:410px}
+ .lmt-wrap .sigwrap{width:280px}
+ .lmt-wrap .lib-head,.lmt-wrap .onsite-h{flex-direction:column;align-items:flex-start;gap:16px}
+ .lmt-wrap .lib-head .sec-d,.lmt-wrap .onsite-h .sec-d{max-width:none!important}
+ .lmt-wrap .shorts{grid-template-columns:repeat(3,1fr)}
+ .lmt-wrap .chs{grid-template-columns:repeat(2,1fr)}
+ .lmt-wrap .ctwrap{grid-template-columns:1fr;gap:32px}
+}
+@media(max-width:640px){
+ .lmt-wrap{--bkgap:14px;--actgap:14px}
+ .lmt-wrap .wrap{padding:0 20px}
+ .lmt-wrap .sec{padding:58px 0}
+ .lmt-wrap .sec-h{font-size:11px;margin-bottom:11px}
+ .lmt-wrap .sec-t{font-size:25px}
+ .lmt-wrap .sec-d{font-size:15px}
+ .lmt-wrap .hero{padding:64px 0 54px}
+ .lmt-wrap .hero-in{flex-direction:column;align-items:flex-start;gap:32px}
+ .lmt-wrap .hero-R{width:100%}
+ .lmt-wrap .photo{width:100%;height:400px}
+ .lmt-wrap .nm{font-size:52px;margin-top:14px}
+ .lmt-wrap .en{font-size:15px;letter-spacing:.22em}
+ .lmt-wrap .rule{margin:20px 0}
+ .lmt-wrap .tag{font-size:19px}
+ .lmt-wrap .tag small{font-size:15px}
+ .lmt-wrap .pill{font-size:13px;padding:7px 14px}
+ .lmt-wrap .sigwrap{width:230px;margin-top:24px}
+ .lmt-wrap .stage{max-width:none}
+ .lmt-wrap .floor{margin-bottom:32px}
+ .lmt-wrap .books{min-height:0}
+ .lmt-wrap .bk .ttl{font-size:10.5px;margin-top:9px;line-height:1.45}
+ .lmt-wrap .floor-tag{font-size:10px;top:-20px}
+ .lmt-wrap .shelf{margin-top:12px}
+ .lmt-wrap .actgrid{grid-template-columns:1fr!important}
+ .lmt-wrap .act .cp{font-size:13px}
+ .lmt-wrap .onsite{margin-top:52px}
+ .lmt-wrap .vids{grid-template-columns:1fr;gap:18px;margin-top:32px}
+ .lmt-wrap .vid .tt{padding:17px 18px;font-size:15px}
+ .lmt-wrap .shorts{grid-template-columns:repeat(2,1fr);gap:12px;margin-top:32px}
+ .lmt-wrap .cards{grid-template-columns:1fr;gap:16px;margin-top:34px}
+ .lmt-wrap .chs{grid-template-columns:1fr;gap:12px;margin-top:32px}
+ .lmt-wrap .acc{margin-top:32px}
+ .lmt-wrap summary{padding:20px 2px;gap:12px;flex-wrap:wrap}
+ .lmt-wrap summary .no{width:28px}
+ .lmt-wrap summary .h{font-size:18px}
+ .lmt-wrap summary .sm{width:100%;padding-left:40px;font-size:13px}
+ .lmt-wrap .body{padding:2px 2px 26px 8px}
+ .lmt-wrap .ev .ti{font-size:17px}
+ .lmt-wrap .ev .de{font-size:14px}
+ .lmt-wrap .rows li{flex-direction:column;gap:4px;font-size:15px}
+ .lmt-wrap .rows li b{width:auto}
+ .lmt-wrap .art{flex-direction:column;align-items:flex-start;gap:14px;padding:22px 20px;margin-top:40px!important}
+ .lmt-wrap .art .tx{width:100%}
+ .lmt-wrap .art .t{font-size:17px}
+ .lmt-wrap .art .go{align-self:stretch;text-align:center}
+ .lmt-wrap .form{padding:24px 20px}
+ .lmt-wrap .nav{gap:14px;margin-top:26px}
+ .lmt-wrap .endcap{min-height:0}
+ .lmt-wrap .ec{padding:28px 20px}
+ .lmt-wrap .ecsvg{width:150px;height:62px}
+ .lmt-wrap .ect{font-size:19px}
+ .lmt-wrap .ecs{font-size:14px}
+}
+`;
+
+function LeeMoontaePage() {
+  const [libIdx, setLibIdx] = useState(0);
+  const [actIdx, setActIdx] = useState(0);
+  const [lmtForm, setLmtForm] = useState({name:'',phone:'',message:''});
+  const [lmtSubmitting, setLmtSubmitting] = useState(false);
+  const [lmtSubmitted, setLmtSubmitted] = useState(false);
+  const [lmtErr, setLmtErr] = useState('');
+
+  async function handleLmtSubmit(e) {
+    e.preventDefault();
+    if (!lmtForm.name || !lmtForm.phone || !lmtForm.message) {
+      setLmtErr('이름, 연락처, 문의 내용을 모두 입력해 주세요.');
+      return;
+    }
+    setLmtSubmitting(true);
+    setLmtErr('');
+    try {
+      const res = await fetch('/api/lmt-lecture-inquiry', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(lmtForm),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data.ok) {
+        setLmtSubmitted(true);
+        setLmtForm({name:'',phone:'',message:''});
+      } else {
+        setLmtErr(data.error || '전송 중 오류가 발생했습니다. 다시 시도해 주세요.');
+      }
+    } catch {
+      setLmtErr('네트워크 오류가 발생했습니다. 다시 시도해 주세요.');
+    } finally {
+      setLmtSubmitting(false);
+    }
+  }
+
+  /* 서재 슬라이드 렌더링 헬퍼 */
+  function LmtBookSlide({ si }) {
+    return (
+      <div className="slide">
+        {Array.from({length:LMT_SHELVES}, (_,fi) => {
+          const f = LMT_SHELVES - fi;
+          const base = si * LMT_PER_SLIDE + (LMT_SHELVES - f) * LMT_PER_SHELF;
+          const cnt = Math.max(0, Math.min(LMT_PER_SHELF, LMT_TOTAL - base));
+          if (cnt === 0) return (
+            <div key={f} className="floor endcap">
+              <div className="ec">
+                <svg viewBox="0 0 220 90" className="ecsvg">
+                  <path d="M20 70 L70 30 L120 58 L170 22 L205 46"/>
+                  <circle cx="70" cy="30" r="4"/><circle cx="120" cy="58" r="4"/><circle cx="170" cy="22" r="4"/>
+                </svg>
+                <div className="ect">14권, 그리고 계속</div>
+                <div className="ecs">질문이 하나 생길 때마다<br/>책이 한 권씩 늘어납니다</div>
+              </div>
+            </div>
+          );
+          const gridStyle = cnt < LMT_PER_SHELF
+            ? {gridTemplateColumns:`repeat(${cnt},calc((100% - 2*var(--bkgap))/3))`,justifyContent:'center'}
+            : {};
+          return (
+            <div key={f} className="floor">
+              <div className="floor-tag">{f}F</div>
+              <div className="books" style={gridStyle}>
+                {Array.from({length:cnt}, (_,i) => {
+                  const n = base + i + 1;
+                  const c = LMT_PAL[n-1];
+                  return (
+                    <div key={i} className="bk">
+                      <div className="cv" style={{background:`linear-gradient(155deg,${c[1]},${c[0]})`}}>
+                        <img src={LMT_BOOKIMG[n-1]}
+                          alt={LMT_BOOKT[n-1].replace(/<br\/>/g,' ')}
+                          onError={ev => { ev.currentTarget.style.display='none'; }} />
+                      </div>
+                      <div className="ttl" dangerouslySetInnerHTML={{__html: LMT_BOOKT[n-1]}} />
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="shelf"/><div className="shelf-glow"/>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  /* 활동 현장 슬라이드 */
+  let _actOffset = 0;
+  const actSlides = LMT_APAGE.map((cnt, si) => {
+    const slice = LMT_ACTS.slice(_actOffset, _actOffset + cnt);
+    _actOffset += cnt;
+    const gridStyle = cnt < 3
+      ? {gridTemplateColumns:`repeat(${cnt},calc((100% - 2*var(--actgap))/3))`,justifyContent:'center'}
+      : {};
+    return (
+      <div key={si} className="slide">
+        <div className="actgrid" style={gridStyle}>
+          {slice.map((a,i) => (
+            <div key={i} className="act">
+              <div className="im">
+                <img src={a.s} alt={a.c} onError={ev => { ev.currentTarget.style.display='none'; }} />
+              </div>
+              <div className="cp">{a.c}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  });
+
+  return (
+    <div className="lmt-wrap">
+      <style>{LMT_CSS}</style>
+
+      {/* AI 배경 */}
+      <div className="aibg">
+        <div className="mesh"/><div className="fine"/>
+        <div className="halo h1"/><div className="halo h2"/>
+        <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+          <path className="ln" d="M60 120 L300 210 L520 150 L780 260 L1050 190 L1380 300"/>
+          <path className="ln b" d="M40 480 L260 400 L470 520 L720 430 L980 560 L1400 470" style={{animationDelay:'-3s'}}/>
+          <path className="ln" d="M120 760 L360 690 L610 800 L900 700 L1180 820 L1420 730" style={{animationDelay:'-6s'}}/>
+          <path className="ln b" d="M300 210 L260 400 L360 690"/>
+          <path className="ln" d="M780 260 L720 430 L900 700" style={{animationDelay:'-2s'}}/>
+          <path className="ln b" d="M1050 190 L980 560 L1180 820" style={{animationDelay:'-5s'}}/>
+          <circle className="nd" cx="300" cy="210" r="3"/>
+          <circle className="nd b" cx="520" cy="150" r="3" style={{animationDelay:'-1s'}}/>
+          <circle className="nd" cx="780" cy="260" r="3" style={{animationDelay:'-2s'}}/>
+          <circle className="nd b" cx="1050" cy="190" r="3" style={{animationDelay:'-3s'}}/>
+          <circle className="nd b" cx="260" cy="400" r="3" style={{animationDelay:'-1.6s'}}/>
+          <circle className="nd" cx="720" cy="430" r="3" style={{animationDelay:'-2.4s'}}/>
+          <circle className="nd" cx="980" cy="560" r="3" style={{animationDelay:'-.8s'}}/>
+          <circle className="nd b" cx="470" cy="520" r="3" style={{animationDelay:'-3.4s'}}/>
+          <circle className="nd" cx="360" cy="690" r="3" style={{animationDelay:'-2.9s'}}/>
+          <circle className="nd b" cx="900" cy="700" r="3" style={{animationDelay:'-1.2s'}}/>
+          <circle className="nd" cx="1180" cy="820" r="3" style={{animationDelay:'-3.8s'}}/>
+          <circle className="nd b" cx="610" cy="800" r="3" style={{animationDelay:'-.5s'}}/>
+        </svg>
+        <div className="scan"/>
+      </div>
+
+      {/* ① HERO */}
+      <section className="hero">
+        <div className="grid"/><div className="orb"/>
+        <div className="wrap hero-in">
+          <div className="hero-L">
+            <div className="kick">PIUM · 이음미디어</div>
+            <div className="nm">이문태</div>
+            <div className="en">LEE MOON TAE</div>
+            <div className="rule"/>
+            <div className="tag">행복나눔 휴머니스트 · <em>AI 라이프 코치</em>
+              <small>㈜봉숭아학당문화혁신학교 연구소장 · 웃자대한민국협회 사무총장<br/>
+              열린사이버대학교 AI융합학과 특임교수</small>
+            </div>
+            <div className="pills">
+              <span className="pill">AI 활용 교육</span>
+              <span className="pill">5060 인생후반전</span>
+              <span className="pill">인문학 강연</span>
+              <span className="pill">전자책 14권</span>
+              <span className="pill">서울</span>
+            </div>
+            <div className="sigwrap">
+              <svg className="sig" viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg" aria-label="Lee Moon Tae">
+                <defs>
+                  <linearGradient id="lmtSigG" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#fdf3e0"/>
+                    <stop offset="52%" stopColor="#f0a830"/>
+                    <stop offset="100%" stopColor="#d08a12"/>
+                  </linearGradient>
+                </defs>
+                <path d="M 96 200 C 118 178, 150 130, 162 96 C 170 72, 162 58, 148 62 C 132 67, 128 96, 132 128 C 137 166, 146 196, 152 210 C 158 222, 178 216, 196 196" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M 196 196 C 208 188, 222 185, 230 178 C 236 173, 232 162, 222 162 C 208 162, 196 178, 198 196 C 200 212, 216 218, 232 208" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M 232 208 C 244 198, 258 190, 266 182 C 272 176, 268 164, 258 164 C 244 164, 232 180, 234 198 C 236 214, 252 220, 268 210" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M 310 214 C 316 178, 326 118, 336 92 C 342 74, 354 70, 358 86 C 362 104, 356 160, 352 214 C 358 172, 368 130, 380 112 C 388 100, 398 104, 398 124 C 398 152, 394 186, 392 214 C 398 176, 408 140, 420 124 C 428 113, 438 117, 438 136 C 438 162, 434 192, 432 212 C 431 222, 442 226, 456 214" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M 500 174 C 492 158, 468 156, 458 172 C 448 188, 452 210, 470 214 C 486 218, 500 206, 500 190 C 500 182, 500 177, 500 174" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M 500 190 C 508 194, 516 192, 524 184" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M 570 176 C 562 160, 538 158, 528 174 C 518 190, 522 212, 540 216 C 556 220, 570 208, 570 192 C 570 184, 570 179, 570 176" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M 570 192 C 578 194, 586 192, 592 186" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M 592 188 C 596 198, 598 206, 599 212 C 603 188, 613 170, 627 168 C 641 166, 649 178, 649 194 C 649 204, 648 209, 648 212 C 650 220, 660 220, 670 208" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M 704 92 C 726 74, 768 66, 806 72 C 818 74, 822 82, 814 88" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M 770 72 C 762 108, 752 160, 748 190 C 746 206, 754 216, 768 212 C 778 209, 784 202, 788 196" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M 826 170 C 818 158, 798 158, 790 172 C 782 186, 786 206, 802 210 C 814 213, 824 204, 826 190 C 828 176, 828 166, 828 160 C 826 178, 824 196, 826 204 C 828 212, 838 210, 846 200" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M 846 200 C 858 192, 872 188, 880 181 C 886 176, 882 164, 872 164 C 858 164, 846 180, 848 198 C 850 214, 866 220, 882 210" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M 882 210 C 918 220, 926 248, 892 258 C 830 270, 300 268, 190 250 C 160 245, 158 232, 184 226" fill="none" stroke="url(#lmtSigG)" strokeWidth="7.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <div className="hero-R">
+            <div className="photo">
+              <img src="/pium-app/leemoontae/hero.jpg" alt="이문태 소장"
+                onError={e => { e.currentTarget.style.display='none'; }} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ② 철학 + 현장 사진 + 기사 */}
+      <section className="sec phil">
+        <div className="wrap">
+          <div className="qmark">&ldquo;</div>
+          <div className="big">사람이 사랑입니다</div>
+          <div className="qbody">우리는 이 지구별에 왜 왔을까요? <b>사랑받고, 사랑을 표현하기 위해서</b>입니다.
+            그런데 그 사랑, 어떻게 표현할까요? 바로 <b>&ldquo;일&rdquo;</b>을 통해서입니다.
+            우리가 살아있다는 걸 느끼는 순간은 내가 하는 그 일 속에 있습니다.<br/><br/>
+            그럼 어떤 일을 해야 할까요? <b>가슴 뛰는 일</b>입니다.
+            단순히 먹고살기 위한 일이 아니라 세상을 향해 사랑을 흘려보내는 일,
+            그 일을 할 때 우리는 진짜 행복해집니다.<br/><br/>
+            그래서 저는 이렇게 믿습니다. <b>사람은 사랑이고, 일은 그 사랑을 표현하는 방식입니다.</b>
+          </div>
+          <div className="qby">이문태 · 행복나눔 휴머니스트</div>
+
+          {/* 활동 현장 */}
+          <div className="onsite">
+            <div className="onsite-h">
+              <div><div className="sec-h">ON SITE</div><div className="sec-t" style={{fontSize:'30px'}}>현장에서</div></div>
+              <div className="sec-d" style={{maxWidth:'420px',margin:'0',fontSize:'15px'}}>
+                강의실에서, 강당에서, 마을 배움터에서.<br/>사람이 있는 자리라면 어디든 달려갔습니다.
+              </div>
+            </div>
+            <div className="car">
+              <div className="track" style={{transform:`translateX(${-100*actIdx}%)`}}>
+                {actSlides}
+              </div>
+            </div>
+            <div className="nav">
+              <button className="arw" onClick={() => setActIdx(i => (i - 1 + LMT_APAGE.length) % LMT_APAGE.length)}>‹</button>
+              <div className="dots">
+                {LMT_APAGE.map((_,i) => (
+                  <button key={i} className={`dot${i===actIdx?' on':''}`} onClick={() => setActIdx(i)}/>
+                ))}
+              </div>
+              <button className="arw" onClick={() => setActIdx(i => (i + 1) % LMT_APAGE.length)}>›</button>
+            </div>
+          </div>
+
+          <a className="art" style={{marginTop:'64px'}}
+            href="https://www.eummedia.kr/article/%EC%9D%B4%EB%AC%B8%ED%83%9C-%ED%96%89%EB%B3%B5%EB%82%98%EB%88%94%ED%9C%B4%EB%A8%B8%EB%8B%88%EC%8A%A4%ED%8A%B8"
+            target="_blank" rel="noopener noreferrer">
+            <div className="ic">&#9636;</div>
+            <div className="tx">
+              <div className="k">이음미디어 인터뷰</div>
+              <div className="t">이문태 — 행복나눔 휴머니스트</div>
+              <div className="s">eummedia.kr · 살아온 이야기를 기사 전문으로 읽어 보세요</div>
+            </div>
+            <div className="go">기사 전문 보기 →</div>
+          </a>
+        </div>
+      </section>
+
+      {/* ③ 2층 AI 서재 */}
+      <section className="sec lib">
+        <div className="wrap">
+          <div className="lib-head">
+            <div>
+              <div className="sec-h">DIGITAL LIBRARY</div>
+              <div className="sec-t">2층으로 쌓아 올린<br/>전자책 14권</div>
+            </div>
+            <div className="sec-d" style={{maxWidth:'400px',margin:'0'}}>
+              삶의 질문 하나에 책 한 권.<br/>한 번에 두 층 여섯 권씩, 세 번 넘기면 열네 권이 모두 보입니다.
+            </div>
+          </div>
+          <div className="stage">
+            <div className="car">
+              <div className="track" style={{transform:`translateX(${-100*libIdx}%)`}}>
+                {Array.from({length:LMT_SLIDES}, (_,si) => <LmtBookSlide key={si} si={si} />)}
+              </div>
+            </div>
+            <div className="nav">
+              <button className="arw" onClick={() => setLibIdx(i => (i - 1 + LMT_SLIDES) % LMT_SLIDES)}>‹</button>
+              <div className="dots">
+                {Array.from({length:LMT_SLIDES}, (_,i) => (
+                  <button key={i} className={`dot${i===libIdx?' on':''}`} onClick={() => setLibIdx(i)}/>
+                ))}
+              </div>
+              <button className="arw" onClick={() => setLibIdx(i => (i + 1) % LMT_SLIDES)}>›</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ④ 대표 영상 */}
+      <section className="sec" style={{background:'rgba(12,17,32,.52)'}}>
+        <div className="wrap">
+          <div className="lib-head">
+            <div><div className="sec-h">ON AIR</div><div className="sec-t">대표 영상</div></div>
+            <div className="sec-d" style={{maxWidth:'400px',margin:'0'}}>
+              글로 다 담기지 않는 것이 있습니다.<br/>목소리와 표정으로 직접 만나 보세요.
+            </div>
+          </div>
+          <div className="vids">
+            {LMT_VIDS.map(v => (
+              <a key={v.id} className="vid" href={`https://youtu.be/${v.id}`} target="_blank" rel="noopener noreferrer">
+                <div className="th">
+                  <img src={`https://i.ytimg.com/vi/${v.id}/maxresdefault.jpg`} alt=""
+                    onError={ev => { ev.currentTarget.src=`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`; }}/>
+                  <div className="pl"><i>&#9654;</i></div>
+                </div>
+                <div className="tt">{v.t}</div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ⑤ 이력 · 경력 · 자격 (아코디언) */}
+      <section className="sec">
+        <div className="wrap">
+          <div className="sec-h">CAREER</div>
+          <div className="sec-t">10년마다 한 번씩, 길을 바꿨습니다</div>
+          <div className="sec-d">군인에서 영업으로, 경영에서 돌봄으로, 돌봄에서 다시 AI로.<br/>
+            자리를 옮길 때마다 향한 곳은 언제나 사람이었습니다.</div>
+          <div className="acc">
+            <details>
+              <summary>
+                <span className="no">01</span><span className="h">경력</span>
+                <span className="sm">1989 — 현재 · 6단계</span><span className="pm">+</span>
+              </summary>
+              <div className="body"><div className="tl">
+                <div className="ev"><div className="yr">1989 — 1991</div><div className="ti">육군 보병 11사단 연대교육장교</div>
+                  <div className="de">가르치는 일로 사회생활을 시작했습니다.</div></div>
+                <div className="ev"><div className="yr">1991 — 2002</div><div className="ti">삼성생명 영업소장</div>
+                  <div className="de">11년간 사람의 살림과 미래를 상담했습니다.</div></div>
+                <div className="ev"><div className="yr">2002 — 2012</div><div className="ti">열린아이티 영업이사 · 열린CNS 대표이사</div>
+                  <div className="de">IT 현장에서 경영을 배웠습니다.</div></div>
+                <div className="ev"><div className="yr">2012 — 2014</div><div className="ti">생명숲 실버타운 사무국장</div>
+                  <div className="de">노년의 삶 가까이에서 일했습니다.</div></div>
+                <div className="ev"><div className="yr">2014 — 2024</div><div className="ti">김오곤한의원 사무장 · 건강상담사</div>
+                  <div className="de">10년간 몸과 마음의 회복을 상담했습니다.</div></div>
+                <div className="ev on"><div className="yr">2025 — 현재</div><div className="ti">㈜봉숭아학당문화혁신학교 연구소장</div>
+                  <div className="de">웃자대한민국협회 사무총장 겸임.</div></div>
+              </div></div>
+            </details>
+            <details>
+              <summary>
+                <span className="no">02</span><span className="h">학력</span>
+                <span className="sm">경영학사 · 사회복지 석사 · 자연의학 박사 수료</span><span className="pm">+</span>
+              </summary>
+              <div className="body"><ul className="rows">
+                <li><b>2026</b>열린사이버대학교 AI융합학과 특임교수 (현재)</li>
+                <li><b>2019</b>NWSS 동양의학대학 자연의학 박사 수료</li>
+                <li><b>2016</b>서울사회복지대학원대학교 사회복지 석사</li>
+                <li><b>1989</b>아주대학교 경영학사</li>
+                <li><b>1985</b>유신고등학교 졸업</li>
+              </ul></div>
+            </details>
+            <details>
+              <summary>
+                <span className="no">03</span><span className="h">자격증</span>
+                <span className="sm">6종</span><span className="pm">+</span>
+              </summary>
+              <div className="body"><div className="chips">
+                <span className="chip">NLP Master Practitioner · 2009</span>
+                <span className="chip">사회복지사 · 2014</span>
+                <span className="chip">평생교육사 · 2016</span>
+                <span className="chip">가정상담사 · 2016</span>
+                <span className="chip">심리상담사 · 2016</span>
+                <span className="chip">요양보호사 · 2017</span>
+              </div></div>
+            </details>
+            <details>
+              <summary>
+                <span className="no">04</span><span className="h">연구소</span>
+                <span className="sm">2곳 · 2015년부터</span><span className="pm">+</span>
+              </summary>
+              <div className="body"><ul className="rows">
+                <li><b>2015 ~ 현재</b>한국행복누리연구소 · 소장</li>
+                <li><b>2016 ~ 현재</b>뫔 자연치유건강연구소 · 소장</li>
+              </ul></div>
+            </details>
+            <details>
+              <summary>
+                <span className="no">05</span><span className="h">강의해 온 곳</span>
+                <span className="sm">대학 평생교육원 · 경찰서 · 공공기관</span><span className="pm">+</span>
+              </summary>
+              <div className="body"><ul className="rows">
+                <li><b>2025</b>대한노인회</li>
+                <li><b>2018</b>대명고등학교 한울대안학교 (명상교사)</li>
+                <li><b>2017</b>덕성여자대학교 평생교육원 · 파워지식포럼</li>
+                <li><b>2016</b>고려대학교 · 연세대학교 · 서울사회복지대학원대학교 평생교육원</li>
+                <li><b>2015</b>사강 장수대학</li>
+                <li><b>2014</b>화성동부경찰서 · 안산상록경찰서 · 여주 농촌진흥청</li>
+              </ul></div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      {/* ⑥ 하는 일 */}
+      <section className="sec" style={{background:'rgba(12,17,32,.52)'}}>
+        <div className="wrap">
+          <div className="sec-h">WHAT I DO</div>
+          <div className="sec-t">AI를 배우러 오셨다가,<br/>다시 사는 법을 배워 가십니다</div>
+          <div className="sec-d">주로 만나는 분들은 5060세대입니다. 인생 후반전을 시작하는 자리에서 함께합니다.</div>
+          <div className="cards">
+            <div className="card"><div className="ic">&#9672;</div><b>AI 활용 교육</b>
+              <p>5060세대가 실제로 쓸 수 있는 도구까지. 어렵게 설명하지 않습니다.</p></div>
+            <div className="card"><div className="ic">&#9670;</div><b>사업기획</b>
+              <p>문화혁신학교의 교육 사업을 설계하고 현장에 옮깁니다.</p></div>
+            <div className="card"><div className="ic">&#10022;</div><b>협회 총괄</b>
+              <p>웃자대한민국협회 사무총장으로 웃음과 나눔의 판을 만듭니다.</p></div>
+          </div>
+        </div>
+      </section>
+
+      {/* ⑦ 채널 */}
+      <section className="sec">
+        <div className="wrap">
+          <div className="sec-h">CHANNELS</div>
+          <div className="sec-t">채널 바로가기</div>
+          <div className="chs">
+            <a className="ch" href="https://www.youtube.com/@%ED%96%89%EB%B3%B5%ED%9E%90%EB%A7%81tv" target="_blank" rel="noopener noreferrer">
+              <div className="d">&#9654;</div><div><b>행복힐링tv</b><span>YouTube</span></div>
+            </a>
+            <a className="ch" href="https://blog.naver.com/happynuri35" target="_blank" rel="noopener noreferrer">
+              <div className="d">&#9998;</div><div><b>행복누리 블로그</b><span>naver blog</span></div>
+            </a>
+            <a className="ch" href="https://www.instagram.com/happyman9141" target="_blank" rel="noopener noreferrer">
+              <div className="d">&#9711;</div><div><b>@happyman9141</b><span>Instagram</span></div>
+            </a>
+            <a className="ch" href="https://www.facebook.com/people/%EC%9D%B4%EB%AC%B8%ED%83%9C/pfbid0k3NWjSqNmmbVUWDe5RkcfDYD5DgLzYa4pQu48YYMkFX7gmYyktyV2wneA1QLuYWRl/" target="_blank" rel="noopener noreferrer">
+              <div className="d">f</div><div><b>이문태</b><span>Facebook</span></div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ⑧ 숏츠 */}
+      <section className="sec" style={{background:'rgba(12,17,32,.52)'}}>
+        <div className="wrap">
+          <div className="sec-h">SHORTS</div>
+          <div className="sec-t">1분 안에 만나는 이야기</div>
+          <div className="sec-d">짧지만 하고 싶은 말은 다 들어 있습니다.</div>
+          <div className="shorts">
+            {LMT_SHORTS.map(id => (
+              <a key={id} className="sh" href={`https://youtube.com/shorts/${id}`} target="_blank" rel="noopener noreferrer">
+                <div className="th">
+                  <img src={`https://i.ytimg.com/vi/${id}/oardefault.jpg`} alt=""
+                    onError={ev => { ev.currentTarget.src=`https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }}/>
+                  <div className="pl"><i>&#9654;</i></div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ⑨ 문의 */}
+      <section className="sec ct">
+        <div className="wrap">
+          <div className="sec-h">CONTACT</div>
+          <div className="sec-t">강의 · 상담 문의</div>
+          <div className="ctwrap">
+            <ul className="info">
+              <li><span>전화</span>010-3708-3952</li>
+              <li><span>이메일</span>happynuri35@naver.com</li>
+              <li><span>텔레그램</span>happynuri35</li>
+              <li><span>활동 지역</span>서울시 · 전국 출강</li>
+              <li><span>주요 대상</span>5060세대 · 기관 · 평생교육원</li>
+            </ul>
+            <form className="form" onSubmit={handleLmtSubmit}>
+              {lmtSubmitted ? (
+                <div style={{textAlign:'center',padding:'40px 0'}}>
+                  <div style={{fontSize:'36px',marginBottom:'16px'}}>✅</div>
+                  <div style={{fontSize:'18px',fontWeight:800,color:'var(--am)'}}>문의가 전송되었습니다!</div>
+                  <div style={{fontSize:'14px',color:'var(--sub)',marginTop:'10px'}}>
+                    이문태 소장님께 알림이 발송되었습니다.<br/>빠른 시일 내에 연락드리겠습니다.
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <label>성함</label>
+                  <input className="inp" placeholder="홍길동" value={lmtForm.name}
+                    onChange={e => setLmtForm(f => ({...f, name: e.target.value}))}/>
+                  <label>연락처</label>
+                  <input className="inp" placeholder="010-0000-0000" value={lmtForm.phone}
+                    onChange={e => setLmtForm(f => ({...f, phone: e.target.value}))}/>
+                  <label>문의 내용</label>
+                  <textarea className="inp" placeholder="강의 주제와 일정을 적어 주세요"
+                    value={lmtForm.message}
+                    onChange={e => setLmtForm(f => ({...f, message: e.target.value}))}/>
+                  {lmtErr && <div style={{color:'#e05555',fontSize:'14px',marginTop:'12px'}}>{lmtErr}</div>}
+                  <button className="btn" type="submit" disabled={lmtSubmitting}>
+                    {lmtSubmitting ? '전송 중…' : '문의 보내기'}
+                  </button>
+                  <div className="note">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{width:14,height:14,verticalAlign:-2,marginRight:6}}>
+                      <rect x="2.5" y="5" width="19" height="14" rx="2.5"/>
+                      <path d="M3 7l9 6 9-6"/>
+                    </svg>
+                    전송 시 이문태 소장님께 알림이 발송됩니다
+                  </div>
+                </>
+              )}
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <div className="ft">PIUM 전문가 프로필 · 이음미디어 &nbsp;|&nbsp; eummedia.kr/pium-app/leemoontae</div>
+    </div>
+  );
+}
+
 /* ── 메인 컴포넌트 ── */
 export default function PiumAppDetailPage() {
   const { slug } = useParams();
@@ -2495,6 +3293,7 @@ export default function PiumAppDetailPage() {
   if (slug === "ohaengja")     return <OhaengjaPage />;
   if (slug === "leekwangwoo")  return <LeekwangwooPage />;
   if (slug === "choiilrye")    return <ChoiilryePage />;
+  if (slug === "leemoontae")   return <LeeMoontaePage />;
 
   const app = APPS[slug];
 
