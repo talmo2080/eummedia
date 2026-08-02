@@ -3215,30 +3215,8 @@ function LeeMoontaePage() {
         </div>
       </section>
 
-      {/* ⑦ 채널 */}
+      {/* ⑦ 숏츠 */}
       <section className="sec">
-        <div className="wrap">
-          <div className="sec-h">CHANNELS</div>
-          <div className="sec-t">채널 바로가기</div>
-          <div className="chs">
-            <a className="ch" href="https://www.youtube.com/@%ED%96%89%EB%B3%B5%ED%9E%90%EB%A7%81tv" target="_blank" rel="noopener noreferrer">
-              <div className="d">&#9654;</div><div><b>행복힐링tv</b><span>YouTube</span></div>
-            </a>
-            <a className="ch" href="https://blog.naver.com/happynuri35" target="_blank" rel="noopener noreferrer">
-              <div className="d">&#9998;</div><div><b>행복누리 블로그</b><span>naver blog</span></div>
-            </a>
-            <a className="ch" href="https://www.instagram.com/happyman9141" target="_blank" rel="noopener noreferrer">
-              <div className="d">&#9711;</div><div><b>@happyman9141</b><span>Instagram</span></div>
-            </a>
-            <a className="ch" href="https://www.facebook.com/people/%EC%9D%B4%EB%AC%B8%ED%83%9C/pfbid0k3NWjSqNmmbVUWDe5RkcfDYD5DgLzYa4pQu48YYMkFX7gmYyktyV2wneA1QLuYWRl/" target="_blank" rel="noopener noreferrer">
-              <div className="d">f</div><div><b>이문태</b><span>Facebook</span></div>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* ⑧ 숏츠 */}
-      <section className="sec" style={{background:'rgba(12,17,32,.52)'}}>
         <div className="wrap">
           <div className="sec-h">SHORTS</div>
           <div className="sec-t">1분 안에 만나는 이야기</div>
@@ -3279,6 +3257,28 @@ function LeeMoontaePage() {
               <button className="arw" onClick={() => setShIdx(i => (i+1)%shSlides)}>›</button>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* ⑧ 채널 */}
+      <section className="sec" style={{background:'rgba(12,17,32,.52)'}}>
+        <div className="wrap">
+          <div className="sec-h">CHANNELS</div>
+          <div className="sec-t">채널 바로가기</div>
+          <div className="chs">
+            <a className="ch" href="https://www.youtube.com/@%ED%96%89%EB%B3%B5%ED%9E%90%EB%A7%81tv" target="_blank" rel="noopener noreferrer">
+              <div className="d">&#9654;</div><div><b>행복힐링tv</b><span>YouTube</span></div>
+            </a>
+            <a className="ch" href="https://blog.naver.com/happynuri35" target="_blank" rel="noopener noreferrer">
+              <div className="d">&#9998;</div><div><b>행복누리 블로그</b><span>naver blog</span></div>
+            </a>
+            <a className="ch" href="https://www.instagram.com/happyman9141" target="_blank" rel="noopener noreferrer">
+              <div className="d">&#9711;</div><div><b>@happyman9141</b><span>Instagram</span></div>
+            </a>
+            <a className="ch" href="https://www.facebook.com/people/%EC%9D%B4%EB%AC%B8%ED%83%9C/pfbid0k3NWjSqNmmbVUWDe5RkcfDYD5DgLzYa4pQu48YYMkFX7gmYyktyV2wneA1QLuYWRl/" target="_blank" rel="noopener noreferrer">
+              <div className="d">f</div><div><b>이문태</b><span>Facebook</span></div>
+            </a>
+          </div>
         </div>
       </section>
 
