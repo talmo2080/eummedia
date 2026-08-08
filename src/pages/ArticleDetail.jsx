@@ -707,10 +707,10 @@ export default function ArticleDetail() {
               {a.channel}
             </span>
 
-            {/* 명조체 헤드라인 */}
-            <h1 className="font-serif text-[24px] font-bold leading-[1.3] tracking-tight text-neutral-900 mb-3">
+            {/* 명조체 헤드라인 — 모바일용 (SEO: h1은 데스크탑 블록에만 두어 페이지당 1개 원칙 준수) */}
+            <div className="font-serif text-[24px] font-bold leading-[1.3] tracking-tight text-neutral-900 mb-3">
               {a.title}
-            </h1>
+            </div>
 
             {/* 부제목 (요약) */}
             <div className="font-serif text-[15px] text-neutral-600 italic leading-[1.6] mb-4 border-l-[3px] border-blue-700 pl-4">

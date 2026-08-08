@@ -66,6 +66,86 @@ function buildNewsArticleJsonLd(article, fullUrl) {
   return `<script type="application/ld+json">${json}</script>`;
 }
 
+// 정적 페이지별 SEO 메타 — <title>과 <meta description>이 페이지마다 고유하도록
+// (네이버 서치어드바이저 경고: title/description 중복 21페이지 방지)
+// title에는 자동으로 " | 이음미디어" 접미사 붙음 (applyStaticPageMeta 안에서).
+// 홈('/')은 제외 — 원본 index.html의 title이 그대로 홈에 정합.
+const STATIC_PAGE_META = {
+  '/about': {
+    title: '회사소개 · 편집국 소개',
+    desc: '이음미디어의 창간 정신·편집 원칙·구성원 소개',
+  },
+  '/advertise': {
+    title: '광고안내',
+    desc: '광고가 아닌 당신의 이야기를 싣습니다. 이음미디어 광고 상품·상담·프로세스 안내',
+  },
+  '/subscribe': {
+    title: '구독 신청',
+    desc: '이음미디어 최신 기사·소식을 이메일·카카오로 받아보세요',
+  },
+  '/report': {
+    title: '제보하기',
+    desc: '시민의 눈으로 발견한 이야기, 이음미디어에 제보하세요',
+  },
+  '/citizen-reporter': {
+    title: '시민기자 모집',
+    desc: '이음미디어와 함께 이웃의 이야기를 취재할 시민기자를 모집합니다',
+  },
+  '/videos': {
+    title: '영상 채널',
+    desc: '이음미디어의 인터뷰·현장·강연 영상을 한 곳에서',
+  },
+  '/login': {
+    title: '로그인',
+    desc: '이음미디어 회원 로그인',
+  },
+  '/signup': {
+    title: '회원가입',
+    desc: '이음미디어 회원가입 — 구독·댓글·시민기자 신청',
+  },
+  '/terms': {
+    title: '이용약관',
+    desc: '이음미디어 서비스 이용약관',
+  },
+  '/privacy': {
+    title: '개인정보 처리방침',
+    desc: '이음미디어 개인정보 수집·이용·보관 정책',
+  },
+  '/youth': {
+    title: '청소년 보호정책',
+    desc: '이음미디어 청소년 유해 정보 차단·보호 방침',
+  },
+  // ── 채널 페이지 7개 (description은 ChannelList.jsx의 채널 배너 desc와 완전 동일)
+  '/channel/magazine': {
+    title: '이음매거진',
+    desc: '이음미디어가 엄선한 이번 주의 시선, 그 이상의 깊이',
+  },
+  '/channel/people': {
+    title: '이음피플',
+    desc: '당신의 삶이 뉴스가 되고, 당신의 이름이 브랜드가 되는 공간',
+  },
+  '/channel/local': {
+    title: '이음로컬',
+    desc: '가장 가까운 곳의 숨소리에서 세상의 해답을 찾는 현장',
+  },
+  '/channel/edu': {
+    title: '이음에듀',
+    desc: '기술의 속도에 인간의 가치를 더하는 인문학적 배움의 여정',
+  },
+  '/channel/view': {
+    title: '이음뷰',
+    desc: '복잡한 시대의 실타래를 푸는 이음미디어만의 독창적 시선',
+  },
+  '/channel/trend': {
+    title: '이음트렌드',
+    desc: '시대의 흐름을 읽고 K-컬처의 미래를 선점하는 감각',
+  },
+  '/channel/voice': {
+    title: '이음보이스',
+    desc: '당신의 이야기가 이음미디어를 통해 세상의 울림이 되는 광장',
+  },
+};
+
 // 피움앱 프로필 페이지 OG 메타 데이터
 const PIUM_APP_PROFILES = {
   '/pium-app/sungchangwoon': {
@@ -94,6 +174,26 @@ const PIUM_APP_PROFILES = {
     image: `${SITE_URL}/pium-app/leemoontae/leemoontae-og.jpg`,
   },
 };
+
+// 정적 페이지(/about, /advertise 등)의 <title> + description + og/twitter 메타 교체
+// title에는 자동으로 " | 이음미디어" 접미사 붙임 (일관성 유지).
+function applyStaticPageMeta(html, meta, url) {
+  const fullUrl = `${SITE_URL}${url}`;
+  const title = `${meta.title} | 이음미디어`;
+  const t = escHtml(title);
+  const d = escHtml(meta.desc);
+  const u = escHtml(fullUrl);
+
+  return html
+    .replace(/(<title>)[^<]*(<\/title>)/, `$1${t}$2`)
+    .replace(/(<meta name="description" content=")[^"]*(")/, `$1${d}$2`)
+    .replace(/(<link rel="canonical" href=")[^"]*(")/, `$1${u}$2`)
+    .replace(/(<meta property="og:title" content=")[^"]*(")/, `$1${t}$2`)
+    .replace(/(<meta property="og:description" content=")[^"]*(")/, `$1${d}$2`)
+    .replace(/(<meta property="og:url" content=")[^"]*(")/, `$1${u}$2`)
+    .replace(/(<meta name="twitter:title" content=")[^"]*(")/, `$1${t}$2`)
+    .replace(/(<meta name="twitter:description" content=")[^"]*(")/, `$1${d}$2`);
+}
 
 // 피움앱 프로필 페이지의 <title> + og/twitter/description 메타를 프로필별 값으로 교체
 function applyPiumAppMeta(html, profile, url) {
@@ -196,6 +296,11 @@ async function savePage(browser, url, baseUrl, articlesMap) {
   if (url.startsWith('/pium-app/')) {
     const profile = PIUM_APP_PROFILES[url];
     if (profile) html = applyPiumAppMeta(html, profile, url);
+  }
+  // 정적 페이지(/about, /advertise 등)면 페이지별 title/description 교체
+  //   (네이버 서치어드바이저: title/description 중복 21페이지 방지)
+  if (STATIC_PAGE_META[url]) {
+    html = applyStaticPageMeta(html, STATIC_PAGE_META[url], url);
   }
 
   const filePath = url === '/'
