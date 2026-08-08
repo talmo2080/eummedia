@@ -1233,9 +1233,9 @@ function OhaengjaPage() {
               <div className="ct"><b>웃자대한민국협회</b><span>공식 블로그</span></div>
               <span className="arr">↗</span>
             </a>
-            <a href="https://www.eummedia.kr/" target="_blank" rel="noopener noreferrer" className="ohj3-ch">
+            <a href="https://www.eummedia.kr/article/%EC%98%A4%ED%96%89%EC%9E%90%EC%9B%83%EC%9D%8C%EC%B9%98%EB%A3%8C%EC%82%AC" target="_blank" rel="noopener noreferrer" className="ohj3-ch">
               <span className="ci">▤</span>
-              <div className="ct"><b>이음미디어</b><span>인터넷신문</span></div>
+              <div className="ct"><b>이음미디어 기사</b><span>오행자 · 인터뷰 전문</span></div>
               <span className="arr">↗</span>
             </a>
           </div>
