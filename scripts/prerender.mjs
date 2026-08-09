@@ -13,11 +13,29 @@ const SITE_URL = 'https://www.eummedia.kr';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 const DEFAULT_OG_DESC = '시니어와 소상공인, 이웃의 이야기를 조명하는 인터넷신문';
 
-// Supabase — 환경변수에서 읽기
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,
-  process.env.VITE_SUPABASE_ANON_KEY
-);
+// ── .env 로더 (gen-sitemap.js / gen-rss.js 와 동일 패턴)
+//    Vercel 빌드에선 Env Var가 자동 주입되지만, Env Var 누락 시 여기서 명확 실패.
+//    로컬 build 시엔 .env 파일에서 값 채워 넣음.
+function loadEnv() {
+  const envPath = path.resolve(__dirname, '../.env');
+  if (!fs.existsSync(envPath)) return;
+  const txt = fs.readFileSync(envPath, 'utf8');
+  txt.split(/\r?\n/).forEach((line) => {
+    const m = line.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
+    if (m && !process.env[m[1]]) process.env[m[1]] = m[2];
+  });
+}
+loadEnv();
+
+// ── 환경변수 검증 (모듈 로드 시점 즉시 crash 대신 명확한 에러 로그)
+const SUPA_URL = process.env.VITE_SUPABASE_URL;
+const SUPA_KEY = process.env.VITE_SUPABASE_ANON_KEY;
+if (!SUPA_URL || !SUPA_KEY) {
+  console.error('[prerender] ❌ 환경변수 누락 — VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY');
+  console.error('           로컬: .env 파일 확인. Vercel: Env Var 등록 확인 (Production).');
+  process.exit(1);
+}
+const supabase = createClient(SUPA_URL, SUPA_KEY);
 
 // HTML escape — meta content/title 값의 특수문자 처리
 function escHtml(s) {
