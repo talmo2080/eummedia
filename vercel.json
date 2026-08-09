@@ -4,15 +4,5 @@
       "source": "/((?!api/|.*\\.[a-z0-9]+$|article/|channel/|videos).*)",
       "destination": "/index.html"
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/daily-health-check",
-      "schedule": "0 23 * * *"
-    },
-    {
-      "path": "/api/publish-check",
-      "schedule": "30 22 * * *"
-    }
   ]
 }
