@@ -12,7 +12,7 @@
     },
     {
       "path": "/api/publish-check",
-      "schedule": "*/10 * * * *"
+      "schedule": "30 22 * * *"
     }
   ]
 }
