@@ -16,6 +16,7 @@ const RED = "#a8321f";            // 로고 빨강 포인트
 const CHANNEL_INACTIVE = "#dbe3ec";
 
 // 채널 네비 — "홈" 맨 앞 + 채널 7개
+// (피움은 서브헤더 로고로만 노출. 채널 내비에서는 제거)
 const navItems = [
   { name: "홈",        path: "/" },
   { name: "이음매거진", path: "/channel/magazine" },
@@ -25,7 +26,6 @@ const navItems = [
   { name: "이음뷰",     path: "/channel/view" },
   { name: "이음트렌드", path: "/channel/trend" },
   { name: "이음보이스", path: "/channel/voice" },
-  { name: "🌱 피움", path: "/pium-store" },
 ];
 
 // 오늘 날짜 — YYYY년 M월 D일 요일 (한국어)
@@ -154,6 +154,17 @@ export default function Header() {
             <Link to="/pium-store" style={{ display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", marginRight: 4, background: "#ffffff", borderRadius: 4, padding: "6px 6px" }}>
               <img src="/pium-logo.png" alt="" style={{ height: 90, width: "auto", objectFit: "contain", display: "block", background: "#ffffff" }} />
             </Link>
+            {/* 이음AI마케팅 — 페이지 준비 중. 로고 완성되면 텍스트를 이미지로 교체 예정 */}
+            <button
+              type="button"
+              onClick={() => alert('이음AI마케팅 페이지는 준비 중입니다. 곧 공개됩니다.')}
+              style={{
+                color: NAVY, background: "transparent", border: "none",
+                fontSize: 13, fontWeight: 700,
+                padding: "6px 10px", cursor: "pointer",
+                fontFamily: "inherit",
+              }}
+            >이음AI마케팅</button>
             <Link to="/advertise" style={{
               color: NAVY, textDecoration: "none",
               fontSize: 13, fontWeight: 700,
