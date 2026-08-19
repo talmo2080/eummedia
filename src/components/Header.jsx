@@ -150,21 +150,19 @@ export default function Header() {
 
           {/* 우측 버튼 — 데스크탑 (768px+) */}
           <div className="hidden md:flex" style={{ gap: 10, alignItems: "center" }}>
-            {/* 피움 로고 */}
-            <Link to="/pium-store" style={{ display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", marginRight: 4, background: "#ffffff", borderRadius: 4, padding: "6px 6px" }}>
-              <img src="/pium-logo.png" alt="" style={{ height: 90, width: "auto", objectFit: "contain", display: "block", background: "#ffffff" }} />
-            </Link>
-            {/* 이음AI마케팅 — 페이지 준비 중. 로고 완성되면 텍스트를 이미지로 교체 예정 */}
+            {/* 이음마케팅 — 8/13 확정 브랜드명(이음AI마케팅 → 이음마케팅).
+                로고(EM 적/청 + AI MARKETING 워드마크) 파일 업로드 후 이미지로 교체 예정.
+                피움 로고는 이번에 서브헤더에서 완전 제거 (지시 8/12 ③). */}
             <button
               type="button"
-              onClick={() => alert('이음AI마케팅 페이지는 준비 중입니다. 곧 공개됩니다.')}
+              onClick={() => alert('이음마케팅 페이지는 준비 중입니다. 곧 공개됩니다.')}
               style={{
                 color: NAVY, background: "transparent", border: "none",
                 fontSize: 13, fontWeight: 700,
                 padding: "6px 10px", cursor: "pointer",
                 fontFamily: "inherit",
               }}
-            >이음AI마케팅</button>
+            >이음마케팅</button>
             <Link to="/advertise" style={{
               color: NAVY, textDecoration: "none",
               fontSize: 13, fontWeight: 700,

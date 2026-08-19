@@ -253,9 +253,9 @@ export default function ChannelList() {
       <header className={`border-l-4 ${getChannelBorderClass(channel?.name || activeChannel)} bg-white px-4 py-4 mb-4`}>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl">{CHANNEL_META[channel?.name || activeChannel]?.icon}</span>
-          <h1 className="font-serif font-bold text-xl text-neutral-900">
+          <div className="font-serif font-bold text-xl text-neutral-900">
             {channel?.name ?? activeChannel}
-          </h1>
+          </div>
         </div>
         <p className="text-sm text-neutral-600 leading-relaxed">
           {CHANNEL_META[channel?.name || activeChannel]?.desc}

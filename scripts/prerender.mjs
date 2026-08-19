@@ -37,6 +37,20 @@ if (!SUPA_URL || !SUPA_KEY) {
 }
 const supabase = createClient(SUPA_URL, SUPA_KEY);
 
+// summary 필드를 meta description/JSON-LD description으로 변환할 때 정리:
+//   · 개행 → 공백 (한 줄로)
+//   · "요약", "요약:", "요약 " 같은 라벨 접두어/구분자 제거
+//   · 연속 공백 하나로
+// (기자가 부제 + 개행 + "요약 " + 실제 요약 형식으로 저장하는 관행 대응)
+function cleanSummaryForMeta(s) {
+  if (!s) return '';
+  return String(s)
+    .replace(/\r?\n/g, ' ')
+    .replace(/(^|\s)요약\s*[:：]?\s*/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 // HTML escape — meta content/title 값의 특수문자 처리
 function escHtml(s) {
   return String(s ?? '')
@@ -51,7 +65,7 @@ function escHtml(s) {
 // (검색엔진 — 특히 네이버·구글 뉴스 — 이 기사 메타데이터를 정확히 파싱하도록 함)
 function buildNewsArticleJsonLd(article, fullUrl) {
   const headline = article.title || '';
-  const description = (article.summary && article.summary.trim()) || DEFAULT_OG_DESC;
+  const description = cleanSummaryForMeta(article.summary) || DEFAULT_OG_DESC;
   const image = article.thumbnail_url || DEFAULT_OG_IMAGE;
   const datePublished = article.published_at || '';
   const dateModified  = article.updated_at  || article.published_at || '';
@@ -239,7 +253,7 @@ function applyPiumAppMeta(html, profile, url) {
 // + NewsArticle JSON-LD 를 </head> 직전에 삽입
 function applyArticleMeta(html, article, url) {
   const title = `${article.title} | 이음미디어`;
-  const desc = (article.summary && article.summary.trim()) || DEFAULT_OG_DESC;
+  const desc = cleanSummaryForMeta(article.summary) || DEFAULT_OG_DESC;
   const image = article.thumbnail_url || DEFAULT_OG_IMAGE;
   const fullUrl = `${SITE_URL}${url}`;
 
