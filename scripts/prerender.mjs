@@ -205,6 +205,11 @@ const PIUM_APP_PROFILES = {
     desc: '사람이 사랑입니다. 행복 나눔 휴머니스트 이문태 소장의 PIUM 전문가 프로필',
     image: `${SITE_URL}/pium-app/leemoontae/leemoontae-og.jpg`,
   },
+  '/pium-app/gilbongjo': {
+    title: '길봉조 · 유비오맥파 맥파분석전문가 · 건강 인생 코치 | 이음미디어',
+    desc: '사람의 몸이 보내는 신호를 대화로 잇는 사람. 맥파바이오솔루션 대표 길봉조 PIUM 전문가 프로필',
+    image: `${SITE_URL}/pium-app/gilbongjo/gilbongjo-og.jpg`,
+  },
 };
 
 // 정적 페이지(/about, /advertise 등)의 <title> + description + og/twitter 메타 교체

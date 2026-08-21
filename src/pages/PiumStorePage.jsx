@@ -913,6 +913,15 @@ export default function PiumStorePage() {
       price_model:   "free",
       users:         { nickname: "이문태" },
     },
+    {
+      slug:          "gilbongjo",
+      title:         "길봉조 대표",
+      summary:       "맥파바이오솔루션 · 유비오맥파 맥파분석전문가 · 건강 인생 코치",
+      thumbnail_url: "/pium-app/gilbongjo/gilbongjo-card.jpg",
+      category:      "expert_tool",
+      price_model:   "free",
+      users:         { nickname: "길봉조" },
+    },
   ];
   // 갓 피어난 앱: 하드코딩 선두 + DB 최근 순
   const recentFeatured = [

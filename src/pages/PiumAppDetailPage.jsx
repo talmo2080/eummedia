@@ -3339,6 +3339,618 @@ function LeeMoontaePage() {
   );
 }
 
+/* ══════════════════════════════════════
+   길봉조 대표 프로필 — /pium-app/gilbongjo
+══════════════════════════════════════ */
+const GBJ_SLIDES=['/pium-app/gilbongjo/slide01.jpg','/pium-app/gilbongjo/slide02.jpg','/pium-app/gilbongjo/slide03.jpg'];
+const GBJ_BOOKS=[
+  {img:'/pium-app/gilbongjo/book01.jpg',t:'유비오맥파 사용설명서'},
+  {img:'/pium-app/gilbongjo/book02.jpg',t:'현장에서 바로쓰는 맥파상담 멘트집'},
+  {img:'/pium-app/gilbongjo/book03.jpg',t:'혈관 스트레스 측정 맥파검사 200% 활용법'},
+  {img:'/pium-app/gilbongjo/book04.jpg',t:'유비오맥파, 건강을 바꾸는 비밀병기'},
+  {img:'/pium-app/gilbongjo/book05.jpg',t:'음이온 공기청정기 아비테가 좋은 10가지 이유'},
+  {img:'/pium-app/gilbongjo/book06.jpg',t:'인생소금'},
+  {img:'/pium-app/gilbongjo/book07.jpg',t:'내 인생의 에코시즌'},
+];
+const GBJ_ACTS=[
+  {s:'/pium-app/gilbongjo/act-class.jpg',c:'현장 강의 — 측정 기반 건강상담 교육'},
+  {s:'/pium-app/gilbongjo/act-device.jpg',c:'손끝에서 시작되는 유비오맥파 측정'},
+];
+const GBJ_SHORTS=[];
+const GBJ_CSS=`
+.gbj-wrap *{margin:0;padding:0;box-sizing:border-box}
+.gbj-wrap{
+ --bg:#06101e;--card:#0b1a2e;--line:#162540;
+ --am:#1e90d6;--am2:#5ab8e8;--amd:#1a4a6a;
+ --tx:#e8f4fd;--sub:#8ab0cc;--dim:#5a7a99;
+ font-family:'Pretendard','Noto Sans KR',sans-serif;
+ background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;
+}
+.gbj-wrap *{box-sizing:border-box}
+.gbj-wrap section{position:relative;z-index:1}
+.gbj-wrap .wrap{max-width:1180px;margin:0 auto;padding:0 44px}
+.gbj-wrap .sec{padding:100px 0}
+.gbj-wrap .sec-h{font-size:12px;font-weight:800;letter-spacing:.24em;color:var(--am);margin-bottom:14px}
+.gbj-wrap .sec-t{font-size:38px;font-weight:900;letter-spacing:-.02em;line-height:1.25}
+.gbj-wrap .sec-d{font-size:16px;color:var(--sub);margin-top:14px;line-height:1.75}
+.gbj-wrap .hero{position:relative;min-height:780px;display:flex;align-items:center;overflow:hidden;
+ background:radial-gradient(1200px 720px at 76% -12%,#0e2040 0%,#06101e 62%)}
+.gbj-wrap .hero .grid{position:absolute;inset:0;
+ background-image:linear-gradient(rgba(30,144,214,.07) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(30,144,214,.07) 1px,transparent 1px);
+ background-size:52px 52px;
+ mask-image:radial-gradient(900px 620px at 72% 30%,#000,transparent 78%)}
+.gbj-wrap .hero .orb{position:absolute;right:-160px;top:-120px;width:720px;height:720px;
+ border-radius:50%;background:radial-gradient(circle,rgba(30,144,214,.14),transparent 62%);filter:blur(30px)}
+.gbj-wrap .hero-in{position:relative;z-index:2;display:flex;gap:60px;align-items:flex-start;width:100%;padding-top:80px;padding-bottom:80px}
+.gbj-wrap .hero-L{flex:1;min-width:0;padding-top:40px}
+.gbj-wrap .kick{font-size:13px;font-weight:800;letter-spacing:.22em;color:var(--am)}
+.gbj-wrap .nm{font-size:88px;font-weight:900;letter-spacing:-.03em;line-height:1;margin-top:18px}
+.gbj-wrap .en{font-size:17px;font-weight:500;letter-spacing:.3em;color:var(--sub);margin-top:14px}
+.gbj-wrap .rule{width:64px;height:3px;background:var(--am);border-radius:2px;margin:26px 0}
+.gbj-wrap .tag{font-size:22px;font-weight:700;line-height:1.55;color:#e8f4fd}
+.gbj-wrap .tag em{font-style:normal;color:var(--am)}
+.gbj-wrap .tag small{display:block;font-size:16px;font-weight:500;color:var(--sub);margin-top:8px}
+.gbj-wrap .pills{display:flex;gap:9px;flex-wrap:wrap;margin-top:26px}
+.gbj-wrap .pill{border:1.2px solid var(--amd);color:var(--am2);border-radius:999px;padding:8px 17px;font-size:14px;font-weight:600}
+.gbj-wrap .hero-R{width:380px;flex-shrink:0}
+.gbj-wrap .sld-box{width:380px;margin-bottom:14px}
+.gbj-wrap .sld-track-wrap{overflow:hidden;border-radius:14px;position:relative}
+.gbj-wrap .sld-track{display:flex;transition:transform .45s cubic-bezier(.4,0,.2,1)}
+.gbj-wrap .sld-track img{width:380px;height:260px;object-fit:cover;flex-shrink:0;display:block}
+.gbj-wrap .sld-dots{display:flex;justify-content:center;gap:7px;margin-top:10px}
+.gbj-wrap .sld-dot{width:8px;height:8px;border-radius:50%;background:var(--amd);border:none;cursor:pointer;padding:0}
+.gbj-wrap .sld-dot.on{background:var(--am)}
+.gbj-wrap .photo{width:380px;height:460px;border-radius:16px;position:relative;overflow:hidden}
+.gbj-wrap .photo img{width:100%;height:100%;object-fit:cover;display:block}
+.gbj-wrap .photo::before{content:'';position:absolute;inset:0;z-index:1;border-radius:16px;pointer-events:none;
+ background:linear-gradient(180deg,rgba(6,16,30,.10) 0%,transparent 34%,rgba(6,16,30,.40) 86%,rgba(6,16,30,.62) 100%)}
+.gbj-wrap .back-btn{position:absolute;top:24px;left:44px;z-index:10;display:inline-flex;align-items:center;gap:6px;
+ color:var(--sub);text-decoration:none;font-size:14px;font-weight:600;
+ background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+ padding:8px 16px;border-radius:99px;transition:background .2s}
+.gbj-wrap .back-btn:hover{background:rgba(255,255,255,.1)}
+/* 기사 섹션 */
+.gbj-wrap .press-lead{font-size:20px;font-weight:700;color:var(--am2);line-height:1.7;margin-bottom:32px}
+.gbj-wrap .press-body{display:flex;flex-direction:column;gap:0}
+.gbj-wrap .press-ch{font-size:22px;font-weight:900;letter-spacing:-.02em;margin:40px 0 16px;color:var(--tx);border-left:4px solid var(--am);padding-left:18px}
+.gbj-wrap .press-ch:first-child{margin-top:0}
+.gbj-wrap .press-p{font-size:16px;line-height:1.9;color:#b8d0e8;margin-bottom:18px}
+.gbj-wrap .press-q{border-left:3px solid var(--am);padding:20px 28px;margin:28px 0;background:rgba(30,144,214,.07);border-radius:0 12px 12px 0}
+.gbj-wrap .press-q p{font-size:18px;font-weight:700;font-style:italic;color:var(--am2);line-height:1.65}
+.gbj-wrap .press-q cite{display:block;font-size:13px;color:var(--dim);margin-top:10px;font-style:normal}
+.gbj-wrap .press-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin:16px 0 24px}
+.gbj-wrap .press-list li{font-size:15px;color:#b8d0e8;line-height:1.7;padding-left:18px;position:relative}
+.gbj-wrap .press-list li::before{content:'▶';position:absolute;left:0;color:var(--am);font-size:11px;top:5px}
+/* 철학 */
+.gbj-wrap .phil-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
+.gbj-wrap .phil-c{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:32px 28px}
+.gbj-wrap .phil-ic{font-size:28px;margin-bottom:16px}
+.gbj-wrap .phil-q{font-size:18px;font-weight:800;line-height:1.55;color:var(--am2);margin-bottom:14px}
+.gbj-wrap .phil-d{font-size:14px;color:var(--sub);line-height:1.75}
+/* 전문분야 */
+.gbj-wrap .exp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:36px}
+.gbj-wrap .exp-c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 24px}
+.gbj-wrap .exp-ic{width:44px;height:44px;border-radius:12px;background:rgba(30,144,214,.15);
+ display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px}
+.gbj-wrap .exp-t{font-size:16px;font-weight:800;margin-bottom:8px}
+.gbj-wrap .exp-d{font-size:13px;color:var(--sub);line-height:1.7}
+/* 방송 */
+.gbj-wrap .air-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:36px}
+.gbj-wrap .air-c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 24px;display:flex;flex-direction:column;gap:10px}
+.gbj-wrap .air-badge{font-size:11px;font-weight:800;letter-spacing:.1em;background:rgba(30,144,214,.18);color:var(--am2);padding:4px 10px;border-radius:99px;display:inline-block;width:fit-content}
+.gbj-wrap .air-ch{font-size:18px;font-weight:800;color:var(--am2)}
+.gbj-wrap .air-ep{font-size:14px;color:var(--sub);line-height:1.6}
+/* 저서 */
+.gbj-wrap .shelf{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:36px}
+.gbj-wrap .bk{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.gbj-wrap .bk img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.gbj-wrap .bk-t{font-size:13px;font-weight:700;line-height:1.5;padding:12px 14px;color:var(--tx)}
+/* 현장 */
+.gbj-wrap .site-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:36px}
+.gbj-wrap .site-c{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:16/9}
+.gbj-wrap .site-c img{width:100%;height:100%;object-fit:cover;display:block}
+.gbj-wrap .site-cap{position:absolute;bottom:0;left:0;right:0;padding:20px 20px 18px;
+ background:linear-gradient(transparent,rgba(6,16,30,.85));font-size:14px;font-weight:700;color:#e8f4fd}
+/* 숏츠 */
+.gbj-wrap .car{overflow:hidden;margin-top:32px}
+.gbj-wrap .track{display:flex;transition:transform .45s cubic-bezier(.4,0,.2,1)}
+.gbj-wrap .slide{flex:0 0 100%;width:100%}
+.gbj-wrap .shorts{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;--shgap:16px}
+.gbj-wrap .sh{display:block;text-decoration:none;border-radius:14px;overflow:hidden;background:var(--card)}
+.gbj-wrap .th{position:relative;aspect-ratio:9/16;overflow:hidden}
+.gbj-wrap .th img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.gbj-wrap .sh:hover .th img{transform:scale(1.06)}
+.gbj-wrap .pl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+ background:rgba(6,16,30,.35)}
+.gbj-wrap .pl i{font-style:normal;font-size:32px;color:#fff;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.gbj-wrap .nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:24px}
+.gbj-wrap .arw{background:rgba(30,144,214,.15);border:1px solid var(--amd);color:var(--am2);
+ width:42px;height:42px;border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.gbj-wrap .arw:hover{background:rgba(30,144,214,.3)}
+.gbj-wrap .dots{display:flex;gap:8px}
+.gbj-wrap .dot{width:9px;height:9px;border-radius:50%;background:var(--amd);border:none;cursor:pointer;padding:0}
+.gbj-wrap .dot.on{background:var(--am)}
+/* 채널 */
+.gbj-wrap .chs{display:flex;flex-direction:column;gap:12px;margin-top:32px}
+.gbj-wrap .ch{display:flex;align-items:center;gap:16px;padding:18px 24px;
+ background:var(--card);border:1px solid var(--line);border-radius:14px;
+ text-decoration:none;color:var(--tx);transition:border-color .2s}
+.gbj-wrap .ch:hover{border-color:var(--am)}
+.gbj-wrap .ch .d{width:40px;height:40px;border-radius:10px;background:rgba(30,144,214,.15);
+ display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--am2);flex-shrink:0}
+.gbj-wrap .ch b{display:block;font-size:16px;font-weight:700}
+.gbj-wrap .ch span{font-size:12px;color:var(--sub)}
+/* 문의 */
+.gbj-wrap .ct{background:rgba(11,26,46,.52)}
+.gbj-wrap .ctwrap{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:40px}
+.gbj-wrap .info{list-style:none;display:flex;flex-direction:column;gap:18px}
+.gbj-wrap .info li{display:flex;gap:14px;font-size:16px;line-height:1.6}
+.gbj-wrap .info span{color:var(--am);font-weight:700;min-width:72px;font-size:14px;padding-top:2px}
+.gbj-wrap .form{display:flex;flex-direction:column;gap:14px}
+.gbj-wrap label{font-size:13px;font-weight:700;color:var(--sub)}
+.gbj-wrap .inp{background:rgba(255,255,255,.06);border:1px solid var(--line);
+ border-radius:10px;padding:14px 16px;font-size:15px;color:var(--tx);
+ font-family:inherit;width:100%;transition:border-color .2s;resize:none}
+.gbj-wrap .inp:focus{outline:none;border-color:var(--am)}
+.gbj-wrap textarea.inp{min-height:120px}
+.gbj-wrap .btn{background:var(--am);color:#fff;border:none;border-radius:10px;padding:16px;
+ font-size:16px;font-weight:800;cursor:pointer;transition:opacity .2s;font-family:inherit}
+.gbj-wrap .btn:hover{opacity:.85}
+.gbj-wrap .btn:disabled{opacity:.5;cursor:not-allowed}
+.gbj-wrap .note{font-size:12px;color:var(--dim);text-align:center;line-height:1.6}
+.gbj-wrap .ft{text-align:center;padding:48px 24px;font-size:12px;color:var(--dim)}
+/* 한눈에 보기 테이블 */
+.gbj-wrap .sum-table{width:100%;border-collapse:collapse;margin-top:36px}
+.gbj-wrap .sum-table th,.gbj-wrap .sum-table td{padding:16px 20px;text-align:left;border-bottom:1px solid var(--line);font-size:15px;line-height:1.7}
+.gbj-wrap .sum-table th{width:140px;font-size:13px;font-weight:800;color:var(--am);vertical-align:top}
+.gbj-wrap .sum-table td{color:#b8d0e8}
+/* 반응형 */
+@media(max-width:900px){
+ .gbj-wrap .wrap{padding:0 20px}
+ .gbj-wrap .sec{padding:64px 0}
+ .gbj-wrap .hero-in{flex-direction:column;gap:32px;padding-top:60px}
+ .gbj-wrap .hero-R,.gbj-wrap .sld-box,.gbj-wrap .sld-track img,.gbj-wrap .photo{width:100%}
+ .gbj-wrap .nm{font-size:56px}
+ .gbj-wrap .sec-t{font-size:28px}
+ .gbj-wrap .phil-grid,.gbj-wrap .exp-grid,.gbj-wrap .air-grid{grid-template-columns:1fr}
+ .gbj-wrap .shelf{grid-template-columns:repeat(2,1fr)}
+ .gbj-wrap .site-grid{grid-template-columns:1fr}
+ .gbj-wrap .ctwrap{grid-template-columns:1fr;gap:36px}
+ .gbj-wrap .shorts{grid-template-columns:repeat(2,1fr)}
+ .gbj-wrap .back-btn{left:20px}
+}
+`;
+
+function GilBongJoPage() {
+  const [slideIdx, setSlideIdx] = useState(0);
+  const [shIdx, setShIdx] = useState(0);
+  const [gbjForm, setGbjForm] = useState({name:'',phone:'',message:''});
+  const [gbjSubmitting, setGbjSubmitting] = useState(false);
+  const [gbjSubmitted, setGbjSubmitted] = useState(false);
+  const [gbjErr, setGbjErr] = useState('');
+
+  const SPER = 4;
+  const shSlides = GBJ_SHORTS.length > 0 ? Math.ceil(GBJ_SHORTS.length / SPER) : 0;
+
+  useEffect(() => {
+    if (GBJ_SLIDES.length < 2) return;
+    const t = setInterval(() => setSlideIdx(i => (i+1) % GBJ_SLIDES.length), 4000);
+    return () => clearInterval(t);
+  }, []);
+
+  async function handleGbjSubmit(e) {
+    e.preventDefault();
+    if (!gbjForm.name.trim() || !gbjForm.phone.trim() || !gbjForm.message.trim()) {
+      setGbjErr('성함, 연락처, 문의 내용을 모두 입력해 주세요.');
+      return;
+    }
+    setGbjSubmitting(true); setGbjErr('');
+    try {
+      const res = await fetch('/api/gbj-lecture-inquiry', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({...gbjForm, speaker:'길봉조'}),
+      });
+      if (!res.ok) throw new Error('서버 오류');
+      setGbjSubmitted(true);
+    } catch {
+      setGbjErr('전송에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setGbjSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="gbj-wrap">
+      <style>{GBJ_CSS}</style>
+
+      {/* 히어로 */}
+      <section className="hero">
+        <div className="grid"/>
+        <div className="orb"/>
+        <a className="back-btn" href="/pium-store">← 스토어로 돌아가기</a>
+        <div className="wrap" style={{width:'100%'}}>
+          <div className="hero-in">
+            <div className="hero-L">
+              <div className="kick">PIUM 전문가 프로필 · 이음미디어</div>
+              <div className="nm">길봉조</div>
+              <div className="en">GIL BONG JO</div>
+              <div className="rule"/>
+              <div className="tag">
+                사람의 몸이 보내는 신호를<br/>
+                <em>대화로 잇는 사람</em>
+                <small>맥파바이오솔루션 대표 · 유비오맥파 맥파분석 전문가 · 건강 인생 코치</small>
+              </div>
+              <div className="pills">
+                <span className="pill">유비오맥파</span>
+                <span className="pill">HRV · APG 분석</span>
+                <span className="pill">건강상담 교육</span>
+                <span className="pill">현장 코칭</span>
+              </div>
+            </div>
+            <div className="hero-R">
+              {/* 슬라이드 캐러셀 */}
+              <div className="sld-box">
+                <div className="sld-track-wrap">
+                  <div className="sld-track" style={{transform:`translateX(${-100*slideIdx}%)`}}>
+                    {GBJ_SLIDES.map((s,i) => (
+                      <img key={i} src={s} alt={`길봉조 대표 ${i+1}`}/>
+                    ))}
+                  </div>
+                </div>
+                <div className="sld-dots">
+                  {GBJ_SLIDES.map((_,i) => (
+                    <button key={i} className={`sld-dot${i===slideIdx?' on':''}`} onClick={() => setSlideIdx(i)}/>
+                  ))}
+                </div>
+              </div>
+              {/* 프로필 사진 */}
+              <div className="photo">
+                <img src="/pium-app/gilbongjo/profile.jpg" alt="길봉조 대표 프로필"/>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ① PRESS — 기사 */}
+      <section className="sec" style={{background:'rgba(11,26,46,.52)'}}>
+        <div className="wrap">
+          <div className="sec-h">PRESS</div>
+          <div className="sec-t">이음매거진 인물탐방</div>
+          <div className="sec-d">유비오맥파로 건강상담의 새 길을 열다</div>
+
+          <div style={{marginTop:40}}>
+            <p className="press-lead">봉숭아학당 문화혁신학교·웃자대한민국협회가 주목한 현장형 건강 코치, 길봉조 대표의 측정 기반 상담 철학</p>
+
+            <div className="press-body">
+              <div className="press-q">
+                <p>"건강관리 이제는 하셔야 합니다."<br/>"스트레스가 많으신 것 같습니다."<br/>"이 제품을 드셔 보시면 좋습니다."</p>
+                <cite>건강상담 현장에서 자주 오가는 말. 그러나 좋은 의도로 건넨 말도 때로는 상대에게 '권유'처럼 들린다.</cite>
+              </div>
+
+              <p className="press-p">길봉조 맥파바이오솔루션 대표는 바로 이 지점을 오랫동안 현장에서 지켜봐 왔다. 그는 건강상담의 핵심이 '더 많이 설명하는 것'이 아니라 '상대가 자기 몸을 스스로 이해하도록 돕는 것'이라고 말한다.</p>
+
+              <div className="press-q">
+                <p>"먼저 권유하면 상대는 경계합니다. 하지만 자신의 몸에서 나온 데이터를 함께 보면 대화가 달라집니다. 유비오맥파는 고객을 설득하는 장비가 아니라, 고객이 자기 몸을 이해하도록 돕는 상담의 입구입니다."</p>
+              </div>
+
+              <p className="press-p">길 대표가 말하는 건강상담은 단순한 측정이나 제품 안내가 아니다. 손끝에서 읽어낸 생체 신호를 바탕으로 한 사람의 수면, 피로, 긴장, 식사, 생활 리듬을 함께 바라보는 과정이다. 숫자는 결론이 아니라 질문의 시작이고, 결과지는 판정표가 아니라 대화의 지도다.</p>
+
+              <h3 className="press-ch">현장에서 길을 찾은 사람</h3>
+              <p className="press-p">길봉조 대표는 20년 경력의 생체신호 분석 전문가이자 건강 인생 코치로 활동해 왔다. 건강기능식품 매장, 한의원, 상담센터, 교육 현장 등 다양한 공간에서 사람을 만나며 유비오맥파를 활용한 상담 흐름을 만들어 왔다.</p>
+              <p className="press-p">그가 관심을 두는 것은 단순히 장비를 보급하는 일이 아니다. 장비가 현장에서 제대로 쓰이도록 돕는 일이다. 유비오맥파를 도입한 공간이 있다고 해도, 누가 측정할 것인지, 어디까지 설명할 것인지, 어떤 질문으로 상담을 이어갈 것인지가 정해져 있지 않으면 장비는 오래 활용되기 어렵다. 길 대표는 이 부분을 '현장 설계'라고 부른다.</p>
+
+              <div className="press-q">
+                <p>"장비를 설치하는 것은 어렵지 않습니다. 문제는 그다음입니다. 상담자가 결과를 어떻게 읽고, 고객에게 어떤 언어로 설명하며, 재방문까지 어떻게 연결할 것인지가 중요합니다."</p>
+              </div>
+
+              <p className="press-p">길 대표의 활동은 크게 세 가지로 나뉜다.</p>
+              <ul className="press-list">
+                <li>현장에 맞는 장비 상담과 공급</li>
+                <li>측정 방법과 결과지 해석, 피해야 할 표현을 알려주는 실무 교육</li>
+                <li>실제 상담 공간에서 측정부터 설명, 생활습관 대화, 재방문 관리까지 이어지도록 돕는 현장 코칭</li>
+              </ul>
+
+              <h3 className="press-ch">유비오맥파, 2분의 측정이 여는 대화</h3>
+              <p className="press-p">유비오맥파 상담은 손가락에 센서를 끼우는 짧은 과정에서 시작된다. 약 2분 뒤 화면에는 맥파와 함께 혈관 건강, 스트레스, 자율신경과 관련된 참고 지표들이 나타난다. 하지만 길 대표는 이 수치를 곧바로 결론처럼 말하지 않는다. 대신 질문을 던진다.</p>
+
+              <div style={{display:'flex',gap:12,flexWrap:'wrap',margin:'8px 0 24px'}}>
+                {['"최근 잠은 어떠셨나요?"','"오늘 커피는 드셨나요?"','"운동 직후이거나 많이 움직인 날인가요?"','"요즘 가장 피로했던 시간대가 언제였나요?"'].map((q,i)=>(
+                  <div key={i} style={{background:'rgba(30,144,214,.1)',border:'1px solid rgba(30,144,214,.25)',borderRadius:10,padding:'10px 16px',fontSize:14,color:'var(--am2)',fontWeight:600}}>{q}</div>
+                ))}
+              </div>
+
+              <p className="press-p">이 질문들이 이어지면 고객은 자신의 생활을 말하기 시작한다. 수면 부족, 불규칙한 식사, 누적된 피로, 긴장 상태, 스트레스가 하나씩 대화 위로 올라온다.</p>
+
+              <div style={{background:'rgba(30,144,214,.08)',border:'1px solid rgba(30,144,214,.2)',borderRadius:14,padding:'24px 28px',margin:'24px 0',textAlign:'center'}}>
+                <div style={{fontSize:20,fontWeight:900,color:'var(--am2)',marginBottom:8}}>측정은 끝이 아니라 시작이다.</div>
+                <div style={{fontSize:16,fontWeight:700,color:'var(--sub)'}}>숫자는 진단이 아니라 대화의 입구다.</div>
+              </div>
+
+              <h3 className="press-ch">"단정하지 않는 상담이 오래 갑니다"</h3>
+              <p className="press-p">길 대표가 교육에서 가장 먼저 강조하는 원칙은 '단정하지 않기'다. 결과지를 보고 곧바로 "혈관이 나쁩니다", "스트레스가 심합니다", "자율신경이 무너졌습니다"라고 말하면 고객은 불안해지거나 방어적이 된다.</p>
+
+              <div className="press-q">
+                <p>"숫자로 겁을 주면 안 됩니다. 숫자는 고객을 위협하는 도구가 아니라 생활을 돌아보게 하는 질문의 출발점이어야 합니다."</p>
+              </div>
+
+              <p className="press-p">그는 유비오맥파 결과를 질병 진단이나 치료 판단처럼 말해서는 안 된다고 강조한다. 혈관나이, 혈관탄성, 스트레스 지수, HRV, APG 등은 건강상담에 활용할 수 있는 참고 지표일 뿐이다.</p>
+
+              <div className="press-q">
+                <p>"할 수 있는 것과 할 수 없는 것을 정확히 말해야 합니다. 필요할 때 병원에 가보시라고 안내하는 것이 오래가는 상담의 기본입니다."</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ② PHILOSOPHY */}
+      <section className="sec">
+        <div className="wrap">
+          <div className="sec-h">PHILOSOPHY</div>
+          <div className="sec-t">상담 철학</div>
+          <div className="sec-d">20년 현장이 만들어낸 길봉조 대표의 세 가지 원칙</div>
+          <div className="phil-grid">
+            <div className="phil-c">
+              <div className="phil-ic">🩺</div>
+              <div className="phil-q">측정은 진단이 아니라 건강관리의 출발점이다</div>
+              <div className="phil-d">유비오맥파의 수치는 참고 지표입니다. 숫자를 보여주는 것이 아니라 고객이 자기 몸을 이해하는 과정을 함께 만드는 것이 상담의 목적입니다.</div>
+            </div>
+            <div className="phil-c">
+              <div className="phil-ic">💬</div>
+              <div className="phil-q">단정하지 않는 상담이 오래 갑니다</div>
+              <div className="phil-d">결과지를 보고 곧바로 단정하면 고객은 불안해지거나 방어적이 됩니다. 측정 당시의 조건을 함께 살피고, 생활을 돌아보게 하는 질문으로 연결합니다.</div>
+            </div>
+            <div className="phil-c">
+              <div className="phil-ic">🤝</div>
+              <div className="phil-q">상담자는 판정하는 사람이 아니라 함께 길을 찾는 사람이어야 합니다</div>
+              <div className="phil-d">결과가 좋게 나오면 격려하면 됩니다. 좋지 않게 나오면 다시 생활을 살펴볼 기회로 삼으면 됩니다. 숫자보다 사람을 먼저 봅니다.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ③ EXPERTISE */}
+      <section className="sec" style={{background:'rgba(11,26,46,.52)'}}>
+        <div className="wrap">
+          <div className="sec-h">EXPERTISE</div>
+          <div className="sec-t">전문 분야</div>
+          <div className="exp-grid">
+            <div className="exp-c">
+              <div className="exp-ic">📡</div>
+              <div className="exp-t">맥파분석 · HRV · APG</div>
+              <div className="exp-d">유비오맥파를 활용한 혈관 건강, 스트레스 지수, 자율신경 균형 분석. 손끝 PPG 신호 기반 생체신호 해석 전문가.</div>
+            </div>
+            <div className="exp-c">
+              <div className="exp-ic">🏫</div>
+              <div className="exp-t">건강상담 실무 교육</div>
+              <div className="exp-d">측정 방법, 결과지 해석, 피해야 할 표현, 재방문으로 이어지는 상담 루틴까지 현장 실무 중심으로 교육합니다.</div>
+            </div>
+            <div className="exp-c">
+              <div className="exp-ic">🗺️</div>
+              <div className="exp-t">현장 설계 코칭</div>
+              <div className="exp-d">한의원, 건강상담실, 방문건강관리, 보건교육 등 현장마다 다른 상담 흐름을 설계합니다. 장비 도입 이후의 운영 구조까지 함께 만듭니다.</div>
+            </div>
+            <div className="exp-c">
+              <div className="exp-ic">📦</div>
+              <div className="exp-t">장비 상담 및 공급</div>
+              <div className="exp-d">맥파바이오솔루션을 통해 유비오맥파 장비 상담과 공급을 담당합니다. 도입 전 현장 조건 분석부터 사후 교육까지 지원합니다.</div>
+            </div>
+            <div className="exp-c">
+              <div className="exp-ic">🧠</div>
+              <div className="exp-t">뇌기능분석 · 뉴로피드백</div>
+              <div className="exp-d">HRV 검사 분석 및 APG 검사 분석을 기반으로 한 뇌기능 및 뉴로피드백 전문가 과정을 보유합니다.</div>
+            </div>
+            <div className="exp-c">
+              <div className="exp-ic">❤️</div>
+              <div className="exp-t">건강 인생 코치</div>
+              <div className="exp-d">측정과 데이터를 넘어, 고객이 자기 생활을 스스로 돌아보고 건강한 습관으로 이어가도록 돕는 인생 코칭을 함께합니다.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ④ ON AIR */}
+      <section className="sec">
+        <div className="wrap">
+          <div className="sec-h">ON AIR</div>
+          <div className="sec-t">방송 출연</div>
+          <div className="air-grid">
+            <div className="air-c">
+              <span className="air-badge">MBN</span>
+              <div className="air-ch">천기누설</div>
+              <div className="air-ep">대한민국 치유의 마을을 찾아라</div>
+            </div>
+            <div className="air-c">
+              <span className="air-badge">MBC</span>
+              <div className="air-ch">파워매거진</div>
+              <div className="air-ep">당신의 혈관은 안녕하십니까</div>
+            </div>
+            <div className="air-c">
+              <span className="air-badge">SBS</span>
+              <div className="air-ch">좋은 아침</div>
+              <div className="air-ep">혈관다이어트가 장수비결 외 다수</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ⑤ BOOKS */}
+      <section className="sec" style={{background:'rgba(11,26,46,.52)'}}>
+        <div className="wrap">
+          <div className="sec-h">BOOKS</div>
+          <div className="sec-t">저서</div>
+          <div className="shelf">
+            {GBJ_BOOKS.map((b,i) => (
+              <div key={i} className="bk">
+                <img src={b.img} alt={b.t}/>
+                <div className="bk-t">{b.t}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ⑥ ON SITE */}
+      <section className="sec">
+        <div className="wrap">
+          <div className="sec-h">ON SITE</div>
+          <div className="sec-t">현장에서 만납니다</div>
+          <div className="site-grid">
+            {GBJ_ACTS.map((a,i) => (
+              <div key={i} className="site-c">
+                <img src={a.s} alt={a.c}/>
+                <div className="site-cap">{a.c}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ⑦ SHORTS — 숏츠 있을 때만 표시 */}
+      {GBJ_SHORTS.length > 0 && (
+        <section className="sec" style={{background:'rgba(11,26,46,.52)'}}>
+          <div className="wrap">
+            <div className="sec-h">SHORTS</div>
+            <div className="sec-t">맥파길봉조TV 숏츠</div>
+            <div className="car">
+              <div className="track" style={{transform:`translateX(${-100*shIdx}%)`}}>
+                {Array.from({length:shSlides}, (_,si) => {
+                  const slice = GBJ_SHORTS.slice(si*SPER, (si+1)*SPER);
+                  return (
+                    <div key={si} className="slide">
+                      <div className="shorts">
+                        {slice.map(id => (
+                          <a key={id} className="sh" href={`https://youtube.com/shorts/${id}`} target="_blank" rel="noopener noreferrer">
+                            <div className="th">
+                              <img src={`https://i.ytimg.com/vi/${id}/oardefault.jpg`} alt=""
+                                onError={ev => { ev.currentTarget.src=`https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }}/>
+                              <div className="pl"><i>&#9654;</i></div>
+                            </div>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            {shSlides > 1 && (
+              <div className="nav">
+                <button className="arw" onClick={() => setShIdx(i => (i-1+shSlides)%shSlides)}>‹</button>
+                <div className="dots">
+                  {Array.from({length:shSlides}, (_,i) => (
+                    <button key={i} className={`dot${i===shIdx?' on':''}`} onClick={() => setShIdx(i)}/>
+                  ))}
+                </div>
+                <button className="arw" onClick={() => setShIdx(i => (i+1)%shSlides)}>›</button>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ⑧ 한눈에 보기 */}
+      <section className="sec" style={{background:'rgba(11,26,46,.52)'}}>
+        <div className="wrap">
+          <div className="sec-h">RECORD</div>
+          <div className="sec-t">한눈에 보는 길봉조 대표</div>
+          <table className="sum-table">
+            <tbody>
+              <tr><th>이름</th><td>길봉조</td></tr>
+              <tr><th>소속</th><td>맥파바이오솔루션 대표</td></tr>
+              <tr><th>전문 분야</th><td>유비오맥파, HRV, APG, 맥파 건강상담, 생체신호 분석, 건강상담 교육, 현장 코칭</td></tr>
+              <tr><th>주요 활동</th><td>
+                유비오맥파 장비 상담 및 공급 · 측정 실무 교육 · 결과지 해석 교육 ·
+                건강상담 현장 코칭 · 한의원·건강상담·방문건강관리·보건교육 현장별 활용 설계
+              </td></tr>
+              <tr><th>저서</th><td>
+                『유비오맥파 사용설명서』 · 『유비오맥파 건강을 바꾸는 비밀병기』 ·
+                『현장에서 활용되는 맥파상담 멘트집』 · 『혈관 스트레스 측정 맥파검사 200% 활용법』 외
+              </td></tr>
+              <tr><th>상담 철학</th><td>
+                측정은 진단이 아니라 건강관리의 출발점이다.<br/>
+                숫자는 사람을 겁주는 도구가 아니라, 생활을 돌아보게 하는 대화의 시작이다.
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* ⑨ CHANNELS */}
+      <section className="sec">
+        <div className="wrap">
+          <div className="sec-h">CHANNELS</div>
+          <div className="sec-t">채널 바로가기</div>
+          <div className="chs">
+            <a className="ch" href="https://www.youtube.com/@%EB%A7%A5%ED%8C%8C%EA%B8%B8%EB%B4%89%EC%A1%B0TV" target="_blank" rel="noopener noreferrer">
+              <div className="d">&#9654;</div>
+              <div><b>맥파길봉조TV</b><span>YouTube</span></div>
+            </a>
+            <a className="ch" href="https://www.eummedia.kr/article/%EA%B8%B8%EB%B4%89%EC%A1%B0" target="_blank" rel="noopener noreferrer">
+              <div className="d">&#9998;</div>
+              <div><b>이음미디어 기사</b><span>eummedia.kr</span></div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ⑩ CONTACT */}
+      <section className="sec ct">
+        <div className="wrap">
+          <div className="sec-h">CONTACT</div>
+          <div className="sec-t">강의 · 상담 문의</div>
+          <div className="ctwrap">
+            <ul className="info">
+              <li><span>전화</span>010-8291-0088</li>
+              <li><span>활동 지역</span>서울시 · 전국 출강</li>
+              <li><span>주요 대상</span>건강상담사 · 한의원 · 방문건강관리 · 보건교육 현장</li>
+            </ul>
+            <form className="form" onSubmit={handleGbjSubmit}>
+              {gbjSubmitted ? (
+                <div style={{textAlign:'center',padding:'40px 0'}}>
+                  <div style={{fontSize:'36px',marginBottom:'16px'}}>✅</div>
+                  <div style={{fontSize:'18px',fontWeight:800,color:'var(--am)'}}>문의가 전송되었습니다!</div>
+                  <div style={{fontSize:'14px',color:'var(--sub)',marginTop:'10px'}}>
+                    길봉조 대표님께 알림이 발송되었습니다.<br/>빠른 시일 내에 연락드리겠습니다.
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <label>성함</label>
+                  <input className="inp" placeholder="홍길동" value={gbjForm.name}
+                    onChange={e => setGbjForm(f => ({...f, name: e.target.value}))}/>
+                  <label>연락처</label>
+                  <input className="inp" placeholder="010-0000-0000" value={gbjForm.phone}
+                    onChange={e => setGbjForm(f => ({...f, phone: e.target.value}))}/>
+                  <label>문의 내용</label>
+                  <textarea className="inp" placeholder="강의 주제와 일정을 적어 주세요"
+                    value={gbjForm.message}
+                    onChange={e => setGbjForm(f => ({...f, message: e.target.value}))}/>
+                  {gbjErr && <div style={{color:'#e05555',fontSize:'14px',marginTop:'12px'}}>{gbjErr}</div>}
+                  <button className="btn" type="submit" disabled={gbjSubmitting}>
+                    {gbjSubmitting ? '전송 중…' : '문의 보내기'}
+                  </button>
+                  <div className="note">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{width:14,height:14,verticalAlign:-2,marginRight:6}}>
+                      <rect x="2.5" y="5" width="19" height="14" rx="2.5"/>
+                      <path d="M3 7l9 6 9-6"/>
+                    </svg>
+                    전송 시 길봉조 대표님께 알림이 발송됩니다
+                  </div>
+                </>
+              )}
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <div className="ft">PIUM 전문가 프로필 · 이음미디어 &nbsp;|&nbsp; eummedia.kr/pium-app/gilbongjo</div>
+    </div>
+  );
+}
+
 /* ── 메인 컴포넌트 ── */
 export default function PiumAppDetailPage() {
   const { slug } = useParams();
@@ -3348,6 +3960,7 @@ export default function PiumAppDetailPage() {
   if (slug === "leekwangwoo")  return <LeekwangwooPage />;
   if (slug === "choiilrye")    return <ChoiilryePage />;
   if (slug === "leemoontae")   return <LeeMoontaePage />;
+  if (slug === "gilbongjo")    return <GilBongJoPage />;
 
   const app = APPS[slug];
 
