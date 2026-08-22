@@ -38,3 +38,4 @@ test-*.js
 
 .vercel
 .env*
+public/pium-app/gilbongjo/_orig/

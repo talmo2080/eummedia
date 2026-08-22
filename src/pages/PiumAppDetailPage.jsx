@@ -3339,205 +3339,15 @@ function LeeMoontaePage() {
   );
 }
 
+
 /* ══════════════════════════════════════
    길봉조 대표 프로필 — /pium-app/gilbongjo
 ══════════════════════════════════════ */
-const GBJ_SLIDES=['/pium-app/gilbongjo/slide01.jpg','/pium-app/gilbongjo/slide02.jpg','/pium-app/gilbongjo/slide03.jpg'];
-const GBJ_BOOKS=[
-  {img:'/pium-app/gilbongjo/book01.jpg',t:'유비오맥파 사용설명서'},
-  {img:'/pium-app/gilbongjo/book02.jpg',t:'현장에서 바로쓰는 맥파상담 멘트집'},
-  {img:'/pium-app/gilbongjo/book03.jpg',t:'혈관 스트레스 측정 맥파검사 200% 활용법'},
-  {img:'/pium-app/gilbongjo/book04.jpg',t:'유비오맥파, 건강을 바꾸는 비밀병기'},
-  {img:'/pium-app/gilbongjo/book05.jpg',t:'음이온 공기청정기 아비테가 좋은 10가지 이유'},
-  {img:'/pium-app/gilbongjo/book06.jpg',t:'인생소금'},
-  {img:'/pium-app/gilbongjo/book07.jpg',t:'내 인생의 에코시즌'},
-];
-const GBJ_ACTS=[
-  {s:'/pium-app/gilbongjo/act-class.jpg',c:'현장 강의 — 측정 기반 건강상담 교육'},
-  {s:'/pium-app/gilbongjo/act-device.jpg',c:'손끝에서 시작되는 유비오맥파 측정'},
-];
-const GBJ_SHORTS=[];
-const GBJ_CSS=`
-.gbj-wrap *{margin:0;padding:0;box-sizing:border-box}
-.gbj-wrap{
- --bg:#06101e;--card:#0b1a2e;--line:#162540;
- --am:#1e90d6;--am2:#5ab8e8;--amd:#1a4a6a;
- --tx:#e8f4fd;--sub:#8ab0cc;--dim:#5a7a99;
- font-family:'Pretendard','Noto Sans KR',sans-serif;
- background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;
-}
-.gbj-wrap *{box-sizing:border-box}
-.gbj-wrap section{position:relative;z-index:1}
-.gbj-wrap .wrap{max-width:1180px;margin:0 auto;padding:0 44px}
-.gbj-wrap .sec{padding:100px 0}
-.gbj-wrap .sec-h{font-size:12px;font-weight:800;letter-spacing:.24em;color:var(--am);margin-bottom:14px}
-.gbj-wrap .sec-t{font-size:38px;font-weight:900;letter-spacing:-.02em;line-height:1.25}
-.gbj-wrap .sec-d{font-size:16px;color:var(--sub);margin-top:14px;line-height:1.75}
-.gbj-wrap .hero{position:relative;min-height:780px;display:flex;align-items:center;overflow:hidden;
- background:radial-gradient(1200px 720px at 76% -12%,#0e2040 0%,#06101e 62%)}
-.gbj-wrap .hero .grid{position:absolute;inset:0;
- background-image:linear-gradient(rgba(30,144,214,.07) 1px,transparent 1px),
-  linear-gradient(90deg,rgba(30,144,214,.07) 1px,transparent 1px);
- background-size:52px 52px;
- mask-image:radial-gradient(900px 620px at 72% 30%,#000,transparent 78%)}
-.gbj-wrap .hero .orb{position:absolute;right:-160px;top:-120px;width:720px;height:720px;
- border-radius:50%;background:radial-gradient(circle,rgba(30,144,214,.14),transparent 62%);filter:blur(30px)}
-.gbj-wrap .hero-in{position:relative;z-index:2;display:flex;gap:60px;align-items:flex-start;width:100%;padding-top:80px;padding-bottom:80px}
-.gbj-wrap .hero-L{flex:1;min-width:0;padding-top:40px}
-.gbj-wrap .kick{font-size:13px;font-weight:800;letter-spacing:.22em;color:var(--am)}
-.gbj-wrap .nm{font-size:88px;font-weight:900;letter-spacing:-.03em;line-height:1;margin-top:18px}
-.gbj-wrap .en{font-size:17px;font-weight:500;letter-spacing:.3em;color:var(--sub);margin-top:14px}
-.gbj-wrap .rule{width:64px;height:3px;background:var(--am);border-radius:2px;margin:26px 0}
-.gbj-wrap .tag{font-size:22px;font-weight:700;line-height:1.55;color:#e8f4fd}
-.gbj-wrap .tag em{font-style:normal;color:var(--am)}
-.gbj-wrap .tag small{display:block;font-size:16px;font-weight:500;color:var(--sub);margin-top:8px}
-.gbj-wrap .pills{display:flex;gap:9px;flex-wrap:wrap;margin-top:26px}
-.gbj-wrap .pill{border:1.2px solid var(--amd);color:var(--am2);border-radius:999px;padding:8px 17px;font-size:14px;font-weight:600}
-.gbj-wrap .hero-R{width:380px;flex-shrink:0}
-.gbj-wrap .sld-box{width:380px;margin-bottom:14px}
-.gbj-wrap .sld-track-wrap{overflow:hidden;border-radius:14px;position:relative}
-.gbj-wrap .sld-track{display:flex;transition:transform .45s cubic-bezier(.4,0,.2,1)}
-.gbj-wrap .sld-track img{width:380px;height:260px;object-fit:cover;flex-shrink:0;display:block}
-.gbj-wrap .sld-dots{display:flex;justify-content:center;gap:7px;margin-top:10px}
-.gbj-wrap .sld-dot{width:8px;height:8px;border-radius:50%;background:var(--amd);border:none;cursor:pointer;padding:0}
-.gbj-wrap .sld-dot.on{background:var(--am)}
-.gbj-wrap .photo{width:380px;height:460px;border-radius:16px;position:relative;overflow:hidden}
-.gbj-wrap .photo img{width:100%;height:100%;object-fit:cover;display:block}
-.gbj-wrap .photo::before{content:'';position:absolute;inset:0;z-index:1;border-radius:16px;pointer-events:none;
- background:linear-gradient(180deg,rgba(6,16,30,.10) 0%,transparent 34%,rgba(6,16,30,.40) 86%,rgba(6,16,30,.62) 100%)}
-.gbj-wrap .back-btn{position:absolute;top:24px;left:44px;z-index:10;display:inline-flex;align-items:center;gap:6px;
- color:var(--sub);text-decoration:none;font-size:14px;font-weight:600;
- background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
- padding:8px 16px;border-radius:99px;transition:background .2s}
-.gbj-wrap .back-btn:hover{background:rgba(255,255,255,.1)}
-/* 기사 섹션 */
-.gbj-wrap .press-lead{font-size:20px;font-weight:700;color:var(--am2);line-height:1.7;margin-bottom:32px}
-.gbj-wrap .press-body{display:flex;flex-direction:column;gap:0}
-.gbj-wrap .press-ch{font-size:22px;font-weight:900;letter-spacing:-.02em;margin:40px 0 16px;color:var(--tx);border-left:4px solid var(--am);padding-left:18px}
-.gbj-wrap .press-ch:first-child{margin-top:0}
-.gbj-wrap .press-p{font-size:16px;line-height:1.9;color:#b8d0e8;margin-bottom:18px}
-.gbj-wrap .press-q{border-left:3px solid var(--am);padding:20px 28px;margin:28px 0;background:rgba(30,144,214,.07);border-radius:0 12px 12px 0}
-.gbj-wrap .press-q p{font-size:18px;font-weight:700;font-style:italic;color:var(--am2);line-height:1.65}
-.gbj-wrap .press-q cite{display:block;font-size:13px;color:var(--dim);margin-top:10px;font-style:normal}
-.gbj-wrap .press-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin:16px 0 24px}
-.gbj-wrap .press-list li{font-size:15px;color:#b8d0e8;line-height:1.7;padding-left:18px;position:relative}
-.gbj-wrap .press-list li::before{content:'▶';position:absolute;left:0;color:var(--am);font-size:11px;top:5px}
-/* 철학 */
-.gbj-wrap .phil-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
-.gbj-wrap .phil-c{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:32px 28px}
-.gbj-wrap .phil-ic{font-size:28px;margin-bottom:16px}
-.gbj-wrap .phil-q{font-size:18px;font-weight:800;line-height:1.55;color:var(--am2);margin-bottom:14px}
-.gbj-wrap .phil-d{font-size:14px;color:var(--sub);line-height:1.75}
-/* 전문분야 */
-.gbj-wrap .exp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:36px}
-.gbj-wrap .exp-c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 24px}
-.gbj-wrap .exp-ic{width:44px;height:44px;border-radius:12px;background:rgba(30,144,214,.15);
- display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px}
-.gbj-wrap .exp-t{font-size:16px;font-weight:800;margin-bottom:8px}
-.gbj-wrap .exp-d{font-size:13px;color:var(--sub);line-height:1.7}
-/* 방송 */
-.gbj-wrap .air-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:36px}
-.gbj-wrap .air-c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 24px;display:flex;flex-direction:column;gap:10px}
-.gbj-wrap .air-badge{font-size:11px;font-weight:800;letter-spacing:.1em;background:rgba(30,144,214,.18);color:var(--am2);padding:4px 10px;border-radius:99px;display:inline-block;width:fit-content}
-.gbj-wrap .air-ch{font-size:18px;font-weight:800;color:var(--am2)}
-.gbj-wrap .air-ep{font-size:14px;color:var(--sub);line-height:1.6}
-/* 저서 */
-.gbj-wrap .shelf{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:36px}
-.gbj-wrap .bk{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.gbj-wrap .bk img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
-.gbj-wrap .bk-t{font-size:13px;font-weight:700;line-height:1.5;padding:12px 14px;color:var(--tx)}
-/* 현장 */
-.gbj-wrap .site-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:36px}
-.gbj-wrap .site-c{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:16/9}
-.gbj-wrap .site-c img{width:100%;height:100%;object-fit:cover;display:block}
-.gbj-wrap .site-cap{position:absolute;bottom:0;left:0;right:0;padding:20px 20px 18px;
- background:linear-gradient(transparent,rgba(6,16,30,.85));font-size:14px;font-weight:700;color:#e8f4fd}
-/* 숏츠 */
-.gbj-wrap .car{overflow:hidden;margin-top:32px}
-.gbj-wrap .track{display:flex;transition:transform .45s cubic-bezier(.4,0,.2,1)}
-.gbj-wrap .slide{flex:0 0 100%;width:100%}
-.gbj-wrap .shorts{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;--shgap:16px}
-.gbj-wrap .sh{display:block;text-decoration:none;border-radius:14px;overflow:hidden;background:var(--card)}
-.gbj-wrap .th{position:relative;aspect-ratio:9/16;overflow:hidden}
-.gbj-wrap .th img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
-.gbj-wrap .sh:hover .th img{transform:scale(1.06)}
-.gbj-wrap .pl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
- background:rgba(6,16,30,.35)}
-.gbj-wrap .pl i{font-style:normal;font-size:32px;color:#fff;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
-.gbj-wrap .nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:24px}
-.gbj-wrap .arw{background:rgba(30,144,214,.15);border:1px solid var(--amd);color:var(--am2);
- width:42px;height:42px;border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.gbj-wrap .arw:hover{background:rgba(30,144,214,.3)}
-.gbj-wrap .dots{display:flex;gap:8px}
-.gbj-wrap .dot{width:9px;height:9px;border-radius:50%;background:var(--amd);border:none;cursor:pointer;padding:0}
-.gbj-wrap .dot.on{background:var(--am)}
-/* 채널 */
-.gbj-wrap .chs{display:flex;flex-direction:column;gap:12px;margin-top:32px}
-.gbj-wrap .ch{display:flex;align-items:center;gap:16px;padding:18px 24px;
- background:var(--card);border:1px solid var(--line);border-radius:14px;
- text-decoration:none;color:var(--tx);transition:border-color .2s}
-.gbj-wrap .ch:hover{border-color:var(--am)}
-.gbj-wrap .ch .d{width:40px;height:40px;border-radius:10px;background:rgba(30,144,214,.15);
- display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--am2);flex-shrink:0}
-.gbj-wrap .ch b{display:block;font-size:16px;font-weight:700}
-.gbj-wrap .ch span{font-size:12px;color:var(--sub)}
-/* 문의 */
-.gbj-wrap .ct{background:rgba(11,26,46,.52)}
-.gbj-wrap .ctwrap{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:40px}
-.gbj-wrap .info{list-style:none;display:flex;flex-direction:column;gap:18px}
-.gbj-wrap .info li{display:flex;gap:14px;font-size:16px;line-height:1.6}
-.gbj-wrap .info span{color:var(--am);font-weight:700;min-width:72px;font-size:14px;padding-top:2px}
-.gbj-wrap .form{display:flex;flex-direction:column;gap:14px}
-.gbj-wrap label{font-size:13px;font-weight:700;color:var(--sub)}
-.gbj-wrap .inp{background:rgba(255,255,255,.06);border:1px solid var(--line);
- border-radius:10px;padding:14px 16px;font-size:15px;color:var(--tx);
- font-family:inherit;width:100%;transition:border-color .2s;resize:none}
-.gbj-wrap .inp:focus{outline:none;border-color:var(--am)}
-.gbj-wrap textarea.inp{min-height:120px}
-.gbj-wrap .btn{background:var(--am);color:#fff;border:none;border-radius:10px;padding:16px;
- font-size:16px;font-weight:800;cursor:pointer;transition:opacity .2s;font-family:inherit}
-.gbj-wrap .btn:hover{opacity:.85}
-.gbj-wrap .btn:disabled{opacity:.5;cursor:not-allowed}
-.gbj-wrap .note{font-size:12px;color:var(--dim);text-align:center;line-height:1.6}
-.gbj-wrap .ft{text-align:center;padding:48px 24px;font-size:12px;color:var(--dim)}
-/* 한눈에 보기 테이블 */
-.gbj-wrap .sum-table{width:100%;border-collapse:collapse;margin-top:36px}
-.gbj-wrap .sum-table th,.gbj-wrap .sum-table td{padding:16px 20px;text-align:left;border-bottom:1px solid var(--line);font-size:15px;line-height:1.7}
-.gbj-wrap .sum-table th{width:140px;font-size:13px;font-weight:800;color:var(--am);vertical-align:top}
-.gbj-wrap .sum-table td{color:#b8d0e8}
-/* 반응형 */
-@media(max-width:900px){
- .gbj-wrap .wrap{padding:0 20px}
- .gbj-wrap .sec{padding:64px 0}
- .gbj-wrap .hero-in{flex-direction:column;gap:32px;padding-top:60px}
- .gbj-wrap .hero-R,.gbj-wrap .sld-box,.gbj-wrap .sld-track img,.gbj-wrap .photo{width:100%}
- .gbj-wrap .nm{font-size:56px}
- .gbj-wrap .sec-t{font-size:28px}
- .gbj-wrap .phil-grid,.gbj-wrap .exp-grid,.gbj-wrap .air-grid{grid-template-columns:1fr}
- .gbj-wrap .shelf{grid-template-columns:repeat(2,1fr)}
- .gbj-wrap .site-grid{grid-template-columns:1fr}
- .gbj-wrap .ctwrap{grid-template-columns:1fr;gap:36px}
- .gbj-wrap .shorts{grid-template-columns:repeat(2,1fr)}
- .gbj-wrap .back-btn{left:20px}
-}
-`;
-
 function GilBongJoPage() {
-  const [slideIdx, setSlideIdx] = useState(0);
-  const [shIdx, setShIdx] = useState(0);
   const [gbjForm, setGbjForm] = useState({name:'',phone:'',message:''});
   const [gbjSubmitting, setGbjSubmitting] = useState(false);
   const [gbjSubmitted, setGbjSubmitted] = useState(false);
   const [gbjErr, setGbjErr] = useState('');
-
-  const SPER = 4;
-  const shSlides = GBJ_SHORTS.length > 0 ? Math.ceil(GBJ_SHORTS.length / SPER) : 0;
-
-  useEffect(() => {
-    if (GBJ_SLIDES.length < 2) return;
-    const t = setInterval(() => setSlideIdx(i => (i+1) % GBJ_SLIDES.length), 4000);
-    return () => clearInterval(t);
-  }, []);
 
   async function handleGbjSubmit(e) {
     e.preventDefault();
@@ -3549,12 +3359,12 @@ function GilBongJoPage() {
     try {
       const res = await fetch('/api/gbj-lecture-inquiry', {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({...gbjForm, speaker:'길봉조'}),
+        body: JSON.stringify(gbjForm),
       });
       if (!res.ok) throw new Error('서버 오류');
       setGbjSubmitted(true);
     } catch {
-      setGbjErr('전송에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      setGbjErr('전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setGbjSubmitting(false);
     }
@@ -3562,391 +3372,396 @@ function GilBongJoPage() {
 
   return (
     <div className="gbj-wrap">
-      <style>{GBJ_CSS}</style>
+      <style>{`
+.gbj-wrap *{margin:0;padding:0;box-sizing:border-box}
+.gbj-wrap{--ink:#0B1E3A;--ink2:#33455F;--mut:#6E809A;--blue:#1668E3;--paper:#FFFFFF;--tint:#F3F7FC;--line:#DCE7F4;--gap:26px;background:var(--paper);color:var(--ink);font-family:'Noto Sans CJK KR','Noto Sans KR',sans-serif;-webkit-font-smoothing:antialiased}
+.gbj-wrap .wrap{max-width:1180px;margin:0 auto;padding:0 40px}
+.gbj-wrap .sec{padding:92px 0}
+.gbj-wrap .sec.sky{background:#E7F0FB}
+.gbj-wrap .sec.navy{background:var(--ink);color:#fff}
+.gbj-wrap .sec.navy .sec-t{color:#fff}
+.gbj-wrap .sec.navy .sec-d{color:#B9CDE6}
+.gbj-wrap .sec.navy .sec-h{color:#7FB2F5}
+.gbj-wrap .sec.navy .ex,.gbj-wrap .sec.navy .ch,.gbj-wrap .sec.navy .tvi,.gbj-wrap .sec.navy .box{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16)}
+.gbj-wrap .sec.navy .ch b,.gbj-wrap .sec.navy .box{color:#fff}
+.gbj-wrap .sec.navy .ch span,.gbj-wrap .sec.navy .ex li{color:#B9CDE6}
+.gbj-wrap .sec.navy .ch .d{background:rgba(255,255,255,.10);color:#8FC0FA}
+.gbj-wrap .sec.navy .hold{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.22);color:#9FBEE2}
+.gbj-wrap .sec.navy .q p{color:#D6E4F7}
+.gbj-wrap .sec.navy .qbig{color:#fff}
+.gbj-wrap .sec.navy .qbig em{background:linear-gradient(transparent 62%,rgba(34,116,220,.55) 62%)}
+.gbj-wrap .sec-h{font-size:12px;font-weight:800;letter-spacing:.26em;color:var(--blue);margin-bottom:14px}
+.gbj-wrap .sec-t{font-size:34px;font-weight:800;letter-spacing:-.02em}
+.gbj-wrap .sec-d{margin-top:14px;font-size:16px;color:var(--mut);line-height:1.85;max-width:660px;word-break:keep-all}
+.gbj-wrap .wave{display:block;width:100%;height:24px;opacity:.45}
+.gbj-wrap .need{display:inline-block;background:#FFE08A;color:#6A4A00;font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;margin-left:7px;vertical-align:2px}
+.gbj-wrap .hold{border:2px dashed var(--line);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:14px;font-weight:700;text-align:center;line-height:1.6;background:#fff}
+.gbj-wrap .hero{background:#EEF3FA}
+.gbj-wrap .heroimg{width:100%;display:block}
+.gbj-wrap .hero-b{background:var(--ink);color:#fff;padding:32px 0}
+.gbj-wrap .hero-b .wrap{display:flex;align-items:center;gap:34px;flex-wrap:wrap}
+.gbj-wrap .nm{line-height:1}
+.gbj-wrap .sig{display:block}
+.gbj-wrap .nm small{display:block;font-size:12px;font-weight:700;letter-spacing:.3em;color:#7FB2F5;margin-bottom:12px}
+.gbj-wrap .hbar{width:1px;height:54px;background:rgba(255,255,255,.22)}
+.gbj-wrap .role{font-size:17px;line-height:1.6;color:#D6E4F7}
+.gbj-wrap .role b{color:#fff;font-weight:700}
+.gbj-wrap .pills{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.gbj-wrap .pill{border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:8px 15px;font-size:13px;color:#DCE9FA}
+.gbj-wrap .press{text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:16px;background:#fff;padding:26px 30px;display:flex;align-items:center;gap:22px;margin-top:30px;box-shadow:0 10px 30px rgba(11,30,58,.06)}
+.gbj-wrap .press .ic{width:44px;height:44px;flex:0 0 44px;border-radius:11px;background:#E8F1FE;display:flex;align-items:center;justify-content:center;color:var(--blue)}
+.gbj-wrap .press .tx b{display:block;font-size:18px;font-weight:700;line-height:1.5}
+.gbj-wrap .press .tx span{display:block;margin-top:7px;font-size:13px;color:var(--mut)}
+.gbj-wrap .press .go{margin-left:auto;white-space:nowrap;font-size:14px;font-weight:700;color:var(--blue)}
+.gbj-wrap .qbig{font-size:40px;font-weight:800;line-height:1.45;letter-spacing:-.03em;word-break:keep-all;max-width:900px}
+.gbj-wrap .qbig em{font-style:normal;background:linear-gradient(transparent 62%,#BFE0FA 62%)}
+.gbj-wrap .qlist{margin-top:50px;display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);max-width:900px}
+.gbj-wrap .q{border-left:3px solid var(--blue);padding:6px 0 6px 20px}
+.gbj-wrap .q p{font-size:17px;line-height:1.75;color:var(--ink2);word-break:keep-all}
+.gbj-wrap .acc{margin-top:44px;border-top:1px solid var(--line)}
+.gbj-wrap .acc details{border-bottom:1px solid var(--line)}
+.gbj-wrap .acc summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:20px;padding:30px 4px}
+.gbj-wrap .acc summary::-webkit-details-marker{display:none}
+.gbj-wrap .acc .no{flex:0 0 34px;font-size:12px;font-weight:800;letter-spacing:.14em;color:var(--blue)}
+.gbj-wrap .acc .h{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.gbj-wrap .acc .cnt{font-size:13px;font-weight:700;color:var(--mut);background:var(--tint);border-radius:999px;padding:5px 13px}
+.gbj-wrap .acc .arw{margin-left:auto;font-size:13px;color:var(--blue);font-weight:800;display:flex;align-items:center;gap:8px}
+.gbj-wrap .acc details[open] .arw i{transform:rotate(180deg)}
+.gbj-wrap .acc .arw i{font-style:normal;display:inline-block;transition:transform .2s}
+.gbj-wrap .acc .body{padding:4px 4px 38px 54px}
+.gbj-wrap .tl{border-left:2px solid var(--line);padding-left:30px}
+.gbj-wrap .tl .it{position:relative;padding:0 0 26px}
+.gbj-wrap .tl .it:last-child{padding-bottom:0}
+.gbj-wrap .tl .it:before{content:'';position:absolute;left:-38px;top:6px;width:11px;height:11px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 4px #fff}
+.gbj-wrap .tl .it.now:before{background:#fff;border:3px solid var(--blue)}
+.gbj-wrap .tl .yr{font-size:12px;font-weight:800;letter-spacing:.14em;color:var(--blue)}
+.gbj-wrap .tl .h2{margin-top:5px;font-size:18px;font-weight:700;line-height:1.5;word-break:keep-all}
+.gbj-wrap .two{display:grid;grid-template-columns:1fr 1fr;gap:36px}
+.gbj-wrap .two h5{font-size:12px;font-weight:800;letter-spacing:.2em;color:var(--blue);margin-bottom:14px}
+.gbj-wrap .two li{list-style:none;font-size:15px;line-height:1.95;color:var(--ink2);padding-left:14px;position:relative;word-break:keep-all}
+.gbj-wrap .two li:before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;border-radius:50%;background:#9DBBE0}
+.gbj-wrap .tv{margin-top:44px;display:grid;grid-template-columns:1fr 1fr;gap:14px 26px}
+.gbj-wrap .tvi{display:flex;align-items:flex-start;gap:16px;padding:18px 20px;background:#fff;border:1px solid var(--line);border-radius:13px}
+.gbj-wrap .tvi .ch{flex:0 0 76px;font-size:12px;font-weight:800;color:#fff;background:var(--ink);border-radius:6px;padding:5px 0;text-align:center;letter-spacing:.02em}
+.gbj-wrap .tvi .t{font-size:15px;font-weight:700;line-height:1.55;word-break:keep-all}
+.gbj-wrap .tvi .t span{display:block;margin-top:4px;font-size:12.5px;font-weight:500;color:var(--mut)}
+.gbj-wrap .bkhead{display:grid;grid-template-columns:1fr 280px;gap:52px;align-items:center}
+.gbj-wrap .bkhead .ph{border-radius:18px;overflow:hidden;aspect-ratio:3/4;background:#DDE7F3;box-shadow:0 20px 44px rgba(11,30,58,.18)}
+.gbj-wrap .bkhead .ph img{width:100%;height:100%;object-fit:cover;object-position:center 18%;display:block}
+.gbj-wrap .bkhead .cap{margin-top:14px;font-size:13px;color:var(--mut);line-height:1.6;text-align:center}
+.gbj-wrap .bkhead .cap b{display:block;color:var(--ink);font-size:15px;font-weight:800;margin-bottom:4px}
+.gbj-wrap .books{display:grid;grid-template-columns:repeat(2,1fr);gap:32px 40px;margin-top:48px}
+.gbj-wrap .bk{display:flex;align-items:center;gap:26px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px 30px;box-shadow:0 10px 30px rgba(11,30,58,.05)}
+.gbj-wrap .bk .im{width:170px;flex:0 0 170px;height:225px;display:flex;align-items:center;justify-content:center}
+.gbj-wrap .bk img{max-height:225px;max-width:100%;width:auto;display:block;filter:drop-shadow(0 14px 26px rgba(11,30,58,.22))}
+.gbj-wrap .bk .no{font-size:11px;font-weight:800;letter-spacing:.2em;color:var(--blue)}
+.gbj-wrap .bk .t{margin-top:9px;font-size:18px;font-weight:800;line-height:1.45;word-break:keep-all}
+.gbj-wrap .bk .s{margin-top:11px;font-size:13px;color:var(--mut);line-height:1.7;word-break:keep-all}
+.gbj-wrap .bk.soon{border-style:dashed;background:transparent;box-shadow:none;justify-content:center;text-align:center;min-height:277px}
+.gbj-wrap .bk.soon .t{color:var(--mut);font-weight:700;font-size:16px;margin:0}
+.gbj-wrap .vids{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:44px}
+.gbj-wrap .vids .hold{aspect-ratio:16/9}
+.gbj-wrap .shorts{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:44px;max-width:620px}
+.gbj-wrap .shorts .hold{aspect-ratio:9/16}
+.gbj-wrap .exg{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:44px}
+.gbj-wrap .ex{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px}
+.gbj-wrap .ex h4{font-size:12px;font-weight:800;letter-spacing:.2em;color:var(--blue);margin-bottom:16px}
+.gbj-wrap .ex li{list-style:none;font-size:14.5px;line-height:1.85;color:var(--ink2);padding-left:14px;position:relative;word-break:keep-all}
+.gbj-wrap .ex li:before{content:'';position:absolute;left:0;top:11px;width:5px;height:5px;border-radius:50%;background:#9DBBE0}
+.gbj-wrap .acts{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);margin-top:44px}
+.gbj-wrap .act .im{aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#DDE7F3}
+.gbj-wrap .act .im img{width:100%;height:100%;object-fit:cover;display:block}
+.gbj-wrap .act .cp{margin-top:14px;font-size:14px;color:var(--ink2);line-height:1.6}
+.gbj-wrap .class{margin-top:40px;background:var(--ink);color:#fff;border-radius:16px;padding:28px 34px;display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.gbj-wrap .class .k{font-size:12px;font-weight:800;letter-spacing:.2em;color:#7FB2F5}
+.gbj-wrap .class .v{font-size:24px;font-weight:800;margin-top:6px}
+.gbj-wrap .class .w{margin-left:auto;font-size:14px;color:#C7DAF2;line-height:1.7}
+.gbj-wrap .chs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.gbj-wrap .ch{text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:13px;padding:18px 20px;display:flex;align-items:center;gap:14px;background:#fff}
+.gbj-wrap .ch .d{width:36px;height:36px;flex:0 0 36px;border-radius:9px;background:var(--tint);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--blue)}
+.gbj-wrap .ch b{display:block;font-size:15px;font-weight:700}
+.gbj-wrap .ch span{display:block;font-size:12px;color:var(--mut);margin-top:3px}
+.gbj-wrap .ct{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:44px}
+.gbj-wrap .ct .box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:30px}
+.gbj-wrap .ct .row{display:flex;gap:14px;padding:11px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.gbj-wrap .ct .row:last-child{border:0}
+.gbj-wrap .ct .row .k{flex:0 0 84px;color:var(--mut);font-size:13px;font-weight:700;padding-top:2px}
+.gbj-wrap .fld{width:100%;height:44px;border:1px solid var(--line);border-radius:9px;margin-top:12px;background:#F8FAFD;padding:0 12px;font-size:15px;font-family:inherit;color:var(--ink)}
+.gbj-wrap .fld.tall{height:104px;padding:10px 12px;resize:vertical}
+.gbj-wrap .btn{margin-top:16px;height:50px;border-radius:10px;background:var(--blue);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:16px;border:none;cursor:pointer;width:100%;font-family:inherit}
+.gbj-wrap .btn:disabled{opacity:.6;cursor:not-allowed}
+.gbj-wrap .gbj-err{margin-top:10px;font-size:13px;color:#c0392b}
+.gbj-wrap .gbj-ok{margin-top:10px;font-size:14px;color:#1668E3;font-weight:700}
+.gbj-wrap img{max-width:100%}
+.gbj-wrap .bk>div,.gbj-wrap .tvi .t,.gbj-wrap .press .tx,.gbj-wrap .ch>div{min-width:0}
+@media(max-width:1024px){
+.gbj-wrap .wrap{padding:0 28px}
+.gbj-wrap .sec{padding:72px 0}
+.gbj-wrap .sec-t{font-size:29px}
+.gbj-wrap .qbig{font-size:32px}
+.gbj-wrap .qlist{grid-template-columns:1fr;gap:20px}
+.gbj-wrap .tv{grid-template-columns:1fr}
+.gbj-wrap .books{grid-template-columns:1fr}
+.gbj-wrap .bkhead{grid-template-columns:1fr 230px;gap:34px}
+.gbj-wrap .exg{grid-template-columns:1fr 1fr}
+.gbj-wrap .chs{grid-template-columns:1fr 1fr}
+.gbj-wrap .acts{grid-template-columns:1fr 1fr}
+.gbj-wrap .ct{grid-template-columns:1fr;gap:28px}
+}
+@media(max-width:640px){
+.gbj-wrap .wrap{padding:0 20px}
+.gbj-wrap .sec{padding:54px 0}
+.gbj-wrap .sec-h{font-size:11px;margin-bottom:11px}
+.gbj-wrap .sec-t{font-size:24px}
+.gbj-wrap .sec-d{font-size:15px}
+.gbj-wrap .hero-b{padding:26px 0}
+.gbj-wrap .hero-b .wrap{flex-direction:column;align-items:flex-start;gap:18px}
+.gbj-wrap .hbar{display:none}
+.gbj-wrap .pills{margin-left:0}
+.gbj-wrap .pill{font-size:12px;padding:7px 13px}
+.gbj-wrap .press{flex-direction:column;align-items:flex-start;gap:16px;padding:22px}
+.gbj-wrap .press .go{margin-left:0}
+.gbj-wrap .press .tx b{font-size:16px}
+.gbj-wrap .qbig{font-size:26px;line-height:1.5}
+.gbj-wrap .acc summary{gap:12px;padding:22px 2px;flex-wrap:wrap}
+.gbj-wrap .acc .h{font-size:19px}
+.gbj-wrap .acc .cnt{font-size:12px;padding:4px 10px}
+.gbj-wrap .acc .arw{font-size:12px;width:100%;margin-left:0;justify-content:flex-start}
+.gbj-wrap .acc .body{padding:0 2px 30px 4px}
+.gbj-wrap .tl{padding-left:22px}
+.gbj-wrap .tl .it:before{left:-28px}
+.gbj-wrap .tl .h2{font-size:16px}
+.gbj-wrap .two{grid-template-columns:1fr;gap:24px}
+.gbj-wrap .tvi{padding:16px}
+.gbj-wrap .tvi .ch{flex:0 0 62px;font-size:11px}
+.gbj-wrap .bkhead{grid-template-columns:1fr;gap:26px}
+.gbj-wrap .bkhead .ph{max-width:230px;margin:0 auto}
+.gbj-wrap .bk{flex-direction:column;align-items:flex-start;gap:18px;padding:22px}
+.gbj-wrap .bk .im{width:auto;flex:none;height:auto;justify-content:flex-start}
+.gbj-wrap .bk img{max-height:200px}
+.gbj-wrap .bk .t{font-size:17px}
+.gbj-wrap .bk.soon{min-height:140px;align-items:center;justify-content:center}
+.gbj-wrap .vids{grid-template-columns:1fr}
+.gbj-wrap .shorts{grid-template-columns:1fr 1fr;max-width:none;gap:14px}
+.gbj-wrap .exg{grid-template-columns:1fr}
+.gbj-wrap .acts{grid-template-columns:1fr}
+.gbj-wrap .chs{grid-template-columns:1fr}
+.gbj-wrap .class{flex-direction:column;align-items:flex-start;gap:16px;padding:24px}
+.gbj-wrap .class .v{font-size:20px}
+.gbj-wrap .class .w{margin-left:0}
+.gbj-wrap .ct .box{padding:24px}
+.gbj-wrap .ct .row{flex-direction:column;gap:4px}
+.gbj-wrap .ct .row .k{flex:none}
+}
+      `}</style>
 
-      {/* 히어로 */}
-      <section className="hero">
-        <div className="grid"/>
-        <div className="orb"/>
-        <a className="back-btn" href="/pium-store">← 스토어로 돌아가기</a>
-        <div className="wrap" style={{width:'100%'}}>
-          <div className="hero-in">
-            <div className="hero-L">
-              <div className="kick">PIUM 전문가 프로필 · 이음미디어</div>
-              <div className="nm">길봉조</div>
-              <div className="en">GIL BONG JO</div>
-              <div className="rule"/>
-              <div className="tag">
-                사람의 몸이 보내는 신호를<br/>
-                <em>대화로 잇는 사람</em>
-                <small>맥파바이오솔루션 대표 · 유비오맥파 맥파분석 전문가 · 건강 인생 코치</small>
-              </div>
-              <div className="pills">
-                <span className="pill">유비오맥파</span>
-                <span className="pill">HRV · APG 분석</span>
-                <span className="pill">건강상담 교육</span>
-                <span className="pill">현장 코칭</span>
-              </div>
-            </div>
-            <div className="hero-R">
-              {/* 슬라이드 캐러셀 */}
-              <div className="sld-box">
-                <div className="sld-track-wrap">
-                  <div className="sld-track" style={{transform:`translateX(${-100*slideIdx}%)`}}>
-                    {GBJ_SLIDES.map((s,i) => (
-                      <img key={i} src={s} alt={`길봉조 대표 ${i+1}`}/>
-                    ))}
-                  </div>
-                </div>
-                <div className="sld-dots">
-                  {GBJ_SLIDES.map((_,i) => (
-                    <button key={i} className={`sld-dot${i===slideIdx?' on':''}`} onClick={() => setSlideIdx(i)}/>
-                  ))}
-                </div>
-              </div>
-              {/* 프로필 사진 */}
-              <div className="photo">
-                <img src="/pium-app/gilbongjo/profile.jpg" alt="길봉조 대표 프로필"/>
-              </div>
-            </div>
+      {/* ① 히어로 */}
+      <section className="hero"><img className="heroimg" src="/pium-app/gilbongjo/hero.jpg" alt="사람의 몸이 보내는 신호를 대화로 잇는 사람 — 유비오맥파 길봉조 대표" /></section>
+      <div className="hero-b"><div className="wrap">
+        <div className="nm"><small>GIL BONG JO</small><svg className="sig" viewBox="-41 -854 1664 1097" style={{height:'64px',width:'97px'}}><defs><linearGradient id="sigG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#FFFFFF"/><stop offset="1" stopColor="#8FC0FA"/></linearGradient></defs><path d="M532 -775Q521 -690 511.0 -607.5Q501 -525 501 -440Q501 -439 499.0 -438.5Q497 -438 495 -436Q490 -431 488 -431Q486 -431 483.0 -435.5Q480 -440 479 -445Q468 -488 465.0 -533.0Q462 -578 464.5 -620.0Q467 -662 474.0 -698.0Q481 -734 490 -759Q492 -764 499.0 -769.5Q506 -775 510 -778Q514 -781 514.0 -781.5Q514 -782 517 -782Q519 -782 525.5 -779.5Q532 -777 532 -775ZM472 -302Q467 -291 458.0 -276.5Q449 -262 438.5 -247.5Q428 -233 417.5 -219.0Q407 -205 399 -195Q409 -200 433.0 -207.5Q457 -215 478 -216Q486 -217 494.0 -213.0Q502 -209 507 -207Q520 -203 530.0 -196.0Q540 -189 538 -176Q536 -167 529.5 -160.0Q523 -153 518 -143Q506 -119 489.5 -90.0Q473 -61 455.0 -30.5Q437 0 417.5 30.0Q398 60 380 85Q414 74 442.5 64.0Q471 54 499.5 44.5Q528 35 561.0 24.0Q594 13 638 -1Q645 -2 646.5 -1.5Q648 -1 653 -1Q653 4 648.5 8.0Q644 12 641 17Q635 24 629.5 33.5Q624 43 613 49Q552 83 484.0 112.5Q416 142 338 162Q330 160 325.0 151.5Q320 143 318 135Q316 130 319.5 125.5Q323 121 328 115Q330 111 331.5 106.5Q333 102 335 99Q373 41 410.0 -20.0Q447 -81 476 -141Q463 -139 444.0 -134.0Q425 -129 403.0 -122.5Q381 -116 359.0 -108.5Q337 -101 318 -94Q310 -97 307.0 -109.5Q304 -122 302 -133Q301 -137 303.0 -138.5Q305 -140 307 -145L311 -166Q321 -181 335.0 -198.5Q349 -216 363.5 -235.0Q378 -254 391.5 -272.5Q405 -291 414 -308Q419 -316 405 -315Q378 -313 347.0 -307.0Q316 -301 274 -288Q268 -290 268.5 -299.5Q269 -309 273 -320Q275 -324 278.5 -329.0Q282 -334 285 -341Q287 -346 289.5 -352.0Q292 -358 296 -360Q327 -374 361.5 -381.0Q396 -388 432 -378Q440 -376 445.5 -372.5Q451 -369 459 -364Q465 -362 470.5 -357.5Q476 -353 478 -346Q480 -341 483.0 -335.5Q486 -330 485 -324Q484 -318 479.5 -312.5Q475 -307 472 -302ZM255 -617Q248 -599 239.0 -572.0Q230 -545 221.0 -515.0Q212 -485 204.0 -454.0Q196 -423 191 -397Q189 -389 185 -382Q183 -379 181.0 -371.0Q179 -363 177 -361Q173 -353 171.5 -354.0Q170 -355 166 -361Q160 -380 160.0 -411.5Q160 -443 164.5 -478.0Q169 -513 177.0 -548.0Q185 -583 194 -611Q179 -607 158.0 -597.5Q137 -588 115.0 -577.0Q93 -566 74.0 -555.5Q55 -545 43 -538Q41 -537 35 -542Q32 -544 29.5 -543.5Q27 -543 24 -547Q18 -553 19 -555Q38 -568 60.5 -582.5Q83 -597 107.0 -609.5Q131 -622 155.5 -632.5Q180 -643 201 -648Q206 -649 210.5 -648.0Q215 -647 220 -647Q230 -648 238.5 -646.5Q247 -645 250 -641Q260 -631 255 -617Z" fill="url(#sigG)"/><path d="M897 -119Q919 -118 940 -113Q949 -113 955.5 -110.5Q962 -108 963 -103Q963 -101 960.0 -100.5Q957 -100 957 -96Q946 -91 935.0 -82.5Q924 -74 913 -72Q847 -57 773.5 -44.5Q700 -32 634 -23Q621 -21 610.0 -25.0Q599 -29 600 -45Q603 -51 608.0 -53.5Q613 -56 618 -60Q623 -64 628.0 -68.5Q633 -73 640 -75Q654 -80 670.0 -84.0Q686 -88 704 -93Q701 -108 699.0 -122.0Q697 -136 695 -147Q694 -174 698.0 -200.0Q702 -226 708.0 -251.0Q714 -276 721.0 -301.5Q728 -327 733 -354Q735 -366 740.5 -378.5Q746 -391 749 -405Q742 -405 736 -408Q724 -412 712.5 -423.5Q701 -435 700 -448Q699 -465 695.0 -484.5Q691 -504 691 -512Q691 -526 699.5 -534.5Q708 -543 719 -551Q733 -562 760.5 -569.5Q788 -577 813 -576Q831 -627 845.5 -678.5Q860 -730 874 -778Q876 -782 880.0 -785.5Q884 -789 887 -793Q889 -795 893.0 -793.5Q897 -792 899 -790Q902 -785 905.5 -776.5Q909 -768 911.5 -758.0Q914 -748 915.0 -739.0Q916 -730 915 -725Q904 -665 891.0 -606.0Q878 -547 855 -487Q851 -477 846.5 -467.0Q842 -457 837 -449Q829 -438 823.0 -430.5Q817 -423 808 -417Q797 -411 787 -408Q788 -337 770.0 -270.5Q752 -204 735 -140Q730 -123 724.5 -113.5Q719 -104 714 -96Q759 -107 807.0 -114.0Q855 -121 897 -119ZM895 -27Q904 -27 914.0 -28.5Q924 -30 929 -27Q937 -22 939.0 -12.0Q941 -2 939 9Q938 19 935.0 30.0Q932 41 927 51Q922 62 919.5 73.0Q917 84 909 95Q887 130 839 161Q827 168 805.5 176.0Q784 184 761 182Q753 181 746.5 178.0Q740 175 739 168Q737 159 738.0 151.0Q739 143 740 132Q740 125 739.0 117.0Q738 109 740 102Q742 92 745.0 83.0Q748 74 753 65Q763 48 779.5 25.5Q796 3 819 -16Q823 -20 827.0 -20.5Q831 -21 836 -24Q844 -28 852.5 -32.5Q861 -37 865 -37Q871 -34 866 -25Q874 -26 881.0 -26.5Q888 -27 895 -27ZM681 -400Q681 -396 669 -384Q665 -379 657.0 -375.5Q649 -372 645 -370Q638 -366 635.5 -373.5Q633 -381 627 -392Q621 -412 614.5 -441.5Q608 -471 605 -495Q605 -524 606.0 -554.0Q607 -584 609.5 -610.5Q612 -637 615.0 -658.0Q618 -679 622 -691Q627 -696 631.5 -699.0Q636 -702 639 -705Q643 -709 646 -710Q647 -711 650 -711Q656 -708 657.5 -703.5Q659 -699 661 -694Q663 -688 669.5 -680.0Q676 -672 677 -664Q671 -598 668.0 -535.5Q665 -473 669 -407Q669 -404 675.0 -403.5Q681 -403 681 -400ZM799 118Q815 114 829.0 104.5Q843 95 854.0 83.5Q865 72 872.5 60.5Q880 49 883 40Q884 37 880.0 35.0Q876 33 869.0 32.0Q862 31 853.0 30.5Q844 30 836 30Q824 55 814.0 78.5Q804 102 799 118ZM735 -528Q730 -521 731.5 -512.0Q733 -503 738.5 -495.0Q744 -487 751.0 -481.5Q758 -476 764 -476Q770 -476 774.5 -483.0Q779 -490 784 -500Q789 -512 794.0 -524.5Q799 -537 804 -551Q785 -549 764.0 -544.0Q743 -539 735 -528Z" fill="url(#sigG)"/><path d="M1244 -635Q1245 -612 1240.0 -585.0Q1235 -558 1226 -528Q1251 -528 1286.5 -528.0Q1322 -528 1360.0 -525.5Q1398 -523 1435.0 -517.5Q1472 -512 1501 -501Q1503 -498 1510.0 -496.0Q1517 -494 1517 -492Q1517 -484 1501 -481Q1429 -473 1357.5 -472.5Q1286 -472 1211 -484Q1189 -427 1158.5 -369.0Q1128 -311 1096 -262L1090 -267Q1088 -269 1088.5 -280.0Q1089 -291 1090.5 -305.0Q1092 -319 1094.5 -333.0Q1097 -347 1098 -355Q1109 -433 1136.5 -502.0Q1164 -571 1195 -634Q1174 -630 1152.5 -622.5Q1131 -615 1111.5 -607.5Q1092 -600 1076.5 -593.5Q1061 -587 1051 -584Q1037 -579 1020.5 -576.0Q1004 -573 991 -575Q983 -583 987.0 -594.5Q991 -606 997 -613Q1001 -617 1003.5 -624.0Q1006 -631 1017 -640Q1062 -672 1104.5 -686.0Q1147 -700 1198 -702Q1202 -702 1207.0 -696.5Q1212 -691 1217 -685Q1222 -680 1229.5 -675.0Q1237 -670 1241 -661Q1244 -655 1244.0 -649.0Q1244 -643 1244 -635ZM1560 -198Q1564 -196 1562.0 -193.0Q1560 -190 1561 -187Q1563 -179 1549 -170Q1538 -163 1529.5 -158.5Q1521 -154 1512.0 -149.5Q1503 -145 1492.5 -139.0Q1482 -133 1467 -124Q1403 -86 1339.5 -69.0Q1276 -52 1212 -39Q1206 -45 1206.0 -49.5Q1206 -54 1208 -59L1212 -73Q1226 -82 1244.0 -91.5Q1262 -101 1280 -109Q1280 -146 1281.0 -184.0Q1282 -222 1287.0 -258.5Q1292 -295 1302.5 -329.5Q1313 -364 1331 -396Q1335 -402 1337.0 -394.5Q1339 -387 1339 -380Q1339 -372 1344.0 -362.5Q1349 -353 1348 -345Q1342 -327 1338.0 -300.0Q1334 -273 1330.0 -242.5Q1326 -212 1322.5 -180.5Q1319 -149 1314 -123Q1322 -126 1328.0 -128.5Q1334 -131 1339 -133Q1390 -150 1438.0 -164.5Q1486 -179 1535 -192Z" fill="url(#sigG)"/></svg></div>
+        <div className="hbar"></div>
+        <div className="role"><b>맥파분석전문가 · 건강 인생 코치</b><br />맥파바이오솔루션 대표</div>
+        <div className="pills"><span className="pill">생체신호 분석 20년</span><span className="pill">유비오맥파 · HRV · APG</span><span className="pill">저서 7권</span></div>
+      </div></div>
+
+      {/* ② PRESS */}
+      <section className="sec"><div className="wrap">
+        <div className="sec-h">PRESS</div><div className="sec-t">이음미디어가 만난 사람</div>
+        <a className="press" href="https://www.eummedia.kr/article/%EA%B8%B8%EB%B4%89%EC%A1%B0-%EC%9C%A0%EB%B9%84%EC%98%A4%EB%A7%A5%ED%8C%8C" target="_blank" rel="noopener">
+          <div className="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{width:'22px',height:'22px'}}><path d="M4 5h12a1 1 0 0 1 1 1v12a2 2 0 0 0 2 2H5a1 1 0 0 1-1-1z"/><path d="M17 8h2a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2"/><path d="M7 8h6"/><path d="M7 11.5h6"/><path d="M7 15h4"/></svg></div>
+          <div className="tx"><b>&#34;사람의 몸이 보내는 신호를 대화로 잇는 사람&#34; — 길봉조 대표, 유비오맥파로 건강상담의 새 길을 열다</b><span>이음미디어 · 2026.08.21</span></div>
+          <div className="go">기사 전문 보기 →</div>
+        </a>
+      </div></section>
+
+      <svg className="wave" viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0 20 H300 l14 -15 l12 30 l13 -34 l14 38 l12 -19 H1200" fill="none" stroke="#1668E3" strokeWidth="2"/></svg>
+
+      {/* ③ 철학 */}
+      <section className="sec navy"><div className="wrap">
+        <div className="sec-h">PHILOSOPHY</div>
+        <div className="qbig">검사는 진단이 아니라,<br /><em>건강관리의 출발점</em>입니다.</div>
+        <div className="qlist">
+          <div className="q"><p>&#34;먼저 권유하면 상대는 경계합니다.&#34;</p></div>
+          <div className="q"><p>&#34;유비오맥파는 고객을 설득하는 장비가 아니라, 고객이 자기 몸을 이해하도록 돕는 상담의 입구입니다.&#34;</p></div>
+          <div className="q"><p>단정하지 않는 상담. 수치를 들이밀지 않고, 상대가 스스로 묻게 만드는 자리를 먼저 만듭니다.</p></div>
+          <div className="q"><p>건강상담 현장에서 20년. 기계가 아니라 사람의 말이 먼저라는 것을 배웠습니다.</p></div>
+        </div>
+      </div></section>
+
+      {/* ④ 이력 (펼쳐보기) */}
+      <section className="sec"><div className="wrap">
+        <div className="sec-h">RECORD</div><div className="sec-t">걸어온 길</div>
+        <div className="sec-d">뇌교육에서 출발해 생체신호 분석으로. 사람의 상태를 읽는 일을 20년 이어 왔습니다. 항목을 눌러 펼쳐 보세요.</div>
+        <div className="acc">
+
+          <details><summary><span className="no">01</span><span className="h">경력</span>
+            <span className="cnt">10건</span><span className="arw">펼쳐보기 <i>▼</i></span></summary>
+            <div className="body"><div className="tl">
+              <div className="it now"><div className="yr">현재</div><div className="h2">맥파바이오솔루션 대표<br /><span style={{display:'block',marginTop:'5px',fontSize:'14px',fontWeight:'500',color:'var(--mut)'}}>유비오맥파 · 생체신호 분석 · 건강상담 교육</span></div></div>
+              <div className="it now"><div className="yr">현재</div><div className="h2">한국혈관관리교육협회 · 한국스트레스관리협회</div></div>
+              <div className="it now"><div className="yr">현재</div><div className="h2">리드젠 · 상상마켓<br /><span style={{display:'block',marginTop:'5px',fontSize:'14px',fontWeight:'500',color:'var(--mut)'}}>마케팅 자동화 솔루션 · 제휴마켓 플랫폼 · 큐레이터 연구소 · 퍼널 연구소</span></div></div>
+              <div className="it"><div className="h2">서울과학기술대학교 산학 · 바이오센스 고객지원팀장</div></div>
+              <div className="it"><div className="h2">힐리언스서울 뇌교육센터장</div></div>
+              <div className="it"><div className="h2">해피브레인 네트워크 뇌교육센터장</div></div>
+              <div className="it"><div className="h2">한국정신과학연구소 뇌교육센터장</div></div>
+              <div className="it"><div className="h2">한국뇌과학연구원 뇌교육 트레이너 · 한국감성심리협회 심리상담사</div></div>
+              <div className="it"><div className="yr">학력</div><div className="h2">경기대학교 서비스경영전문대학원</div></div>
+            </div></div>
+          </details>
+
+          <details><summary><span className="no">02</span><span className="h">자격 · 강의 이력</span>
+            <span className="cnt">13건</span><span className="arw">펼쳐보기 <i>▼</i></span></summary>
+            <div className="body"><div className="two">
+              <div><h5>자격</h5><ul>
+                <li>국제공인 NLP Master Practitioner</li>
+                <li>국제공인 NLP Practitioner</li>
+                <li>국제공인 Time Line Therapy Practitioner</li>
+                <li>삼성문화아카데미 뉴로피드백 전문 강사</li>
+                <li>피닉스 리더십 · 크리스토퍼 리더십 강사</li>
+                <li>P.E.T · 데일카네기 리더십 강사</li></ul></div>
+              <div><h5>강의한 곳</h5><ul>
+                <li>롯데백화점 · 삼성생명 · LG텔레콤</li>
+                <li>순창군 건강장수연구소</li>
+                <li>국제안전보건전시회 (COEX)</li>
+                <li>산업안전 국제행사 (COEX)</li>
+                <li>서울시한의사회 금연의 날</li>
+                <li>구로구 · 울산 중구 정신보건증진센터</li></ul></div>
+            </div></div>
+          </details>
+
+        </div>
+      </div></section>
+
+      {/* ⑤ 방송 출연 */}
+      <section className="sec sky"><div className="wrap">
+        <div className="sec-h">ON AIR</div><div className="sec-t">방송이 먼저 찾았습니다</div>
+        <div className="sec-d">혈관과 스트레스를 설명해야 할 때, 방송이 그를 불렀습니다. HRV 검사·분석으로 촬영과 인터뷰를 지원했습니다.</div>
+        <div className="tv">
+          <div className="tvi"><div className="ch">MBN</div><div className="t">천기누설<span>대한민국 치유의 마을을 찾아라 · 2015.09</span></div></div>
+          <div className="tvi"><div className="ch">JTBC</div><div className="t">이규연의 스포트라이트<span>7회 · 2015.07</span></div></div>
+          <div className="tvi"><div className="ch">채널A</div><div className="t">닥터 지바고<span>동맥경화, 혈관이 막히고 있다 · 2015.07</span></div></div>
+          <div className="tvi"><div className="ch">KBS</div><div className="t">밥상의 신<span>스트레스 ZERO · 2014.06</span></div></div>
+          <div className="tvi"><div className="ch">MBC</div><div className="t">컬투 베란다 쇼<span>분노조절장애 · 2013.11</span></div></div>
+          <div className="tvi"><div className="ch">MBC</div><div className="t">파워매거진<span>당신의 혈관은 안녕하십니까</span></div></div>
+          <div className="tvi"><div className="ch">SBS</div><div className="t">좋은 아침<span>혈관 다이어트가 장수 비결</span></div></div>
+        </div>
+      </div></section>
+
+      {/* ⑥ 저서 */}
+      <section className="sec"><div className="wrap">
+        <div className="bkhead">
+          <div>
+            <div className="sec-h">BOOKS</div>
+            <div className="sec-t">현장에서 바로 쓰이는 일곱 권</div>
+            <div className="sec-d" style={{maxWidth:'none'}}>검사에서 상담까지, 실무자가 그날 바로 쓸 수 있는 언어로 정리한 기록입니다.
+              맥파 데이터를 어떻게 읽고, 그것을 고객에게 어떤 말로 옮길지 —
+              현장에서 스무 해 동안 부딪히며 얻은 것을 일곱 권에 나눠 담았습니다.</div>
+          </div>
+          <div>
+            <div className="ph"><img src="/pium-app/gilbongjo/profile.jpg" alt="길봉조 대표" /></div>
+            <div className="cap"><b>길봉조</b>맥파분석전문가 · 건강 인생 코치</div>
           </div>
         </div>
-      </section>
-
-      {/* ① PRESS — 기사 */}
-      <section className="sec" style={{background:'rgba(11,26,46,.52)'}}>
-        <div className="wrap">
-          <div className="sec-h">PRESS</div>
-          <div className="sec-t">이음매거진 인물탐방</div>
-          <div className="sec-d">유비오맥파로 건강상담의 새 길을 열다</div>
-
-          <div style={{marginTop:40}}>
-            <p className="press-lead">봉숭아학당 문화혁신학교·웃자대한민국협회가 주목한 현장형 건강 코치, 길봉조 대표의 측정 기반 상담 철학</p>
-
-            <div className="press-body">
-              <div className="press-q">
-                <p>"건강관리 이제는 하셔야 합니다."<br/>"스트레스가 많으신 것 같습니다."<br/>"이 제품을 드셔 보시면 좋습니다."</p>
-                <cite>건강상담 현장에서 자주 오가는 말. 그러나 좋은 의도로 건넨 말도 때로는 상대에게 '권유'처럼 들린다.</cite>
-              </div>
-
-              <p className="press-p">길봉조 맥파바이오솔루션 대표는 바로 이 지점을 오랫동안 현장에서 지켜봐 왔다. 그는 건강상담의 핵심이 '더 많이 설명하는 것'이 아니라 '상대가 자기 몸을 스스로 이해하도록 돕는 것'이라고 말한다.</p>
-
-              <div className="press-q">
-                <p>"먼저 권유하면 상대는 경계합니다. 하지만 자신의 몸에서 나온 데이터를 함께 보면 대화가 달라집니다. 유비오맥파는 고객을 설득하는 장비가 아니라, 고객이 자기 몸을 이해하도록 돕는 상담의 입구입니다."</p>
-              </div>
-
-              <p className="press-p">길 대표가 말하는 건강상담은 단순한 측정이나 제품 안내가 아니다. 손끝에서 읽어낸 생체 신호를 바탕으로 한 사람의 수면, 피로, 긴장, 식사, 생활 리듬을 함께 바라보는 과정이다. 숫자는 결론이 아니라 질문의 시작이고, 결과지는 판정표가 아니라 대화의 지도다.</p>
-
-              <h3 className="press-ch">현장에서 길을 찾은 사람</h3>
-              <p className="press-p">길봉조 대표는 20년 경력의 생체신호 분석 전문가이자 건강 인생 코치로 활동해 왔다. 건강기능식품 매장, 한의원, 상담센터, 교육 현장 등 다양한 공간에서 사람을 만나며 유비오맥파를 활용한 상담 흐름을 만들어 왔다.</p>
-              <p className="press-p">그가 관심을 두는 것은 단순히 장비를 보급하는 일이 아니다. 장비가 현장에서 제대로 쓰이도록 돕는 일이다. 유비오맥파를 도입한 공간이 있다고 해도, 누가 측정할 것인지, 어디까지 설명할 것인지, 어떤 질문으로 상담을 이어갈 것인지가 정해져 있지 않으면 장비는 오래 활용되기 어렵다. 길 대표는 이 부분을 '현장 설계'라고 부른다.</p>
-
-              <div className="press-q">
-                <p>"장비를 설치하는 것은 어렵지 않습니다. 문제는 그다음입니다. 상담자가 결과를 어떻게 읽고, 고객에게 어떤 언어로 설명하며, 재방문까지 어떻게 연결할 것인지가 중요합니다."</p>
-              </div>
-
-              <p className="press-p">길 대표의 활동은 크게 세 가지로 나뉜다.</p>
-              <ul className="press-list">
-                <li>현장에 맞는 장비 상담과 공급</li>
-                <li>측정 방법과 결과지 해석, 피해야 할 표현을 알려주는 실무 교육</li>
-                <li>실제 상담 공간에서 측정부터 설명, 생활습관 대화, 재방문 관리까지 이어지도록 돕는 현장 코칭</li>
-              </ul>
-
-              <h3 className="press-ch">유비오맥파, 2분의 측정이 여는 대화</h3>
-              <p className="press-p">유비오맥파 상담은 손가락에 센서를 끼우는 짧은 과정에서 시작된다. 약 2분 뒤 화면에는 맥파와 함께 혈관 건강, 스트레스, 자율신경과 관련된 참고 지표들이 나타난다. 하지만 길 대표는 이 수치를 곧바로 결론처럼 말하지 않는다. 대신 질문을 던진다.</p>
-
-              <div style={{display:'flex',gap:12,flexWrap:'wrap',margin:'8px 0 24px'}}>
-                {['"최근 잠은 어떠셨나요?"','"오늘 커피는 드셨나요?"','"운동 직후이거나 많이 움직인 날인가요?"','"요즘 가장 피로했던 시간대가 언제였나요?"'].map((q,i)=>(
-                  <div key={i} style={{background:'rgba(30,144,214,.1)',border:'1px solid rgba(30,144,214,.25)',borderRadius:10,padding:'10px 16px',fontSize:14,color:'var(--am2)',fontWeight:600}}>{q}</div>
-                ))}
-              </div>
-
-              <p className="press-p">이 질문들이 이어지면 고객은 자신의 생활을 말하기 시작한다. 수면 부족, 불규칙한 식사, 누적된 피로, 긴장 상태, 스트레스가 하나씩 대화 위로 올라온다.</p>
-
-              <div style={{background:'rgba(30,144,214,.08)',border:'1px solid rgba(30,144,214,.2)',borderRadius:14,padding:'24px 28px',margin:'24px 0',textAlign:'center'}}>
-                <div style={{fontSize:20,fontWeight:900,color:'var(--am2)',marginBottom:8}}>측정은 끝이 아니라 시작이다.</div>
-                <div style={{fontSize:16,fontWeight:700,color:'var(--sub)'}}>숫자는 진단이 아니라 대화의 입구다.</div>
-              </div>
-
-              <h3 className="press-ch">"단정하지 않는 상담이 오래 갑니다"</h3>
-              <p className="press-p">길 대표가 교육에서 가장 먼저 강조하는 원칙은 '단정하지 않기'다. 결과지를 보고 곧바로 "혈관이 나쁩니다", "스트레스가 심합니다", "자율신경이 무너졌습니다"라고 말하면 고객은 불안해지거나 방어적이 된다.</p>
-
-              <div className="press-q">
-                <p>"숫자로 겁을 주면 안 됩니다. 숫자는 고객을 위협하는 도구가 아니라 생활을 돌아보게 하는 질문의 출발점이어야 합니다."</p>
-              </div>
-
-              <p className="press-p">그는 유비오맥파 결과를 질병 진단이나 치료 판단처럼 말해서는 안 된다고 강조한다. 혈관나이, 혈관탄성, 스트레스 지수, HRV, APG 등은 건강상담에 활용할 수 있는 참고 지표일 뿐이다.</p>
-
-              <div className="press-q">
-                <p>"할 수 있는 것과 할 수 없는 것을 정확히 말해야 합니다. 필요할 때 병원에 가보시라고 안내하는 것이 오래가는 상담의 기본입니다."</p>
-              </div>
-            </div>
-          </div>
+        <div className="books">
+          <div className="bk"><div className="im"><img src="/pium-app/gilbongjo/book01.jpg" /></div><div><div className="no">BOOK 01</div><div className="t">유비오맥파 사용 설명서</div><div className="s">맥파검사로 시작하는 건강상담, 누구나 전문가처럼<br />한국심뇌혈관연구소</div></div></div>
+          <div className="bk"><div className="im"><img src="/pium-app/gilbongjo/book02.jpg" /></div><div><div className="no">BOOK 02</div><div className="t">현장에서 바로쓰는 맥파상담 멘트집</div><div className="s">HRV·APG 데이터를 고객의 언어로 바꿔주는 실전 해석 가이드<br />한국심뇌혈관연구소</div></div></div>
+          <div className="bk"><div className="im"><img src="/pium-app/gilbongjo/book03.jpg" /></div><div><div className="no">BOOK 03</div><div className="t">혈관 스트레스 측정, 맥파검사 200% 활용법</div><div className="s">건강식품 판매 고수가 알려주는 검사 활용법<br />한국심뇌혈관연구소</div></div></div>
+          <div className="bk"><div className="im"><img src="/pium-app/gilbongjo/book04.jpg" /></div><div><div className="no">BOOK 04</div><div className="t">유비오맥파, 건강을 바꾸는 비밀병기</div><div className="s">맥파분석 활용 시 노하우 10가지<br />한국심뇌혈관연구소</div></div></div>
+          <div className="bk"><div className="im"><img src="/pium-app/gilbongjo/book05.jpg" /></div><div><div className="no">BOOK 05</div><div className="t">ABIETE · 음이온 공기청정기 아비테가 좋은 10가지 이유</div><div className="s">공기보다 더 중요한 건 없다<br />한국심뇌혈관연구소</div></div></div>
+          <div className="bk"><div className="im"><img src="/pium-app/gilbongjo/book06.jpg" /></div><div><div className="no">BOOK 06</div><div className="t">인생소금</div><div className="s">천연미네랄 효소소금이 바꾼 장과 인생의 이야기<br />한국심뇌혈관연구소</div></div></div>
+          <div className="bk"><div className="im"><img src="/pium-app/gilbongjo/book07.jpg" /></div><div><div className="no">BOOK 07</div><div className="t">내 인생의 에코시즌</div><div className="s">양자에너지가 만든 환경 비즈니스 이야기<br />ECO Season</div></div></div>
+          <div className="bk soon"><div className="t">여덟 번째 책을<br />쓰고 계십니다</div></div>
         </div>
-      </section>
+      </div></section>
 
-      {/* ② PHILOSOPHY */}
-      <section className="sec">
-        <div className="wrap">
-          <div className="sec-h">PHILOSOPHY</div>
-          <div className="sec-t">상담 철학</div>
-          <div className="sec-d">20년 현장이 만들어낸 길봉조 대표의 세 가지 원칙</div>
-          <div className="phil-grid">
-            <div className="phil-c">
-              <div className="phil-ic">🩺</div>
-              <div className="phil-q">측정은 진단이 아니라 건강관리의 출발점이다</div>
-              <div className="phil-d">유비오맥파의 수치는 참고 지표입니다. 숫자를 보여주는 것이 아니라 고객이 자기 몸을 이해하는 과정을 함께 만드는 것이 상담의 목적입니다.</div>
-            </div>
-            <div className="phil-c">
-              <div className="phil-ic">💬</div>
-              <div className="phil-q">단정하지 않는 상담이 오래 갑니다</div>
-              <div className="phil-d">결과지를 보고 곧바로 단정하면 고객은 불안해지거나 방어적이 됩니다. 측정 당시의 조건을 함께 살피고, 생활을 돌아보게 하는 질문으로 연결합니다.</div>
-            </div>
-            <div className="phil-c">
-              <div className="phil-ic">🤝</div>
-              <div className="phil-q">상담자는 판정하는 사람이 아니라 함께 길을 찾는 사람이어야 합니다</div>
-              <div className="phil-d">결과가 좋게 나오면 격려하면 됩니다. 좋지 않게 나오면 다시 생활을 살펴볼 기회로 삼으면 됩니다. 숫자보다 사람을 먼저 봅니다.</div>
-            </div>
-          </div>
+      {/* ⑦ 영상 */}
+      <section className="sec navy"><div className="wrap">
+        <div className="sec-h">VIDEO</div><div className="sec-t">대표 영상</div>
+        <div className="sec-d">맥파 길봉조TV에서 고른 두 편입니다.</div>
+        <div className="vids">
+          <div className="hold">영상 1<br /><span style={{fontWeight:'500'}}>주소와 제목 대기</span></div>
+          <div className="hold">영상 2<br /><span style={{fontWeight:'500'}}>주소와 제목 대기</span></div>
         </div>
-      </section>
+      </div></section>
 
-      {/* ③ EXPERTISE */}
-      <section className="sec" style={{background:'rgba(11,26,46,.52)'}}>
-        <div className="wrap">
-          <div className="sec-h">EXPERTISE</div>
-          <div className="sec-t">전문 분야</div>
-          <div className="exp-grid">
-            <div className="exp-c">
-              <div className="exp-ic">📡</div>
-              <div className="exp-t">맥파분석 · HRV · APG</div>
-              <div className="exp-d">유비오맥파를 활용한 혈관 건강, 스트레스 지수, 자율신경 균형 분석. 손끝 PPG 신호 기반 생체신호 해석 전문가.</div>
-            </div>
-            <div className="exp-c">
-              <div className="exp-ic">🏫</div>
-              <div className="exp-t">건강상담 실무 교육</div>
-              <div className="exp-d">측정 방법, 결과지 해석, 피해야 할 표현, 재방문으로 이어지는 상담 루틴까지 현장 실무 중심으로 교육합니다.</div>
-            </div>
-            <div className="exp-c">
-              <div className="exp-ic">🗺️</div>
-              <div className="exp-t">현장 설계 코칭</div>
-              <div className="exp-d">한의원, 건강상담실, 방문건강관리, 보건교육 등 현장마다 다른 상담 흐름을 설계합니다. 장비 도입 이후의 운영 구조까지 함께 만듭니다.</div>
-            </div>
-            <div className="exp-c">
-              <div className="exp-ic">📦</div>
-              <div className="exp-t">장비 상담 및 공급</div>
-              <div className="exp-d">맥파바이오솔루션을 통해 유비오맥파 장비 상담과 공급을 담당합니다. 도입 전 현장 조건 분석부터 사후 교육까지 지원합니다.</div>
-            </div>
-            <div className="exp-c">
-              <div className="exp-ic">🧠</div>
-              <div className="exp-t">뇌기능분석 · 뉴로피드백</div>
-              <div className="exp-d">HRV 검사 분석 및 APG 검사 분석을 기반으로 한 뇌기능 및 뉴로피드백 전문가 과정을 보유합니다.</div>
-            </div>
-            <div className="exp-c">
-              <div className="exp-ic">❤️</div>
-              <div className="exp-t">건강 인생 코치</div>
-              <div className="exp-d">측정과 데이터를 넘어, 고객이 자기 생활을 스스로 돌아보고 건강한 습관으로 이어가도록 돕는 인생 코칭을 함께합니다.</div>
-            </div>
-          </div>
+      {/* ⑧ 숏츠 */}
+      <section className="sec"><div className="wrap">
+        <div className="sec-h">SHORTS</div><div className="sec-t">1분 안에 만나는 이야기</div>
+        <div className="sec-d">짧지만 하고 싶은 말은 다 들어 있습니다. 숏츠가 늘어나면 아래로 한 줄씩 이어집니다.</div>
+        <div className="shorts">
+          <div className="hold">숏츠 1</div><div className="hold">숏츠 2</div>
+          <div className="hold">숏츠 3</div><div className="hold">숏츠 4</div>
         </div>
-      </section>
+      </div></section>
 
-      {/* ④ ON AIR */}
-      <section className="sec">
-        <div className="wrap">
-          <div className="sec-h">ON AIR</div>
-          <div className="sec-t">방송 출연</div>
-          <div className="air-grid">
-            <div className="air-c">
-              <span className="air-badge">MBN</span>
-              <div className="air-ch">천기누설</div>
-              <div className="air-ep">대한민국 치유의 마을을 찾아라</div>
-            </div>
-            <div className="air-c">
-              <span className="air-badge">MBC</span>
-              <div className="air-ch">파워매거진</div>
-              <div className="air-ep">당신의 혈관은 안녕하십니까</div>
-            </div>
-            <div className="air-c">
-              <span className="air-badge">SBS</span>
-              <div className="air-ch">좋은 아침</div>
-              <div className="air-ep">혈관다이어트가 장수비결 외 다수</div>
-            </div>
-          </div>
+      {/* ⑨ 전문분야 */}
+      <section className="sec sky"><div className="wrap">
+        <div className="sec-h">EXPERTISE</div><div className="sec-t">하는 일</div>
+        <div className="sec-d">검사에서 상담까지, 그리고 그 상담을 남에게 가르치는 일까지.</div>
+        <div className="exg">
+          <div className="ex"><h4>검사 · 분석</h4><ul>
+            <li>누적 스트레스 검사 (HRV)</li><li>말초 혈액순환 검사 (APG)</li><li>뇌기능분석 · 뉴로피드백</li></ul></div>
+          <div className="ex"><h4>교육 · 코칭</h4><ul>
+            <li>맥파 분석과 상담 교육</li><li>건강상담실 · 한의원 현장 코칭</li><li>방문건강관리 · 보건교육</li></ul></div>
+          <div className="ex"><h4>제품 · 사업</h4><ul>
+            <li>맥파 건강의료기 마케팅</li><li>유비오맥파 제품 상담</li><li>저서 7권 집필</li></ul></div>
         </div>
-      </section>
+      </div></section>
 
-      {/* ⑤ BOOKS */}
-      <section className="sec" style={{background:'rgba(11,26,46,.52)'}}>
-        <div className="wrap">
-          <div className="sec-h">BOOKS</div>
-          <div className="sec-t">저서</div>
-          <div className="shelf">
-            {GBJ_BOOKS.map((b,i) => (
-              <div key={i} className="bk">
-                <img src={b.img} alt={b.t}/>
-                <div className="bk-t">{b.t}</div>
-              </div>
-            ))}
-          </div>
+      {/* ⑩ 현장 */}
+      <section className="sec"><div className="wrap">
+        <div className="sec-h">ON SITE</div><div className="sec-t">현장에서</div>
+        <div className="sec-d">건강상담실 · 한의원 · 방문건강관리 · 보건교육 현장에서 교육과 코칭을 이어 왔습니다.</div>
+        <div className="acts">
+          <div className="act"><div className="im"><img src="/pium-app/gilbongjo/act-class.jpg" /></div><div className="cp">맥파기 활용 실무 교육 현장</div></div>
+          <div className="act"><div className="im"><img src="/pium-app/gilbongjo/act-device.jpg" /></div><div className="cp">손끝 하나로 읽는 혈관 건강도와 누적 스트레스</div></div>
+          <div className="act"><div className="hold" style={{aspectRatio:'4/3'}}>현장 사진<br /><span style={{fontWeight:'500'}}>구글드라이브에서 선별 대기</span></div></div>
         </div>
-      </section>
-
-      {/* ⑥ ON SITE */}
-      <section className="sec">
-        <div className="wrap">
-          <div className="sec-h">ON SITE</div>
-          <div className="sec-t">현장에서 만납니다</div>
-          <div className="site-grid">
-            {GBJ_ACTS.map((a,i) => (
-              <div key={i} className="site-c">
-                <img src={a.s} alt={a.c}/>
-                <div className="site-cap">{a.c}</div>
-              </div>
-            ))}
-          </div>
+        <div className="class">
+          <div><div className="k">WEEKLY CLASS</div><div className="v">매주 금요일 오후 2시 ~ 4시</div></div>
+          <div className="w">맥파분석 강의 · 맥파바이오솔루션<br />서울 송파구 송파대로 201</div>
         </div>
-      </section>
+      </div></section>
 
-      {/* ⑦ SHORTS — 숏츠 있을 때만 표시 */}
-      {GBJ_SHORTS.length > 0 && (
-        <section className="sec" style={{background:'rgba(11,26,46,.52)'}}>
-          <div className="wrap">
-            <div className="sec-h">SHORTS</div>
-            <div className="sec-t">맥파길봉조TV 숏츠</div>
-            <div className="car">
-              <div className="track" style={{transform:`translateX(${-100*shIdx}%)`}}>
-                {Array.from({length:shSlides}, (_,si) => {
-                  const slice = GBJ_SHORTS.slice(si*SPER, (si+1)*SPER);
-                  return (
-                    <div key={si} className="slide">
-                      <div className="shorts">
-                        {slice.map(id => (
-                          <a key={id} className="sh" href={`https://youtube.com/shorts/${id}`} target="_blank" rel="noopener noreferrer">
-                            <div className="th">
-                              <img src={`https://i.ytimg.com/vi/${id}/oardefault.jpg`} alt=""
-                                onError={ev => { ev.currentTarget.src=`https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }}/>
-                              <div className="pl"><i>&#9654;</i></div>
-                            </div>
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            {shSlides > 1 && (
-              <div className="nav">
-                <button className="arw" onClick={() => setShIdx(i => (i-1+shSlides)%shSlides)}>‹</button>
-                <div className="dots">
-                  {Array.from({length:shSlides}, (_,i) => (
-                    <button key={i} className={`dot${i===shIdx?' on':''}`} onClick={() => setShIdx(i)}/>
-                  ))}
-                </div>
-                <button className="arw" onClick={() => setShIdx(i => (i+1)%shSlides)}>›</button>
-              </div>
+      {/* ⑪ 채널 · 문의 */}
+      <section className="sec navy"><div className="wrap">
+        <div className="sec-h">CHANNELS</div><div className="sec-t">채널 바로가기</div>
+        <div className="chs">
+          <a className="ch" href="https://www.youtube.com/@macpa/videos" target="_blank" rel="noopener"><div className="d">▶</div><div><b>맥파 길봉조TV</b><span>YouTube @맥파tv</span></div></a>
+          <a className="ch" href="https://www.instagram.com/mac_pa_" target="_blank" rel="noopener"><div className="d">◉</div><div><b>@mac_pa_</b><span>Instagram</span></div></a>
+          <a className="ch" href="https://ubiomacpa.modoo.at/" target="_blank" rel="noopener"><div className="d">홈</div><div><b>유비오맥파 공식</b><span>ubiomacpa.modoo.at</span></div></a>
+          <a className="ch" href="https://blog.naver.com/macpa_sos" target="_blank" rel="noopener"><div className="d">✎</div><div><b>유비오맥파 제품상담실</b><span>blog.naver.com/macpa_sos</span></div></a>
+          <a className="ch" href="https://cafe.naver.com/we1212" target="_blank" rel="noopener"><div className="d">카</div><div><b>유비오맥파 제품 사업부</b><span>cafe.naver.com/we1212</span></div></a>
+          <a className="ch" href="https://smartstore.naver.com/macpa119" target="_blank" rel="noopener"><div className="d">S</div><div><b>맥파 측정기 구매</b><span>smartstore.naver.com/macpa119</span></div></a>
+        </div>
+
+        <div style={{height:'70px'}}></div>
+        <div className="sec-h">CONTACT</div><div className="sec-t">문의하기</div>
+        <div className="ct">
+          <div className="box">
+            <div className="row"><div className="k">사무실</div><div>02-6949-3000</div></div>
+            <div className="row"><div className="k">상담 전화</div><div>010-8291-0088</div></div>
+            <div className="row"><div className="k">오시는 길</div><div>서울 송파구 송파대로 201<br /><span style={{color:'#6E809A',fontSize:'13px'}}>문정역 4번 출구에서 직진 150m</span></div></div>
+            <div className="row"><div className="k">강의</div><div>매주 금요일 오후 2시 ~ 4시 맥파분석 강의</div></div>
+          </div>
+          <div className="box">
+            <div style={{fontSize:'15px',fontWeight:'700'}}>강의 · 상담 문의</div>
+            {gbjSubmitted ? (
+              <p className="gbj-ok">문의가 전달되었습니다. 길봉조 대표님께서 연락 드립니다.</p>
+            ) : (
+              <form onSubmit={handleGbjSubmit}>
+                <input className="fld" placeholder="성함" value={gbjForm.name} onChange={e=>setGbjForm(f=>({...f,name:e.target.value}))} />
+                <input className="fld" placeholder="연락처" value={gbjForm.phone} onChange={e=>setGbjForm(f=>({...f,phone:e.target.value}))} />
+                <textarea className="fld tall" placeholder="문의 내용" value={gbjForm.message} onChange={e=>setGbjForm(f=>({...f,message:e.target.value}))} />
+                {gbjErr && <p className="gbj-err">{gbjErr}</p>}
+                <button className="btn" type="submit" disabled={gbjSubmitting}>{gbjSubmitting ? '전송 중…' : '문의 보내기'}</button>
+              </form>
             )}
-          </div>
-        </section>
-      )}
-
-      {/* ⑧ 한눈에 보기 */}
-      <section className="sec" style={{background:'rgba(11,26,46,.52)'}}>
-        <div className="wrap">
-          <div className="sec-h">RECORD</div>
-          <div className="sec-t">한눈에 보는 길봉조 대표</div>
-          <table className="sum-table">
-            <tbody>
-              <tr><th>이름</th><td>길봉조</td></tr>
-              <tr><th>소속</th><td>맥파바이오솔루션 대표</td></tr>
-              <tr><th>전문 분야</th><td>유비오맥파, HRV, APG, 맥파 건강상담, 생체신호 분석, 건강상담 교육, 현장 코칭</td></tr>
-              <tr><th>주요 활동</th><td>
-                유비오맥파 장비 상담 및 공급 · 측정 실무 교육 · 결과지 해석 교육 ·
-                건강상담 현장 코칭 · 한의원·건강상담·방문건강관리·보건교육 현장별 활용 설계
-              </td></tr>
-              <tr><th>저서</th><td>
-                『유비오맥파 사용설명서』 · 『유비오맥파 건강을 바꾸는 비밀병기』 ·
-                『현장에서 활용되는 맥파상담 멘트집』 · 『혈관 스트레스 측정 맥파검사 200% 활용법』 외
-              </td></tr>
-              <tr><th>상담 철학</th><td>
-                측정은 진단이 아니라 건강관리의 출발점이다.<br/>
-                숫자는 사람을 겁주는 도구가 아니라, 생활을 돌아보게 하는 대화의 시작이다.
-              </td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {/* ⑨ CHANNELS */}
-      <section className="sec">
-        <div className="wrap">
-          <div className="sec-h">CHANNELS</div>
-          <div className="sec-t">채널 바로가기</div>
-          <div className="chs">
-            <a className="ch" href="https://www.youtube.com/@%EB%A7%A5%ED%8C%8C%EA%B8%B8%EB%B4%89%EC%A1%B0TV" target="_blank" rel="noopener noreferrer">
-              <div className="d">&#9654;</div>
-              <div><b>맥파길봉조TV</b><span>YouTube</span></div>
-            </a>
-            <a className="ch" href="https://www.eummedia.kr/article/%EA%B8%B8%EB%B4%89%EC%A1%B0" target="_blank" rel="noopener noreferrer">
-              <div className="d">&#9998;</div>
-              <div><b>이음미디어 기사</b><span>eummedia.kr</span></div>
-            </a>
+            <div style={{marginTop:'14px',fontSize:'12.5px',color:'var(--mut)'}}>전송 시 길봉조 대표님께 알림이 발송됩니다</div>
           </div>
         </div>
-      </section>
+      </div></section>
 
-      {/* ⑩ CONTACT */}
-      <section className="sec ct">
-        <div className="wrap">
-          <div className="sec-h">CONTACT</div>
-          <div className="sec-t">강의 · 상담 문의</div>
-          <div className="ctwrap">
-            <ul className="info">
-              <li><span>전화</span>010-8291-0088</li>
-              <li><span>활동 지역</span>서울시 · 전국 출강</li>
-              <li><span>주요 대상</span>건강상담사 · 한의원 · 방문건강관리 · 보건교육 현장</li>
-            </ul>
-            <form className="form" onSubmit={handleGbjSubmit}>
-              {gbjSubmitted ? (
-                <div style={{textAlign:'center',padding:'40px 0'}}>
-                  <div style={{fontSize:'36px',marginBottom:'16px'}}>✅</div>
-                  <div style={{fontSize:'18px',fontWeight:800,color:'var(--am)'}}>문의가 전송되었습니다!</div>
-                  <div style={{fontSize:'14px',color:'var(--sub)',marginTop:'10px'}}>
-                    길봉조 대표님께 알림이 발송되었습니다.<br/>빠른 시일 내에 연락드리겠습니다.
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <label>성함</label>
-                  <input className="inp" placeholder="홍길동" value={gbjForm.name}
-                    onChange={e => setGbjForm(f => ({...f, name: e.target.value}))}/>
-                  <label>연락처</label>
-                  <input className="inp" placeholder="010-0000-0000" value={gbjForm.phone}
-                    onChange={e => setGbjForm(f => ({...f, phone: e.target.value}))}/>
-                  <label>문의 내용</label>
-                  <textarea className="inp" placeholder="강의 주제와 일정을 적어 주세요"
-                    value={gbjForm.message}
-                    onChange={e => setGbjForm(f => ({...f, message: e.target.value}))}/>
-                  {gbjErr && <div style={{color:'#e05555',fontSize:'14px',marginTop:'12px'}}>{gbjErr}</div>}
-                  <button className="btn" type="submit" disabled={gbjSubmitting}>
-                    {gbjSubmitting ? '전송 중…' : '문의 보내기'}
-                  </button>
-                  <div className="note">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{width:14,height:14,verticalAlign:-2,marginRight:6}}>
-                      <rect x="2.5" y="5" width="19" height="14" rx="2.5"/>
-                      <path d="M3 7l9 6 9-6"/>
-                    </svg>
-                    전송 시 길봉조 대표님께 알림이 발송됩니다
-                  </div>
-                </>
-              )}
-            </form>
-          </div>
-        </div>
-      </section>
-
-      <div className="ft">PIUM 전문가 프로필 · 이음미디어 &nbsp;|&nbsp; eummedia.kr/pium-app/gilbongjo</div>
     </div>
   );
 }
