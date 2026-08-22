@@ -3468,7 +3468,7 @@ function GilBongJoPage() {
 .gbj-wrap .ex h4{font-size:12px;font-weight:800;letter-spacing:.2em;color:var(--blue);margin-bottom:16px}
 .gbj-wrap .ex li{list-style:none;font-size:14.5px;line-height:1.85;color:var(--ink2);padding-left:14px;position:relative;word-break:keep-all}
 .gbj-wrap .ex li:before{content:'';position:absolute;left:0;top:11px;width:5px;height:5px;border-radius:50%;background:#9DBBE0}
-.gbj-wrap .acts{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);margin-top:44px}
+.gbj-wrap .acts{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--gap);margin-top:44px}
 .gbj-wrap .act .im{aspect-ratio:4/3;border-radius:14px;overflow:hidden;background:#DDE7F3}
 .gbj-wrap .act .im img{width:100%;height:100%;object-fit:cover;display:block}
 .gbj-wrap .act .cp{margin-top:14px;font-size:14px;color:var(--ink2);line-height:1.6}
@@ -3552,6 +3552,42 @@ function GilBongJoPage() {
 .gbj-wrap .ct .box{padding:24px}
 .gbj-wrap .ct .row{flex-direction:column;gap:4px}
 .gbj-wrap .ct .row .k{flex:none}
+}
+@media(max-width:640px){
+ /* ① 히어로 이름띠를 사진에 눌리지 않게 축소 */
+ .gbj-wrap .hero-b{padding:20px 0}
+ .gbj-wrap .hero-b .wrap{gap:14px}
+ .gbj-wrap .hero-b .sig{height:46px!important;width:auto!important}
+ .gbj-wrap .nm small{font-size:10.5px;letter-spacing:.24em;margin-bottom:8px}
+ .gbj-wrap .role{font-size:14px;line-height:1.55}
+ .gbj-wrap .pills{gap:6px}
+ .gbj-wrap .pill{font-size:11.5px;padding:6px 11px}
+ /* ② 방송 2열 */
+ .gbj-wrap .tv{grid-template-columns:1fr 1fr;gap:10px}
+ .gbj-wrap .tvi{flex-direction:column;align-items:flex-start;gap:9px;padding:13px}
+ .gbj-wrap .tvi .ch{flex:none;width:58px;font-size:10.5px;padding:4px 0}
+ .gbj-wrap .tvi .t{font-size:13px;line-height:1.45}
+ .gbj-wrap .tvi .t span{font-size:11px;margin-top:3px}
+ /* ② 저서 2열 */
+ .gbj-wrap .books{grid-template-columns:1fr 1fr;gap:14px}
+ .gbj-wrap .bk{padding:14px;gap:11px}
+ .gbj-wrap .bk .im{height:auto}
+ .gbj-wrap .bk img{max-height:140px}
+ .gbj-wrap .bk .no{font-size:9.5px;letter-spacing:.14em}
+ .gbj-wrap .bk .t{font-size:13.5px;margin-top:7px;line-height:1.4}
+ .gbj-wrap .bk .s{font-size:11px;margin-top:7px;line-height:1.6}
+ .gbj-wrap .bk.soon{min-height:198px}
+ /* ② 채널 2열 */
+ .gbj-wrap .chs{grid-template-columns:1fr 1fr;gap:10px}
+ .gbj-wrap .ch{flex-direction:column;align-items:flex-start;gap:9px;padding:13px}
+ .gbj-wrap .ch .d{width:30px;height:30px;flex:0 0 30px;font-size:12px}
+ .gbj-wrap .ch b{font-size:12.5px;line-height:1.35}
+ .gbj-wrap .ch span{font-size:10px;margin-top:3px;word-break:break-all;line-height:1.4}
+ /* ③ 현장 사진 가로 스크롤 */
+ .gbj-wrap .acts{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;padding-bottom:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+ .gbj-wrap .acts::-webkit-scrollbar{display:none}
+ .gbj-wrap .acts>*{flex:0 0 84%;scroll-snap-align:center}
+ .gbj-wrap .act .cp{font-size:13px}
 }
       `}</style>
 
@@ -3723,8 +3759,8 @@ function GilBongJoPage() {
         </div>
       </div></section>
 
-      {/* ⑪ 채널 · 문의 */}
-      <section className="sec navy"><div className="wrap">
+      {/* ⑪ 채널 */}
+      <section className="sec sky"><div className="wrap">
         <div className="sec-h">CHANNELS</div><div className="sec-t">채널 바로가기</div>
         <div className="chs">
           <a className="ch" href="https://www.youtube.com/@macpa/videos" target="_blank" rel="noopener"><div className="d">▶</div><div><b>맥파 길봉조TV</b><span>YouTube @맥파tv</span></div></a>
@@ -3734,8 +3770,10 @@ function GilBongJoPage() {
           <a className="ch" href="https://cafe.naver.com/we1212" target="_blank" rel="noopener"><div className="d">카</div><div><b>유비오맥파 제품 사업부</b><span>cafe.naver.com/we1212</span></div></a>
           <a className="ch" href="https://smartstore.naver.com/macpa119" target="_blank" rel="noopener"><div className="d">S</div><div><b>맥파 측정기 구매</b><span>smartstore.naver.com/macpa119</span></div></a>
         </div>
+      </div></section>
 
-        <div style={{height:'70px'}}></div>
+      {/* ⑫ 문의 */}
+      <section className="sec navy"><div className="wrap">
         <div className="sec-h">CONTACT</div><div className="sec-t">문의하기</div>
         <div className="ct">
           <div className="box">
