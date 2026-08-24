@@ -50,17 +50,48 @@
     <meta name="twitter:description" content="시니어와 소상공인, 이웃의 이야기를 조명하는 인터넷신문">
     <meta name="twitter:image" content="https://www.eummedia.kr/og-image.png">
 
-    <!-- Schema.org JSON-LD: 매체 정체성 (Organization) -->
+    <!-- Schema.org JSON-LD: 매체 정체성 (NewsMediaOrganization)
+         브랜드명 검색 충돌(예: 하남시 eeummedia.com) 해소 목적으로 정체성 필드 강화.
+         sameAs 외부 프로필 URL은 세연 확인 후 추가 예정. -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "NewsMediaOrganization",
+      "@id": "https://www.eummedia.kr/#organization",
       "name": "이음미디어",
+      "alternateName": "Eum Media",
       "url": "https://www.eummedia.kr",
-      "logo": "https://www.eummedia.kr/og-image.png",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.eummedia.kr/og-image.png",
+        "width": 1200,
+        "height": 630
+      },
+      "image": "https://www.eummedia.kr/og-image.png",
       "email": "press@eummedia.kr",
-      "description": "시니어와 소상공인, 이웃의 이야기를 조명하는 인터넷신문",
-      "foundingDate": "2026"
+      "telephone": "+82-10-7368-0368",
+      "description": "시니어와 소상공인, 이웃의 이야기를 조명하는 대한민국 인터넷신문",
+      "foundingDate": "2026-06-04",
+      "founder": {
+        "@type": "Person",
+        "name": "성창운"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "남부순환로 1699, 2층",
+        "addressLocality": "관악구",
+        "addressRegion": "서울특별시",
+        "addressCountry": "KR"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+82-10-7368-0368",
+        "email": "press@eummedia.kr",
+        "contactType": "editorial",
+        "areaServed": "KR",
+        "availableLanguage": ["ko"]
+      },
+      "publishingPrinciples": "https://www.eummedia.kr/about"
     }
     </script>
 

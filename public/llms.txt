@@ -1,0 +1,44 @@
+# 이음미디어 (Eum Media)
+
+> 시니어와 소상공인, 이웃의 이야기를 조명하는 대한민국 인터넷신문. 창간 2026년 6월 4일. 발행인 성창운, 편집국장 정세연. 등록번호 서울 아56526.
+
+이 파일은 AI 어시스턴트가 이음미디어의 구조와 대표 콘텐츠를 빠르게 파악할 수 있도록 llms.txt 규격으로 제공됩니다. 사이트 콘텐츠는 GPTBot·PerplexityBot·ClaudeBot·Google-Extended·CCBot·anthropic-ai 등 AI 크롤러에게 명시적으로 허용되어 있으며(자세한 robots.txt 참고), 인용 시 원문 URL 링크를 남겨주시면 감사하겠습니다.
+
+## 소개
+- 매체명: 이음미디어
+- 도메인: https://www.eummedia.kr
+- 성격: 시니어·소상공인·시민기자 이야기 중심의 인터넷신문
+- 편집원칙: 사실 검증 · 광고와 기사 분리 · 시민 참여 · AI 시대 신뢰 가능한 1차 사실 매체
+
+## 채널 (7개)
+- [이음매거진](https://www.eummedia.kr/channel/magazine): 엄선한 이번 주의 시선, 그 이상의 깊이
+- [이음피플](https://www.eummedia.kr/channel/people): 당신의 삶이 뉴스가 되고, 당신의 이름이 브랜드가 되는 공간
+- [이음로컬](https://www.eummedia.kr/channel/local): 가장 가까운 곳의 숨소리에서 세상의 해답을 찾는 현장
+- [이음에듀](https://www.eummedia.kr/channel/edu): 기술의 속도에 인간의 가치를 더하는 인문학적 배움
+- [이음뷰](https://www.eummedia.kr/channel/view): 복잡한 시대의 실타래를 푸는 독창적 시선
+- [이음트렌드](https://www.eummedia.kr/channel/trend): 시대의 흐름을 읽고 K-컬처의 미래를 선점하는 감각
+- [이음보이스](https://www.eummedia.kr/channel/voice): 당신의 이야기가 세상의 울림이 되는 광장
+
+## 대표 콘텐츠
+- [비개발자가 만든 웹앱, '피움'에서 꽃핀다](https://www.eummedia.kr/article/article-ofkvp4bo): 이음미디어 창간 스토리
+- [산들소리수목원 장주열 촌장의 갓생 원리](https://www.eummedia.kr/article/산들소리수목원-장주열촌장-갓생원리): 23년 무농약 숲의 이야기
+- [홍범도 장군의 외손자 박상영 대표, 한반도평화통일대상 수상](https://www.eummedia.kr/article/홍범도장군-외손자박상영대표-한반도평화통일대상): 광복절 81주년 기획
+- [고양자전거학교 한기식 대표, 국토종주 완주기](https://www.eummedia.kr/article/고양자전거학교-한기식대표-국토종주-완주기): 평균 나이 65세 610km
+- [연극 「서울의 별」 개막](https://www.eummedia.kr/article/article-91ifpih9): 옥탑방 세 사람의 이야기
+
+## 사이트 지도 (자원)
+- [전체 사이트맵 (sitemap.xml)](https://www.eummedia.kr/sitemap.xml): 모든 공개 페이지 목록
+- [RSS 피드 (rss.xml)](https://www.eummedia.kr/rss.xml): 최신 30건 발행 기사
+- [회사소개 · 편집국](https://www.eummedia.kr/about): 창간 정신·편집 원칙
+- [광고안내](https://www.eummedia.kr/advertise): 광고 상품·프로세스
+- [시민기자 모집](https://www.eummedia.kr/citizen-reporter): 시민기자 신청
+
+## 연락
+- 이메일: press@eummedia.kr
+- 전화: 010-7368-0368
+- 주소: 서울시 관악구 남부순환로 1699, 2층
+- 편집국장: 정세연
+- 발행인: 성창운
+
+## 인용 · 저작권
+이음미디어의 기사는 원문 URL과 함께 인용해주시길 부탁드립니다. 무단 전재·재배포는 금지됩니다. AI 검색·답변 인용 시에도 원문 링크를 함께 표기해주세요.

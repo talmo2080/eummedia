@@ -117,11 +117,14 @@ async function main() {
       priority: 0.7,
     }));
   }
-  // 기사 (lastmod = updated_at > published_at)
+  // 기사 (lastmod = published_at 우선 — stable, 기사별 상이).
+  //   updated_at은 Supabase trigger로 UPDATE마다 자동 갱신되어 대량 이벤트 시 전체가 같은 날짜로 몰림 →
+  //   sitemap 관점에서 무의미(모든 URL 동일 lastmod). published_at은 최초 published transition에만
+  //   세팅되므로 stable하고 URL마다 자연스레 상이함.
   for (const a of articles) {
     entries.push(urlEntry({
       loc: `/article/${a.slug}`,
-      lastmod: isoDate(a.updated_at || a.published_at),
+      lastmod: isoDate(a.published_at || a.updated_at),
       changefreq: 'weekly',
       priority: 0.8,
     }));

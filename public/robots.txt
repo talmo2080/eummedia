@@ -1,3 +1,13 @@
+# 이음미디어 robots.txt
+# 사이트: https://www.eummedia.kr
+# 갱신: 2026-08-24 (AI 크롤러 명시적 Allow 보강)
+#
+# 정책:
+#   · 일반 크롤러 · 검색엔진 봇 · AI 크롤러 모두 사이트 콘텐츠 크롤 허용
+#   · 관리·인증 관련 경로는 전면 차단 (색인 무의미 + 사용자 프라이버시)
+#   · llms.txt로 AI 어시스턴트에게 사이트 지도 제공 (사이트 루트)
+
+# ── 기본(모든 봇) ──────────────────────────────
 User-agent: *
 Allow: /
 Disallow: /admin
@@ -7,7 +17,7 @@ Disallow: /login
 Disallow: /signup
 Disallow: /find-password
 
-# 네이버 봇 — 명시적 허용 (private 경로는 동일하게 차단)
+# ── 국내 검색엔진 봇 ─────────────────────────
 User-agent: Yeti
 Allow: /
 Disallow: /admin
@@ -17,8 +27,78 @@ Disallow: /login
 Disallow: /signup
 Disallow: /find-password
 
-# 다음(카카오) 봇 — 명시적 허용
 User-agent: Daum
 Allow: /
+Disallow: /admin
+Disallow: /write
+Disallow: /mypage
+Disallow: /login
+Disallow: /signup
+Disallow: /find-password
 
+# ── AI 크롤러 — 명시적 Allow (콘텐츠 학습·검색 답변 인용 허용) ──
+User-agent: GPTBot
+Allow: /
+Disallow: /admin
+Disallow: /write
+Disallow: /mypage
+Disallow: /login
+Disallow: /signup
+Disallow: /find-password
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin
+Disallow: /write
+Disallow: /mypage
+Disallow: /login
+Disallow: /signup
+Disallow: /find-password
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /write
+Disallow: /mypage
+Disallow: /login
+Disallow: /signup
+Disallow: /find-password
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin
+Disallow: /write
+Disallow: /mypage
+Disallow: /login
+Disallow: /signup
+Disallow: /find-password
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /admin
+Disallow: /write
+Disallow: /mypage
+Disallow: /login
+Disallow: /signup
+Disallow: /find-password
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin
+Disallow: /write
+Disallow: /mypage
+Disallow: /login
+Disallow: /signup
+Disallow: /find-password
+
+User-agent: CCBot
+Allow: /
+Disallow: /admin
+Disallow: /write
+Disallow: /mypage
+Disallow: /login
+Disallow: /signup
+Disallow: /find-password
+
+# ── 사이트맵 ─────────────────────────────────
 Sitemap: https://www.eummedia.kr/sitemap.xml
