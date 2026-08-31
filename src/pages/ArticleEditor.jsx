@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { pingSitemap } from '../lib/sitemapPing'
@@ -714,47 +714,16 @@ export default function ArticleEditor() {
       const { data: { publicUrl } } = supabase.storage
         .from('article-images')
         .getPublicUrl(path)
-      // 업로드 성공 → 캡션·alt 순차 prompt 입력
-      //   · 캡션: 사진 아래 표시. 출처·날짜 포함 가능
-      //   · alt: 검색·시각장애인용 대체 텍스트. 100자 이내 권장. 125자 초과 시 경고
-      //   두 값 결정 후 [이미지:URL|캡션|alt] (또는 슬롯 축약 형식) 태그 삽입
-      const captionInput = window.prompt(
-        '① 캡션 (사진 아래 표시) — 출처·날짜 포함 가능\n\n예) 대둔산 케이블카 정상 / 사진=이음미디어제공\n\n비워두면 캡션 없이 사진만 표시됩니다.',
-        ''
-      )
-      if (captionInput === null) {
-        // 취소 → 태그 삽입 안 함 (업로드된 파일은 스토리지에 남지만 참조는 안 됨)
-        return
-      }
-      const altInput = window.prompt(
-        '② 대체 텍스트(alt) — 검색·시각장애인 안내용\n\n· 사진에 보이는 것을 한 문장으로.\n· 100자 이내 권장.\n· 출처·날짜·인원은 캡션에만.\n· 비워두면 캡션에서 자동 추출.',
-        ''
-      )
-      if (altInput === null) {
-        return
-      }
-      if (altInput.trim().length > 125) {
-        alert('⚠️ 대체 텍스트가 125자를 초과했습니다.\n짧게 줄이는 걸 권장하지만, 이대로 저장은 진행됩니다.')
-      }
-
-      // 커서 위치에 태그 삽입 (단락 매칭 위해 앞뒤 \n 강제)
+      // 업로드 성공 → 즉시 [이미지:URL] 태그 삽입 (URL만, 캡션·alt 없음)
+      //   · prompt 취소 시 이미지가 사라지는 UX 문제 해소 — 이미지 먼저 넣고 나중에 편집
+      //   · 캡션·alt는 아래 인라인 편집 카드에서 여러 줄 입력·수정·글자수 카운터 지원
       const ta = contentRef.current
       const start = ta?.selectionStart ?? content.length
       const end = ta?.selectionEnd ?? content.length
-      const caption = captionInput.trim()
-      const alt = altInput.trim()
-
-      let snippet
-      if (alt) {
-        snippet = `\n[이미지:${publicUrl}|${caption}|${alt}]\n`
-      } else if (caption) {
-        snippet = `\n[이미지:${publicUrl}|${caption}]\n`
-      } else {
-        snippet = `\n[이미지:${publicUrl}]\n`
-      }
+      const snippet = `\n[이미지:${publicUrl}]\n`
       const newContent = content.slice(0, start) + snippet + content.slice(end)
       setContent(newContent)
-      // 커서를 삽입 태그 끝으로
+      // 커서를 삽입 태그 끝으로 이동 (사용자가 계속 본문 입력 가능)
       setTimeout(() => {
         if (!ta) return
         ta.focus()
@@ -768,6 +737,50 @@ export default function ArticleEditor() {
       setInlineImageUploading(false)
       e.target.value = ''
     }
+  }
+
+  // ─── 본문 이미지 인라인 편집 (캡션·alt) ─────────────────────────────
+  // content 안 [이미지:URL(|캡션)?(|alt)?] 태그를 파싱해 편집 카드 리스트로 노출.
+  // 사용자가 캡션·alt를 입력하면 해당 태그만 새 형식으로 replace.
+  //   중복 URL 삽입 케이스: URL 기준 replace라 첫 매치만 교체됨 (실무 대부분 각 이미지 URL 유일).
+  const inlineImages = useMemo(() => {
+    const regex = /\[이미지:([^|\]]+)(?:\|([^|\]]*))?(?:\|([^\]]*))?\]/g
+    const items = []
+    let m
+    while ((m = regex.exec(content)) !== null) {
+      items.push({
+        full: m[0],
+        url: (m[1] || '').trim(),
+        caption: (m[2] || '').trim(),
+        alt: (m[3] || '').trim(),
+      })
+    }
+    return items
+  }, [content])
+
+  const updateInlineImage = (url, patch) => {
+    const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const target = inlineImages.find(i => i.url === url)
+    if (!target) return
+    const caption = (patch.caption ?? target.caption).trim()
+    const alt = (patch.alt ?? target.alt).trim()
+    let newTag
+    if (alt) newTag = `[이미지:${url}|${caption}|${alt}]`
+    else if (caption) newTag = `[이미지:${url}|${caption}]`
+    else newTag = `[이미지:${url}]`
+    // 첫 매치만 replace (같은 URL 여러 개면 첫 것만 편집됨 — 안전한 선택)
+    const findRe = new RegExp(escapeRe(target.full))
+    setContent(prev => prev.replace(findRe, newTag))
+  }
+
+  const removeInlineImage = (url) => {
+    const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const target = inlineImages.find(i => i.url === url)
+    if (!target) return
+    if (!window.confirm('이 이미지를 본문에서 제거할까요?\n(스토리지의 파일은 남습니다)')) return
+    // 앞뒤 개행까지 함께 제거
+    const findRe = new RegExp('\\n?' + escapeRe(target.full) + '\\n?')
+    setContent(prev => prev.replace(findRe, '\n'))
   }
 
   // slug 생성 — crypto.randomUUID()는 secure context(HTTPS/localhost) 전용 → LAN HTTP에서 throw
@@ -1673,6 +1686,92 @@ export default function ArticleEditor() {
                 {content.length >= 500 ? ' ✓ (500자 이상)' : ' (500자 이상 필요)'}
               </div>
             </div>
+
+            {/* 8.5 본문 이미지 캡션·alt 편집 — 본문에 삽입된 [이미지:...] 태그를 자동 파싱 */}
+            {inlineImages.length > 0 && (
+              <div style={card}>
+                <label style={lbl}>
+                  본문 이미지 캡션·대체 텍스트 <span style={{ color: '#888', fontWeight: 500, fontSize: 15 }}>({inlineImages.length}장)</span>
+                </label>
+                <div style={{ fontSize: 13, color: '#666', marginBottom: 16, lineHeight: 1.7 }}>
+                  본문에 삽입된 이미지의 캡션·대체 텍스트를 편집합니다.
+                  캡션은 사진 아래 표시(출처·날짜 가능), 대체 텍스트는 검색·시각장애인용입니다.
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                  {inlineImages.map((img, idx) => {
+                    const altLen = img.alt.length
+                    const altColor = altLen > 125 ? '#c0392b' : altLen > 100 ? '#c45c0a' : '#888'
+                    const altWeight = altLen > 100 ? 700 : 500
+                    return (
+                      <div key={img.url + ':' + idx} style={{
+                        display: 'grid', gridTemplateColumns: '120px 1fr', gap: 14,
+                        padding: 14, background: '#fafafa',
+                        border: '1px solid #e6e6e6', borderRadius: 8,
+                      }}>
+                        {/* 썸네일 */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          <img src={img.url} alt="" style={{
+                            width: '100%', height: 90, objectFit: 'cover',
+                            borderRadius: 4, background: '#fff', border: '1px solid #ddd',
+                          }} />
+                          <button type="button" onClick={() => removeInlineImage(img.url)}
+                            style={{
+                              fontSize: 11, color: '#c0392b', background: '#fff',
+                              border: '1px solid #e0b0a8', borderRadius: 4,
+                              padding: '4px 6px', cursor: 'pointer', fontFamily: SANS,
+                            }}>
+                            🗑 본문에서 제거
+                          </button>
+                        </div>
+                        {/* 입력 영역 */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          <div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: NAVY, marginBottom: 4 }}>
+                              캡션 (사진 아래 표시 · 출처·날짜 포함 가능)
+                            </div>
+                            <textarea
+                              value={img.caption}
+                              onChange={e => updateInlineImage(img.url, { caption: e.target.value })}
+                              rows={2}
+                              placeholder="예: 대둔산 케이블카 정상. 사진=이음미디어제공"
+                              style={{
+                                width: '100%', boxSizing: 'border-box',
+                                padding: '8px 10px', fontSize: 14, lineHeight: 1.6,
+                                border: '1px solid #d0d0d0', borderRadius: 4,
+                                fontFamily: 'inherit', resize: 'vertical',
+                              }} />
+                          </div>
+                          <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: NAVY }}>
+                                대체 텍스트(alt) — 검색·시각장애인 안내용
+                              </div>
+                              <div style={{ fontSize: 11, color: altColor, fontWeight: altWeight, fontVariantNumeric: 'tabular-nums' }}>
+                                {altLen} / 125자{altLen > 125 ? ' ⚠️' : altLen > 100 ? ' 권장 초과' : ''}
+                              </div>
+                            </div>
+                            <input type="text"
+                              value={img.alt}
+                              onChange={e => updateInlineImage(img.url, { alt: e.target.value })}
+                              placeholder="사진에 보이는 것을 한 문장으로 (100자 이내 권장)"
+                              style={{
+                                width: '100%', boxSizing: 'border-box',
+                                padding: '8px 10px', fontSize: 14, lineHeight: 1.6,
+                                border: `1px solid ${altLen > 125 ? '#c0392b' : '#d0d0d0'}`, borderRadius: 4,
+                                fontFamily: 'inherit',
+                              }} />
+                            <div style={{ fontSize: 11, color: '#888', marginTop: 4, lineHeight: 1.6 }}>
+                              사진에 보이는 것을 한 문장으로. 100자 이내. 출처·날짜·인원은 캡션에만.
+                              비워두면 캡션에서 출처를 뺀 값이 자동 사용됩니다.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* 9. 본문 중간 배너 (선택) — 광고/협찬. 제목 있으면 배너 표시, 이미지 있으면 이미지형 자동 분기 */}
             <div style={card}>
