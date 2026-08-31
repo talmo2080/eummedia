@@ -714,20 +714,52 @@ export default function ArticleEditor() {
       const { data: { publicUrl } } = supabase.storage
         .from('article-images')
         .getPublicUrl(path)
-      // 커서 위치에 [이미지:URL|캡션] 태그 삽입 (단락 단위 매칭 위해 앞뒤 \n 강제)
+      // 업로드 성공 → 캡션·alt 순차 prompt 입력
+      //   · 캡션: 사진 아래 표시. 출처·날짜 포함 가능
+      //   · alt: 검색·시각장애인용 대체 텍스트. 100자 이내 권장. 125자 초과 시 경고
+      //   두 값 결정 후 [이미지:URL|캡션|alt] (또는 슬롯 축약 형식) 태그 삽입
+      const captionInput = window.prompt(
+        '① 캡션 (사진 아래 표시) — 출처·날짜 포함 가능\n\n예) 대둔산 케이블카 정상 / 사진=이음미디어제공\n\n비워두면 캡션 없이 사진만 표시됩니다.',
+        ''
+      )
+      if (captionInput === null) {
+        // 취소 → 태그 삽입 안 함 (업로드된 파일은 스토리지에 남지만 참조는 안 됨)
+        return
+      }
+      const altInput = window.prompt(
+        '② 대체 텍스트(alt) — 검색·시각장애인 안내용\n\n· 사진에 보이는 것을 한 문장으로.\n· 100자 이내 권장.\n· 출처·날짜·인원은 캡션에만.\n· 비워두면 캡션에서 자동 추출.',
+        ''
+      )
+      if (altInput === null) {
+        return
+      }
+      if (altInput.trim().length > 125) {
+        alert('⚠️ 대체 텍스트가 125자를 초과했습니다.\n짧게 줄이는 걸 권장하지만, 이대로 저장은 진행됩니다.')
+      }
+
+      // 커서 위치에 태그 삽입 (단락 매칭 위해 앞뒤 \n 강제)
       const ta = contentRef.current
       const start = ta?.selectionStart ?? content.length
       const end = ta?.selectionEnd ?? content.length
-      const defaultCaption = '캡션을 입력하세요'
-      const snippet = `\n[이미지:${publicUrl}|${defaultCaption}]\n`
+      const caption = captionInput.trim()
+      const alt = altInput.trim()
+
+      let snippet
+      if (alt) {
+        snippet = `\n[이미지:${publicUrl}|${caption}|${alt}]\n`
+      } else if (caption) {
+        snippet = `\n[이미지:${publicUrl}|${caption}]\n`
+      } else {
+        snippet = `\n[이미지:${publicUrl}]\n`
+      }
       const newContent = content.slice(0, start) + snippet + content.slice(end)
       setContent(newContent)
-      // 커서를 캡션 텍스트 위치로 — 사용자가 바로 수정 가능
+      // 커서를 삽입 태그 끝으로
       setTimeout(() => {
         if (!ta) return
         ta.focus()
-        const captionStart = start + snippet.indexOf(defaultCaption)
-        ta.setSelectionRange(captionStart, captionStart + defaultCaption.length)
+        const afterSnippet = start + snippet.length
+        ta.setSelectionRange(afterSnippet, afterSnippet)
       }, 0)
     } catch (err) {
       console.error('inline image upload error:', err)

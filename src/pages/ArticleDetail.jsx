@@ -120,21 +120,31 @@ function paragraphToHtml(p) {
     // white-space:pre-line — 박스 내부 \n을 시각적 줄바꿈으로 자동 처리
     return `<div style="background:#f0f5ff;border:1px solid #93b4e8;border-left:4px solid #0d2d52;border-radius:8px;padding:16px 20px;margin:20px 0;white-space:pre-line;">${inner}</div>`;
   }
-  // 본문 콘텐츠 이미지 [이미지:URL|캡션] — <figure><img alt><figcaption></figure>
-  // 캡션을 alt에 주입 → SSG prerender HTML에 그대로 박혀 검색·AI 노출
-  m = text.match(/^\[이미지:([^|\]]+)(?:\|([^\]]*))?\]$/);
+  // 본문 콘텐츠 이미지 — <figure><img alt><figcaption></figure>
+  //   형식 (하위 호환):
+  //     · 2슬롯: [이미지:URL|캡션]           (기존, 캡션이 alt로 fallback)
+  //     · 3슬롯: [이미지:URL|캡션|대체텍스트]  (신규, alt 분리)
+  //   alt 결정 규칙:
+  //     · 3번째 슬롯(alt) 있으면 그대로 사용 (권장)
+  //     · 없으면 캡션에서 "사진=..." 이후 출처 제거한 값 사용 (하위 호환)
+  //     · 둘 다 비면 '본문 이미지' 기본값
+  m = text.match(/^\[이미지:([^|\]]+)(?:\|([^|\]]*))?(?:\|([^\]]*))?\]$/);
   if (m) {
     const url = String(m[1]).trim();
     const caption = (m[2] || '').trim();
+    const altExplicit = (m[3] || '').trim();
     // 보안: https:// 시작 URL만 허용 (외부 임의 URL 방어)
     if (/^https:\/\//.test(url)) {
       const safeUrl = escapeHtml(url);
       const safeCaption = escapeHtml(caption);
-      const altAttr = safeCaption || '본문 이미지';
+      // alt fallback: 캡션에서 "사진=..." 출처 문구 제거 (검색·AI에 노출되는 값 정리)
+      const captionForAlt = caption.replace(/\s*사진\s*=[^,]*$/, '').trim();
+      const altText = altExplicit || captionForAlt || '본문 이미지';
+      const safeAlt = escapeHtml(altText);
       const figcaption = caption
         ? `<figcaption style="font-size:0.85rem;color:#888;text-align:center;margin-top:8px;line-height:1.6;">${safeCaption}</figcaption>`
         : '';
-      return `<figure style="margin:28px auto;text-align:center;"><img src="${safeUrl}" alt="${altAttr}" loading="lazy" style="max-width:100%;height:auto;display:block;margin:0 auto;border-radius:4px;" />${figcaption}</figure>`;
+      return `<figure style="margin:28px auto;text-align:center;"><img src="${safeUrl}" alt="${safeAlt}" loading="lazy" style="max-width:100%;height:auto;display:block;margin:0 auto;border-radius:4px;" />${figcaption}</figure>`;
     }
     // 잘못된 URL (http://, javascript: 등) — 일반 단락으로 fallthrough (escape 처리)
   }
