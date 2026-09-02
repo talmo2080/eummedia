@@ -150,23 +150,28 @@ export default function Header() {
 
           {/* 우측 버튼 — 데스크탑 (768px+) */}
           <div className="hidden md:flex" style={{ gap: 10, alignItems: "center" }}>
-            {/* 피움 로고 */}
+            {/* 피움 로고 + "피움" 텍스트 — 옆 메뉴와 시각 균형
+                alt="" — 옆 텍스트가 접근성 이름 제공, 중복 낭독 회피 */}
             <Link
               to="/pium-store"
               aria-label="피움 웹앱스토어"
               style={{
-                display: "flex",
+                display: "inline-flex",
                 alignItems: "center",
-                justifyContent: "center",
+                gap: 6,
                 textDecoration: "none",
-                marginRight: 10,
+                color: NAVY,
+                fontSize: 13,
+                fontWeight: 700,
+                padding: "6px 10px",
               }}
             >
               <img
                 src="/pium-logo.png"
-                alt="피움"
-                style={{ height: 28, width: "auto", objectFit: "contain", display: "block" }}
+                alt=""
+                style={{ height: 22, width: "auto", objectFit: "contain", display: "block" }}
               />
+              <span>피움</span>
             </Link>
             {/* 이음마케팅 — 8/13 확정 브랜드명(이음AI마케팅 → 이음마케팅).
                 로고(EM 적/청 + AI MARKETING 워드마크) 파일 업로드 후 이미지로 교체 예정. */}
