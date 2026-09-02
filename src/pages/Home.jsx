@@ -773,7 +773,8 @@ export default function Home() {
       {/* ━━━━━━━━━━━ 데스크탑 본문 (lg 이상) — 기존 그대로 ━━━━━━━━━━━ */}
       <div className="hidden lg:grid lg:grid-cols-[1fr_300px]" style={{ maxWidth:"1200px", margin:"0 auto", padding:"32px 32px 56px", gap:"40px", alignItems:"start" }}>
 
-        <main>
+        {/* 데스크탑 콘텐츠 컬럼 — 최상위 <main>이 이미 있어 여기는 <div>로 (main 태그 페이지당 1개 유지) */}
+        <div>
           {/* 히어로 — 1면 대표 캐러셀 (1~3개) 또는 폴백(최신 1건) */}
           {featuredArticles.length > 0 ? (
             <div style={{ position:"relative", marginBottom:"24px" }}
@@ -960,7 +961,7 @@ export default function Home() {
 
           {/* 주식 현황 위젯 */}
           <StockWidget />
-        </main>
+        </div>
 
         {/* 사이드바 — 협찬 3개 (양주상회 → 플레이앤팝 → 닥터리부트) */}
         <aside className="lg:sticky lg:top-5" style={{ display:"flex", flexDirection:"column", gap:"24px" }}>
