@@ -38,6 +38,15 @@ function AppShell() {
 
   return (
     <AuthProvider>
+      {/* Skip-to-content 링크 — 키보드·스크린리더 사용자용
+          평소엔 sr-only (화면에서 안 보임)로 감춤. Tab 누르면 첫 focus로 이동해 표시.
+          클릭·Enter 시 <main id="main-content">로 포커스 이동. */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[9999] focus:bg-[#0d2d52] focus:text-white focus:px-4 focus:py-2 focus:rounded focus:shadow-lg focus:font-bold"
+      >
+        본문 바로가기
+      </a>
       {!isPium && <Header />}
       <Routes>
         {/* ── 이음미디어 라우트 ── */}
