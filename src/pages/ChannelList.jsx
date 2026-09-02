@@ -247,7 +247,7 @@ export default function ChannelList() {
     </div>
 
     {/* ━━━━━━━━━━━ 모바일·태블릿 (lg 미만) — 신문형 4섹션 ━━━━━━━━━━━ */}
-    <div className="lg:hidden bg-white min-h-screen pb-12" style={{fontFamily:"'Noto Sans KR',sans-serif"}}>
+    <main id="main-content" className="lg:hidden bg-white min-h-screen pb-12" style={{fontFamily:"'Noto Sans KR',sans-serif"}}>
 
       {/* ① 채널 헤더 (좌측 색상 라인 + 아이콘 + 이름 + 한 줄 설명) */}
       <header className={`border-l-4 ${getChannelBorderClass(channel?.name || activeChannel)} bg-white px-4 py-4 mb-4`}>
@@ -406,7 +406,7 @@ export default function ChannelList() {
           </>
         );
       })()}
-    </div>
+    </main>
     </>
   );
 }

@@ -42,12 +42,12 @@ export default function Footer() {
               이음미디어
             </div>
             <div style={{
-              opacity: 0.5, fontSize: 10, letterSpacing: 3, marginBottom: 10,
+              color: '#c9c9c9', fontSize: 10, letterSpacing: 3, marginBottom: 10,
             }}>
               E-UM MEDIA
             </div>
             <p style={{
-              fontSize: 13, lineHeight: 1.7, opacity: 0.7, margin: 0,
+              fontSize: 13, lineHeight: 1.7, color: '#d0d0d0', margin: 0,
             }}>
               세상과 당신을 잇는<br />인터넷신문
             </p>
@@ -55,17 +55,17 @@ export default function Footer() {
 
           {/* [B] 바로가기 영역 (중앙) */}
           <div>
-            <h4 style={{
+            <h3 style={{
               color: GOLD, fontSize: 14, fontWeight: 700,
               letterSpacing: 1.5, marginBottom: 18, marginTop: 0,
             }}>
               바로가기
-            </h4>
+            </h3>
             {QUICK_LINKS.map(item => (
               <div key={item.to} style={{ marginBottom: 12 }}>
                 <Link to={item.to}
                   style={{
-                    color: '#595959', fontSize: 13,
+                    color: '#d0d0d0', fontSize: 13,
                     textDecoration: 'none',
                     transition: 'color 0.2s',
                     display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -82,16 +82,16 @@ export default function Footer() {
 
           {/* [C] 매체 정보 영역 (우측, 통합) */}
           <div>
-            <h4 style={{
+            <h3 style={{
               color: GOLD, fontSize: 14, fontWeight: 700,
               letterSpacing: 1.5, marginBottom: 18, marginTop: 0,
             }}>
               매체 정보
-            </h4>
+            </h3>
 
             {/* 등록번호 강조 */}
             <div style={{
-              fontSize: 13, fontWeight: 600, opacity: 0.95, marginBottom: 12,
+              fontSize: 13, fontWeight: 600, color: '#e8e8e8', marginBottom: 12,
             }}>
               등록번호: 서울 아56526
             </div>
@@ -99,39 +99,39 @@ export default function Footer() {
             {/* 인물 영역 (3행) */}
             <table style={{
               borderCollapse: 'collapse', marginBottom: 16,
-              fontSize: 12.5, opacity: 0.8,
+              fontSize: 12.5, color: '#d0d0d0',
             }}>
               <tbody>
                 <tr>
-                  <td style={{ width: 60, padding: '3px 0', opacity: 0.7 }}>발행인</td>
+                  <td style={{ width: 60, padding: '3px 0', color: '#c9c9c9' }}>발행인</td>
                   <td style={{ padding: '3px 0' }}>성창운</td>
                 </tr>
                 <tr>
-                  <td style={{ padding: '3px 0', opacity: 0.7 }}>편집인</td>
+                  <td style={{ padding: '3px 0', color: '#c9c9c9' }}>편집인</td>
                   <td style={{ padding: '3px 0' }}>정세연</td>
                 </tr>
                 <tr>
-                  <td style={{ padding: '3px 0', opacity: 0.7 }}>대표</td>
+                  <td style={{ padding: '3px 0', color: '#c9c9c9' }}>대표</td>
                   <td style={{ padding: '3px 0' }}>최일례</td>
                 </tr>
               </tbody>
             </table>
 
             {/* 이메일 */}
-            <div style={{ fontSize: 12.5, opacity: 0.8, marginBottom: 8 }}>
+            <div style={{ fontSize: 12.5, color: '#d0d0d0', marginBottom: 8 }}>
               📧 press@eummedia.kr
             </div>
 
             {/* 주소 */}
             <div style={{
-              fontSize: 12.5, opacity: 0.8, lineHeight: 1.7, marginBottom: 12,
+              fontSize: 12.5, color: '#d0d0d0', lineHeight: 1.7, marginBottom: 12,
             }}>
               📍 서울특별시 관악구<br />
               &nbsp;&nbsp;&nbsp;&nbsp;남부순환로 1699 2층
             </div>
 
             {/* 법인 */}
-            <div style={{ fontSize: 11, opacity: 0.55 }}>
+            <div style={{ fontSize: 11, color: '#b8b8b8' }}>
               주식회사 봉숭아학당문화혁신학교
             </div>
           </div>
@@ -142,7 +142,7 @@ export default function Footer() {
           borderTop: '1px solid #1e4a7a',
           paddingTop: 24,
           fontSize: 12,
-          opacity: 0.5,
+          color: '#b8b8b8',
           textAlign: 'center',
         }}>
           © 2026 이음미디어. All rights reserved.
@@ -192,7 +192,7 @@ export default function Footer() {
           <div>
             <Link
               to="/subscribe"
-              className="inline-flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-md transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-md transition-colors"
             >
               📋 구독 신청하기
             </Link>

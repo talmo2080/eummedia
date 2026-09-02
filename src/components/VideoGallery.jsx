@@ -48,7 +48,9 @@ export default function VideoGallery({ videos }) {
         ) : (
           <button type="button"
             onClick={() => embedUrl && setPlaying(true)}
-            aria-label={active?.title ? `${active.title} 영상 재생` : '영상 재생'}
+            aria-label={active?.title
+              ? `${active.channels?.name ? active.channels.name + ' ' : ''}▶ ${active.title} 영상 재생`
+              : '영상 재생'}
             style={{
               position: 'absolute', inset: 0,
               width: '100%', height: '100%',

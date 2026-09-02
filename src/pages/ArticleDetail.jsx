@@ -227,13 +227,15 @@ const socialIconStyle = { fontSize: "24px", textDecoration: "none", lineHeight: 
 // (AUTHOR_ARTICLES MOCK 제거됨 — 동적 fetch로 교체, authorArticles state 사용)
 // (INIT_COMMENTS MOCK 제거됨 — supabase comments 테이블에서 실시간 fetch)
 
-function StickyBtn({ onClick, title, bg, fg, active, activeColor, children }) {
+function StickyBtn({ onClick, title, bg, fg, active, activeColor, visibleText, children }) {
   const [h, setH] = useState(false);
+  // visibleText가 있으면 그것으로 aria-label 시작 (label-content-name-mismatch 회피)
+  const label = visibleText ? `${visibleText} — ${title}` : title;
   return (
     <button
       onClick={onClick}
       title={title}
-      aria-label={title}
+      aria-label={label}
       onMouseEnter={() => setH(true)}
       onMouseLeave={() => setH(false)}
       style={{
@@ -265,7 +267,7 @@ function StickyReactionBar({ liked, likeCount, onLike, onCopy, copied, onKakao, 
     { icon: "💬", label: commentCount, onClick: () => document.getElementById("comment-section")?.scrollIntoView({ behavior: "smooth" }), title: "댓글" },
     { type: "divider" },
     { icon: "K", label: "카톡", onClick: onKakao, title: "카카오 공유", bg: "#FEE500", fg: "#3C1E1E", iconStyle: { fontSize: "13px", fontWeight: "900" } },
-    { icon: "f", label: "FB", onClick: onFb, title: "페이스북 공유", bg: "#1877F2", fg: "white", iconStyle: { fontSize: "13px", fontWeight: "900" } },
+    { icon: "f", label: "FB", onClick: onFb, title: "페이스북 공유", bg: "#166FE5", fg: "white", iconStyle: { fontSize: "13px", fontWeight: "900" } },
     { icon: copied ? "✅" : "🔗", label: copied ? "복사됨" : "링크", onClick: onCopy, title: "링크 복사" },
   ];
 
@@ -273,8 +275,10 @@ function StickyReactionBar({ liked, likeCount, onLike, onCopy, copied, onKakao, 
     <div style={{ position: "sticky", top: "120px", display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", width: "52px", alignSelf: "flex-start" }}>
       {buttons.map((btn, i) => {
         if (btn.type === "divider") return <div key={i} style={{ width: "1px", height: "14px", background: "#e0e0e0", margin: "2px 0" }} />;
+        // visible text = 이모지/아이콘 + 라벨 (예: "🤍 3", "K 카톡")
+        const visibleText = `${btn.icon} ${btn.label}`;
         return (
-          <StickyBtn key={i} onClick={btn.onClick} title={btn.title} bg={btn.bg} fg={btn.fg} active={btn.active} activeColor={btn.activeColor}>
+          <StickyBtn key={i} onClick={btn.onClick} title={btn.title} bg={btn.bg} fg={btn.fg} active={btn.active} activeColor={btn.activeColor} visibleText={visibleText}>
             <span style={btn.iconStyle || { fontSize: "16px" }}>{btn.icon}</span>
             <span style={{ fontSize: "9px", color: btn.fg || (btn.active ? btn.activeColor : "#595959"), fontWeight: "700", lineHeight: 1 }}>{btn.label}</span>
           </StickyBtn>
@@ -289,7 +293,7 @@ function BottomReactionBar({ liked, likeCount, onLike, onCopy, copied, onKakao, 
     { icon: liked ? "❤️" : "🤍", label: likeCount, onClick: onLike, title: "좋아요", active: liked, activeColor: "#e74c3c" },
     { icon: "💬", label: commentCount, onClick: () => document.getElementById("comment-section")?.scrollIntoView({ behavior: "smooth" }), title: "댓글" },
     { icon: "K", label: "카톡", onClick: onKakao, title: "카카오 공유", bg: "#FEE500", fg: "#3C1E1E", isBrand: true },
-    { icon: "f", label: "FB", onClick: onFb, title: "페이스북 공유", bg: "#1877F2", fg: "white", isBrand: true },
+    { icon: "f", label: "FB", onClick: onFb, title: "페이스북 공유", bg: "#166FE5", fg: "white", isBrand: true },
     { icon: copied ? "✅" : "🔗", label: copied ? "복사됨" : "링크", onClick: onCopy, title: "링크 복사" },
   ];
 
@@ -313,7 +317,7 @@ function BottomReactionBar({ liked, likeCount, onLike, onCopy, copied, onKakao, 
           key={i}
           onClick={it.onClick}
           title={it.title}
-          aria-label={it.title}
+          aria-label={`${it.icon} ${it.label} — ${it.title}`}
           style={{
             minWidth: 52, minHeight: 52,
             padding: "6px 8px",

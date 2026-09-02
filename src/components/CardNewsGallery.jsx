@@ -46,7 +46,7 @@ export default function CardNewsGallery({ items, onOpen }) {
             <div key={item.id || i} className={hideClass}>
               <button type="button"
                 onClick={() => onOpen?.(item)}
-                aria-label={`카드뉴스 5장 보기 — ${article?.title || ''}`}
+                aria-label={`${article?.title || ''} — 카드뉴스 5장 보기`}
                 style={{
                   background: 'transparent', border: 0, padding: 0,
                   cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
