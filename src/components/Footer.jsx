@@ -65,13 +65,13 @@ export default function Footer() {
               <div key={item.to} style={{ marginBottom: 12 }}>
                 <Link to={item.to}
                   style={{
-                    color: '#bbb', fontSize: 13,
+                    color: '#595959', fontSize: 13,
                     textDecoration: 'none',
                     transition: 'color 0.2s',
                     display: 'inline-flex', alignItems: 'center', gap: 8,
                   }}
                   onMouseEnter={e => { e.currentTarget.style.color = GOLD }}
-                  onMouseLeave={e => { e.currentTarget.style.color = '#bbb' }}
+                  onMouseLeave={e => { e.currentTarget.style.color = '#595959' }}
                 >
                   <span>{item.icon}</span>
                   <span>{item.label}</span>
@@ -233,7 +233,7 @@ export default function Footer() {
               href="/rss.xml"
               target="_blank"
               rel="noopener"
-              className="text-neutral-500 hover:text-[#0d2d52] transition-colors inline-flex items-center gap-1"
+              className="text-neutral-600 hover:text-[#0d2d52] transition-colors inline-flex items-center gap-1"
               title="이음미디어 RSS 피드 구독"
             >
               📡 RSS 구독
@@ -241,7 +241,7 @@ export default function Footer() {
           </div>
 
           {/* 섹션 7. 저작권 */}
-          <div className="text-xs leading-relaxed text-neutral-500">
+          <div className="text-xs leading-relaxed text-neutral-600">
             <p>Copyright © 2026 eummedia.kr</p>
             <p>All rights reserved.</p>
           </div>

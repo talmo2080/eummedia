@@ -263,7 +263,7 @@ function PreviewModal({ article, onClose }) {
           {' · '}
           작성일 {formatDateTime(article.created_at)}
           {article.citizen_complete > 0 && (
-            <span style={{ marginLeft: 10, color: '#888' }}>· 시민기자 체크 {article.citizen_complete}/14</span>
+            <span style={{ marginLeft: 10, color: '#595959' }}>· 시민기자 체크 {article.citizen_complete}/14</span>
           )}
         </div>
 
@@ -573,7 +573,7 @@ function CardNewsModal({ article, onClose, onDelete, onSaved }) {
 
           {/* 이미지 업로드 (표지·엔딩에만 배경으로 사용됨) */}
           <div className="border-2 border-dashed border-neutral-300 rounded-lg p-3 text-center mt-3">
-            <div className="text-xs text-neutral-500 mb-2 leading-relaxed">
+            <div className="text-xs text-neutral-600 mb-2 leading-relaxed">
               {current.type === 'main'
                 ? '본문은 글이 주인공입니다 — 이미지 업로드 무관'
                 : '슬라이드 전용 이미지 (선택) — 비워두면 기사 대표이미지 사용'}
@@ -612,7 +612,7 @@ function CardNewsModal({ article, onClose, onDelete, onSaved }) {
             />
           )}
 
-          <div className="text-right text-xs text-neutral-500">
+          <div className="text-right text-xs text-neutral-600">
             {current.type === 'cover' && `${current.title.length}/15`}
             {current.type === 'main' && `제목 ${current.title.length}/10 · 내용 ${current.text.length}/40`}
             {current.type === 'ending' && `${current.text.length}/30`}
@@ -1172,7 +1172,7 @@ export default function AdminDashboard() {
                   flex: 1, height: 56, fontSize: 18, fontWeight: 700,
                   fontFamily: SANS,
                   background: active ? NAVY : '#f0f0f0',
-                  color: active ? '#fff' : '#888',
+                  color: active ? '#fff' : '#595959',
                   border: 'none', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   transition: 'all 0.15s',
@@ -1242,12 +1242,12 @@ export default function AdminDashboard() {
             </div>
 
             {filteredArticles.length === 0 && (
-              <div style={{ ...card, textAlign: 'center', color: '#888', fontSize: 18, padding: 40 }}>
+              <div style={{ ...card, textAlign: 'center', color: '#595959', fontSize: 18, padding: 40 }}>
                 해당 상태의 기사가 없습니다.
               </div>
             )}
             {visibleArticles.map(a => {
-              const sb = ARTICLE_STATUS_LABELS[a.status] || { label: a.status, color: '#888', bg: '#f0f0f0' }
+              const sb = ARTICLE_STATUS_LABELS[a.status] || { label: a.status, color: '#595959', bg: '#f0f0f0' }
               const showApprovedBanner = approvedId === a.id && a.status === 'published'
               const isRejecting = rejectingId === a.id
               const completeness = a.status === 'draft' ? 0 : 15
@@ -1278,7 +1278,7 @@ export default function AdminDashboard() {
                       background: sb.bg, color: sb.color, fontWeight: 700,
                       padding: '4px 10px', borderRadius: 12,
                     }}>{sb.label}</span>
-                    <span style={{ color: '#888', marginLeft: 'auto' }}>{formatDateTime(a.created_at)}</span>
+                    <span style={{ color: '#595959', marginLeft: 'auto' }}>{formatDateTime(a.created_at)}</span>
                   </div>
 
                   <div style={{
@@ -1375,8 +1375,8 @@ export default function AdminDashboard() {
                                 padding: '8px 14px', fontSize: 13, fontWeight: 700,
                                 borderRadius: 4, cursor: 'pointer',
                                 background: a.is_main_featured ? '#d4a017' : '#fff',
-                                color: a.is_main_featured ? '#fff' : '#888',
-                                border: `1px solid ${a.is_main_featured ? '#d4a017' : '#bbb'}`,
+                                color: a.is_main_featured ? '#fff' : '#595959',
+                                border: `1px solid ${a.is_main_featured ? '#d4a017' : '#595959'}`,
                                 fontFamily: "'Noto Sans KR', sans-serif",
                               }}>
                               {a.is_main_featured
@@ -1394,8 +1394,8 @@ export default function AdminDashboard() {
                                 padding: '8px 14px', fontSize: 13, fontWeight: 700,
                                 borderRadius: 4, cursor: 'pointer',
                                 background: a.show_in_side_ad ? '#1c4f8a' : '#fff',
-                                color: a.show_in_side_ad ? '#fff' : '#888',
-                                border: `1px solid ${a.show_in_side_ad ? '#1c4f8a' : '#bbb'}`,
+                                color: a.show_in_side_ad ? '#fff' : '#595959',
+                                border: `1px solid ${a.show_in_side_ad ? '#1c4f8a' : '#595959'}`,
                                 fontFamily: "'Noto Sans KR', sans-serif",
                               }}>
                               {a.show_in_side_ad
@@ -1524,7 +1524,7 @@ export default function AdminDashboard() {
             </div>
 
             {filteredEntries.length === 0 && (
-              <div style={{ ...card, textAlign: 'center', color: '#888', fontSize: 18, padding: 40 }}>
+              <div style={{ ...card, textAlign: 'center', color: '#595959', fontSize: 18, padding: 40 }}>
                 해당 상태의 시민기자/신청자가 없습니다.
               </div>
             )}
@@ -1542,7 +1542,7 @@ export default function AdminDashboard() {
               // 상태 배지
               const badge = status === 'pending' ? { label: '🔴 승인대기', color: RED, bg: '#fef0ef' }
                           : status === 'rejected' ? { label: '❌ 반려됨', color: ORANGE, bg: '#fff8f0' }
-                          : (u?.is_active === false ? { label: '🚫 정지됨', color: '#888', bg: '#f0f0f0' }
+                          : (u?.is_active === false ? { label: '🚫 정지됨', color: '#595959', bg: '#f0f0f0' }
                                                      : { label: '✅ 활동중', color: GREEN, bg: '#eef7f2' })
 
               const showApprovedBanner = isApp && approvedUserId === app.user_id && status === 'approved' && u?.is_active
@@ -1575,7 +1575,7 @@ export default function AdminDashboard() {
                         신청서 없음 (legacy)
                       </span>
                     )}
-                    <span style={{ color: '#888', fontSize: 13, marginLeft: 'auto' }}>
+                    <span style={{ color: '#595959', fontSize: 13, marginLeft: 'auto' }}>
                       {isApp
                         ? `신청일: ${dbDateToShort(app.applied_at)}`
                         : `가입일: ${dbDateToShort(u.created_at)}`}
@@ -1689,7 +1689,7 @@ export default function AdminDashboard() {
                 color: NAVY, margin: 0, lineHeight: 1.4,
               }}>
                 🧑‍🤝‍🧑 회원 관리
-                <span style={{ fontSize: 16, fontWeight: 500, color: '#888', marginLeft: 8 }}>
+                <span style={{ fontSize: 16, fontWeight: 500, color: '#595959', marginLeft: 8 }}>
                   · 전체 {users.length}명
                 </span>
               </h1>
@@ -1744,7 +1744,7 @@ export default function AdminDashboard() {
 
             {/* 목록 */}
             {filteredMembers.length === 0 ? (
-              <div style={{ ...card, textAlign: 'center', color: '#888', fontSize: 16, padding: 40 }}>
+              <div style={{ ...card, textAlign: 'center', color: '#595959', fontSize: 16, padding: 40 }}>
                 해당 필터의 회원이 없습니다.
               </div>
             ) : (
@@ -1816,7 +1816,7 @@ export default function AdminDashboard() {
               <StatCard label="총 기사 수" value="41건" color={NAVY} />
               <StatCard label="이번 달 발행" value="8건" color={GREEN} />
               <StatCard label="시민기자 수" value="12명" color={BLUE} />
-              <StatCard label="구독자 수" value="준비중" color="#888" />
+              <StatCard label="구독자 수" value="준비중" color="#595959" />
             </div>
 
             <div style={card}>

@@ -102,7 +102,7 @@ export default function Videos() {
       {loading ? (
         <div style={{
           padding: '80px 20px', textAlign: 'center',
-          fontSize: 15, color: '#9a9a9a',
+          fontSize: 15, color: '#595959',
         }}>
           영상을 불러오는 중입니다…
         </div>
@@ -204,7 +204,7 @@ export default function Videos() {
                         WebkitBoxOrient: 'vertical', overflow: 'hidden',
                       }}>{v.summary}</div>
                     )}
-                    <div style={{ fontSize: 12, color: '#9a9a9a' }}>
+                    <div style={{ fontSize: 12, color: '#595959' }}>
                       {formatDate(v.published_at)}
                     </div>
                   </div>
@@ -221,7 +221,7 @@ export default function Videos() {
                   minWidth: 180, padding: '14px 28px',
                   fontSize: 17, fontWeight: 700,
                   background: loadingMore ? '#f0f0f0' : '#fff',
-                  color: loadingMore ? '#888' : NAVY,
+                  color: loadingMore ? '#595959' : NAVY,
                   border: `2px solid ${loadingMore ? '#ccc' : NAVY}`, borderRadius: 8,
                   cursor: loadingMore ? 'wait' : 'pointer',
                   fontFamily: SANS,
@@ -234,7 +234,7 @@ export default function Videos() {
           {/* 카운트 표시 */}
           <div style={{
             marginTop: 24, textAlign: 'center',
-            fontSize: 13, color: '#9a9a9a',
+            fontSize: 13, color: '#595959',
           }}>
             총 {videos.length}건 표시{hasMore ? ' · 더보기로 추가 로드' : ''}
           </div>

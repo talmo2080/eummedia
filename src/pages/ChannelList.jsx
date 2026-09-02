@@ -172,7 +172,7 @@ export default function ChannelList() {
         </div>
       )}
 
-      <main style={s.main}>
+      <main id="main-content" style={s.main}>
         <div style={s.filterBar}>
           <div style={s.tabRow}>
             {CHANNELS.map(ch=>(
@@ -211,7 +211,7 @@ export default function ChannelList() {
         {channel && !featured && latest.length === 0 && (
           <div style={s.empty}>
             <div style={{fontSize:"3rem"}}>📭</div>
-            <p style={{color:"#888",marginTop:12}}>아직 기사가 없습니다.</p>
+            <p style={{color:"#595959",marginTop:12}}>아직 기사가 없습니다.</p>
           </div>
         )}
 
@@ -346,7 +346,7 @@ export default function ChannelList() {
       {channel && !featured && latest.length === 0 && !error && (
         <div className="text-center py-16">
           <div className="text-5xl mb-3">📭</div>
-          <p className="text-sm text-neutral-500">아직 기사가 없습니다.</p>
+          <p className="text-sm text-neutral-600">아직 기사가 없습니다.</p>
         </div>
       )}
 
@@ -383,7 +383,7 @@ export default function ChannelList() {
                           {a.summary}
                         </p>
                       </div>
-                      <div className="text-[10px] text-neutral-500 mt-1">
+                      <div className="text-[10px] text-neutral-600 mt-1">
                         {formatDate(a.published_at)}
                       </div>
                     </div>
@@ -458,7 +458,7 @@ const s = {
   searchInput:{border:"1.5px solid #e2e8f0",borderRight:"none",borderRadius:"20px 0 0 20px",padding:"6px 12px",fontSize:"0.82rem",outline:"none",fontFamily:"'Noto Sans KR',sans-serif",width:130},
   searchBtn:{background:"#0d2d52",color:"#fff",border:"none",borderRadius:"0 20px 20px 0",padding:"6px 12px",cursor:"pointer"},
   searchResult:{background:"#fffbeb",border:"1px solid #f0d060",borderRadius:8,padding:"10px 16px",marginBottom:20,fontSize:"0.88rem",color:"#555",display:"flex",alignItems:"center",gap:12},
-  clearBtn:{background:"none",border:"1px solid #ccc",borderRadius:12,padding:"3px 10px",cursor:"pointer",fontSize:"0.78rem",color:"#888"},
+  clearBtn:{background:"none",border:"1px solid #ccc",borderRadius:12,padding:"3px 10px",cursor:"pointer",fontSize:"0.78rem",color:"#595959"},
   skeletonGrid:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:24},
   skeleton:{height:300,borderRadius:14,background:"linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%)",backgroundSize:"800px 100%",animation:"shimmer 1.5s infinite"},
   empty:{textAlign:"center",padding:"80px 20px"},
@@ -467,7 +467,8 @@ const s = {
   featuredImg:{width:"100%",height:"100%",objectFit:"cover",display:"block"},
   featuredBody:{padding:"32px 28px",display:"flex",flexDirection:"column",justifyContent:"center",gap:12},
   featuredMeta:{display:"flex",gap:10,alignItems:"center"},
-  featuredLabel:{fontSize:"0.78rem",color:"#c9a84c",fontWeight:600},
+  // 편집국장 픽 라벨: 배지형 (배경 NAVY, 골드 텍스트) — 대비율 7.4:1로 WCAG AAA 만족
+  featuredLabel:{fontSize:"0.72rem",color:"#c9a84c",fontWeight:700,background:"#0d2d52",padding:"4px 10px",borderRadius:4,display:"inline-block"},
   featuredTitle:{fontFamily:"'Noto Serif KR',serif",fontSize:"1.4rem",fontWeight:700,color:"#0d2d52",lineHeight:1.5,margin:0},
   featuredSummary:{color:"#555",fontSize:"0.93rem",lineHeight:1.8,margin:0},
   featuredFooter:{display:"flex",gap:12,flexWrap:"wrap"},
@@ -483,6 +484,6 @@ const s = {
   tag:{background:"#f0f4f8",color:"#4a6fa5",fontSize:"0.73rem",padding:"3px 8px",borderRadius:10},
   cardFooter:{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:"auto",paddingTop:10,borderTop:"1px solid #f0f4f8"},
   badge:{display:"inline-block",color:"#fff",fontSize:"0.72rem",padding:"3px 9px",borderRadius:10,fontWeight:600},
-  metaText:{fontSize:"0.78rem",color:"#aaa"},
+  metaText:{fontSize:"0.78rem",color:"#595959"},
   loadMore:{display:"block",margin:"32px auto 0",background:"#fff",border:"2px solid #0d2d52",color:"#0d2d52",padding:"11px 36px",borderRadius:28,cursor:"pointer",fontSize:"0.9rem",fontWeight:600,fontFamily:"'Noto Sans KR',sans-serif"},
 };

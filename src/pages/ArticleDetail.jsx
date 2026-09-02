@@ -189,7 +189,7 @@ function paragraphToHtml(p) {
       const altText = altExplicit || captionForAlt || '';
       const safeAlt = escapeHtml(altText);
       const figcaption = caption
-        ? `<figcaption style="font-size:0.85rem;color:#888;text-align:center;margin-top:8px;line-height:1.6;">${safeCaption}</figcaption>`
+        ? `<figcaption style="font-size:0.85rem;color:#595959;text-align:center;margin-top:8px;line-height:1.6;">${safeCaption}</figcaption>`
         : '';
       return `<figure style="margin:28px auto;text-align:center;"><img src="${safeUrl}" alt="${safeAlt}" loading="lazy" style="max-width:100%;height:auto;display:block;margin:0 auto;border-radius:4px;" />${figcaption}</figure>`;
     }
@@ -276,7 +276,7 @@ function StickyReactionBar({ liked, likeCount, onLike, onCopy, copied, onKakao, 
         return (
           <StickyBtn key={i} onClick={btn.onClick} title={btn.title} bg={btn.bg} fg={btn.fg} active={btn.active} activeColor={btn.activeColor}>
             <span style={btn.iconStyle || { fontSize: "16px" }}>{btn.icon}</span>
-            <span style={{ fontSize: "9px", color: btn.fg || (btn.active ? btn.activeColor : "#9a9a9a"), fontWeight: "700", lineHeight: 1 }}>{btn.label}</span>
+            <span style={{ fontSize: "9px", color: btn.fg || (btn.active ? btn.activeColor : "#595959"), fontWeight: "700", lineHeight: 1 }}>{btn.label}</span>
           </StickyBtn>
         );
       })}
@@ -678,7 +678,7 @@ export default function ArticleDetail() {
   }
   if (!article) {
     return (
-      <div aria-busy="true" style={{ maxWidth:"800px", margin:"80px auto", padding:"24px", color:"#9a9a9a", fontSize:"14px", textAlign:"center", fontFamily:"'Noto Sans KR',sans-serif" }}>
+      <div aria-busy="true" style={{ maxWidth:"800px", margin:"80px auto", padding:"24px", color:"#595959", fontSize:"14px", textAlign:"center", fontFamily:"'Noto Sans KR',sans-serif" }}>
         기사를 불러오는 중입니다…
       </div>
     );
@@ -707,7 +707,7 @@ export default function ArticleDetail() {
     <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#fff", color:"#1a1a1a", minHeight:"100vh" }}>
 
       {/* 브레드크럼 */}
-      <div style={{ background:"#f7f8fa", borderBottom:"1px solid #e8e8e8", padding:"10px 0", fontSize:"11px", color:"#9a9a9a" }}>
+      <div style={{ background:"#f7f8fa", borderBottom:"1px solid #e8e8e8", padding:"10px 0", fontSize:"11px", color:"#595959" }}>
         <div style={{ maxWidth:"1200px", margin:"0 auto", padding:"0 32px", display:"flex", gap:"6px", alignItems:"center" }}>
           <Link to="/" style={{ color:"#1c4f8a", textDecoration:"none" }}>홈</Link>
           <span>›</span>
@@ -765,9 +765,9 @@ export default function ArticleDetail() {
             <div aria-hidden="true" style={{ width:"44px", height:"44px", borderRadius:"50%", background:color, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:"18px", fontWeight:"700", flexShrink:0 }}>정</div>
             <div>
               <div style={{ fontSize:"13px", fontWeight:"700", marginBottom:"3px" }}>{a.author_name}</div>
-              <div style={{ fontSize:"11px", color:"#9a9a9a" }}>{a.author_bio}</div>
+              <div style={{ fontSize:"11px", color:"#595959" }}>{a.author_bio}</div>
             </div>
-            <div style={{ marginLeft:"auto", textAlign:"right", fontSize:"11px", color:"#9a9a9a", lineHeight:"1.8" }}>
+            <div style={{ marginLeft:"auto", textAlign:"right", fontSize:"11px", color:"#595959", lineHeight:"1.8" }}>
               <div>{a.published_at}</div>
               <div>
                 <span aria-hidden="true">⏱ </span>
@@ -809,11 +809,11 @@ export default function ArticleDetail() {
           />
           {/* 대표 이미지 캡션 — image_alt 있을 때만 노출 (본문 [이미지:] 캡션과 동일 스타일) */}
           {a.image_alt && (
-            <div style={{ fontSize:"0.85rem", color:"#888", textAlign:"center", marginTop:"8px", lineHeight:"1.6" }}>
+            <div style={{ fontSize:"0.85rem", color:"#595959", textAlign:"center", marginTop:"8px", lineHeight:"1.6" }}>
               {a.image_alt}
             </div>
           )}
-          <div style={{ fontSize:"11px", color:"#9a9a9a", textAlign:"center", marginBottom:"32px", fontStyle:"italic", marginTop: a.image_alt ? "4px" : "0" }}>{a.channel} / 이음미디어</div>
+          <div style={{ fontSize:"11px", color:"#595959", textAlign:"center", marginBottom:"32px", fontStyle:"italic", marginTop: a.image_alt ? "4px" : "0" }}>{a.channel} / 이음미디어</div>
 
           {/* 본문 — 평문 + 원문 보기 (스테이지 1) — 모바일 16/1.8, 데스크탑 17/2.0 */}
           <div className="text-[16px] leading-[1.8] lg:text-[17px] lg:leading-[2.0] text-neutral-800" style={{ fontFamily:"'Noto Sans KR', sans-serif", marginBottom:"24px" }}>
@@ -840,7 +840,7 @@ export default function ArticleDetail() {
                                borderLeft:"4px solid #1c4f8a", overflow:"hidden",
                                textDecoration:"none", color:"inherit",
                                fontFamily:"'Noto Sans KR', sans-serif" }}>
-                      <div style={{ padding:"10px 16px 8px", fontSize:"10px", color:"#9a9a9a", letterSpacing:"1px", fontWeight:"700", borderBottom:"1px solid #e8e8e8" }}>SPONSORED</div>
+                      <div style={{ padding:"10px 16px 8px", fontSize:"10px", color:"#595959", letterSpacing:"1px", fontWeight:"700", borderBottom:"1px solid #e8e8e8" }}>SPONSORED</div>
                       <img src={article.inline_ad_image} alt={article.inline_ad_title}
                         style={{ width:"100%", height:"auto", display:"block" }} />
                       <div style={{ display:"flex", alignItems:"center", gap:"12px", padding:"14px 16px" }}>
@@ -859,7 +859,7 @@ export default function ArticleDetail() {
                   items.push(
                     <a key={"midad-"+i} href={article.inline_ad_link || '#'} target="_blank" rel="noopener noreferrer"
                       style={{ display:"flex", alignItems:"center", gap:"16px", width:"100%", minHeight:"80px", padding:"16px 20px", margin:"32px 0", background:"#f7f8fa", border:"1px solid #e0e0e0", borderLeft:"4px solid #1c4f8a", textDecoration:"none", color:"inherit", fontFamily:"'Noto Sans KR', sans-serif" }}>
-                      <div style={{ fontSize:"10px", color:"#9a9a9a", letterSpacing:"1px", fontWeight:"700", flexShrink:0, paddingRight:"16px", borderRight:"1px solid #e0e0e0" }}>SPONSORED</div>
+                      <div style={{ fontSize:"10px", color:"#595959", letterSpacing:"1px", fontWeight:"700", flexShrink:0, paddingRight:"16px", borderRight:"1px solid #e0e0e0" }}>SPONSORED</div>
                       <div style={{ flex:1, minWidth:0 }}>
                         <div style={{ fontSize:"15px", fontWeight:"700", color:"#0d2d52", marginBottom:"4px" }}>{article.inline_ad_title}</div>
                         {article.inline_ad_subtitle && (
@@ -875,7 +875,7 @@ export default function ArticleDetail() {
               });
             })()}
           </div>
-          <div style={{ borderTop:"2px solid #bbb", margin:"24px 0" }} />
+          <div style={{ borderTop:"2px solid #595959", margin:"24px 0" }} />
           <div style={{ display:"flex", justifyContent: article.external_url ? "space-between" : "center", alignItems:"flex-start", marginBottom:"24px" }}>
             {article.external_url && (
               <a href={article.external_url} target="_blank" rel="noopener noreferrer"
@@ -887,14 +887,14 @@ export default function ArticleDetail() {
               <div style={{ fontSize:"13px", color:"#555", marginBottom:"4px" }}>
                 정세연 편집국장 | press@eummedia.kr
               </div>
-              <div style={{ fontSize:"12px", color:"#888", fontWeight:"600" }}>
+              <div style={{ fontSize:"12px", color:"#595959", fontWeight:"600" }}>
                 ⓒ 이음미디어, 무단전재 및 재배포 금지
               </div>
             </div>
           </div>
           {/* 이음매거진 통합 안내 — 창간(2026-06-04 KST) 이전 발행 기사에만 노출 */}
           {article.published_at && new Date(article.published_at) < LEGACY_NOTICE_CUTOFF && (
-            <div style={{ fontSize:"12px", color:"#9a9a9a", marginBottom:"24px" }}>
+            <div style={{ fontSize:"12px", color:"#595959", marginBottom:"24px" }}>
               이음매거진은 인터넷신문 이음미디어로 통합되었습니다.<br />
               '세상과 당신을 잇는, 더 넓은 미디어의 시작입니다.'
             </div>
@@ -953,7 +953,7 @@ export default function ArticleDetail() {
                 <textarea value={cText} onChange={e => setCText(e.target.value)} placeholder="의견을 남겨주세요..." rows={3} style={{ width:"100%", border:"1px solid #d0d0d0", padding:"10px 12px", fontSize:"13px", fontFamily:"inherit", resize:"none", outline:"none", boxSizing:"border-box", marginBottom:"8px" }} />
                 <div style={{ display:"flex", justifyContent:"flex-end" }}>
                   <button onClick={onComment} disabled={posting || !cText.trim()}
-                    style={{ background: posting || !cText.trim() ? "#9a9a9a" : "#0d2d52", color:"white", border:"none", padding:"8px 20px", fontSize:"12px", fontWeight:"700", cursor: posting || !cText.trim() ? "not-allowed" : "pointer", fontFamily:"inherit" }}>
+                    style={{ background: posting || !cText.trim() ? "#595959" : "#0d2d52", color:"white", border:"none", padding:"8px 20px", fontSize:"12px", fontWeight:"700", cursor: posting || !cText.trim() ? "not-allowed" : "pointer", fontFamily:"inherit" }}>
                     {posting ? "등록 중..." : "댓글 등록"}
                   </button>
                 </div>
@@ -975,7 +975,7 @@ export default function ArticleDetail() {
             )}
 
             {comments.length === 0 && (
-              <div style={{ padding:"24px 0", textAlign:"center", color:"#9a9a9a", fontSize:"13px" }}>
+              <div style={{ padding:"24px 0", textAlign:"center", color:"#595959", fontSize:"13px" }}>
                 아직 댓글이 없습니다. 첫 댓글을 남겨주세요.
               </div>
             )}
@@ -996,13 +996,13 @@ export default function ArticleDetail() {
                       <div style={{ width:"32px", height:"32px", borderRadius:"50%", background:"#e0e0e0", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"14px", fontWeight:"700", color:"#555" }}>{initial}</div>
                       <div>
                         <div style={{ fontSize:"12px", fontWeight:"700" }}>{nickname}</div>
-                        <div style={{ fontSize:"10px", color:"#9a9a9a" }}>
+                        <div style={{ fontSize:"10px", color:"#595959" }}>
                           {date}
-                          {wasEdited && <span style={{ marginLeft:"6px", color:"#bbb" }}>(수정됨)</span>}
+                          {wasEdited && <span style={{ marginLeft:"6px", color:"#595959" }}>(수정됨)</span>}
                         </div>
                       </div>
                     </div>
-                    <div style={{ fontSize:"11px", color:"#9a9a9a" }}>👍 {c.like_count ?? 0}</div>
+                    <div style={{ fontSize:"11px", color:"#595959" }}>👍 {c.like_count ?? 0}</div>
                   </div>
                   {isEditing ? (
                     <div style={{ paddingLeft:"42px" }}>
@@ -1052,7 +1052,7 @@ export default function ArticleDetail() {
 
           {/* 기자란 */}
           <div style={{ border:"1px solid #e0e0e0", padding:"20px", margin:"32px 0", background:"#f7f8fa" }}>
-            <div style={{ fontSize:"11px", color:"#9a9a9a", letterSpacing:"1px", fontWeight:"700", marginBottom:"14px" }}>이 기사를 쓴 기자</div>
+            <div style={{ fontSize:"11px", color:"#595959", letterSpacing:"1px", fontWeight:"700", marginBottom:"14px" }}>이 기사를 쓴 기자</div>
             <div style={{ display:"flex", gap:"14px", alignItems:"flex-start" }}>
               <div style={{ width:"52px", height:"52px", borderRadius:"50%", background:color, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:"20px", fontWeight:"700", flexShrink:0 }}>정</div>
               <div style={{ flex:1 }}>
@@ -1063,13 +1063,13 @@ export default function ArticleDetail() {
                     {showAuthorMore ? "접기 ▲" : "더보기 ▼"}
                   </button>
                 </div>
-                <div style={{ fontSize:"12px", color:"#9a9a9a", marginBottom: showAuthorMore ? "10px" : "0" }}>{a.author_bio}</div>
+                <div style={{ fontSize:"12px", color:"#595959", marginBottom: showAuthorMore ? "10px" : "0" }}>{a.author_bio}</div>
                 {showAuthorMore && (
                   <div>
                     <div style={{ fontSize:"13px", color:"#3a3a3a", lineHeight:"1.7", marginBottom:"16px" }}>{a.author_intro}</div>
                     {authorArticles.length > 0 && (
                       <div style={{ paddingTop:"14px", borderTop:"1px solid #e0e0e0" }}>
-                        <div style={{ fontSize:"11px", color:"#9a9a9a", fontWeight:"700", letterSpacing:"1px", marginBottom:"10px" }}>이 기자의 다른 기사</div>
+                        <div style={{ fontSize:"11px", color:"#595959", fontWeight:"700", letterSpacing:"1px", marginBottom:"10px" }}>이 기자의 다른 기사</div>
                         <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
                           {authorArticles.map(art => (
                             <Link key={art.id} to={`/article/${art.slug}`} style={{ display:"flex", alignItems:"center", gap:"10px", textDecoration:"none" }}>
@@ -1080,7 +1080,7 @@ export default function ArticleDetail() {
                               </div>
                               <div>
                                 <div style={{ fontSize:"12px", color:"#1a1a1a", fontWeight:"600", lineHeight:"1.4" }}>{art.title}</div>
-                                <div style={{ fontSize:"10px", color:"#9a9a9a", marginTop:"2px" }}>{formatDate(art.published_at)}</div>
+                                <div style={{ fontSize:"10px", color:"#595959", marginTop:"2px" }}>{formatDate(art.published_at)}</div>
                               </div>
                             </Link>
                           ))}
@@ -1110,7 +1110,7 @@ export default function ArticleDetail() {
 
           {/* 광고 박스 — 정세연 본인 광고 (광고 샘플 역할) — 카드뉴스 뒤로 이동 (commit 52) */}
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", borderLeft:"4px solid #1c4f8a", padding:"24px 24px 16px", margin:"32px 0" }}>
-            <div style={{ fontSize:"10px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
+            <div style={{ fontSize:"10px", color:"#595959", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
             <div style={{ fontFamily:"serif", fontSize:"17px", fontWeight:"700", color:"#0d2d52", lineHeight:"1.5", marginBottom:"8px", fontStyle:"italic" }}>
               "고객의 마지막 희망이 되고픈 두피전문가"
             </div>
@@ -1127,7 +1127,7 @@ export default function ArticleDetail() {
               <a href="https://www.youtube.com/channel/UCVdGlBOwnxzPs5rnNGhAZuQ" target="_blank" rel="noopener noreferrer" title="유튜브" style={socialIconStyle}>🎥</a>
               <a href="https://blog.naver.com/mzk6682" target="_blank" rel="noopener noreferrer" title="네이버 블로그" style={socialIconStyle}>✍️</a>
             </div>
-            <div style={{ marginTop:"14px", paddingTop:"12px", borderTop:"1px dashed #e0e0e0", fontSize:"11px", color:"#9a9a9a", textAlign:"right" }}>
+            <div style={{ marginTop:"14px", paddingTop:"12px", borderTop:"1px dashed #e0e0e0", fontSize:"11px", color:"#595959", textAlign:"right" }}>
               광고 문의: <a href="mailto:press@eummedia.kr" style={{ color:"#1c4f8a", textDecoration:"none" }}>press@eummedia.kr</a>
             </div>
           </div>
@@ -1236,7 +1236,7 @@ export default function ArticleDetail() {
 
           {/* 광고(양주상회) — 사진 배너 + 내부 라우트 */}
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
-            <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
+            <div style={{ fontSize:"9px", color:"#595959", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
             <img src="/ads/yangju-sanghoe.jpg" alt="양주상회 종암동 고깃집"
                  loading="lazy"
                  style={{ display:"block", width:"100%", height:"120px", objectFit:"cover", marginBottom:"12px", borderRadius:"2px" }} />
@@ -1254,7 +1254,7 @@ export default function ArticleDetail() {
           {sideAdArticles.map(ad => (
             <div key={ad.slug} style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"10px" }}>
-                <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px" }}>광고</div>
+                <div style={{ fontSize:"9px", color:"#595959", letterSpacing:"1px" }}>광고</div>
                 {ad.side_ad_badge && (
                   <span style={{ fontSize:"10px", fontWeight:"700", color:"#1c4f8a", background:"#e8f0fa", padding:"2px 8px", borderRadius:"3px", letterSpacing:"0.5px" }}>
                     {ad.side_ad_badge}
@@ -1281,7 +1281,7 @@ export default function ArticleDetail() {
 
           {/* 광고(플레이앤팝) — 사진 배너 + 내부 라우트 */}
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
-            <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
+            <div style={{ fontSize:"9px", color:"#595959", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
             <img src="/ads/play-and-pop.jpg" alt="오창 플레이앤팝 인형뽑기"
                  loading="lazy"
                  style={{ display:"block", width:"100%", height:"120px", objectFit:"cover", marginBottom:"12px", borderRadius:"2px" }} />
@@ -1297,7 +1297,7 @@ export default function ArticleDetail() {
 
           {/* 광고(닥터리부트) — 사진 배너 + 외부 링크 + SNS 4개 유지 */}
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
-            <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
+            <div style={{ fontSize:"9px", color:"#595959", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
             <img src="/ads/dr-reboot.jpg" alt="닥터리부트 두피관리센터"
                  loading="lazy"
                  style={{ display:"block", width:"100%", height:"120px", objectFit:"cover", marginBottom:"12px", borderRadius:"2px" }} />

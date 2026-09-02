@@ -120,7 +120,7 @@ export default function MyPage() {
               }
             </p>
             {joinedDate && (
-              <p className="text-xs text-neutral-500 mt-1">
+              <p className="text-xs text-neutral-600 mt-1">
                 가입일: {joinedDate}
               </p>
             )}
@@ -200,15 +200,15 @@ export default function MyPage() {
           </h2>
           <dl className="text-sm">
             <div className="flex py-2 border-b border-neutral-100">
-              <dt className="w-20 text-neutral-500 font-semibold flex-shrink-0">닉네임</dt>
+              <dt className="w-20 text-neutral-600 font-semibold flex-shrink-0">닉네임</dt>
               <dd className="text-neutral-900 truncate">{profile?.nickname || '—'}</dd>
             </div>
             <div className="flex py-2 border-b border-neutral-100">
-              <dt className="w-20 text-neutral-500 font-semibold flex-shrink-0">이메일</dt>
+              <dt className="w-20 text-neutral-600 font-semibold flex-shrink-0">이메일</dt>
               <dd className="text-neutral-900 truncate">{user.email}</dd>
             </div>
             <div className="flex py-2">
-              <dt className="w-20 text-neutral-500 font-semibold flex-shrink-0">가입일</dt>
+              <dt className="w-20 text-neutral-600 font-semibold flex-shrink-0">가입일</dt>
               <dd className="text-neutral-900">{joinedDate || '—'}</dd>
             </div>
           </dl>
@@ -281,9 +281,9 @@ export default function MyPage() {
         </div>
 
         {loading ? (
-          <div className="text-center py-12 text-neutral-500">불러오는 중...</div>
+          <div className="text-center py-12 text-neutral-600">불러오는 중...</div>
         ) : filteredArticles.length === 0 ? (
-          <div className="text-center py-12 text-neutral-500 bg-neutral-50 rounded-lg">
+          <div className="text-center py-12 text-neutral-600 bg-neutral-50 rounded-lg">
             {filter === 'all' ? (
               <>
                 아직 작성한 기사가 없습니다.
@@ -346,7 +346,7 @@ function ApplicationStatusCard({ app }) {
             </h2>
             <p className="text-sm text-neutral-700 leading-relaxed">
               편집국장이 검토 후 1-3일 이내에 연락드립니다.
-              {dateStr && <span className="text-xs text-neutral-500 ml-2">(신청일: {dateStr})</span>}
+              {dateStr && <span className="text-xs text-neutral-600 ml-2">(신청일: {dateStr})</span>}
             </p>
           </div>
         </div>
@@ -431,12 +431,12 @@ function ArticleCard({ article, onDelete }) {
           {statusInfo.label}
         </span>
         {article.channels?.name && (
-          <span className="text-xs text-neutral-500">
+          <span className="text-xs text-neutral-600">
             [{article.channels.name}]
           </span>
         )}
         {article.citizen_complete > 0 && (
-          <span className="text-xs text-neutral-500">
+          <span className="text-xs text-neutral-600">
             · {article.citizen_complete}/14
           </span>
         )}
@@ -455,7 +455,7 @@ function ArticleCard({ article, onDelete }) {
       )}
 
       {/* 시각 + 조회수 */}
-      <div className="text-xs text-neutral-500 mt-2 flex gap-3 flex-wrap">
+      <div className="text-xs text-neutral-600 mt-2 flex gap-3 flex-wrap">
         <span>📅 {new Date(article.updated_at).toLocaleString('ko-KR')}</span>
         {article.status === 'published' && (
           <>

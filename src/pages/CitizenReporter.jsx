@@ -248,7 +248,7 @@ export default function CitizenReporter() {
           </div>
         ) : checking ? (
           /* 본인 기존 신청서 확인 중 */
-          <div style={{ padding: '40px', textAlign: 'center', color: '#888', fontSize: 14 }}>
+          <div style={{ padding: '40px', textAlign: 'center', color: '#595959', fontSize: 14 }}>
             확인 중...
           </div>
         ) : alreadyActive ? (
@@ -407,7 +407,7 @@ export default function CitizenReporter() {
               <textarea style={{ ...inp, height: 110, resize: 'vertical', lineHeight: 1.7 }}
                 placeholder="왜 이음미디어 시민기자로 활동하고 싶으신가요? (50자 이상)"
                 value={form.motive} onChange={e => setForm(f => ({ ...f, motive: e.target.value }))} />
-              <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, marginTop: 4, color: form.motive.trim().length >= 50 ? '#1a6b3c' : '#888' }}>
+              <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, marginTop: 4, color: form.motive.trim().length >= 50 ? '#1a6b3c' : '#595959' }}>
                 {form.motive.trim().length}자{form.motive.trim().length < 50 ? ' (50자 이상 필요)' : ' ✓'}
               </div>
             </div>
@@ -471,7 +471,7 @@ export default function CitizenReporter() {
             <div onClick={() => setOpenFaq(openFaq === i ? null : i)}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0', cursor: 'pointer', fontSize: 13.5, fontWeight: 600, color: openFaq === i ? '#1c4f8a' : '#1a1a1a' }}>
               <span>Q. {item.q}</span>
-              <span style={{ fontSize: 18, color: '#9a9a9a', transition: 'transform 0.2s', transform: openFaq === i ? 'rotate(45deg)' : 'none', flexShrink: 0 }}>+</span>
+              <span style={{ fontSize: 18, color: '#595959', transition: 'transform 0.2s', transform: openFaq === i ? 'rotate(45deg)' : 'none', flexShrink: 0 }}>+</span>
             </div>
             {openFaq === i && (
               <div style={{ fontSize: 13, color: '#6b6b6b', lineHeight: 1.8, paddingBottom: 16 }}>{item.a}</div>

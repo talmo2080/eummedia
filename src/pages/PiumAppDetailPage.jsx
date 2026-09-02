@@ -3504,6 +3504,13 @@ function GilBongJoPage() {
 .gbj-wrap .ct .row{display:flex;gap:14px;padding:11px 0;border-bottom:1px dashed var(--line);font-size:15px}
 .gbj-wrap .ct .row:last-child{border:0}
 .gbj-wrap .ct .row .k{flex:0 0 84px;color:var(--mut);font-size:13px;font-weight:700;padding-top:2px}
+.gbj-wrap .ct .tel{display:inline-flex;align-items:center;gap:9px;min-height:52px;padding:6px 18px 6px 14px;margin:-5px 0;
+  border:1px solid #BFD6F7;border-radius:12px;background:#F2F7FE;color:#1157C4;
+  font-size:19px;font-weight:700;line-height:1.2;text-decoration:none;font-variant-numeric:tabular-nums;
+  transition:background .15s,border-color .15s}
+.gbj-wrap .ct .tel svg{width:19px;height:19px;flex:none}
+.gbj-wrap .ct .tel:hover{background:#E2EDFD;border-color:#1668E3}
+.gbj-wrap .ct .tel:focus-visible{outline:3px solid #1668E3;outline-offset:2px}
 .gbj-wrap .fld{width:100%;height:44px;border:1px solid var(--line);border-radius:9px;margin-top:12px;background:#F8FAFD;padding:0 12px;font-size:15px;font-family:inherit;color:var(--ink)}
 .gbj-wrap .fld.tall{height:104px;padding:10px 12px;resize:vertical}
 .gbj-wrap .btn{margin-top:16px;height:50px;border-radius:10px;background:var(--blue);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:16px;border:none;cursor:pointer;width:100%;font-family:inherit}
@@ -3604,6 +3611,8 @@ function GilBongJoPage() {
  .gbj-wrap .ch .d svg{width:19px;height:19px}
  .gbj-wrap .ch b{font-size:12.5px;line-height:1.35}
  .gbj-wrap .ch span{font-size:10px;margin-top:3px;word-break:break-all;line-height:1.4}
+ /* ③ 전화 버튼 — 손가락으로 누르기 쉽게 전체 폭 */
+ .gbj-wrap .ct .tel{width:100%;justify-content:center;min-height:56px;font-size:20px;margin:2px 0 0}
  /* ③ 현장 사진 가로 스크롤 */
  .gbj-wrap .acts{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;padding-bottom:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
  .gbj-wrap .acts::-webkit-scrollbar{display:none}
@@ -3836,8 +3845,8 @@ function GilBongJoPage() {
         <div className="sec-h">CONTACT</div><div className="sec-t">문의하기</div>
         <div className="ct">
           <div className="box">
-            <div className="row"><div className="k">사무실</div><div>02-6949-3000</div></div>
-            <div className="row"><div className="k">상담 전화</div><div>010-8291-0088</div></div>
+            <div className="row"><div className="k">사무실</div><div><a className="tel" href="tel:0269493000" aria-label="사무실로 전화 걸기, 02-6949-3000"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>02-6949-3000</a></div></div>
+            <div className="row"><div className="k">상담 전화</div><div><a className="tel" href="tel:01082910088" aria-label="상담 전화 걸기, 010-8291-0088"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>010-8291-0088</a></div></div>
             <div className="row"><div className="k">오시는 길</div><div>서울 송파구 송파대로 201<br /><span style={{color:'#6E809A',fontSize:'13px'}}>문정역 4번 출구에서 직진 150m</span></div></div>
             <div className="row"><div className="k">강의</div><div>매주 금요일 오후 2시 ~ 4시 맥파분석 강의</div></div>
           </div>

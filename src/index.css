@@ -7,3 +7,25 @@
 /* 가로 스크롤 영역 스크롤바 숨김 (헤더 채널 네비 등) */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Skip-to-content 링크 — 접근성 (WCAG 2.4.1 Bypass Blocks)
+   평소엔 화면 밖(-40px), Tab focus 시 화면 안(top:8px)으로. Lighthouse가 focusable 판정. */
+.skip-link {
+  position: fixed;
+  top: -40px;
+  left: 8px;
+  z-index: 9999;
+  background: #0d2d52;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: top 0.15s;
+}
+.skip-link:focus {
+  top: 8px;
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}

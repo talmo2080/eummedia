@@ -52,7 +52,7 @@ function formatDate(iso) {
 // 빈 블록용 안내 — 컴포넌트 바깥에 정의 (react-hooks/static-components 규칙)
 function PrepMsg({ label }) {
   return (
-    <div style={{ padding:"18px 8px", textAlign:"center", color:"#9a9a9a", fontSize:"12px", background:"#fafbfc", borderRadius:6 }}>
+    <div style={{ padding:"18px 8px", textAlign:"center", color:"#595959", fontSize:"12px", background:"#fafbfc", borderRadius:6 }}>
       📡 {label} 데이터 준비 중 (API 활성화 대기)
     </div>
   );
@@ -93,9 +93,12 @@ function StockWidget() {
     return () => { cancelled = true; };
   }, []);
 
-  const colorUp = '#e74c3c', colorDown = '#1c7ed6';
+  // WCAG 대비 4.5:1 확보 위해 진한 톤 사용 (2026-09-04 접근성 2단계)
+  const colorUp = '#c0392b', colorDown = '#1863b0';
   const c = s => s.up ? colorUp : colorDown;
   const bg = s => s.up ? '#fff0f0' : '#f0f4ff';
+  // 색상만으로 상승/하락 구분하지 않도록 기호 병기 (WCAG 1.4.1)
+  const arrow = s => s.up ? '▲' : '▼';
 
   return (
     <div style={{ background:"#fff", border:"1px solid #e0e0e0", borderTop:"3px solid #0d2d52", marginTop:"40px" }}>
@@ -104,7 +107,7 @@ function StockWidget() {
         <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
           <span style={{ fontSize:"16px" }}>📈</span>
           <span style={{ fontSize:"14px", fontWeight:"700", color:"#0d2d52" }}>증시 현황</span>
-          <span style={{ fontSize:"11px", color:"#9a9a9a", marginLeft:"4px" }}>
+          <span style={{ fontSize:"11px", color:"#595959", marginLeft:"4px" }}>
             {data.basDt ? `${data.basDt} 종가 기준` : (loading ? '불러오는 중...' : '')}
           </span>
         </div>
@@ -125,7 +128,7 @@ function StockWidget() {
 
       <div style={{ padding:"16px 20px" }}>
         {loading ? (
-          <div style={{ padding:"32px 8px", textAlign:"center", color:"#9a9a9a", fontSize:"12px" }}>
+          <div style={{ padding:"32px 8px", textAlign:"center", color:"#595959", fontSize:"12px" }}>
             불러오는 중...
           </div>
         ) : errMsg ? (
@@ -144,8 +147,8 @@ function StockWidget() {
                       <div style={{ fontSize:11, fontWeight:700, color:"#666", marginBottom:4 }}>{i.name}</div>
                       <div style={{ fontSize:20, fontWeight:800, color:"#1a1a1a", lineHeight:1.1, marginBottom:4 }}>{i.value}</div>
                       <div style={{ display:"flex", justifyContent:"space-between", fontSize:11 }}>
-                        <span style={{ color: c(i), fontWeight:600 }}>{i.change}</span>
-                        <span style={{ color: c(i), background: bg(i), padding:"1px 7px", borderRadius:3, fontWeight:700 }}>{i.pct}</span>
+                        <span style={{ color: c(i), fontWeight:600 }}><span aria-hidden="true">{arrow(i)}</span> {i.change}</span>
+                        <span style={{ color: c(i), background: bg(i), padding:"1px 7px", borderRadius:3, fontWeight:700 }}><span aria-hidden="true">{arrow(i)}</span> {i.pct}</span>
                       </div>
                     </div>
                   ))}
@@ -158,18 +161,31 @@ function StockWidget() {
               <div style={{ fontSize:11, fontWeight:700, color:"#0d2d52", letterSpacing:1, marginBottom:8 }}>📊 주요 종목</div>
               {data.stocks.length === 0 ? <PrepMsg label="종목" /> : (
                 <table style={{ width:"100%", borderCollapse:"collapse", fontSize:"12px" }}>
+                  <caption style={{ position:"absolute", left:"-9999px" }}>주요 종목의 종가·변동·등락률</caption>
+                  <thead>
+                    <tr style={{ borderBottom:"1px solid #e0e0e0" }}>
+                      <th scope="col" style={{ padding:"6px 8px", textAlign:"left", fontSize:"11px", color:"#595959", fontWeight:"700" }}>종목</th>
+                      <th scope="col" style={{ padding:"6px 8px", textAlign:"right", fontSize:"11px", color:"#595959", fontWeight:"700" }}>종가</th>
+                      <th scope="col" style={{ padding:"6px 8px", textAlign:"right", fontSize:"11px", color:"#595959", fontWeight:"700" }}>변동</th>
+                      <th scope="col" style={{ padding:"6px 8px", textAlign:"right", fontSize:"11px", color:"#595959", fontWeight:"700" }}>등락률</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     {data.stocks.map(s => (
                       <tr key={s.code} style={{ borderBottom:"1px solid #f7f7f7" }}>
                         <td style={{ padding:"8px 8px" }}>
                           <div style={{ fontWeight:"600", color:"#1a1a1a" }}>{s.name}</div>
-                          <div style={{ fontSize:"10px", color:"#bbb", marginTop:"1px" }}>{s.code}</div>
+                          <div style={{ fontSize:"10px", color:"#595959", marginTop:"1px" }}>{s.code}</div>
                         </td>
                         <td style={{ padding:"8px 8px", textAlign:"right", fontWeight:"600" }}>{s.price}</td>
-                        <td style={{ padding:"8px 8px", textAlign:"right", color: c(s), fontWeight:"500" }}>{s.change}</td>
+                        <td style={{ padding:"8px 8px", textAlign:"right", color: c(s), fontWeight:"500" }}>
+                          <span aria-hidden="true">{arrow(s)}</span> {s.change}
+                        </td>
                         <td style={{ padding:"8px 8px", textAlign:"right" }}>
                           <span style={{ display:"inline-block", padding:"2px 8px", borderRadius:3, fontSize:11, fontWeight:700,
-                            background: bg(s), color: c(s) }}>{s.pct}</span>
+                            background: bg(s), color: c(s) }}>
+                            <span aria-hidden="true">{arrow(s)}</span> {s.pct}
+                          </span>
                         </td>
                       </tr>
                     ))}
@@ -183,15 +199,28 @@ function StockWidget() {
               <div style={{ fontSize:11, fontWeight:700, color:"#0d2d52", letterSpacing:1, marginBottom:8 }}>💹 ETF</div>
               {data.etfs.length === 0 ? <PrepMsg label="ETF" /> : (
                 <table style={{ width:"100%", borderCollapse:"collapse", fontSize:"12px" }}>
+                  <caption style={{ position:"absolute", left:"-9999px" }}>주요 ETF의 종가·변동·등락률</caption>
+                  <thead>
+                    <tr style={{ borderBottom:"1px solid #e0e0e0" }}>
+                      <th scope="col" style={{ padding:"6px 8px", textAlign:"left", fontSize:"11px", color:"#595959", fontWeight:"700" }}>ETF</th>
+                      <th scope="col" style={{ padding:"6px 8px", textAlign:"right", fontSize:"11px", color:"#595959", fontWeight:"700" }}>종가</th>
+                      <th scope="col" style={{ padding:"6px 8px", textAlign:"right", fontSize:"11px", color:"#595959", fontWeight:"700" }}>변동</th>
+                      <th scope="col" style={{ padding:"6px 8px", textAlign:"right", fontSize:"11px", color:"#595959", fontWeight:"700" }}>등락률</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     {data.etfs.map(e => (
                       <tr key={e.name} style={{ borderBottom:"1px solid #f7f7f7" }}>
                         <td style={{ padding:"8px 8px", fontWeight:"600", color:"#1a1a1a" }}>{e.name}</td>
                         <td style={{ padding:"8px 8px", textAlign:"right", fontWeight:"600" }}>{e.price}</td>
-                        <td style={{ padding:"8px 8px", textAlign:"right", color: c(e), fontWeight:"500" }}>{e.change}</td>
+                        <td style={{ padding:"8px 8px", textAlign:"right", color: c(e), fontWeight:"500" }}>
+                          <span aria-hidden="true">{arrow(e)}</span> {e.change}
+                        </td>
                         <td style={{ padding:"8px 8px", textAlign:"right" }}>
                           <span style={{ display:"inline-block", padding:"2px 8px", borderRadius:3, fontSize:11, fontWeight:700,
-                            background: bg(e), color: c(e) }}>{e.pct}</span>
+                            background: bg(e), color: c(e) }}>
+                            <span aria-hidden="true">{arrow(e)}</span> {e.pct}
+                          </span>
                         </td>
                       </tr>
                     ))}
@@ -370,7 +399,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f7f8fa", color:"#1a1a1a", minHeight:"100vh" }}>
+    <main id="main-content" style={{ fontFamily:"'Noto Sans KR',sans-serif", background:"#f7f8fa", color:"#1a1a1a", minHeight:"100vh" }}>
 
       {error && (
         <div role="alert" style={{
@@ -437,29 +466,37 @@ export default function Home() {
                     <p className="text-[14px] text-neutral-600 line-clamp-1 mb-1">
                       {a.summary}
                     </p>
-                    <div className="text-[11px] text-neutral-500">
+                    <div className="text-[11px] text-neutral-600">
                       {a.author_name ? `${a.author_name} · ` : ''}{formatDate(a.published_at)}
                     </div>
                   </Link>
                 );
               })}
             </div>
-            {/* 점 인디케이터 (모바일·데스크탑 공통) */}
+            {/* 점 인디케이터 (모바일·데스크탑 공통)
+                시각 크기 10x10 유지 + 클릭 영역 44x44 (WCAG target-size)
+                → button 44x44 + inner span 10x10, negative margin으로 부모 공간 소비 최소화 */}
             {featuredArticles.length > 1 && (
-              <div className="flex justify-center gap-2 mt-4">
+              <div className="flex justify-center items-center mt-4" style={{ gap: 0 }}>
                 {featuredArticles.map((_, i) => (
                   <button key={i} type="button"
                     onClick={() => carouselJump(i)}
                     aria-label={`슬라이드 ${i + 1} 보기`}
                     aria-current={i === activeFeaturedIndex}
-                    className="block"
                     style={{
-                      width: 10, height: 10, padding: 0,
-                      borderRadius: '50%', border: 'none',
-                      background: i === activeFeaturedIndex ? '#0d2d52' : '#cfd3da',
+                      width: 44, height: 44, padding: 0,
+                      margin: '-14px 0',
+                      border: 'none', background: 'transparent',
                       cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                    <span aria-hidden="true" style={{
+                      display: 'block', width: 10, height: 10,
+                      borderRadius: '50%',
+                      background: i === activeFeaturedIndex ? '#0d2d52' : '#cfd3da',
                       transition: 'background 0.15s',
                     }} />
+                  </button>
                 ))}
               </div>
             )}
@@ -483,7 +520,7 @@ export default function Home() {
             <p className="text-[14px] text-neutral-600 line-clamp-1 mb-1">
               {heroArticle.summary}
             </p>
-            <div className="text-[11px] text-neutral-500">
+            <div className="text-[11px] text-neutral-600">
               {heroArticle.author_name ? `${heroArticle.author_name} · ` : ''}{formatDate(heroArticle.published_at)}
             </div>
           </Link>
@@ -577,7 +614,7 @@ export default function Home() {
                             </p>
                           )}
                         </div>
-                        <div className="text-[10px] text-neutral-500 mt-1">
+                        <div className="text-[10px] text-neutral-600 mt-1">
                           {p.author_name ? `${p.author_name} · ` : ''}{formatDate(p.published_at)}
                         </div>
                       </div>
@@ -612,7 +649,7 @@ export default function Home() {
 
         {/* ⑤-a 양주상회 — 사진 배너 + 내부 라우트 (기사) */}
         <div className="px-4 mb-7">
-          <div className="text-[10px] text-neutral-500 tracking-widest mb-2">광고</div>
+          <div className="text-[10px] text-neutral-600 tracking-widest mb-2">광고</div>
           <Link to="/article/article-q787vlqn"
                 className="block bg-white border border-neutral-200 rounded-sm overflow-hidden no-underline">
             <img src="/ads/yangju-sanghoe.jpg" alt="양주상회 종암동 고깃집"
@@ -636,7 +673,7 @@ export default function Home() {
         {sideAdArticles.map(ad => (
           <div key={ad.slug} className="px-4 mb-7">
             <div className="flex items-center justify-between mb-2">
-              <div className="text-[10px] text-neutral-500 tracking-widest">광고</div>
+              <div className="text-[10px] text-neutral-600 tracking-widest">광고</div>
               {ad.side_ad_badge && (
                 <span className="text-[10px] font-bold text-[#1c4f8a] bg-[#e8f0fa] px-2 py-0.5 rounded tracking-wider">
                   {ad.side_ad_badge}
@@ -669,7 +706,7 @@ export default function Home() {
 
         {/* ⑤-b 플레이앤팝 — 사진 배너 + 내부 라우트 (기사) */}
         <div className="px-4 mb-7">
-          <div className="text-[10px] text-neutral-500 tracking-widest mb-2">광고</div>
+          <div className="text-[10px] text-neutral-600 tracking-widest mb-2">광고</div>
           <Link to="/article/article-idb8v7ux"
                 className="block bg-white border border-neutral-200 rounded-sm overflow-hidden no-underline">
             <img src="/ads/play-and-pop.jpg" alt="오창 플레이앤팝 인형뽑기"
@@ -691,7 +728,7 @@ export default function Home() {
 
         {/* ⑤-c 닥터리부트 — 사진 배너 + 외부 링크 (네이버 지도) — SNS 4개 유지 */}
         <div className="px-4 mb-7">
-          <div className="text-[10px] text-neutral-500 tracking-widest mb-2">광고</div>
+          <div className="text-[10px] text-neutral-600 tracking-widest mb-2">광고</div>
           <a href="https://naver.me/GWeDuL23" target="_blank" rel="noopener noreferrer"
              className="block bg-white border border-neutral-200 rounded-sm overflow-hidden no-underline">
             <img src="/ads/dr-reboot.jpg" alt="닥터리부트 두피관리센터"
@@ -804,8 +841,8 @@ export default function Home() {
               {/* 점 인디케이터 (이미지 위 오버레이) */}
               {featuredArticles.length > 1 && (
                 <div style={{
-                  position:"absolute", bottom:12, left:0, right:0,
-                  display:"flex", justifyContent:"center", gap:8,
+                  position:"absolute", bottom:0, left:0, right:0,
+                  display:"flex", justifyContent:"center", alignItems:"center", gap:0,
                 }}>
                   {featuredArticles.map((_, i) => (
                     <button key={i} type="button"
@@ -813,11 +850,19 @@ export default function Home() {
                       aria-label={`슬라이드 ${i + 1} 보기`}
                       aria-current={i === activeFeaturedIndex}
                       style={{
-                        width:10, height:10, padding:0,
-                        borderRadius:"50%", border:"1px solid rgba(255,255,255,0.7)",
+                        width:44, height:44, padding:0,
+                        border:"none", background:"transparent",
+                        cursor:"pointer",
+                        display:"flex", alignItems:"center", justifyContent:"center",
+                      }}>
+                      <span aria-hidden="true" style={{
+                        display:"block", width:10, height:10,
+                        borderRadius:"50%",
+                        border:"1px solid rgba(255,255,255,0.7)",
                         background: i === activeFeaturedIndex ? '#fff' : 'rgba(255,255,255,0.3)',
-                        cursor:"pointer", transition:"background 0.15s",
+                        transition:"background 0.15s",
                       }} />
+                    </button>
                   ))}
                 </div>
               )}
@@ -875,7 +920,7 @@ export default function Home() {
                     <div style={{ padding:"14px" }}>
                       <div style={{ fontSize:"10px", color: CC[a.channels?.name] || "#0d2d52", fontWeight:"700", marginBottom:"6px" }}>{a.channels?.name}</div>
                       <div style={{ fontSize:"14px", fontWeight:"600", color:"#1a1a1a", lineHeight:"1.5", marginBottom:"8px", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{a.title}</div>
-                      <div style={{ display:"flex", justifyContent:"space-between", fontSize:"10px", color:"#9a9a9a" }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", fontSize:"10px", color:"#595959" }}>
                         <span>{formatDate(a.published_at)}</span>
                       </div>
                     </div>
@@ -940,7 +985,7 @@ export default function Home() {
 
           {/* 광고(양주상회) — 사진 배너 + 내부 라우트 */}
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
-            <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
+            <div style={{ fontSize:"9px", color:"#595959", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
             <img src="/ads/yangju-sanghoe.jpg" alt="양주상회 종암동 고깃집"
                  loading="lazy"
                  style={{ display:"block", width:"100%", height:"120px", objectFit:"cover", marginBottom:"12px", borderRadius:"2px" }} />
@@ -958,7 +1003,7 @@ export default function Home() {
           {sideAdArticles.map(ad => (
             <div key={ad.slug} style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"10px" }}>
-                <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px" }}>광고</div>
+                <div style={{ fontSize:"9px", color:"#595959", letterSpacing:"1px" }}>광고</div>
                 {ad.side_ad_badge && (
                   <span style={{ fontSize:"10px", fontWeight:"700", color:"#1c4f8a", background:"#e8f0fa", padding:"2px 8px", borderRadius:"3px", letterSpacing:"0.5px" }}>
                     {ad.side_ad_badge}
@@ -985,7 +1030,7 @@ export default function Home() {
 
           {/* 광고(플레이앤팝) — 사진 배너 + 내부 라우트 */}
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
-            <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
+            <div style={{ fontSize:"9px", color:"#595959", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
             <img src="/ads/play-and-pop.jpg" alt="오창 플레이앤팝 인형뽑기"
                  loading="lazy"
                  style={{ display:"block", width:"100%", height:"120px", objectFit:"cover", marginBottom:"12px", borderRadius:"2px" }} />
@@ -1001,7 +1046,7 @@ export default function Home() {
 
           {/* 광고(닥터리부트) — 사진 배너 + 외부 링크 + SNS 4개 유지 */}
           <div style={{ background:"#f7f8fa", border:"1px solid #e0e0e0", padding:"16px" }}>
-            <div style={{ fontSize:"9px", color:"#9a9a9a", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
+            <div style={{ fontSize:"9px", color:"#595959", letterSpacing:"1px", marginBottom:"10px" }}>광고</div>
             <img src="/ads/dr-reboot.jpg" alt="닥터리부트 두피관리센터"
                  loading="lazy"
                  style={{ display:"block", width:"100%", height:"120px", objectFit:"cover", marginBottom:"12px", borderRadius:"2px" }} />
@@ -1062,6 +1107,6 @@ export default function Home() {
         </aside>
       </div>
 
-    </div>
+    </main>
   );
 }

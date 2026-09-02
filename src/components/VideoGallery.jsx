@@ -48,7 +48,7 @@ export default function VideoGallery({ videos }) {
         ) : (
           <button type="button"
             onClick={() => embedUrl && setPlaying(true)}
-            aria-label="영상 재생"
+            aria-label={active?.title ? `${active.title} 영상 재생` : '영상 재생'}
             style={{
               position: 'absolute', inset: 0,
               width: '100%', height: '100%',
@@ -84,12 +84,12 @@ export default function VideoGallery({ videos }) {
 
       {/* 제목 + 기사 전체 보기 */}
       <div style={{ marginTop: 12, marginBottom: 14 }}>
-        <h3 style={{
+        <h2 style={{
           fontFamily: 'serif', fontSize: 17, fontWeight: 700,
           color: '#1a1a1a', lineHeight: 1.45, margin: '0 0 8px 0',
           display: '-webkit-box', WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical', overflow: 'hidden',
-        }}>{active.title}</h3>
+        }}>{active.title}</h2>
         <Link to={"/article/" + active.slug}
           style={{
             display: 'inline-block', fontSize: 13, fontWeight: 700,

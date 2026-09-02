@@ -244,7 +244,7 @@ export default function Advertise() {
           <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 20, fontWeight: 700, color: '#0d2d52' }}>광고 기사 예시</div>
         </div>
         <div style={{ border: '1px solid #e0e0e0', borderTop: '3px solid #1c4f8a', overflow: 'hidden' }}>
-          <div style={{ background: '#f0f0f0', padding: '8px 16px', fontSize: 11, color: '#888', display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ background: '#f0f0f0', padding: '8px 16px', fontSize: 11, color: '#595959', display: 'flex', justifyContent: 'space-between' }}>
             <span>eummedia.kr/article/article-d13pwd9w</span><span>[협찬]</span>
           </div>
           <div style={{ padding: '24px' }}>
@@ -262,7 +262,7 @@ export default function Advertise() {
               </div>
               <a href="https://www.eummedia.kr/article/article-d13pwd9w" target="_blank" rel="noopener noreferrer" style={{ background: '#0d2d52', color: 'white', border: 'none', padding: '8px 16px', fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: "'Noto Sans KR',sans-serif", textDecoration: 'none', display: 'inline-block' }}>전시 보러가기</a>
             </div>
-            <div style={{ fontSize: 9, color: '#bbb', textAlign: 'right' }}>※ 본 기사는 광고주의 협찬으로 제작되었습니다</div>
+            <div style={{ fontSize: 9, color: '#595959', textAlign: 'right' }}>※ 본 기사는 광고주의 협찬으로 제작되었습니다</div>
           </div>
         </div>
       </div>
@@ -289,7 +289,7 @@ export default function Advertise() {
                   background: '#0d2d52', color: 'white',
                   fontSize: 11, fontWeight: 700, padding: '4px 12px', letterSpacing: 0.5,
                 }}>[ {sample.label} ]</span>
-                <span style={{ fontSize: 12, color: '#888', fontWeight: 600 }}>{sample.spec}</span>
+                <span style={{ fontSize: 12, color: '#595959', fontWeight: 600 }}>{sample.spec}</span>
               </div>
 
               {/* 설명 */}
@@ -329,7 +329,7 @@ export default function Advertise() {
               )}
 
               {/* 워터마크 — 실제 화면 예시 */}
-              <div style={{ fontSize: 10, color: '#bbb', textAlign: 'right', marginTop: 12, fontStyle: 'italic' }}>
+              <div style={{ fontSize: 10, color: '#595959', textAlign: 'right', marginTop: 12, fontStyle: 'italic' }}>
                 ※ 실제 화면 예시
               </div>
             </div>
@@ -408,7 +408,7 @@ export default function Advertise() {
               <div style={{ fontSize: 28, marginBottom: 8 }}>{pkg.icon}</div>
               <div style={{ fontFamily: "'Noto Serif KR',serif", fontSize: 18, fontWeight: 700, color: '#0d2d52', marginBottom: 4 }}>{pkg.name}</div>
               {pkg.sub && (
-                <div style={{ fontSize: 11, color: '#888', fontStyle: 'italic', lineHeight: 1.5, marginBottom: 12 }}>{pkg.sub}</div>
+                <div style={{ fontSize: 11, color: '#595959', fontStyle: 'italic', lineHeight: 1.5, marginBottom: 12 }}>{pkg.sub}</div>
               )}
 
               {/* 구분선 */}
@@ -416,7 +416,7 @@ export default function Advertise() {
 
               {/* 가격 + 기간 */}
               <div style={{ fontSize: 22, fontWeight: 700, color: pkg.color, marginBottom: 2 }}>₩{pkg.price}</div>
-              <div style={{ fontSize: 11, color: '#9a9a9a', marginBottom: 14 }}>{pkg.period || '1회 기준'}</div>
+              <div style={{ fontSize: 11, color: '#595959', marginBottom: 14 }}>{pkg.period || '1회 기준'}</div>
 
               {/* 기능 목록 */}
               <ul style={{ listStyle: 'none', padding: 0, marginBottom: 14 }}>
@@ -440,7 +440,7 @@ export default function Advertise() {
                 ))}
               </div>
 
-              <div style={{ textAlign: 'center', padding: '10px', background: selectedPkg === pkg.step ? pkg.color : '#f5f5f5', color: selectedPkg === pkg.step ? 'white' : '#888', fontSize: 12, fontWeight: 700, transition: 'all 0.2s' }}>
+              <div style={{ textAlign: 'center', padding: '10px', background: selectedPkg === pkg.step ? pkg.color : '#f5f5f5', color: selectedPkg === pkg.step ? 'white' : '#595959', fontSize: 12, fontWeight: 700, transition: 'all 0.2s' }}>
                 {selectedPkg === pkg.step ? '✅ 선택됨' : '선택하기'}
               </div>
             </div>
@@ -627,7 +627,7 @@ export default function Advertise() {
             <div onClick={() => setOpenFaq(openFaq === i ? null : i)}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0', cursor: 'pointer', fontSize: 13.5, fontWeight: 600, color: openFaq === i ? '#1c4f8a' : '#1a1a1a' }}>
               <span>Q. {item.q}</span>
-              <span style={{ fontSize: 18, color: '#9a9a9a', transition: 'transform 0.2s', transform: openFaq === i ? 'rotate(45deg)' : 'none' }}>+</span>
+              <span style={{ fontSize: 18, color: '#595959', transition: 'transform 0.2s', transform: openFaq === i ? 'rotate(45deg)' : 'none' }}>+</span>
             </div>
             {openFaq === i && (
               <div style={{ fontSize: 13, color: '#6b6b6b', lineHeight: 1.8, paddingBottom: 16 }}>
