@@ -85,8 +85,9 @@ export function cleanCaptionForAlt(caption) {
   s = s.replace(/\s*[〈(\[]?\s*사진\s*[=:]\s*[^〉)\]\n]*[〉)\]]?\s*$/g, '');
   // sentinel 복원
   s = s.replace(/AI(\d+)/g, (_, i) => originals[Number(i)] || '');
-  // 앞뒤 문장부호·공백 정리
-  return s.replace(/^[\s,·—-]+|[\s,·—-]+$/g, '').trim();
+  // 앞뒤 문장부호·공백·파이프 정리
+  //   파이프('|')는 캡션 3슬롯 저장 형식에서 남을 수 있어 alt fallback 시 정리
+  return s.replace(/^[\s,·—\-|]+|[\s,·—\-|]+$/g, '').trim();
 }
 
 // HTML escape (XSS 방지) — 본문은 textarea 입력값이라 escape 후 커스텀 태그만 HTML로 변환

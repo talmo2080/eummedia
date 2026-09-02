@@ -744,16 +744,25 @@ export default function ArticleEditor() {
   // 사용자가 캡션·alt를 입력하면 해당 태그만 새 형식으로 replace.
   //   중복 URL 삽입 케이스: URL 기준 replace라 첫 매치만 교체됨 (실무 대부분 각 이미지 URL 유일).
   const inlineImages = useMemo(() => {
-    const regex = /\[이미지:([^|\]]+)(?:\|([^|\]]*))?(?:\|([^\]]*))?\]/g
+    // ArticleDetail의 렌더 파서와 동일한 split 방식 — 캡션 안 '|' 지원
+    //   1조각: URL만
+    //   2조각: URL|캡션
+    //   3조각 이상: URL|캡션...|alt (마지막이 alt, 중간 파이프는 캡션에 join)
+    const regex = /\[이미지:([^\]]+)\]/g
     const items = []
     let m
     while ((m = regex.exec(content)) !== null) {
-      items.push({
-        full: m[0],
-        url: (m[1] || '').trim(),
-        caption: (m[2] || '').trim(),
-        alt: (m[3] || '').trim(),
-      })
+      const parts = String(m[1]).split('|')
+      const url = (parts[0] || '').trim()
+      let caption = ''
+      let alt = ''
+      if (parts.length === 2) {
+        caption = parts[1].trim()
+      } else if (parts.length >= 3) {
+        alt = parts[parts.length - 1].trim()
+        caption = parts.slice(1, -1).join('|').trim()
+      }
+      items.push({ full: m[0], url, caption, alt })
     }
     return items
   }, [content])
@@ -764,9 +773,13 @@ export default function ArticleEditor() {
     if (!target) return
     const caption = (patch.caption ?? target.caption).trim()
     const alt = (patch.alt ?? target.alt).trim()
+    // alt 없어도 캡션이 있으면 alt 슬롯을 빈 채로 유지 (3슬롯 형식)
+    //   → 캡션 안에 '|' 있어도 파서가 마지막 조각을 alt로 확정하므로 캡션이 온전히 join됨
+    //   예) [이미지:URL|대둔산 케이블카 | 사진=이음미디어|]
+    //       parts=4개 → alt="", caption="대둔산 케이블카 | 사진=이음미디어"
     let newTag
     if (alt) newTag = `[이미지:${url}|${caption}|${alt}]`
-    else if (caption) newTag = `[이미지:${url}|${caption}]`
+    else if (caption) newTag = `[이미지:${url}|${caption}|]`
     else newTag = `[이미지:${url}]`
     // 첫 매치만 replace (같은 URL 여러 개면 첫 것만 편집됨 — 안전한 선택)
     const findRe = new RegExp(escapeRe(target.full))

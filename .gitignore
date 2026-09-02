@@ -39,3 +39,7 @@ test-*.js
 .vercel
 .env*
 public/pium-app/gilbongjo/_orig/
+
+# 임시 파일 (실수 방지) — 실제 scratchpad는 시스템 %TEMP% 안에 있어 저장소 밖
+scratchpad/
+*.bak
