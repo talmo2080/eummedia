@@ -3413,6 +3413,8 @@ function GilBongJoPage() {
 .gbj-wrap .press .tx b{display:block;font-size:18px;font-weight:700;line-height:1.5}
 .gbj-wrap .press .tx span{display:block;margin-top:7px;font-size:13px;color:var(--mut)}
 .gbj-wrap .press .go{margin-left:auto;white-space:nowrap;font-size:14px;font-weight:700;color:var(--blue)}
+.gbj-wrap .prwrap{display:grid;grid-template-columns:1fr 260px;gap:56px;align-items:center}
+.gbj-wrap .prwrap .sk{width:100%;height:auto;display:block}
 .gbj-wrap .qbig{font-size:40px;font-weight:800;line-height:1.45;letter-spacing:-.03em;word-break:keep-all;max-width:900px}
 .gbj-wrap .qbig em{font-style:normal;background:linear-gradient(transparent 62%,#BFE0FA 62%)}
 .gbj-wrap .qlist{margin-top:50px;display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);max-width:900px}
@@ -3442,7 +3444,8 @@ function GilBongJoPage() {
 .gbj-wrap .two li:before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;border-radius:50%;background:#9DBBE0}
 .gbj-wrap .tv{margin-top:44px;display:grid;grid-template-columns:1fr 1fr;gap:14px 26px}
 .gbj-wrap .tvi{display:flex;align-items:flex-start;gap:16px;padding:18px 20px;background:#fff;border:1px solid var(--line);border-radius:13px}
-.gbj-wrap .tvi .ch{flex:0 0 76px;font-size:12px;font-weight:800;color:#fff;background:var(--ink);border-radius:6px;padding:5px 0;text-align:center;letter-spacing:.02em}
+.gbj-wrap .tvi .ch{flex:0 0 88px;height:30px;background:transparent;border-radius:0;padding:0;display:flex;align-items:center;justify-content:flex-start}
+.gbj-wrap .tvi .ch img{max-width:88px;max-height:26px;width:auto;height:auto;object-fit:contain;display:block}
 .gbj-wrap .tvi .t{font-size:15px;font-weight:700;line-height:1.55;word-break:keep-all}
 .gbj-wrap .tvi .t span{display:block;margin-top:4px;font-size:12.5px;font-weight:500;color:var(--mut)}
 .gbj-wrap .bkhead{display:grid;grid-template-columns:1fr 280px;gap:52px;align-items:center}
@@ -3461,8 +3464,19 @@ function GilBongJoPage() {
 .gbj-wrap .bk.soon .t{color:var(--mut);font-weight:700;font-size:16px;margin:0}
 .gbj-wrap .vids{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:44px}
 .gbj-wrap .vids .hold{aspect-ratio:16/9}
+.gbj-wrap .vid{display:block;text-decoration:none;color:inherit;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16)}
+.gbj-wrap .vid .th{aspect-ratio:16/9;position:relative;background:#08182F}
+.gbj-wrap .vid .th img{width:100%;height:100%;object-fit:cover;display:block}
+.gbj-wrap .vid .pl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.gbj-wrap .vid .pl i{width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:17px;color:#fff}
+.gbj-wrap .vid .tt{padding:16px 18px;font-size:15px;font-weight:700;line-height:1.5;color:#fff;word-break:keep-all}
 .gbj-wrap .shorts{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:44px;max-width:620px}
 .gbj-wrap .shorts .hold{aspect-ratio:9/16}
+.gbj-wrap .sh{display:block;text-decoration:none;border-radius:14px;overflow:hidden;background:#E7F0FB;border:1px solid #DCE7F4}
+.gbj-wrap .sh .th{aspect-ratio:9/16;position:relative}
+.gbj-wrap .sh .th img{width:100%;height:100%;object-fit:cover;display:block}
+.gbj-wrap .sh .pl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.gbj-wrap .sh .pl i{width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:14px;color:#fff}
 .gbj-wrap .exg{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:44px}
 .gbj-wrap .ex{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px}
 .gbj-wrap .ex h4{font-size:12px;font-weight:800;letter-spacing:.2em;color:var(--blue);margin-bottom:16px}
@@ -3478,7 +3492,11 @@ function GilBongJoPage() {
 .gbj-wrap .class .w{margin-left:auto;font-size:14px;color:#C7DAF2;line-height:1.7}
 .gbj-wrap .chs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
 .gbj-wrap .ch{text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:13px;padding:18px 20px;display:flex;align-items:center;gap:14px;background:#fff}
-.gbj-wrap .ch .d{width:36px;height:36px;flex:0 0 36px;border-radius:9px;background:var(--tint);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--blue)}
+.gbj-wrap .ch .d{width:38px;height:38px;flex:0 0 38px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.gbj-wrap .ch .d svg{width:22px;height:22px;display:block}
+.gbj-wrap .ch .d.yt{background:#FEECEC}
+.gbj-wrap .ch .d.ig{background:#FDEDF4}
+.gbj-wrap .ch .d.nv{background:#E8F8EE}
 .gbj-wrap .ch b{display:block;font-size:15px;font-weight:700}
 .gbj-wrap .ch span{display:block;font-size:12px;color:var(--mut);margin-top:3px}
 .gbj-wrap .ct{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:44px}
@@ -3507,6 +3525,7 @@ function GilBongJoPage() {
 .gbj-wrap .chs{grid-template-columns:1fr 1fr}
 .gbj-wrap .acts{grid-template-columns:1fr 1fr}
 .gbj-wrap .ct{grid-template-columns:1fr;gap:28px}
+.gbj-wrap .prwrap{grid-template-columns:1fr 200px;gap:34px}
 }
 @media(max-width:640px){
 .gbj-wrap .wrap{padding:0 20px}
@@ -3533,7 +3552,7 @@ function GilBongJoPage() {
 .gbj-wrap .tl .h2{font-size:16px}
 .gbj-wrap .two{grid-template-columns:1fr;gap:24px}
 .gbj-wrap .tvi{padding:16px}
-.gbj-wrap .tvi .ch{flex:0 0 62px;font-size:11px}
+.gbj-wrap .tvi .ch{flex:0 0 88px;height:30px}
 .gbj-wrap .bkhead{grid-template-columns:1fr;gap:26px}
 .gbj-wrap .bkhead .ph{max-width:230px;margin:0 auto}
 .gbj-wrap .bk{flex-direction:column;align-items:flex-start;gap:18px;padding:22px}
@@ -3565,7 +3584,8 @@ function GilBongJoPage() {
  /* ② 방송 2열 */
  .gbj-wrap .tv{grid-template-columns:1fr 1fr;gap:10px}
  .gbj-wrap .tvi{flex-direction:column;align-items:flex-start;gap:9px;padding:13px}
- .gbj-wrap .tvi .ch{flex:none;width:58px;font-size:10.5px;padding:4px 0}
+ .gbj-wrap .tvi .ch{flex:none;width:auto;height:24px}
+ .gbj-wrap .tvi .ch img{max-width:74px;max-height:22px}
  .gbj-wrap .tvi .t{font-size:13px;line-height:1.45}
  .gbj-wrap .tvi .t span{font-size:11px;margin-top:3px}
  /* ② 저서 2열 */
@@ -3580,7 +3600,8 @@ function GilBongJoPage() {
  /* ② 채널 2열 */
  .gbj-wrap .chs{grid-template-columns:1fr 1fr;gap:10px}
  .gbj-wrap .ch{flex-direction:column;align-items:flex-start;gap:9px;padding:13px}
- .gbj-wrap .ch .d{width:30px;height:30px;flex:0 0 30px;font-size:12px}
+ .gbj-wrap .ch .d{width:32px;height:32px;flex:0 0 32px}
+ .gbj-wrap .ch .d svg{width:19px;height:19px}
  .gbj-wrap .ch b{font-size:12.5px;line-height:1.35}
  .gbj-wrap .ch span{font-size:10px;margin-top:3px;word-break:break-all;line-height:1.4}
  /* ③ 현장 사진 가로 스크롤 */
@@ -3588,6 +3609,10 @@ function GilBongJoPage() {
  .gbj-wrap .acts::-webkit-scrollbar{display:none}
  .gbj-wrap .acts>*{flex:0 0 84%;scroll-snap-align:center}
  .gbj-wrap .act .cp{font-size:13px}
+ /* ④ PRESS 일러스트를 글 위로 */
+ .gbj-wrap .prwrap{grid-template-columns:1fr;gap:22px}
+ .gbj-wrap .prwrap .skwrap{order:-1;text-align:center}
+ .gbj-wrap .prwrap .sk{max-width:190px;margin:0 auto}
 }
       `}</style>
 
@@ -3602,12 +3627,19 @@ function GilBongJoPage() {
 
       {/* ② PRESS */}
       <section className="sec"><div className="wrap">
-        <div className="sec-h">PRESS</div><div className="sec-t">이음미디어가 만난 사람</div>
-        <a className="press" href="https://www.eummedia.kr/article/%EA%B8%B8%EB%B4%89%EC%A1%B0-%EC%9C%A0%EB%B9%84%EC%98%A4%EB%A7%A5%ED%8C%8C" target="_blank" rel="noopener">
-          <div className="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{width:'22px',height:'22px'}}><path d="M4 5h12a1 1 0 0 1 1 1v12a2 2 0 0 0 2 2H5a1 1 0 0 1-1-1z"/><path d="M17 8h2a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2"/><path d="M7 8h6"/><path d="M7 11.5h6"/><path d="M7 15h4"/></svg></div>
-          <div className="tx"><b>&#34;사람의 몸이 보내는 신호를 대화로 잇는 사람&#34; — 길봉조 대표, 유비오맥파로 건강상담의 새 길을 열다</b><span>이음미디어 · 2026.08.21</span></div>
-          <div className="go">기사 전문 보기 →</div>
-        </a>
+        <div className="prwrap">
+          <div>
+            <div className="sec-h">PRESS</div><div className="sec-t">이음미디어가 만난 사람</div>
+            <a className="press" href="https://www.eummedia.kr/article/%EA%B8%B8%EB%B4%89%EC%A1%B0-%EC%9C%A0%EB%B9%84%EC%98%A4%EB%A7%A5%ED%8C%8C" target="_blank" rel="noopener">
+              <div className="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{width:'22px',height:'22px'}}><path d="M4 5h12a1 1 0 0 1 1 1v12a2 2 0 0 0 2 2H5a1 1 0 0 1-1-1z"/><path d="M17 8h2a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2"/><path d="M7 8h6"/><path d="M7 11.5h6"/><path d="M7 15h4"/></svg></div>
+              <div className="tx"><b>&#34;사람의 몸이 보내는 신호를 대화로 잇는 사람&#34; — 길봉조 대표, 유비오맥파로 건강상담의 새 길을 열다</b><span>이음미디어 · 2026.08.21</span></div>
+              <div className="go">기사 전문 보기 →</div>
+            </a>
+          </div>
+          <div className="skwrap">
+            <img className="sk" src="/pium-app/gilbongjo/gilbongjo-sketch.png" alt="길봉조 대표 일러스트" />
+          </div>
+        </div>
       </div></section>
 
       <svg className="wave" viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0 20 H300 l14 -15 l12 30 l13 -34 l14 38 l12 -19 H1200" fill="none" stroke="#1668E3" strokeWidth="2"/></svg>
@@ -3673,13 +3705,13 @@ function GilBongJoPage() {
         <div className="sec-h">ON AIR</div><div className="sec-t">방송이 먼저 찾았습니다</div>
         <div className="sec-d">혈관과 스트레스를 설명해야 할 때, 방송이 그를 불렀습니다. HRV 검사·분석으로 촬영과 인터뷰를 지원했습니다.</div>
         <div className="tv">
-          <div className="tvi"><div className="ch">MBN</div><div className="t">천기누설<span>대한민국 치유의 마을을 찾아라 · 2015.09</span></div></div>
-          <div className="tvi"><div className="ch">JTBC</div><div className="t">이규연의 스포트라이트<span>7회 · 2015.07</span></div></div>
-          <div className="tvi"><div className="ch">채널A</div><div className="t">닥터 지바고<span>동맥경화, 혈관이 막히고 있다 · 2015.07</span></div></div>
-          <div className="tvi"><div className="ch">KBS</div><div className="t">밥상의 신<span>스트레스 ZERO · 2014.06</span></div></div>
-          <div className="tvi"><div className="ch">MBC</div><div className="t">컬투 베란다 쇼<span>분노조절장애 · 2013.11</span></div></div>
-          <div className="tvi"><div className="ch">MBC</div><div className="t">파워매거진<span>당신의 혈관은 안녕하십니까</span></div></div>
-          <div className="tvi"><div className="ch">SBS</div><div className="t">좋은 아침<span>혈관 다이어트가 장수 비결</span></div></div>
+          <div className="tvi"><div className="ch"><img src="/pium-app/gilbongjo/tv-mbn.png" alt="MBN" /></div><div className="t">천기누설<span>대한민국 치유의 마을을 찾아라 · 2015.09</span></div></div>
+          <div className="tvi"><div className="ch"><img src="/pium-app/gilbongjo/tv-jtbc.png" alt="JTBC" /></div><div className="t">이규연의 스포트라이트<span>7회 · 2015.07</span></div></div>
+          <div className="tvi"><div className="ch"><img src="/pium-app/gilbongjo/tv-channela.png" alt="채널A" /></div><div className="t">닥터 지바고<span>동맥경화, 혈관이 막히고 있다 · 2015.07</span></div></div>
+          <div className="tvi"><div className="ch"><img src="/pium-app/gilbongjo/tv-kbs.png" alt="KBS" /></div><div className="t">밥상의 신<span>스트레스 ZERO · 2014.06</span></div></div>
+          <div className="tvi"><div className="ch"><img src="/pium-app/gilbongjo/tv-mbc.png" alt="MBC" /></div><div className="t">컬투 베란다 쇼<span>분노조절장애 · 2013.11</span></div></div>
+          <div className="tvi"><div className="ch"><img src="/pium-app/gilbongjo/tv-mbc.png" alt="MBC" /></div><div className="t">파워매거진<span>당신의 혈관은 안녕하십니까</span></div></div>
+          <div className="tvi"><div className="ch"><img src="/pium-app/gilbongjo/tv-sbs.png" alt="SBS" /></div><div className="t">좋은 아침<span>혈관 다이어트가 장수 비결</span></div></div>
         </div>
       </div></section>
 
@@ -3715,8 +3747,14 @@ function GilBongJoPage() {
         <div className="sec-h">VIDEO</div><div className="sec-t">대표 영상</div>
         <div className="sec-d">맥파 길봉조TV에서 고른 두 편입니다.</div>
         <div className="vids">
-          <div className="hold">영상 1<br /><span style={{fontWeight:'500'}}>주소와 제목 대기</span></div>
-          <div className="hold">영상 2<br /><span style={{fontWeight:'500'}}>주소와 제목 대기</span></div>
+          <a className="vid" href="https://www.youtube.com/watch?v=kAcLgcpYWx8" target="_blank" rel="noopener">
+            <div className="th"><img src="https://i.ytimg.com/vi/kAcLgcpYWx8/maxresdefault.jpg" alt=""
+              onError={e => { e.currentTarget.src='https://i.ytimg.com/vi/kAcLgcpYWx8/hqdefault.jpg' }} /><div className="pl"><i>▶</i></div></div>
+            <div className="tt">유비오맥파는 과연 누가 많이 쓸까요</div></a>
+          <a className="vid" href="https://www.youtube.com/watch?v=69PkzOXW77w" target="_blank" rel="noopener">
+            <div className="th"><img src="https://i.ytimg.com/vi/69PkzOXW77w/maxresdefault.jpg" alt=""
+              onError={e => { e.currentTarget.src='https://i.ytimg.com/vi/69PkzOXW77w/hqdefault.jpg' }} /><div className="pl"><i>▶</i></div></div>
+            <div className="tt">유비오맥파 손끝 건강 노트북lm을 통해 밝히다.</div></a>
         </div>
       </div></section>
 
@@ -3724,10 +3762,22 @@ function GilBongJoPage() {
       <section className="sec"><div className="wrap">
         <div className="sec-h">SHORTS</div><div className="sec-t">1분 안에 만나는 이야기</div>
         <div className="sec-d">짧지만 하고 싶은 말은 다 들어 있습니다. 숏츠가 늘어나면 아래로 한 줄씩 이어집니다.</div>
-        <div className="shorts">
-          <div className="hold">숏츠 1</div><div className="hold">숏츠 2</div>
-          <div className="hold">숏츠 3</div><div className="hold">숏츠 4</div>
-        </div>
+        {(() => {
+          const shortIds = ['rsm7F4oARQs','n5cpK1p4VAs','lHMFnMENe0I','4MMi7KxktO8'];
+          return (
+            <div className="shorts">
+              {shortIds.map(id => (
+                <a key={id} className="sh" href={`https://youtube.com/shorts/${id}`} target="_blank" rel="noopener">
+                  <div className="th">
+                    <img src={`https://i.ytimg.com/vi/${id}/oardefault.jpg`} alt=""
+                      onError={e => { e.currentTarget.src=`https://i.ytimg.com/vi/${id}/hqdefault.jpg` }} />
+                    <div className="pl"><i>▶</i></div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          );
+        })()}
       </div></section>
 
       {/* ⑨ 전문분야 */}
@@ -3763,12 +3813,21 @@ function GilBongJoPage() {
       <section className="sec sky"><div className="wrap">
         <div className="sec-h">CHANNELS</div><div className="sec-t">채널 바로가기</div>
         <div className="chs">
-          <a className="ch" href="https://www.youtube.com/@macpa/videos" target="_blank" rel="noopener"><div className="d">▶</div><div><b>맥파 길봉조TV</b><span>YouTube @맥파tv</span></div></a>
-          <a className="ch" href="https://www.instagram.com/mac_pa_" target="_blank" rel="noopener"><div className="d">◉</div><div><b>@mac_pa_</b><span>Instagram</span></div></a>
-          <a className="ch" href="https://ubiomacpa.modoo.at/" target="_blank" rel="noopener"><div className="d">홈</div><div><b>유비오맥파 공식</b><span>ubiomacpa.modoo.at</span></div></a>
-          <a className="ch" href="https://blog.naver.com/macpa_sos" target="_blank" rel="noopener"><div className="d">✎</div><div><b>유비오맥파 제품상담실</b><span>blog.naver.com/macpa_sos</span></div></a>
-          <a className="ch" href="https://cafe.naver.com/we1212" target="_blank" rel="noopener"><div className="d">카</div><div><b>유비오맥파 제품 사업부</b><span>cafe.naver.com/we1212</span></div></a>
-          <a className="ch" href="https://smartstore.naver.com/macpa119" target="_blank" rel="noopener"><div className="d">S</div><div><b>맥파 측정기 구매</b><span>smartstore.naver.com/macpa119</span></div></a>
+          <a className="ch" href="https://www.youtube.com/@%EB%A7%A5%ED%8C%8Ctv/videos" target="_blank" rel="noopener">
+            <div className="d yt"><svg viewBox="0 0 24 24"><path fill="#FF0000" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8z"/><path fill="#fff" d="M9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg></div>
+            <div><b>맥파 길봉조TV</b><span>YouTube @맥파tv</span></div></a>
+          <a className="ch" href="https://www.instagram.com/mac_pa_" target="_blank" rel="noopener">
+            <div className="d ig"><svg viewBox="0 0 24 24" fill="none" stroke="#E4405F" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.15" fill="#E4405F" stroke="none"/></svg></div>
+            <div><b>@mac_pa_</b><span>Instagram</span></div></a>
+          <a className="ch" href="https://blog.naver.com/macpa_sos" target="_blank" rel="noopener">
+            <div className="d nv"><svg viewBox="0 0 24 24" fill="none" stroke="#03C75A" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M16.5 3.3a2.1 2.1 0 0 1 3 3L9.2 16.6l-4 1 1-4L16.5 3.3z"/><path d="M4 20.6h16"/></svg></div>
+            <div><b>유비오맥파 제품상담실</b><span>blog.naver.com/macpa_sos</span></div></a>
+          <a className="ch" href="https://cafe.naver.com/we1212" target="_blank" rel="noopener">
+            <div className="d nv"><svg viewBox="0 0 24 24" fill="none" stroke="#03C75A" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8.5h13v5a4.5 4.5 0 0 1-4.5 4.5h-4A4.5 4.5 0 0 1 3 13.5v-5z"/><path d="M16 10h1.8a2.6 2.6 0 0 1 0 5.2H16"/><path d="M6 5.2V3.4M9.5 5.2V3.4M13 5.2V3.4"/><path d="M2.4 21h15"/></svg></div>
+            <div><b>유비오맥파 제품 사업부</b><span>cafe.naver.com/we1212</span></div></a>
+          <a className="ch" href="https://smartstore.naver.com/macpa119" target="_blank" rel="noopener">
+            <div className="d nv"><svg viewBox="0 0 24 24" fill="none" stroke="#03C75A" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M3.2 8.4 4.6 4.2h14.8l1.4 4.2"/><path d="M4.4 8.4v11.4h15.2V8.4"/><path d="M3.2 8.4a2.5 2.5 0 0 0 4.7 0 2.5 2.5 0 0 0 4.1 0 2.5 2.5 0 0 0 4.1 0 2.5 2.5 0 0 0 4.7 0"/><path d="M9.6 19.8v-5.2h4.8v5.2"/></svg></div>
+            <div><b>맥파 측정기 구매</b><span>smartstore.naver.com/macpa119</span></div></a>
         </div>
       </div></section>
 

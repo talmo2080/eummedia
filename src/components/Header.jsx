@@ -150,9 +150,26 @@ export default function Header() {
 
           {/* 우측 버튼 — 데스크탑 (768px+) */}
           <div className="hidden md:flex" style={{ gap: 10, alignItems: "center" }}>
+            {/* 피움 로고 */}
+            <Link
+              to="/pium-store"
+              aria-label="피움 웹앱스토어"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textDecoration: "none",
+                marginRight: 10,
+              }}
+            >
+              <img
+                src="/pium-logo.png"
+                alt="피움"
+                style={{ height: 28, width: "auto", objectFit: "contain", display: "block" }}
+              />
+            </Link>
             {/* 이음마케팅 — 8/13 확정 브랜드명(이음AI마케팅 → 이음마케팅).
-                로고(EM 적/청 + AI MARKETING 워드마크) 파일 업로드 후 이미지로 교체 예정.
-                피움 로고는 이번에 서브헤더에서 완전 제거 (지시 8/12 ③). */}
+                로고(EM 적/청 + AI MARKETING 워드마크) 파일 업로드 후 이미지로 교체 예정. */}
             <button
               type="button"
               onClick={() => alert('이음마케팅 페이지는 준비 중입니다. 곧 공개됩니다.')}
