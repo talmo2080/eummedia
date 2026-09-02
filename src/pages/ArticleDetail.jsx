@@ -227,15 +227,14 @@ const socialIconStyle = { fontSize: "24px", textDecoration: "none", lineHeight: 
 // (AUTHOR_ARTICLES MOCK 제거됨 — 동적 fetch로 교체, authorArticles state 사용)
 // (INIT_COMMENTS MOCK 제거됨 — supabase comments 테이블에서 실시간 fetch)
 
-function StickyBtn({ onClick, title, bg, fg, active, activeColor, visibleText, children }) {
+function StickyBtn({ onClick, title, bg, fg, active, activeColor, children }) {
   const [h, setH] = useState(false);
-  // visibleText가 있으면 그것으로 aria-label 시작 (label-content-name-mismatch 회피)
-  const label = visibleText ? `${visibleText} — ${title}` : title;
+  // aria-label 대신 자식 <span className="sr-only">로 접근성 이름 제공
+  // 이모지·짧은 라벨 span은 aria-hidden 처리 → axe label-content-name-mismatch 회피
   return (
     <button
       onClick={onClick}
       title={title}
-      aria-label={label}
       onMouseEnter={() => setH(true)}
       onMouseLeave={() => setH(false)}
       style={{
@@ -275,12 +274,11 @@ function StickyReactionBar({ liked, likeCount, onLike, onCopy, copied, onKakao, 
     <div style={{ position: "sticky", top: "120px", display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", width: "52px", alignSelf: "flex-start" }}>
       {buttons.map((btn, i) => {
         if (btn.type === "divider") return <div key={i} style={{ width: "1px", height: "14px", background: "#e0e0e0", margin: "2px 0" }} />;
-        // visible text = 이모지/아이콘 + 라벨 (예: "🤍 3", "K 카톡")
-        const visibleText = `${btn.icon} ${btn.label}`;
         return (
-          <StickyBtn key={i} onClick={btn.onClick} title={btn.title} bg={btn.bg} fg={btn.fg} active={btn.active} activeColor={btn.activeColor} visibleText={visibleText}>
-            <span style={btn.iconStyle || { fontSize: "16px" }}>{btn.icon}</span>
-            <span style={{ fontSize: "9px", color: btn.fg || (btn.active ? btn.activeColor : "#595959"), fontWeight: "700", lineHeight: 1 }}>{btn.label}</span>
+          <StickyBtn key={i} onClick={btn.onClick} title={btn.title} bg={btn.bg} fg={btn.fg} active={btn.active} activeColor={btn.activeColor}>
+            <span aria-hidden="true" style={btn.iconStyle || { fontSize: "16px" }}>{btn.icon}</span>
+            <span aria-hidden="true" style={{ fontSize: "9px", color: btn.fg || (btn.active ? btn.activeColor : "#595959"), fontWeight: "700", lineHeight: 1 }}>{btn.label}</span>
+            <span className="sr-only">{btn.title}</span>
           </StickyBtn>
         );
       })}
@@ -317,7 +315,6 @@ function BottomReactionBar({ liked, likeCount, onLike, onCopy, copied, onKakao, 
           key={i}
           onClick={it.onClick}
           title={it.title}
-          aria-label={`${it.icon} ${it.label} — ${it.title}`}
           style={{
             minWidth: 52, minHeight: 52,
             padding: "6px 8px",
@@ -331,15 +328,16 @@ function BottomReactionBar({ liked, likeCount, onLike, onCopy, copied, onKakao, 
             flex: "1 1 0",
           }}
         >
-          <span style={
+          <span aria-hidden="true" style={
             it.isBrand
               ? { fontSize: 18, fontWeight: 900, color: it.fg, lineHeight: 1 }
               : { fontSize: 24, lineHeight: 1 }
           }>{it.icon}</span>
-          <span style={{
+          <span aria-hidden="true" style={{
             fontSize: 12, fontWeight: 600, lineHeight: 1,
             color: it.fg || (it.active ? it.activeColor : "#666"),
           }}>{it.label}</span>
+          <span className="sr-only">{it.title}</span>
         </button>
       ))}
     </div>

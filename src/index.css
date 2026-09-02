@@ -29,3 +29,17 @@
   outline: 3px solid #fff;
   outline-offset: 2px;
 }
+
+/* 스크린리더 전용 — 화면에 안 보이지만 accessible name 계산에 포함
+   (Tailwind sr-only와 동일 동작; 인라인 style 컴포넌트에서 쉽게 붙이려 별도 정의) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

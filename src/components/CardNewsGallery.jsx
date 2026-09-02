@@ -46,7 +46,7 @@ export default function CardNewsGallery({ items, onOpen }) {
             <div key={item.id || i} className={hideClass}>
               <button type="button"
                 onClick={() => onOpen?.(item)}
-                aria-label={`${article?.title || ''} — 카드뉴스 5장 보기`}
+                title={`${article?.title || ''} — 카드뉴스 5장 보기`}
                 style={{
                   background: 'transparent', border: 0, padding: 0,
                   cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
@@ -57,6 +57,9 @@ export default function CardNewsGallery({ items, onOpen }) {
                   articleThumbnail={article?.thumbnail_url}
                   channelName={article?.channels?.name}
                 />
+                {/* 스크린리더 전용 안내 — 시각 텍스트(제목·채널명)는 CardSlide가 이미 제공,
+                    여기선 "카드뉴스 5장 보기"만 추가로 알림 (label-content-name-mismatch 회피) */}
+                <span className="sr-only">카드뉴스 5장 보기</span>
               </button>
             </div>
           );
