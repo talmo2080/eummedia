@@ -197,6 +197,43 @@ test('bodyToSpeechParagraphs: HTML과 동일 splitter (\\n+ 하나 이상)', () 
   assert.deepEqual(paras, ['문단A.', '문단B.', '문단C.']);
 });
 
+// ─── 음성 우선순위 (지시서 【4】-1) ────────────────────────
+// pickPreferredVoice는 컴포넌트에 있어 여기선 로직만 재현 테스트
+function pickPreferredVoice(koVoices) {
+  if (!koVoices || koVoices.length === 0) return null;
+  const google = koVoices.find(v => /google/i.test(v.name));
+  if (google) return google;
+  const remote = koVoices.find(v => v.localService === false);
+  if (remote) return remote;
+  return koVoices[0];
+}
+test('pickPreferredVoice: 1순위 Google 이름', () => {
+  const voices = [
+    { name: 'Microsoft Heami Desktop', localService: true },
+    { name: 'Google 한국의', localService: false },
+    { name: 'Microsoft SunHi', localService: true },
+  ];
+  assert.equal(pickPreferredVoice(voices).name, 'Google 한국의');
+});
+test('pickPreferredVoice: 2순위 localService=false', () => {
+  const voices = [
+    { name: 'Microsoft Heami Desktop', localService: true },
+    { name: 'Naver Clova Voice', localService: false },
+  ];
+  assert.equal(pickPreferredVoice(voices).name, 'Naver Clova Voice');
+});
+test('pickPreferredVoice: 3순위 첫 번째', () => {
+  const voices = [
+    { name: 'Microsoft Heami Desktop', localService: true },
+    { name: 'Microsoft SunHi', localService: true },
+  ];
+  assert.equal(pickPreferredVoice(voices).name, 'Microsoft Heami Desktop');
+});
+test('pickPreferredVoice: 빈 배열 → null', () => {
+  assert.equal(pickPreferredVoice([]), null);
+  assert.equal(pickPreferredVoice(null), null);
+});
+
 test('bodyToSpeechParagraphs: [이미지:] 단독 문단은 제외', () => {
   const body = '앞 문단.\n\n[이미지:https://x/a.jpg|캡션|alt]\n\n뒷 문단.';
   const paras = bodyToSpeechParagraphs(body);

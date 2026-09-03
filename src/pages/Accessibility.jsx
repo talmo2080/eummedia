@@ -2,6 +2,8 @@
 // ※ 문안은 세연이 최종 작성 예정. 여기선 뼈대만.
 // ※ h1 1개, 다크·라이트 대비 준수, 키보드 이동 가능.
 
+import AccessibilityVoiceGuide from "../components/AccessibilityVoiceGuide";
+
 const NAVY = "#0d2d52";
 const GOLD = "#c9a84c";
 const TEXT = "#2a2a2a";
@@ -58,6 +60,9 @@ export default function Accessibility() {
             한국어 음성이 설치되지 않은 기기에서는 듣기 버튼이 표시되지 않습니다.
           </p>
         </section>
+
+        {/* ── 목소리에 관하여 (별도 컴포넌트) ─────────── */}
+        <AccessibilityVoiceGuide />
 
         {/* ── 의견 보내기 ─────────── */}
         <section style={cardStyle}>

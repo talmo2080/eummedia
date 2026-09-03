@@ -19,6 +19,7 @@ const GOLD = '#c9a84c';
 
 const RATES = [0.8, 1.0, 1.2, 1.5];
 const RATE_STORAGE_KEY = 'eum-tts-rate';
+const VOICE_STORAGE_KEY = 'eum-tts-voice';
 const DEFAULT_RATE = 1.0;
 
 function loadRate() {
@@ -31,11 +32,35 @@ function loadRate() {
 function saveRate(r) {
   try { localStorage.setItem(RATE_STORAGE_KEY, String(r)); } catch {}
 }
+function loadVoiceName() {
+  try { return localStorage.getItem(VOICE_STORAGE_KEY) || null; } catch { return null; }
+}
+function saveVoiceName(name) {
+  try {
+    if (name) localStorage.setItem(VOICE_STORAGE_KEY, name);
+    else localStorage.removeItem(VOICE_STORAGE_KEY);
+  } catch {}
+}
+
+// 한국어 음성 우선순위 규칙 (지시서 【4】-1)
+//   1순위: 이름에 'Google' 포함 (Google 한국의 목소리 — 자연스러움)
+//   2순위: localService === false (네트워크 음성 — 대체로 더 자연스러움)
+//   3순위: 나머지 ko-KR 음성 중 첫 번째
+// (윈도우에서 Microsoft Heami 같은 중년 여성 톤이 잡히는 문제 해소)
+export function pickPreferredVoice(koVoices) {
+  if (!koVoices || koVoices.length === 0) return null;
+  const google = koVoices.find(v => /google/i.test(v.name));
+  if (google) return google;
+  const remote = koVoices.find(v => v.localService === false);
+  if (remote) return remote;
+  return koVoices[0];
+}
 
 export default function ArticleAudioPlayer({ article }) {
   // state: 'idle' | 'playing' | 'paused'
   const [state, setState] = useState('idle');
   const [voice, setVoice] = useState(null);
+  const [koVoices, setKoVoices] = useState([]);
   const [supportStatus, setSupportStatus] = useState('checking'); // 'checking' | 'ok' | 'no-tts' | 'no-ko-voice'
   const [rate, setRate] = useState(DEFAULT_RATE);
   const [currentIdx, setCurrentIdx] = useState(-1);
@@ -44,6 +69,7 @@ export default function ArticleAudioPlayer({ article }) {
   const idxRef = useRef(0);
   const rateRef = useRef(DEFAULT_RATE);
   const stateRef = useRef('idle');
+  const voiceRef = useRef(null);
   const autoScrollPausedRef = useRef(false);
   const autoScrollResumeTimerRef = useRef(null);
   const userScrollLastRef = useRef(0);
@@ -58,6 +84,7 @@ export default function ArticleAudioPlayer({ article }) {
 
   // state 최신값을 ref에도 보관 (onend 콜백 안에서 참조)
   useEffect(() => { stateRef.current = state; }, [state]);
+  useEffect(() => { voiceRef.current = voice; }, [voice]);
 
   // ── 브라우저 지원 & 한국어 음성 감지 ─────────────────
   useEffect(() => {
@@ -68,13 +95,17 @@ export default function ArticleAudioPlayer({ article }) {
     const findKoVoice = () => {
       const voices = window.speechSynthesis.getVoices();
       if (voices.length === 0) return;
-      const ko = voices.find(v => /^ko(-|_|$)/i.test(v.lang));
-      if (ko) {
-        setVoice(ko);
-        setSupportStatus('ok');
-      } else {
+      const koList = voices.filter(v => /^ko(-|_|$)/i.test(v.lang));
+      if (koList.length === 0) {
         setSupportStatus('no-ko-voice');
+        return;
       }
+      setKoVoices(koList);
+      // 저장된 목소리 이름 우선, 없으면 우선순위 규칙
+      const savedName = loadVoiceName();
+      const saved = savedName ? koList.find(v => v.name === savedName) : null;
+      setVoice(saved || pickPreferredVoice(koList));
+      setSupportStatus('ok');
     };
     findKoVoice();
     window.speechSynthesis.addEventListener('voiceschanged', findKoVoice);
@@ -172,7 +203,9 @@ export default function ArticleAudioPlayer({ article }) {
     highlightBodyIndex(bodyIdx);
 
     const u = new SpeechSynthesisUtterance(text);
-    if (voice) u.voice = voice;
+    // voiceRef로 최신 voice 참조 (voice 변경 후 즉시 speakNext 호출되는 경우 대응)
+    const currentVoice = voiceRef.current || voice;
+    if (currentVoice) u.voice = currentVoice;
     u.lang = 'ko-KR';
     u.rate = rateRef.current;
     u.pitch = 1.0;
@@ -257,6 +290,20 @@ export default function ArticleAudioPlayer({ article }) {
     // idxRef는 그대로 유지 → 같은 문단부터
     stateRef.current = 'playing';
     // cancel 후 즉시 speak는 브라우저에 따라 딜레이 필요 (사파리)
+    setTimeout(() => speakNext(), 60);
+  };
+
+  // ── 목소리 변경 ──────────────────────────────────────
+  // 재생 중이면 현재 문단부터 새 목소리로 재재생.
+  const handleVoice = (voiceName) => {
+    const v = koVoices.find(x => x.name === voiceName);
+    if (!v) return;
+    saveVoiceName(v.name);
+    setVoice(v);
+    voiceRef.current = v; // setTimeout에서 최신 voice 즉시 사용
+    if (state !== 'playing') return;
+    window.speechSynthesis.cancel();
+    stateRef.current = 'playing';
     setTimeout(() => speakNext(), 60);
   };
 
@@ -363,6 +410,32 @@ export default function ArticleAudioPlayer({ article }) {
         ))}
       </div>
 
+      {/* 목소리 선택 — 여러 개 있을 때만 노출 */}
+      {koVoices.length >= 2 && voice && (
+        <label style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          fontSize: 12, color: '#555',
+        }}>
+          <span>목소리</span>
+          <select
+            value={voice.name}
+            onChange={(e) => handleVoice(e.target.value)}
+            aria-label="낭독 목소리 선택"
+            style={{
+              minHeight: 44, padding: '6px 10px',
+              border: '1.5px solid #c8d2df',
+              borderRadius: 4, background: '#fff', color: NAVY,
+              fontSize: 13, fontWeight: 700,
+              fontFamily: 'inherit', cursor: 'pointer',
+            }}
+          >
+            {koVoices.map(v => (
+              <option key={v.name} value={v.name}>{v.name}</option>
+            ))}
+          </select>
+        </label>
+      )}
+
       {(state === 'playing' || state === 'paused') && (
         <span
           style={{ fontSize: 12, color: '#595959', marginLeft: 4 }}
@@ -373,6 +446,15 @@ export default function ArticleAudioPlayer({ article }) {
             ` · ${currentIdx + 1} / ${paragraphsRef.current.length}문단`}
         </span>
       )}
+
+      {/* 안내 (지시서 【4】-4-1) — 화면낭독기 사용자에겐 불필요하므로 aria-hidden */}
+      <div aria-hidden="true" style={{
+        flexBasis: '100%',
+        fontSize: 12, color: '#595959',
+        marginTop: 4, lineHeight: 1.5,
+      }}>
+        기기에 설치된 음성으로 읽어드립니다. 기기마다 목소리가 다를 수 있습니다.
+      </div>
     </div>
   );
 }
