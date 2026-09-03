@@ -475,6 +475,46 @@ export default function About() {
       </section>
 
       {/* ── CTA ── */}
+      {/* ── 접근성 안내 (5-4) ── 소개 마지막 섹션 앞, 별도 섹션.
+          '시각장애우' 아닌 '시각장애인' 표기 (당사자 요청·언론 보도준칙). */}
+      <section style={{ background: '#fff', padding: '72px 32px', borderTop: '1px solid #e5e5e5', borderBottom: '1px solid #e5e5e5' }}>
+        <div style={{ maxWidth: 780, margin: '0 auto' }}>
+          <h2 style={{
+            fontFamily: SERIF, fontSize: 26, fontWeight: 700, color: NAVY,
+            marginBottom: 24, lineHeight: 1.45, textAlign: 'center',
+          }}>
+            이음미디어는 듣는 신문입니다
+          </h2>
+          <div style={{ fontSize: 15.5, color: '#2a2a2a', lineHeight: 1.9 }}>
+            <p style={{ margin: '0 0 18px' }}>
+              모든 기사를 소리로 들을 수 있습니다. 눈이 피로한 날에도,
+              손이 바쁜 순간에도 기사를 들으실 수 있습니다.
+            </p>
+            <p style={{ margin: '0 0 18px' }}>
+              화면낭독기를 사용하는 시각장애인 독자도 기사 전체를 읽을 수 있도록
+              지면 구조를 정비했습니다. 제목과 본문, 인용과 사진 설명이 구분되어
+              읽히고, 키보드만으로도 본문까지 이동할 수 있습니다.
+            </p>
+            <p style={{ margin: '0 0 20px' }}>
+              아직 부족한 곳이 있을 것입니다. 불편한 점을 알려주시면 고치겠습니다.
+            </p>
+            <p style={{ margin: 0, textAlign: 'center' }}>
+              <a href="mailto:press@eummedia.kr" style={{
+                color: NAVY, fontWeight: 700, fontSize: 16,
+                textDecoration: 'underline',
+              }}>press@eummedia.kr</a>
+            </p>
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 22 }}>
+            <Link to="/accessibility" style={{
+              color: NAVY, fontSize: 13.5, fontWeight: 700,
+              textDecoration: 'none',
+              borderBottom: `1px solid ${NAVY}`, paddingBottom: 1,
+            }}>접근성 안내 자세히 →</Link>
+          </div>
+        </div>
+      </section>
+
       <section style={{ background: '#fafafa', padding: '80px 32px', borderBottom: '1px solid #e5e5e5' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto', textAlign: 'center' }}>
           <h2 style={{
