@@ -7,6 +7,7 @@ import { getYouTubeEmbedUrl } from "../lib/youtube";
 import VideoGallery from "../components/VideoGallery";
 import CardNewsSlideshow from "../components/CardNewsSlideshow";
 import CardNewsGallery from "../components/CardNewsGallery";
+import ArticleAudioPlayer from "../components/ArticleAudioPlayer";
 
 const CC = {
   "이음매거진":"#0d2d52","이음뉴스":"#c0392b","이음에듀":"#1a6b3c",
@@ -801,6 +802,9 @@ export default function ArticleDetail() {
               </>
             )}
           </div>
+
+          {/* 기사 듣기 컨트롤 (1차: 재생·일시정지·정지) — Web Speech API */}
+          <ArticleAudioPlayer article={a} />
 
           {/* 대표 이미지 — 모바일 16/9 비율(사진 규격 일치 → 잘림 없음), 데스크탑 380px 고정 cover 유지 */}
           <img
