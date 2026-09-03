@@ -95,9 +95,30 @@ export default function Header() {
           maxWidth: 1200, margin: "0 auto",
           padding: "9px 20px",
           display: "flex", justifyContent: "space-between", alignItems: "center",
+          gap: 10,
         }}>
-          <span style={{ fontSize: 11.5, color: DATE_INK, fontWeight: 700 }}>{today}</span>
-          <span style={{ fontSize: 10.5, color: REG_INK, fontWeight: 600 }}>등록 서울 아56526</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+            <span style={{ fontSize: 11.5, color: DATE_INK, fontWeight: 700 }}>{today}</span>
+            {/* 접근성 안내 배지 — 옅은 배경, 남색 글자, 상단 띠 높이 유지 (padding 2px 8px)
+                이모지는 aria-hidden — 화면낭독기 오독 방지 */}
+            <Link
+              to="/accessibility"
+              aria-label="이음미디어 접근성 안내"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 4,
+                background: "#e8eef5", color: "#0d2d52",
+                fontSize: 10.5, fontWeight: 700,
+                padding: "2px 8px", borderRadius: 3,
+                textDecoration: "none", whiteSpace: "nowrap",
+                lineHeight: 1.4,
+              }}
+            >
+              <span aria-hidden="true">🔊</span>
+              <span className="hidden md:inline">듣는 신문 · 음성지원</span>
+              <span className="md:hidden">듣는 신문</span>
+            </Link>
+          </div>
+          <span style={{ fontSize: 10.5, color: REG_INK, fontWeight: 600, whiteSpace: "nowrap" }}>등록 서울 아56526</span>
         </div>
       </div>
 
