@@ -47,7 +47,7 @@ const SANS = "'Noto Sans KR', sans-serif"
 
 export default function About() {
   return (
-    <div style={{ background: '#fff', fontFamily: SANS, color: '#1a1a1a' }}>
+    <main id="main-content" style={{ background: '#fff', fontFamily: SANS, color: '#1a1a1a' }}>
 
       {/* ── Hero ── */}
       <section style={{
@@ -573,6 +573,6 @@ export default function About() {
         </div>
       </section>
 
-    </div>
+    </main>
   )
 }
