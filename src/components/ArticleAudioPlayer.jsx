@@ -56,12 +56,19 @@ export function pickPreferredVoice(koVoices) {
   return koVoices[0];
 }
 
+// 인앱 브라우저 감지 (네이버·카카오톡·라인·인스타·페이스북 등)
+// 인앱 브라우저는 Web Speech API 지원이 제한적이거나 아예 없음.
+function isInAppBrowser(ua) {
+  if (!ua) return false;
+  return /NAVER\(inapp|KAKAOTALK|FBAN|FBAV|Instagram|Line\/|kakaotalk-scrap|whale.*inapp|; wv\)/i.test(ua);
+}
+
 export default function ArticleAudioPlayer({ article }) {
   // state: 'idle' | 'playing' | 'paused'
   const [state, setState] = useState('idle');
   const [voice, setVoice] = useState(null);
   const [koVoices, setKoVoices] = useState([]);
-  const [supportStatus, setSupportStatus] = useState('checking'); // 'checking' | 'ok' | 'no-tts' | 'no-ko-voice'
+  const [supportStatus, setSupportStatus] = useState('checking'); // 'checking' | 'ok' | 'no-tts' | 'no-ko-voice' | 'in-app-browser'
   const [rate, setRate] = useState(DEFAULT_RATE);
   const [currentIdx, setCurrentIdx] = useState(-1);
 
@@ -86,37 +93,84 @@ export default function ArticleAudioPlayer({ article }) {
   useEffect(() => { stateRef.current = state; }, [state]);
   useEffect(() => { voiceRef.current = voice; }, [voice]);
 
-  // ── 브라우저 지원 & 한국어 음성 감지 ─────────────────
+  // ── 브라우저 지원 & 한국어 음성 감지 ────────────────────────
+  //
+  // 중요 버그 수정 (긴급): speechSynthesis.getVoices()는 최초 호출 시
+  // 빈 배열을 리턴할 수 있고, 음성 목록이 비동기로 채워진 뒤에
+  // voiceschanged 이벤트가 발생한다. 기존 코드는 최초 1회 호출로 판단해서
+  // 빈 배열이 나오면 return 후 이벤트만 기다렸는데, 일부 브라우저는
+  // voiceschanged를 아예 쏘지 않아 '지원 안 함' 상태로 굳어졌음.
+  //
+  // 수정: (1) voiceschanged 리스너 (2) 100ms 간격 폴링 (최대 3초)
+  //       (3) 3초 뒤에도 없을 때만 미지원 판정 (4) 인앱 브라우저 별도 감지
   useEffect(() => {
     if (typeof window === 'undefined' || !window.speechSynthesis) {
       setSupportStatus('no-tts');
       return;
     }
-    const findKoVoice = () => {
+    // 인앱 브라우저면 즉시 별도 상태 (링크 안내용)
+    if (isInAppBrowser(navigator.userAgent)) {
+      setSupportStatus('in-app-browser');
+      return;
+    }
+
+    let done = false;
+
+    const tryDetect = () => {
+      if (done) return true;
       const voices = window.speechSynthesis.getVoices();
-      if (voices.length === 0) return;
+      if (voices.length === 0) return false; // 아직 로드 전
       const koList = voices.filter(v => /^ko(-|_|$)/i.test(v.lang));
       if (koList.length === 0) {
-        setSupportStatus('no-ko-voice');
-        return;
+        // 다른 언어 음성은 있지만 한국어가 없음 → 다시 시도하지 않고 최종 판정
+        // (단, 폴링 진행 중이면 계속 재시도되어 후에 ko가 등장하면 성공 처리)
+        return false;
       }
+      done = true;
       setKoVoices(koList);
-      // 저장된 목소리 이름 우선, 없으면 우선순위 규칙
       const savedName = loadVoiceName();
       const saved = savedName ? koList.find(v => v.name === savedName) : null;
       setVoice(saved || pickPreferredVoice(koList));
       setSupportStatus('ok');
+      return true;
     };
-    findKoVoice();
-    window.speechSynthesis.addEventListener('voiceschanged', findKoVoice);
-    const timeout = setTimeout(() => {
-      if (window.speechSynthesis.getVoices().length === 0) {
+
+    // 즉시 1회 시도
+    if (tryDetect()) return;
+
+    // 100ms 간격 폴링 (최대 3초)
+    const pollInterval = setInterval(() => {
+      if (tryDetect()) clearInterval(pollInterval);
+    }, 100);
+
+    // voiceschanged 이벤트도 함께 (이벤트가 폴링보다 빠를 수 있음)
+    const onVoicesChanged = () => { tryDetect(); };
+    window.speechSynthesis.addEventListener('voiceschanged', onVoicesChanged);
+
+    // 3초 뒤 최종 판정
+    const finalTimeout = setTimeout(() => {
+      if (done) return;
+      clearInterval(pollInterval);
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length === 0) {
         setSupportStatus('no-tts');
+      } else {
+        const koList = voices.filter(v => /^ko(-|_|$)/i.test(v.lang));
+        setSupportStatus(koList.length > 0 ? 'ok' : 'no-ko-voice');
+        if (koList.length > 0) {
+          setKoVoices(koList);
+          const savedName = loadVoiceName();
+          const saved = savedName ? koList.find(v => v.name === savedName) : null;
+          setVoice(saved || pickPreferredVoice(koList));
+        }
       }
-    }, 5000);
+      done = true;
+    }, 3000);
+
     return () => {
-      window.speechSynthesis.removeEventListener('voiceschanged', findKoVoice);
-      clearTimeout(timeout);
+      clearInterval(pollInterval);
+      clearTimeout(finalTimeout);
+      window.speechSynthesis.removeEventListener('voiceschanged', onVoicesChanged);
     };
   }, []);
 
@@ -308,21 +362,27 @@ export default function ArticleAudioPlayer({ article }) {
   };
 
   // ── UI ─────────────────────────────────────────────
-  if (supportStatus === 'no-tts' || supportStatus === 'no-ko-voice') {
+  // 미지원 안내 — 무엇을 하면 되는지 함께 알려줌 (지시서: 크롬·사파리 안내)
+  if (supportStatus === 'no-tts' || supportStatus === 'no-ko-voice' || supportStatus === 'in-app-browser') {
     return (
-      <div style={{
-        padding: '10px 12px',
+      <div role="note" style={{
+        padding: '12px 14px',
         background: '#f7f7f4',
         border: '1px solid #e8e8e8',
         borderRadius: 6,
-        fontSize: 13, color: '#595959',
-        margin: '16px 0',
+        fontSize: 13, color: '#404040',
+        lineHeight: 1.6,
+        margin: '18px 0 22px',
       }}>
-        이 브라우저에서는 듣기를 지원하지 않습니다.
+        <div>이 브라우저에서는 듣기가 지원되지 않습니다.</div>
+        <div style={{ color: '#595959', marginTop: 2 }}>
+          크롬이나 사파리에서 열면 들으실 수 있습니다.
+        </div>
       </div>
     );
   }
-  if (supportStatus === 'checking') return null;
+  // checking 중에도 버튼 노출(비활성이 아닌 활성) — 지시서: 성급히 '지원 안 함' 띄우지 말 것
+  // handlePlay가 클릭 시 tryDetect를 다시 시도할 것
 
   const btnBase = {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
