@@ -24,6 +24,7 @@ import YouthPolicy from './pages/YouthPolicy'
 import ArticleEditor from './pages/ArticleEditor'
 import MyPage from './pages/MyPage'
 import Videos from './pages/Videos'
+import Accessibility from './pages/Accessibility'
 import Pium from './pages/Pium'
 import PiumRequest from './pages/PiumRequest'
 import PiumSubmitPage from './pages/PiumSubmitPage'
@@ -65,8 +66,7 @@ function AppShell() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/youth" element={<YouthPolicy />} />
         <Route path="/videos" element={<Videos />} />
-        {/* 접근성 안내 페이지 — 5-3에서 실제 페이지로 대체. 우선 홈으로 리다이렉트 (링크 유효성 확보) */}
-        <Route path="/accessibility" element={<Navigate to="/" replace />} />
+        <Route path="/accessibility" element={<Accessibility />} />
         <Route path="/write" element={
           <ProtectedRoute requiredRole="writer"><ArticleEditor /></ProtectedRoute>
         } />

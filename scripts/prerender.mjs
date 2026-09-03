@@ -127,6 +127,10 @@ const STATIC_PAGE_META = {
     title: '영상 채널',
     desc: '이음미디어의 인터뷰·현장·강연 영상을 한 곳에서',
   },
+  '/accessibility': {
+    title: '접근성 안내',
+    desc: '이음미디어의 듣기 기능·화면낭독기 호환·키보드 이용·색 대비 등 접근성 정책 안내',
+  },
   '/login': {
     title: '로그인',
     desc: '이음미디어 회원 로그인',
@@ -290,7 +294,7 @@ async function getUrls() {
     '/', '/about', '/subscribe',
     '/privacy', '/youth', '/login', '/signup',
     '/advertise', '/report', '/citizen-reporter', '/terms',
-    '/videos',
+    '/videos', '/accessibility',
     // 피움앱 프로필 페이지
     ...Object.keys(PIUM_APP_PROFILES),
   ];
