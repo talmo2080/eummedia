@@ -18,6 +18,29 @@ export default function Footer() {
       marginTop: '80px',
       fontFamily: "'Noto Sans KR', sans-serif"
     }}>
+      {/* ━━━━━━━━━━━ 접근성 안내 (데스크탑·모바일 공통) ━━━━━━━━━━━
+          다크 배경 + #d0d0d0 이상 밝은 글자로 대비 확보 (앞서 다크 배경에 어두운 회색
+          적용해 1.97:1 되었던 사고 재발 방지). 이메일은 mailto: 링크(골드). */}
+      <div style={{
+        background: '#0d2d52',
+        color: '#d0d0d0',
+        padding: '20px 20px',
+        textAlign: 'center',
+        fontSize: 13,
+        lineHeight: 1.7,
+        borderBottom: '1px solid #1e4a7a',
+      }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <span style={{ color: '#f0f0f0', fontWeight: 700 }}>이음미디어는 듣는 신문입니다.</span>{' '}
+          모든 기사를 소리로 들을 수 있습니다. 화면낭독기로도 읽힙니다.{' '}
+          불편한 점이 있으면{' '}
+          <a href="mailto:press@eummedia.kr" style={{
+            color: '#c9a84c', textDecoration: 'underline',
+          }}>press@eummedia.kr</a>
+          {' '}로 알려주세요.
+        </div>
+      </div>
+
       {/* ━━━━━━━━━━━ 데스크탑 (lg 이상) — 기존 푸터 ━━━━━━━━━━━ */}
       <div className="hidden lg:block" style={{ background: '#0d2d52', color: '#ccc', padding: '56px 0 24px' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
