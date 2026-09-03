@@ -34,9 +34,12 @@ test('cleanInline: 이모지 제거', () => {
 });
 
 test('cleanInline: 마크업(굵게/기울임) 제거', () => {
-  assert.equal(cleanInline('**중요한** 발표'), '중요한 발표');
-  assert.equal(cleanInline('***정말*** 중요'), '정말 중요');
+  // 문단 시작 **text** 는 소제목으로 판단 (규칙1) → 마침표 붙음
+  assert.equal(cleanInline('**중요한** 발표'), '중요한. 발표');
+  assert.equal(cleanInline('***정말*** 중요'), '정말. 중요');
+  // 인라인 강조 (문단 시작 아님) → 마크업만 제거
   assert.equal(cleanInline('그는 *조용히* 말했다'), '그는 조용히 말했다');
+  assert.equal(cleanInline('앞 텍스트 **강조** 뒷 텍스트'), '앞 텍스트 강조 뒷 텍스트');
 });
 
 test('cleanInline: [이미지:URL|캡션|alt] → 낭독에서 완전 제거', () => {
@@ -103,6 +106,59 @@ test('articleToSpeechText: 문단 사이 빈 줄 구분', () => {
     body: '문단1.\n\n문단2.',
   });
   assert.equal(text, '제목.\n\n문단1.\n\n문단2.');
+});
+
+// ─── 지시서 【1】 조정 5건 (2차) ────────────────────────────────
+
+test('규칙1: 문단 시작 **소제목** 뒤에 마침표', () => {
+  // "**웃음 세 가지 실습** 진행은…" → "웃음 세 가지 실습. 진행은…"
+  assert.equal(
+    cleanInline('**웃음 세 가지 실습** 진행은 오행자 교수가 맡았다'),
+    '웃음 세 가지 실습. 진행은 오행자 교수가 맡았다'
+  );
+  // ***…*** 도 동일
+  assert.equal(
+    cleanInline('***실패도 배움이 될 수 있다*** 홍보승 강사는 자신의 경험을 나눴다'),
+    '실패도 배움이 될 수 있다. 홍보승 강사는 자신의 경험을 나눴다'
+  );
+  // 인라인 강조는 마침표 없이 (문단 시작 아님)
+  assert.equal(cleanInline('그는 **매우 중요한** 발표를 했다'), '그는 매우 중요한 발표를 했다');
+});
+
+test('규칙2: 표 형태 [info] — 각 줄 마침표 유지', () => {
+  const body = '[info]\n운영: 대둔산삭도\n위치: 완주군\n요금: 왕복 16,500원[/info]';
+  const paras = bodyToSpeechParagraphs(body);
+  assert.equal(paras[0], '안내. 운영 대둔산삭도. 위치 완주군. 요금 왕복 16,500원.');
+});
+
+test('규칙3: 목차성 [info] — "…은/는 다음과 같습니다."', () => {
+  const body = '[info]**■ 이 기사에서 확인할 수 있는 것**\n\n· 대둔산은 어떤 산인가\n· 케이블카는 얼마나 걸리나\n· 구름다리는 어떤 다리인가\n· 정상까지 얼마나 걸리나[/info]';
+  const paras = bodyToSpeechParagraphs(body);
+  assert.equal(
+    paras[0],
+    '이 기사에서 확인할 수 있는 것은 다음과 같습니다. 대둔산은 어떤 산인가. 케이블카는 얼마나 걸리나. 구름다리는 어떤 다리인가. 정상까지 얼마나 걸리나.'
+  );
+});
+
+test('규칙3-b: 받침 없는 명사 → "는 다음과 같습니다."', () => {
+  const body = '[info]행사 개요\n\n· 항목1\n· 항목2\n· 항목3[/info]';
+  const paras = bodyToSpeechParagraphs(body);
+  assert.equal(paras[0], '행사 개요는 다음과 같습니다. 항목1. 항목2. 항목3.');
+});
+
+test('규칙4: 【 】 제거 + 마침표', () => {
+  assert.equal(cleanInline('【 봄 】'), '봄.');
+  assert.equal(cleanInline('【 이용 요금 】 대인 왕복 16,500원'), '이용 요금. 대인 왕복 16,500원');
+  // 안 문장이 !/?로 끝나면 그 부호를 마침표로 대체 (이중 부호 회피)
+  assert.equal(cleanInline('【 그리고 대둔산이 가을이 절정인 이유! 】'), '그리고 대둔산이 가을이 절정인 이유.');
+});
+
+test('규칙5: ※ → "참고."', () => {
+  assert.equal(cleanInline('※ 요금은 변동될 수 있습니다'), '참고. 요금은 변동될 수 있습니다');
+  assert.equal(
+    cleanInline('※ 두 구름다리 모두 일방통행이며 하산 시에는 통행이 금지된다'),
+    '참고. 두 구름다리 모두 일방통행이며 하산 시에는 통행이 금지된다'
+  );
 });
 
 test('cleanInline: 빈 입력', () => {

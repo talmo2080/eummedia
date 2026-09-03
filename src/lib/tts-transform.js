@@ -26,6 +26,14 @@ const HASHTAG_RE = /(^|\s)#[^\s#]+/g;
 // 이모지 계열 (기본 유니코드 블록 위주). 한글·문장부호는 건드리지 않음.
 const EMOJI_RE = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]/gu;
 
+// 한글 받침 유무 판정 (은/는 조사 선택용)
+function hasBatchim(str) {
+  if (!str) return false;
+  const c = str.charCodeAt(str.length - 1);
+  if (c < 0xAC00 || c > 0xD7A3) return false;
+  return (c - 0xAC00) % 28 !== 0;
+}
+
 // 인라인 마크업·태그 정리 (한 문단 안 처리).
 // 순서 중요: 이미지/링크는 텍스트만 남기고, 그 뒤에 URL·이메일·이모지 제거.
 export function cleanInline(text) {
@@ -39,10 +47,26 @@ export function cleanInline(text) {
   // [링크:URL|텍스트] → 텍스트만 (URL 낭독 회피)
   s = s.replace(/\[링크:[^\]|]+(?:\|([^\]]*))?\]/g, (_, label) => (label || '').trim());
 
-  // 굵게/기울임 마크업 제거 (텍스트만 남김)
+  // 소제목-본문 분리 (지시서 【1】-1):
+  //   문단 시작이 **소제목** 형태이면 마침표를 붙여 TTS가 쉬게 함.
+  //   예: "**웃음 세 가지 실습** 진행은…" → "웃음 세 가지 실습. 진행은…"
+  //   ***…*** (bold-italic)도 동일. 문단 시작 (^)에서만.
+  s = s.replace(/^\s*\*\*\*([^*\n]+?)\*\*\*\s+/, (_, t) => t.trim().replace(/[.!?]$/, '') + '. ');
+  s = s.replace(/^\s*\*\*([^*\n]+?)\*\*\s+/, (_, t) => t.trim().replace(/[.!?]$/, '') + '. ');
+
+  // 굵게/기울임 마크업 제거 (인라인 강조 — 텍스트만 남김)
   s = s.replace(/\*\*\*([^*]+?)\*\*\*/g, '$1');
   s = s.replace(/\*\*([^*]+?)\*\*/g, '$1');
   s = s.replace(/(?<![A-Za-z0-9])\*([^*]+?)\*(?![A-Za-z0-9])/g, '$1');
+
+  // 【 】 장식 대괄호 → 안의 글자 + 마침표 (지시서 【1】-4)
+  //   예: "【 봄 】" → "봄." / "【 이용 요금 】" → "이용 요금."
+  s = s.replace(/【\s*([^】\n]+?)\s*】/g, (_, inner) => inner.trim().replace(/[.!?]$/, '') + '.');
+
+  // ※ → "참고." (지시서 【1】-5)
+  //   예: "※ 요금은 변동될 수 있습니다" → "참고. 요금은 변동될 수 있습니다."
+  s = s.replace(/^\s*※\s*/gm, '참고. ');
+  s = s.replace(/\s※\s*/g, ' 참고. ');
 
   // 남아있는 대괄호 태그 자체 제거 (예: [정보], [box], 미처리 태그)
   s = s.replace(/\[[^\]]*\]/g, ' ');
@@ -78,19 +102,40 @@ export function cleanInline(text) {
 }
 
 // 박스 태그 하나를 낭독 문단으로 변환.
-// 접두: quote='인용.', box='정리.', info='안내.'
+//   · [quote] → "인용." 접두
+//   · [box]   → "정리." 접두 (요약/정리 성격)
+//   · [info]  → 두 갈래로 분기:
+//       (a) 목차형: 첫 줄에 콜론 없음 + 항목 3개 이상 → "…은/는 다음과 같습니다." 형태
+//                   (지시서 【1】-3: 듣는 독자에게 목차는 유용, 여는 말만 자연스럽게)
+//       (b) 표 형태: 그 외 → "안내." 접두 + 각 항목 마침표 강화
+//                   (지시서 【1】-2: 요금·일정 등 정보는 빼지 말고 끊어 읽기)
 function boxToSpeech(kind, inner) {
-  const prefixMap = { quote: '인용.', box: '정리.', info: '안내.' };
-  const prefix = prefixMap[kind] || '';
-  // 박스 내부는 \n으로 목록/여러 줄인 경우가 많음 → 한 문단으로 합치되 마침표로 끊음
   const lines = String(inner)
     .split(/\n+/)
     .map(l => cleanInline(l))
     .filter(Boolean);
   if (!lines.length) return '';
-  // 각 줄을 마침표로 마무리 (이미 있으면 그대로)
-  const body = lines.map(l => (/[.!?]$/.test(l) ? l : l + '.')).join(' ');
-  return prefix ? `${prefix} ${body}` : body;
+
+  const withPeriod = l => (/[.!?]$/.test(l) ? l : l + '.');
+
+  if (kind === 'quote') {
+    return `인용. ${lines.map(withPeriod).join(' ')}`;
+  }
+  if (kind === 'box') {
+    return `정리. ${lines.map(withPeriod).join(' ')}`;
+  }
+  if (kind === 'info') {
+    // 목차형 감지: 첫 줄에 콜론 없음 + 이후 항목 3개 이상 (표 형태와 구분)
+    const firstHasColon = /:/.test(lines[0]);
+    if (!firstHasColon && lines.length >= 4) {
+      const heading = lines[0].replace(/[.!?]$/, '');
+      const marker = hasBatchim(heading) ? '은' : '는';
+      const rest = lines.slice(1).map(withPeriod).join(' ');
+      return `${heading}${marker} 다음과 같습니다. ${rest}`;
+    }
+    return `안내. ${lines.map(withPeriod).join(' ')}`;
+  }
+  return lines.map(withPeriod).join(' ');
 }
 
 // 본문 → 낭독용 문단 배열
