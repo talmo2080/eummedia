@@ -1,7 +1,7 @@
 // Node 유닛 테스트 — `node --test src/lib/tts-transform.test.mjs`
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cleanInline, bodyToSpeechParagraphs, articleToSpeech, articleToSpeechText } from './tts-transform.js';
+import { cleanInline, bodyToSpeechParagraphs, articleToSpeech, articleToSpeechText, speechIndexToBodyIndex } from './tts-transform.js';
 
 test('cleanInline: 소제목 기호 제거', () => {
   assert.equal(cleanInline('■ 운영 개요'), '운영 개요');
@@ -170,4 +170,35 @@ test('cleanInline: 빈 입력', () => {
 test('bodyToSpeechParagraphs: 빈 입력', () => {
   assert.deepEqual(bodyToSpeechParagraphs(''), []);
   assert.deepEqual(bodyToSpeechParagraphs(null), []);
+});
+
+// ─── 하이라이트용 매핑 (2차) ────────────────────────────
+
+test('speechIndexToBodyIndex: title+subtitle 있으면 오프셋 +2', () => {
+  const art = { title: '제목', subtitle: '부제' };
+  assert.equal(speechIndexToBodyIndex(art, 0), null); // title 자리
+  assert.equal(speechIndexToBodyIndex(art, 1), null); // subtitle 자리 (음수 → null 아님, 0-2=-1)
+  // 위: 실제로 0-2=-2, 1-2=-1 모두 음수 → null
+  assert.equal(speechIndexToBodyIndex(art, 2), 0);   // 첫 본문 문단
+  assert.equal(speechIndexToBodyIndex(art, 5), 3);
+});
+
+test('speechIndexToBodyIndex: subtitle 없으면 오프셋 +1', () => {
+  const art = { title: '제목', subtitle: '' };
+  assert.equal(speechIndexToBodyIndex(art, 0), null);
+  assert.equal(speechIndexToBodyIndex(art, 1), 0);
+  assert.equal(speechIndexToBodyIndex(art, 3), 2);
+});
+
+test('bodyToSpeechParagraphs: HTML과 동일 splitter (\\n+ 하나 이상)', () => {
+  // 원본이 \n 하나로 구분돼도 HTML은 분리하므로 낭독도 분리
+  const body = '문단A.\n문단B.\n\n문단C.';
+  const paras = bodyToSpeechParagraphs(body);
+  assert.deepEqual(paras, ['문단A.', '문단B.', '문단C.']);
+});
+
+test('bodyToSpeechParagraphs: [이미지:] 단독 문단은 제외', () => {
+  const body = '앞 문단.\n\n[이미지:https://x/a.jpg|캡션|alt]\n\n뒷 문단.';
+  const paras = bodyToSpeechParagraphs(body);
+  assert.deepEqual(paras, ['앞 문단.', '뒷 문단.']);
 });

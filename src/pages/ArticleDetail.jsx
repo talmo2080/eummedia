@@ -833,7 +833,8 @@ export default function ArticleDetail() {
               return paragraphs.flatMap((para, i, arr) => {
               const midIdx = Math.floor((arr.length - 1) / 2);
               const html = paragraphToHtml(restoreBlockTags(para, blocks));
-              const items = [<div key={"p-"+i} dangerouslySetInnerHTML={{ __html: html }} />];
+              // data-tts-body-index — 낭독 컨트롤이 하이라이트/스크롤에 사용
+              const items = [<div key={"p-"+i} className="tts-para" data-tts-body-index={i} dangerouslySetInnerHTML={{ __html: html }} />];
               // 본문 중간 배너 — inline_ad_title 있을 때만 삽입 (이미지 유무에 따라 자동 분기)
               if (i === midIdx && article.inline_ad_title) {
                 const hasImage = !!article.inline_ad_image;

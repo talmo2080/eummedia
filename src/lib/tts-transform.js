@@ -139,35 +139,67 @@ function boxToSpeech(kind, inner) {
 }
 
 // 본문 → 낭독용 문단 배열
-// 반환: 각 원소는 하나의 문단 (한 번의 utterance로 재생 가능한 길이).
+// HTML 렌더 파이프라인과 동일한 방식으로 분할해야 문단 하이라이트가 정확히 매핑됨.
+//   · ArticleDetail.jsx: preserveBlockTags + '\n+' split (blocks 있거나 '\n' 있을 때)
+//   · 없으면 splitIntoParagraphs (마침표 split)
+// 여기서도 동일하게 처리하여 body_para[i] ↔ HTML paragraph[i] 1:1 매핑을 보장.
 export function bodyToSpeechParagraphs(body) {
   if (!body) return [];
-  let text = String(body);
+  const src = String(body);
 
-  // 1) 박스 태그를 먼저 문장으로 치환 (블록 단위)
-  text = text.replace(/\[(quote|box|info)\]([\s\S]*?)\[\/\1\]/g, (_, kind, inner) => {
-    const speech = boxToSpeech(kind, inner);
-    return speech ? `\n\n${speech}\n\n` : '\n\n';
+  // 1) 박스 태그 sentinel 보호 (분할이 박스 내부를 쪼개는 것 방지)
+  const SENTINEL_PRE = '__EUM_TTS_BLOCK_';
+  const SENTINEL_SUF = '__';
+  const blocks = [];
+  let text = src.replace(/\[(quote|box|info)\]([\s\S]*?)\[\/\1\]/g, (full) => {
+    blocks.push(full);
+    return `${SENTINEL_PRE}${blocks.length - 1}${SENTINEL_SUF}`;
   });
 
-  // 2) 구분선 제거 (--- 단독 줄)
-  text = text.replace(/^---+$/gm, '');
+  // 2) 이미지 self-closing 도 보호 (분할이 캡션 내부를 쪼갤 수 있음)
+  text = text.replace(/\[이미지:[^\]]+\]/g, (full) => {
+    blocks.push(full);
+    return `${SENTINEL_PRE}${blocks.length - 1}${SENTINEL_SUF}`;
+  });
 
-  // 3) 문단 분리 (빈 줄 기준)
-  const rawParas = text.split(/\n{2,}/);
+  // 3) 문단 분리 — HTML과 동일 규칙
+  //    blocks 있거나 '\n' 있으면 \n+ split, 아니면 원문 자체를 한 문단으로.
+  //    (HTML은 이 경우 splitIntoParagraphs로 마침표 분할하지만, 낭독에선
+  //     한 문단으로 통째 처리해도 TTS가 문장 단위로 알아서 쉼)
+  const rawParas = (blocks.length > 0 || text.includes('\n'))
+    ? text.split(/\n+/).map(p => p.trim()).filter(Boolean)
+    : (text.trim() ? [text.trim()] : []);
 
-  // 4) 각 문단 인라인 정리 → 빈 것 제외
+  // 4) 각 문단: sentinel 복원 → 박스면 boxToSpeech, 아니면 cleanInline
   const paras = [];
+  const restoreBlocks = (s) => s.replace(
+    new RegExp(`${SENTINEL_PRE}(\\d+)${SENTINEL_SUF}`, 'g'),
+    (_, i) => blocks[Number(i)] || ''
+  );
   for (const raw of rawParas) {
-    const cleaned = cleanInline(raw);
+    const restored = restoreBlocks(raw);
+    // 문단 전체가 박스 태그 하나로 이루어져 있으면 boxToSpeech 처리
+    const m = restored.match(/^\[(quote|box|info)\]([\s\S]*?)\[\/\1\]$/);
+    if (m) {
+      const speech = boxToSpeech(m[1], m[2]);
+      if (speech) paras.push(speech);
+      continue;
+    }
+    // 문단 전체가 [이미지:] 하나면 낭독에서 제외 (사진 캡션 뺄 것)
+    if (/^\[이미지:[^\]]+\]$/.test(restored)) continue;
+    // 구분선 --- 는 제외
+    if (/^---+$/.test(restored)) continue;
+    const cleaned = cleanInline(restored);
     if (cleaned) paras.push(cleaned);
   }
   return paras;
 }
 
 // 기사 전체(제목·부제·본문) → 낭독 문단 배열
-// paragraphs: [ {kind:'title'|'subtitle'|'body', text} ... ]  형태로 반환하지 않고
-// 단순 문자열 배열로만 (kind는 재생부에서 하이라이트에 쓰지 않을 예정).
+// 반환 형식: 단순 문자열 배열
+//   [0] title, [1] subtitle, [2..N] body 문단 (HTML 문단과 1:1 매칭 시도)
+// 문단 하이라이트에서 쓸 매핑: 낭독 idx = i (i≥2) → HTML body index = i - offset
+// offset = title 있으면 +1, subtitle 있으면 +1 (getSpeechToHtmlIndex 참고).
 export function articleToSpeech({ title, subtitle, body }) {
   const out = [];
   const t = cleanInline(title || '');
@@ -177,6 +209,16 @@ export function articleToSpeech({ title, subtitle, body }) {
   const bodyParas = bodyToSpeechParagraphs(body || '');
   for (const p of bodyParas) out.push(p);
   return out;
+}
+
+// 낭독 idx → HTML body 문단 idx 매핑 헬퍼
+// title/subtitle 유무를 알아야 오프셋 계산 가능.
+export function speechIndexToBodyIndex({ title, subtitle }, speechIdx) {
+  let offset = 0;
+  if (cleanInline(title || '')) offset += 1;
+  if (cleanInline(subtitle || '')) offset += 1;
+  const bodyIdx = speechIdx - offset;
+  return bodyIdx >= 0 ? bodyIdx : null;
 }
 
 // 편의: 낭독 문단 배열을 하나의 문자열로 이어붙임 (사전 확인용)
