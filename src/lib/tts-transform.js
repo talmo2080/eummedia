@@ -32,13 +32,9 @@ export function cleanInline(text) {
   if (!text) return '';
   let s = String(text);
 
-  // 커스텀 태그 [이미지:URL|캡션|alt] → alt(3슬롯) 우선, 없으면 캡션(2슬롯).
-  // 낭독에서 사진 자체는 볼 수 없으므로 alt/캡션 텍스트를 문장으로 편입.
-  s = s.replace(/\[이미지:([^\]]+)\]/g, (_, body) => {
-    const parts = body.split('|');
-    const alt = (parts[2] || parts[1] || '').trim();
-    return alt ? ` 사진. ${alt}. ` : ' ';
-  });
+  // 커스텀 태그 [이미지:URL|캡션|alt] → 낭독에서 완전 제거 (지시서: 사진 캡션 뺄 것).
+  // 화면낭독기 사용자는 alt로 별도 접근하므로 낭독문에는 넣지 않음.
+  s = s.replace(/\[이미지:[^\]]+\]/g, ' ');
 
   // [링크:URL|텍스트] → 텍스트만 (URL 낭독 회피)
   s = s.replace(/\[링크:[^\]|]+(?:\|([^\]]*))?\]/g, (_, label) => (label || '').trim());

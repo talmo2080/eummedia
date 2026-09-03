@@ -39,10 +39,11 @@ test('cleanInline: 마크업(굵게/기울임) 제거', () => {
   assert.equal(cleanInline('그는 *조용히* 말했다'), '그는 조용히 말했다');
 });
 
-test('cleanInline: [이미지:URL|캡션|alt] → alt 우선', () => {
+test('cleanInline: [이미지:URL|캡션|alt] → 낭독에서 완전 제거', () => {
+  // 지시서: 사진 캡션은 낭독에서 뺄 것 (화면낭독기 사용자는 alt로 별도 접근)
   assert.equal(
-    cleanInline('본문 [이미지:https://x/a.jpg|사진=봉숭아 제공|웃음특강 참가자 10명이 함께 웃는 모습] 이어짐'),
-    '본문 사진. 웃음특강 참가자 10명이 함께 웃는 모습. 이어짐'
+    cleanInline('본문 [이미지:https://x/a.jpg|사진=봉숭아 제공|웃음특강 참가자 10명] 이어짐'),
+    '본문 이어짐'
   );
 });
 
