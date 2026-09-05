@@ -1206,13 +1206,16 @@ export default function ArticleEditor() {
             발행 시간(published_at)·URL(slug)·작성자(author)는 그대로 유지되었습니다.
           </p>
 
-          {/* 색인 ping 알림 — approved-banner와 동일 톤 */}
+          {/* 색인 알림 — 사실대로: 구글 ping은 2023-06 폐기(404), 네이버만 자동 요청 */}
           <div style={{
             background: '#eef7f2', borderRadius: 8,
             padding: '12px 16px', marginBottom: 24,
             fontSize: 15, color: '#1c8a4f', fontWeight: 600,
           }}>
-            ✅ 구글·네이버 색인 요청 완료
+            ✅ 네이버 색인 요청 전송
+            <div style={{ fontSize: 13, fontWeight: 500, marginTop: 6, color: '#4a4a4a' }}>
+              구글은 자동 색인이 지원되지 않습니다. 서치콘솔에서 URL 검사 → 색인 요청을 직접 눌러주세요.
+            </div>
           </div>
 
           <div style={{

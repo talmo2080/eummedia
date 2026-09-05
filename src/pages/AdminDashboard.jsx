@@ -1261,7 +1261,7 @@ export default function AdminDashboard() {
                     }}>
                       ✅ 발행됐습니다! 이제 카드뉴스를 만들어보세요.
                       <div style={{ fontSize: 13, fontWeight: 500, marginTop: 4, opacity: 0.85 }}>
-                        ✅ 구글·네이버 색인 요청 완료
+                        ✅ 네이버 색인 요청 전송 · 구글은 서치콘솔에서 직접 요청
                       </div>
                     </div>
                   )}
