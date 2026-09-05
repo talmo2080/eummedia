@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { pingSitemap } from '../lib/sitemapPing'
+import { submitIndexNow } from '../lib/indexNow'
 import { useAuth } from '../contexts/AuthContext'
 
 const NAVY = '#0d2d52'
@@ -276,6 +276,8 @@ export default function ArticleEditor() {
   const [viewMode, setViewMode] = useState('edit')
   const [savedAt, setSavedAt] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  // IndexNow 결과: null(요청 전) | {pending:true} | {ok, status, error?, engineResponse?}
+  const [indexNowResult, setIndexNowResult] = useState(null)
   const [activeTab, setActiveTab] = useState(1)
   const [channel, setChannel] = useState('')
   const [title, setTitle] = useState('')
@@ -1022,8 +1024,11 @@ export default function ArticleEditor() {
       window.scrollTo({ top: 0, behavior: 'smooth' })
       // 발행본 수정도 prerender 갱신 필요 (본문·이미지 변경 반영)
       triggerDeploy('handlePublishUpdate')
-      // 색인 ping (구글·네이버 sitemap) — no-cors fire-and-forget
-      pingSitemap()
+      // IndexNow: 실제 응답 확인 — 성공/실패를 화면에 표시
+      setIndexNowResult({ pending: true })
+      const articleUrl = `https://www.eummedia.kr/article/${slug}`
+      const r = await submitIndexNow([articleUrl])
+      setIndexNowResult(r)
     } catch (err) {
       console.error('[handlePublishUpdate] catch:', err)
       alert(`발행본 저장 중 오류: ${err?.message || err}`)
@@ -1206,17 +1211,47 @@ export default function ArticleEditor() {
             발행 시간(published_at)·URL(slug)·작성자(author)는 그대로 유지되었습니다.
           </p>
 
-          {/* 색인 알림 — 사실대로: 구글 ping은 2023-06 폐기(404), 네이버만 자동 요청 */}
-          <div style={{
-            background: '#eef7f2', borderRadius: 8,
-            padding: '12px 16px', marginBottom: 24,
-            fontSize: 15, color: '#1c8a4f', fontWeight: 600,
-          }}>
-            ✅ 네이버 색인 요청 전송
-            <div style={{ fontSize: 13, fontWeight: 500, marginTop: 6, color: '#4a4a4a' }}>
-              구글은 자동 색인이 지원되지 않습니다. 서치콘솔에서 URL 검사 → 색인 요청을 직접 눌러주세요.
-            </div>
-          </div>
+          {/* IndexNow 결과 — 실제 응답 코드에 따라 성공/실패/대기 표시 */}
+          {(() => {
+            const r = indexNowResult
+            if (!r || r.pending) {
+              return (
+                <div style={{
+                  background: '#f5f5f5', borderRadius: 8,
+                  padding: '12px 16px', marginBottom: 24,
+                  fontSize: 15, color: '#555', fontWeight: 600,
+                }}>
+                  ⏳ IndexNow 요청 중…
+                </div>
+              )
+            }
+            if (r.ok) {
+              return (
+                <div style={{
+                  background: '#eef7f2', borderRadius: 8,
+                  padding: '12px 16px', marginBottom: 24,
+                  fontSize: 15, color: '#1c8a4f', fontWeight: 600,
+                }}>
+                  ✅ IndexNow 요청 성공 (HTTP {r.status}) — Bing·Naver·Yandex 등에 전파됨
+                  <div style={{ fontSize: 13, fontWeight: 500, marginTop: 6, color: '#4a4a4a' }}>
+                    구글은 IndexNow 미참여. 서치콘솔에서 URL 검사 → 색인 요청을 직접 눌러주세요.
+                  </div>
+                </div>
+              )
+            }
+            return (
+              <div style={{
+                background: '#fdecea', borderRadius: 8,
+                padding: '12px 16px', marginBottom: 24,
+                fontSize: 15, color: '#c0392b', fontWeight: 600,
+              }}>
+                ⚠ IndexNow 요청 실패{r.status ? ` (HTTP ${r.status})` : ''}
+                <div style={{ fontSize: 13, fontWeight: 500, marginTop: 6, color: '#4a4a4a', wordBreak: 'break-all' }}>
+                  {r.error || r.engineResponse || '알 수 없는 오류'}
+                </div>
+              </div>
+            )
+          })()}
 
           <div style={{
             background: '#eef3fa', borderRadius: 12,

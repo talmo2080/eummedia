@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { getYouTubeEmbedUrl } from '../lib/youtube'
-import { pingSitemap } from '../lib/sitemapPing'
+import { submitIndexNow } from '../lib/indexNow'
 import CardSlide from '../components/CardSlide'
 import { downloadCsv } from '../lib/csv'
 
@@ -659,6 +659,8 @@ export default function AdminDashboard() {
   const [rejectingId, setRejectingId] = useState(null)
   const [rejectReason, setRejectReason] = useState('')
   const [approvedId, setApprovedId] = useState(null)
+  // 발행 배너 안에 표시할 IndexNow 결과 (id → 결과)
+  const [indexNowResults, setIndexNowResults] = useState({})
   const [approvedUserId, setApprovedUserId] = useState(null)
   const [modalArticle, setModalArticle] = useState(null)
   const [previewArticle, setPreviewArticle] = useState(null)
@@ -919,6 +921,7 @@ export default function AdminDashboard() {
 
   const approveArticle = async (id) => {
     const nowIso = new Date().toISOString()
+    const article = articles.find(a => a.id === id)
     const { error } = await supabase
       .from('articles')
       .update({ status: 'published', published_at: nowIso })
@@ -927,10 +930,14 @@ export default function AdminDashboard() {
     setArticles(articles.map(a => a.id === id ? { ...a, status: 'published', published_at: nowIso } : a))
     setApprovedId(id)
     // 발행 성공 후 Vercel 재배포 트리거 (prerender 갱신 → 검색·AI 노출)
-    // 실패해도 발행 자체는 성공 — 사용자 동선 안 끊김 (콘솔 경고만)
     triggerDeploy('approveArticle')
-    // 색인 ping (구글·네이버 sitemap) — no-cors fire-and-forget, 응답 미검증
-    pingSitemap()
+    // IndexNow: 실제 응답 확인 후 상태를 배너에 표시
+    if (article?.slug) {
+      setIndexNowResults(prev => ({ ...prev, [id]: { pending: true } }))
+      const url = `https://www.eummedia.kr/article/${article.slug}`
+      const r = await submitIndexNow([url])
+      setIndexNowResults(prev => ({ ...prev, [id]: r }))
+    }
   }
   const startReject = (id) => { setRejectingId(id); setRejectReason('') }
   const confirmReject = async (id) => {
@@ -1260,9 +1267,24 @@ export default function AdminDashboard() {
                       fontSize: 16, color: GREEN, fontWeight: 600,
                     }}>
                       ✅ 발행됐습니다! 이제 카드뉴스를 만들어보세요.
-                      <div style={{ fontSize: 13, fontWeight: 500, marginTop: 4, opacity: 0.85 }}>
-                        ✅ 네이버 색인 요청 전송 · 구글은 서치콘솔에서 직접 요청
-                      </div>
+                      {(() => {
+                        const r = indexNowResults[a.id]
+                        if (!r || r.pending) return (
+                          <div style={{ fontSize: 13, fontWeight: 500, marginTop: 4, opacity: 0.85 }}>
+                            ⏳ IndexNow 요청 중…
+                          </div>
+                        )
+                        if (r.ok) return (
+                          <div style={{ fontSize: 13, fontWeight: 500, marginTop: 4, opacity: 0.85 }}>
+                            ✅ IndexNow 요청 성공 (HTTP {r.status}) · 구글은 서치콘솔에서 직접 요청
+                          </div>
+                        )
+                        return (
+                          <div style={{ fontSize: 13, fontWeight: 500, marginTop: 4, color: '#c0392b' }}>
+                            ⚠ IndexNow 실패{r.status ? ` (HTTP ${r.status})` : ''}: {(r.error || r.engineResponse || '').slice(0, 120)}
+                          </div>
+                        )
+                      })()}
                     </div>
                   )}
 
