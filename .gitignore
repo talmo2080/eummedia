@@ -44,3 +44,7 @@ public/pium-app/gilbongjo/_orig/
 scratchpad/
 *.bak
 tools/tg-check.mjs
+
+# 세션 산출물 (다른 프로젝트 파일 · 저장소에 포함하지 않음)
+.codex-tools/
+output/
