@@ -101,7 +101,27 @@ function escapeHtml(s) {
     .replace(/'/g, '&#39;');
 }
 
-// 단락 텍스트 → HTML 변환 (커스텀 태그 5종 + 굵게 + 구분선)
+// 자동 링크 — 순수 텍스트 안의 http(s)://URL을 <a>로 감쌈.
+//   · 한글 slug 지원 (non-whitespace 문자면 모두 URL 문자로 인정)
+//   · 앞이 공백/문자열 시작일 때만 매치 → 이미 <a href="URL">…</a> 안의 URL 이중 처리 회피
+//   · URL 뒤 문장부호(.,;:!?)]」』)는 URL에서 제외
+//   · escapeHtml 이후, [링크:...] 커스텀 태그 치환 이후 실행할 것
+function autolink(html) {
+  // prefix에 `>`를 넣지 않음 — 이미 <a href="URL">URL</a> 형태로 감싸진 안쪽 URL을
+  // 다시 <a>로 감싸 이중 링크가 되는 것을 방지.
+  return html.replace(
+    /(^|[\s(])(https?:\/\/[^\s<>"'()]+)/g,
+    (m, prefix, url) => {
+      const trailing = url.match(/[.,;:!?)\]」』]+$/);
+      const cleanUrl = trailing ? url.slice(0, -trailing[0].length) : url;
+      const tail = trailing ? trailing[0] : '';
+      if (!cleanUrl) return m;
+      return `${prefix}<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" style="color:#0d2d52;text-decoration:underline;font-weight:600;word-break:break-all;">${cleanUrl}</a>${tail}`;
+    }
+  );
+}
+
+// 단락 텍스트 → HTML 변환 (커스텀 태그 5종 + 굵게 + 구분선 + 자동 링크)
 function paragraphToHtml(p) {
   const text = String(p ?? '').trim();
   if (!text) return '';
@@ -120,7 +140,7 @@ function paragraphToHtml(p) {
         return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#0d2d52;text-decoration:underline;font-weight:600;">${label}</a>`;
       });
     // white-space:pre-line — 박스 내부 \n을 시각적 줄바꿈으로 자동 처리 (자동 줄바꿈은 그대로)
-    return `<blockquote style="border-left:3px solid #c9a84c;margin:20px 0;padding:16px 20px;background:#fafaf7;color:#555;font-style:italic;font-size:1.05rem;white-space:pre-line;">${inner}</blockquote>`;
+    return `<blockquote style="border-left:3px solid #c9a84c;margin:20px 0;padding:16px 20px;background:#fafaf7;color:#555;font-style:italic;font-size:1.05rem;white-space:pre-line;">${autolink(inner)}</blockquote>`;
   }
   m = text.match(/^\[box\]([\s\S]*)\[\/box\]$/);
   if (m) {
@@ -135,7 +155,7 @@ function paragraphToHtml(p) {
       });
     // white-space:pre-line — 박스 내부 \n을 시각적 줄바꿈으로 자동 처리
     // <aside> — 본문에서 분리된 보조 콘텐츠. 스크린리더에도 "부가 정보" 인식.
-    return `<aside style="background:#fdf6ec;border:1px solid #e8c98a;border-radius:8px;padding:16px 20px;margin:20px 0;white-space:pre-line;">${inner}</aside>`;
+    return `<aside style="background:#fdf6ec;border:1px solid #e8c98a;border-radius:8px;padding:16px 20px;margin:20px 0;white-space:pre-line;">${autolink(inner)}</aside>`;
   }
   m = text.match(/^\[info\]([\s\S]*)\[\/info\]$/);
   if (m) {
@@ -150,7 +170,7 @@ function paragraphToHtml(p) {
       });
     // white-space:pre-line — 박스 내부 \n을 시각적 줄바꿈으로 자동 처리
     // <aside> — 본문에서 분리된 보조 정보 (참고·안내). 스크린리더에도 "부가 정보" 인식.
-    return `<aside style="background:#f0f5ff;border:1px solid #93b4e8;border-left:4px solid #0d2d52;border-radius:8px;padding:16px 20px;margin:20px 0;white-space:pre-line;">${inner}</aside>`;
+    return `<aside style="background:#f0f5ff;border:1px solid #93b4e8;border-left:4px solid #0d2d52;border-radius:8px;padding:16px 20px;margin:20px 0;white-space:pre-line;">${autolink(inner)}</aside>`;
   }
   // 본문 콘텐츠 이미지 — <figure><img alt><figcaption></figure>
   //   형식 (하위 호환):
@@ -209,7 +229,7 @@ function paragraphToHtml(p) {
       });
     // <h2> — 기사 본문의 소제목. <h1> 기사 제목 하위 계층.
     //   스크린리더가 "제목 레벨 2"로 인식해 문서 구조 이해 도움.
-    return `<h2 style="font-size:1.2rem;font-weight:700;border-left:4px solid #0d2d52;padding-left:12px;margin:24px 0 12px;">${inner}</h2>`;
+    return `<h2 style="font-size:1.2rem;font-weight:700;border-left:4px solid #0d2d52;padding-left:12px;margin:24px 0 12px;">${autolink(inner)}</h2>`;
   }
   const escaped = escapeHtml(text)
     .replace(/\*\*\*([^*]+?)\*\*\*/g, '<strong><em>$1</em></strong>')
@@ -220,7 +240,7 @@ function paragraphToHtml(p) {
       const label = (text || url).trim();
       return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#0d2d52;text-decoration:underline;font-weight:600;">${label}</a>`;
     });
-  return `<p style="margin:0 0 1em 0;">${escaped}</p>`;
+  return `<p style="margin:0 0 1em 0;">${autolink(escaped)}</p>`;
 }
 
 const socialIconStyle = { fontSize: "24px", textDecoration: "none", lineHeight: 1 };
