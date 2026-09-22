@@ -2119,6 +2119,9 @@ const LWK_CSS = `
     margin:0 auto 16px; font-size:22px; }
   .lwk-ch-title { color:#fff; font-weight:800; font-size:16px; margin-bottom:6px; }
   .lwk-ch-desc { color:var(--lwk-gray); font-size:12.5px; }
+  .lwk-ch-home { padding-top:0; overflow:hidden; }
+  .lwk-ch-thumb { width:calc(100% + 60px); max-width:none; height:auto; display:block;
+    aspect-ratio:800/367; object-fit:cover; margin:0 -30px 18px; border-radius:15px 15px 0 0; }
 
   /* Videos */
   .lwk-yt-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
@@ -2359,10 +2362,11 @@ function LeekwangwooPage() {
           <div className="lwk-sec-title">Channels</div>
           <div className="lwk-sec-heading">바로가기</div>
           <div className="lwk-channels">
-            <a className="lwk-ch-card" href="http://yijingkangkorea.com" target="_blank" rel="noopener noreferrer">
+            <a className="lwk-ch-card lwk-ch-home" href="https://healingsooplafa.com/" target="_blank" rel="noopener noreferrer">
+              <img className="lwk-ch-thumb" src={LWK_IMG + 'lwk-home-thumb.jpg'} alt="힐링숲라파 홈페이지" loading="lazy" width="800" height="367" />
               <div className="lwk-ch-icon">🏠</div>
               <div className="lwk-ch-title">홈페이지</div>
-              <div className="lwk-ch-desc">yijingkangkorea.com</div>
+              <div className="lwk-ch-desc">힐링숲라파</div>
             </a>
             <a className="lwk-ch-card" href="https://www.youtube.com/@%EC%9D%B4%EC%A7%95%EC%BA%89%EC%A1%B1%EC%9A%95%EA%B8%B0" target="_blank" rel="noopener noreferrer">
               <div className="lwk-ch-icon">▶️</div>
