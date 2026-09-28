@@ -343,11 +343,12 @@ export default function ArticleEditor() {
     if (!ta) return
     const start = ta.selectionStart
     const end = ta.selectionEnd
-    const selected = content.slice(start, end)
+    // ta.value는 controlled input이라 현재 content state와 동일 (setContent 반영 전)
+    const selected = ta.value.slice(start, end)
     const inner = selected || defaultText
     const snippet = before + inner + after
-    const newContent = content.slice(0, start) + snippet + content.slice(end)
-    setContent(newContent)
+    // ★ 함수형 업데이트 — stale closure 방어 (이미지 업로드 사고와 같은 계열)
+    setContent(prev => prev.slice(0, start) + snippet + prev.slice(end))
     // 커서 위치 갱신: 선택 텍스트가 있었으면 끝으로, 없었으면 defaultText 자동 선택
     setTimeout(() => {
       ta.focus()
@@ -719,18 +720,27 @@ export default function ArticleEditor() {
       // 업로드 성공 → 즉시 [이미지:URL] 태그 삽입 (URL만, 캡션·alt 없음)
       //   · prompt 취소 시 이미지가 사라지는 UX 문제 해소 — 이미지 먼저 넣고 나중에 편집
       //   · 캡션·alt는 아래 인라인 편집 카드에서 여러 줄 입력·수정·글자수 카운터 지원
+      //
+      // ★ 중요: setContent(prev => ...) 함수형 업데이트 사용 (2026-09-28 정세연 사고 대응)
+      //   여러 이미지를 연속 업로드하면 각 async 콜백은 자기가 시작될 때의 content 클로저를
+      //   붙잡고 있어서, setContent(newValue) 방식을 쓰면 마지막 업로드가 앞의 것을 덮어써
+      //   본문에 마지막 1장만 남는 버그가 있었음. prev로 최신 state를 받아 append.
       const ta = contentRef.current
-      const start = ta?.selectionStart ?? content.length
-      const end = ta?.selectionEnd ?? content.length
+      const start = ta?.selectionStart ?? -1
+      const end = ta?.selectionEnd ?? -1
       const snippet = `\n[이미지:${publicUrl}]\n`
-      const newContent = content.slice(0, start) + snippet + content.slice(end)
-      setContent(newContent)
+      let insertionEnd = null
+      setContent(prev => {
+        const s = start >= 0 && start <= prev.length ? start : prev.length
+        const e = end >= 0 && end <= prev.length ? end : prev.length
+        insertionEnd = s + snippet.length
+        return prev.slice(0, s) + snippet + prev.slice(e)
+      })
       // 커서를 삽입 태그 끝으로 이동 (사용자가 계속 본문 입력 가능)
       setTimeout(() => {
-        if (!ta) return
+        if (!ta || insertionEnd == null) return
         ta.focus()
-        const afterSnippet = start + snippet.length
-        ta.setSelectionRange(afterSnippet, afterSnippet)
+        ta.setSelectionRange(insertionEnd, insertionEnd)
       }, 0)
     } catch (err) {
       console.error('inline image upload error:', err)
