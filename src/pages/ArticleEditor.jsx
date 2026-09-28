@@ -319,6 +319,10 @@ export default function ArticleEditor() {
   const [bannerUploading, setBannerUploading] = useState(false)
   const [inlineImageUploading, setInlineImageUploading] = useState(false)   // 본문 콘텐츠 이미지 업로드 상태
   const [originalStatus, setOriginalStatus] = useState(null)
+  // 편집 진입 시 원래 slug — 저장 시 실제로 바뀌었는지 판단해 confirm 노출
+  const [originalSlug, setOriginalSlug] = useState('')
+  // published 기사에서 명시적 잠금 해제 (사용자가 '주소 변경하기' 버튼 눌렀을 때만 true)
+  const [slugUnlocked, setSlugUnlocked] = useState(false)
   const fileInputRef = useRef(null)
   const bannerFileInputRef = useRef(null)
   const inlineImageFileInputRef = useRef(null)   // 본문 콘텐츠 이미지 파일 input
@@ -449,6 +453,8 @@ export default function ArticleEditor() {
       //   데이터 fetch는 마운트 후 async라 defaultValue는 '' 상태였음 →
       //   state와 DOM value 모두 명시적으로 세팅해야 편집 진입 시 기존 slug가 필드에 나타남.
       setSlug(data.slug || '')
+      setOriginalSlug(data.slug || '')
+      setSlugUnlocked(false) // 편집 새로 열 때는 항상 잠금
       if (slugInputRef.current) slugInputRef.current.value = data.slug || ''
       setChannel(ID_TO_CHANNEL[data.channel_id] || '')
       setContent(data.content || '')
@@ -827,19 +833,30 @@ export default function ArticleEditor() {
     return s
   }
 
-  // slug 잠금 여부 — 발행된 기사만 잠금 (draft/submitted는 수정 허용)
-  const isSlugLocked = !!editId && originalStatus === 'published'
+  // slug 잠금 여부
+  //   · draft/submitted는 항상 편집 가능
+  //   · published는 기본 잠금이나 사용자가 명시적으로 unlock 버튼 누르면 편집 가능
+  //   · 잠금 해제 UX는 실수 방지용 (신문 정정 시나리오에 대응)
+  const isSlugLocked = !!editId && originalStatus === 'published' && !slugUnlocked
 
-  // 저장 직전 중복 slug 검사 (자기 자신 제외)
-  //   · 잠금 상태거나 slug가 비어있으면 검사 스킵
-  //   · 있으면 { duplicate: true }, 오류면 { error: msg }, 이상 없으면 null
+  // 저장 직전 중복 slug 검사
+  //   · articles.slug와 slug_history.old_slug 둘 다 확인 (옛 URL과 충돌 방지)
+  //   · 자기 자신 제외
+  //   · 반환: null(OK) | { duplicate: 'active' | 'history' } | { error }
   const checkSlugDuplicate = async (targetSlug) => {
     if (!targetSlug) return null
+    // (1) 다른 기사의 현재 slug와 중복?
     let q = supabase.from('articles').select('id').eq('slug', targetSlug)
     if (editId) q = q.neq('id', editId)
     const { data, error } = await q.maybeSingle()
     if (error && error.code !== 'PGRST116') return { error: error.message }
-    if (data) return { duplicate: true }
+    if (data) return { duplicate: 'active' }
+    // (2) 다른 기사의 옛 slug(리다이렉트 대상)와 중복? 이걸 새 slug로 쓰면 순환 발생
+    let hq = supabase.from('slug_history').select('article_id').eq('old_slug', targetSlug)
+    if (editId) hq = hq.neq('article_id', editId)
+    const { data: hd, error: herr } = await hq.maybeSingle()
+    if (herr && herr.code !== 'PGRST116') return { error: herr.message }
+    if (hd) return { duplicate: 'history' }
     return null
   }
 
@@ -923,7 +940,12 @@ export default function ArticleEditor() {
     if (!cleaned) return null
     const check = await checkSlugDuplicate(cleaned)
     if (check?.error) return { alert: `주소 중복 검사 오류: ${check.error}` }
-    if (check?.duplicate) return { alert: `이미 쓰는 주소입니다: "${cleaned}"\n다른 주소로 바꿔주세요.` }
+    if (check?.duplicate === 'active') {
+      return { alert: `이미 쓰는 주소입니다: "${cleaned}"\n다른 주소로 바꿔주세요.` }
+    }
+    if (check?.duplicate === 'history') {
+      return { alert: `이 주소는 다른 기사의 옛 주소로 등록되어 있어 쓸 수 없습니다: "${cleaned}"\n(같은 주소를 쓰면 리다이렉트가 순환됩니다)` }
+    }
     return null
   }
 
@@ -1013,11 +1035,29 @@ export default function ArticleEditor() {
   }
 
   // ━━ 발행본 그대로 저장 (편집국장/발행인 전용 — 발행 기사 수정) ━━
-  // status='published' 유지, published_at·slug·author_id 모두 보존, updated_at만 갱신
+  // status='published' 유지, published_at·author_id 보존, updated_at만 갱신.
+  // slug는 잠금 해제 상태에서만 변경 가능. 변경 감지 시 사용자 재확인.
   const handlePublishUpdate = async () => {
     if (submitting) return
     if (!user || !editId) return
-    // published 편집은 isSlugLocked=true라 preSaveSlugCheck가 즉시 null 반환 (안전 넷)
+
+    // slug 실제로 바뀌었는지 판단 — 잠금 해제(unlocked) 상태에서만 의미 있음
+    const rawSlug = slugInputRef.current?.value ?? slug
+    const cleaned = cleanSlug(rawSlug)
+    const slugChanged = slugUnlocked && cleaned && cleaned !== originalSlug
+
+    // slug 변경 시 최종 확인 대화상자
+    if (slugChanged) {
+      const ok = window.confirm(
+        `기사 주소를 바꾸시겠습니까?\n\n` +
+        `이전:  /article/${originalSlug}\n` +
+        `이후:  /article/${cleaned}\n\n` +
+        `· 이전 주소로 들어와도 자동으로 새 주소로 옮겨갑니다 (301 리다이렉트).\n` +
+        `· 되돌리려면 다시 편집해서 이전 주소를 그대로 입력해 저장하시면 됩니다.`
+      )
+      if (!ok) return
+    }
+
     const slugErr = await preSaveSlugCheck()
     if (slugErr) { alert(slugErr.alert); return }
     setSubmitting(true)
@@ -1032,11 +1072,17 @@ export default function ArticleEditor() {
       setSavedAt(formatNow())
       setViewMode('publishUpdateSuccess')
       window.scrollTo({ top: 0, behavior: 'smooth' })
+      // slug 변경 성공 시 새 slug로 originalSlug 갱신·잠금 복귀 (연속 편집 대비)
+      if (slugChanged) {
+        setOriginalSlug(cleaned)
+        setSlugUnlocked(false)
+      }
       // 발행본 수정도 prerender 갱신 필요 (본문·이미지 변경 반영)
       triggerDeploy('handlePublishUpdate')
-      // IndexNow: 실제 응답 확인 — 성공/실패를 화면에 표시
+      // IndexNow: 실제 응답 확인 — slug 변경 시 새 URL로 전송 (구 URL은 리다이렉트가 처리)
       setIndexNowResult({ pending: true })
-      const articleUrl = `https://www.eummedia.kr/article/${slug}`
+      const targetSlug = slugChanged ? cleaned : slug
+      const articleUrl = `https://www.eummedia.kr/article/${targetSlug}`
       const r = await submitIndexNow([articleUrl])
       setIndexNowResult(r)
     } catch (err) {
@@ -1392,16 +1438,45 @@ export default function ArticleEditor() {
               </div>
             </div>
 
-            {/* 2.5 기사 주소 (slug) — published는 잠금, draft/submitted는 수정 허용 */}
+            {/* 2.5 기사 주소 (slug) — published는 기본 잠금, unlock 후 편집 가능
+                                  · 옛 주소는 slug_history 트리거로 자동 백업 → middleware가 301
+                                  · 실수 방지 위해 2단계 확인 (unlock 대화 + 저장 확인) */}
             <div style={card}>
               <label style={lbl}>
                 기사 주소 (선택)
                 {isSlugLocked && (
                   <span style={{ color: '#888', fontSize: 13, fontWeight: 500, marginLeft: 10 }}>
-                    🔒 발행된 기사는 주소 변경 불가
+                    🔒 잠금
+                  </span>
+                )}
+                {slugUnlocked && originalStatus === 'published' && (
+                  <span style={{ color: '#c0392b', fontSize: 13, fontWeight: 700, marginLeft: 10 }}>
+                    🔓 잠금 해제됨 — 저장 시 새 주소로 변경됩니다
                   </span>
                 )}
               </label>
+              {originalStatus === 'published' && !slugUnlocked && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const ok = window.confirm(
+                      '기사 주소(URL)를 바꾸시겠습니까?\n\n' +
+                      '· 옛 주소로 들어와도 자동으로 새 주소로 옮겨갑니다 (301 리다이렉트).\n' +
+                      '· 검색엔진에 새 주소가 재제출됩니다.\n' +
+                      '· 되돌리려면 다시 편집해서 옛 주소를 그대로 입력해 저장하시면 됩니다.\n\n' +
+                      '변경 이력은 자동으로 기록됩니다.'
+                    )
+                    if (ok) setSlugUnlocked(true)
+                  }}
+                  style={{
+                    background: '#fff', color: NAVY, border: `1.5px solid ${NAVY}`,
+                    padding: '8px 14px', borderRadius: 6,
+                    fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                    fontFamily: 'inherit', marginBottom: 10,
+                  }}>
+                  🔓 이 기사 주소 바꾸기
+                </button>
+              )}
               <input
                 ref={slugInputRef}
                 style={{
