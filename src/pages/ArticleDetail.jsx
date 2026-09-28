@@ -374,6 +374,13 @@ export default function ArticleDetail() {
   const [related, setRelated] = useState([]);
   const [authorArticles, setAuthorArticles] = useState([]);   // 이 기자의 다른 기사 — author_id 동적 fetch
   const [liked, setLiked] = useState(false);
+  // 댓글별 좋아요 상태 (localStorage 기반). Set<comment_id>
+  const [likedComments, setLikedComments] = useState(() => {
+    try {
+      const arr = JSON.parse(localStorage.getItem('eum-liked-comments') || '[]');
+      return new Set(Array.isArray(arr) ? arr : []);
+    } catch { return new Set(); }
+  });
   const [likeCount, setLikeCount] = useState(0);
   const [copied, setCopied] = useState(false);
   const [comments, setComments] = useState([]);
@@ -417,6 +424,54 @@ export default function ArticleDetail() {
       ? likedSlugs.filter(s => s !== slug)
       : [...likedSlugs, slug];
     try { localStorage.setItem('eum-liked-articles', JSON.stringify(next)); } catch { /* ignore */ }
+  };
+
+  // 댓글 좋아요 토글 — 기사 좋아요와 동일 패턴 (localStorage 토글 + RPC)
+  //   RPC: increment_comment_like_count(p_comment_id uuid, p_delta int) → 새 like_count 반환
+  //   보안: RPC 안에서 SECURITY DEFINER + delta ∈ {-1, +1} 검증
+  const onLikeComment = async (commentId) => {
+    if (!commentId) return;
+    const alreadyLiked = likedComments.has(commentId);
+    const delta = alreadyLiked ? -1 : 1;
+
+    // Optimistic UI — 댓글 카운트와 좋아요 상태 즉시 반영
+    const nextLiked = new Set(likedComments);
+    if (alreadyLiked) nextLiked.delete(commentId); else nextLiked.add(commentId);
+    setLikedComments(nextLiked);
+    setComments(prev => prev.map(c =>
+      c.id === commentId
+        ? { ...c, like_count: Math.max(0, (c.like_count ?? 0) + delta) }
+        : c
+    ));
+
+    // RPC 호출
+    const { data: newCount, error: rpcErr } = await supabase
+      .rpc('increment_comment_like_count', { p_comment_id: commentId, p_delta: delta });
+    if (rpcErr) {
+      console.error('[Comment LIKE] rpc error:', rpcErr);
+      // 롤백
+      setLikedComments(prev => {
+        const s = new Set(prev);
+        if (alreadyLiked) s.add(commentId); else s.delete(commentId);
+        return s;
+      });
+      setComments(prev => prev.map(c =>
+        c.id === commentId
+          ? { ...c, like_count: Math.max(0, (c.like_count ?? 0) - delta) }
+          : c
+      ));
+      return;
+    }
+    // DB 응답값으로 동기화
+    if (typeof newCount === 'number') {
+      setComments(prev => prev.map(c =>
+        c.id === commentId ? { ...c, like_count: newCount } : c
+      ));
+    }
+    // localStorage 갱신
+    try {
+      localStorage.setItem('eum-liked-comments', JSON.stringify([...nextLiked]));
+    } catch { /* ignore */ }
   };
 
   const onCopy = async () => {
@@ -1029,7 +1084,26 @@ export default function ArticleDetail() {
                         </div>
                       </div>
                     </div>
-                    <div style={{ fontSize:"11px", color:"#595959" }}>👍 {c.like_count ?? 0}</div>
+                    <button
+                      type="button"
+                      onClick={() => onLikeComment(c.id)}
+                      aria-label={likedComments.has(c.id) ? `좋아요 취소 (${c.like_count ?? 0})` : `좋아요 (${c.like_count ?? 0})`}
+                      aria-pressed={likedComments.has(c.id)}
+                      style={{
+                        background: 'transparent',
+                        border: '1px solid transparent',
+                        borderRadius: 4,
+                        padding: '4px 8px',
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                        fontSize: '11px',
+                        color: likedComments.has(c.id) ? '#c0392b' : '#595959',
+                        fontWeight: likedComments.has(c.id) ? 700 : 400,
+                        display: 'inline-flex', alignItems: 'center', gap: 4,
+                      }}>
+                      <span aria-hidden="true">{likedComments.has(c.id) ? '👍' : '👍🏻'}</span>
+                      <span>{c.like_count ?? 0}</span>
+                    </button>
                   </div>
                   {isEditing ? (
                     <div style={{ paddingLeft:"42px" }}>
