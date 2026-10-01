@@ -7,7 +7,13 @@ const PAGE_SIZE = 15;
 
 // 시민기자 마이페이지 — 1단계 UI (이어쓰기는 별도 commit)
 export default function MyPage() {
-  const { user, profile } = useAuth();
+  const { user, profile, refetchProfile } = useAuth();
+
+  // 닉네임(표시 이름) 인라인 수정 상태
+  const [nicknameEditing, setNicknameEditing] = useState(false);
+  const [nicknameDraft, setNicknameDraft] = useState('');
+  const [nicknameSaving, setNicknameSaving] = useState(false);
+  const [nicknameError, setNicknameError] = useState('');
   const navigate = useNavigate();
   const [articles, setArticles] = useState([]);
   const [filter, setFilter] = useState('all');
@@ -96,6 +102,39 @@ export default function MyPage() {
   const isWriter = profile?.role === 'writer';
   const nickname = profile?.nickname || user.email || '회원';
   const initial = nickname.charAt(0).toUpperCase();
+
+  // 닉네임 저장 — 중복 체크 + RLS 자동 (본인 레코드만)
+  async function handleNicknameSave() {
+    const next = nicknameDraft.trim();
+    if (!next) { setNicknameError('이름을 입력해주세요.'); return; }
+    if (next.length > 30) { setNicknameError('30자 이내로 입력해주세요.'); return; }
+    if (next === profile?.nickname) { setNicknameEditing(false); return; }
+    setNicknameSaving(true);
+    setNicknameError('');
+    try {
+      // 중복 체크 (자기 자신 제외)
+      const { data: dup, error: dupErr } = await supabase
+        .from('users')
+        .select('id')
+        .eq('nickname', next)
+        .neq('id', user.id)
+        .maybeSingle();
+      if (dupErr && dupErr.code !== 'PGRST116') throw dupErr;
+      if (dup) { setNicknameError('이미 쓰는 이름입니다. 다른 이름으로 바꿔주세요.'); return; }
+      // UPDATE (RLS: 본인 행만 허용)
+      const { error } = await supabase
+        .from('users')
+        .update({ nickname: next, updated_at: new Date().toISOString() })
+        .eq('id', user.id);
+      if (error) throw error;
+      await refetchProfile();
+      setNicknameEditing(false);
+    } catch (e) {
+      setNicknameError(`저장 실패: ${e?.message || e}`);
+    } finally {
+      setNicknameSaving(false);
+    }
+  }
   const joinedDate = profile?.created_at
     ? new Date(profile.created_at).toLocaleDateString('ko-KR')
     : '';
@@ -109,9 +148,58 @@ export default function MyPage() {
             {initial}
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="font-serif font-bold text-2xl text-neutral-900 truncate">
-              {nickname}
-            </h1>
+            {!nicknameEditing ? (
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="font-serif font-bold text-2xl text-neutral-900 truncate">
+                  {nickname}
+                </h1>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNicknameDraft(profile?.nickname || '');
+                    setNicknameError('');
+                    setNicknameEditing(true);
+                  }}
+                  className="text-xs font-semibold text-[#0d2d52] border border-[#0d2d52] rounded px-2 py-1 hover:bg-[#0d2d52] hover:text-white transition-colors"
+                  aria-label="표시 이름 바꾸기"
+                >
+                  ✏️ 이름 바꾸기
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-start gap-2 flex-wrap">
+                <input
+                  type="text"
+                  value={nicknameDraft}
+                  onChange={e => setNicknameDraft(e.target.value)}
+                  disabled={nicknameSaving}
+                  maxLength={30}
+                  autoFocus
+                  className="flex-1 min-w-[150px] font-serif font-bold text-xl text-neutral-900 border border-[#0d2d52] rounded px-3 py-1 outline-none focus:ring-2 focus:ring-[#0d2d52]"
+                  placeholder="표시 이름 (실명 권장)"
+                  aria-label="표시 이름 입력"
+                />
+                <button
+                  type="button"
+                  onClick={handleNicknameSave}
+                  disabled={nicknameSaving}
+                  className="text-sm font-bold text-white bg-[#0d2d52] rounded px-3 py-1.5 disabled:opacity-60"
+                >
+                  {nicknameSaving ? '저장 중…' : '저장'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setNicknameEditing(false); setNicknameError(''); }}
+                  disabled={nicknameSaving}
+                  className="text-sm font-semibold text-neutral-600 border border-neutral-300 rounded px-3 py-1.5"
+                >
+                  취소
+                </button>
+              </div>
+            )}
+            {nicknameError && (
+              <p role="alert" className="text-sm text-red-600 mt-1">{nicknameError}</p>
+            )}
             <p className="text-sm text-neutral-600 mt-1">
               이음미디어 {
                 profile?.role === 'admin' ? '편집국장' :

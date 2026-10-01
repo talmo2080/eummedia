@@ -37,7 +37,14 @@ export function AuthProvider({ children }) {
     setProfile(data)
   }
 
-  const value = { user, profile, loading }
+  // profile을 외부에서 갱신 요청할 수 있게 노출
+  //   사용처: 닉네임·bio 등을 본인이 수정한 직후 전역 반영 (리로드 없이)
+  async function refetchProfile() {
+    if (!user?.id) return
+    await fetchProfile(user.id)
+  }
+
+  const value = { user, profile, loading, refetchProfile }
   return (
     <AuthContext.Provider value={value}>
       {!loading && children}
