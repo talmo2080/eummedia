@@ -922,6 +922,15 @@ export default function PiumStorePage() {
       price_model:   "free",
       users:         { nickname: "길봉조" },
     },
+    {
+      slug:          "utjakorea",
+      title:         "웃자대한민국협회",
+      summary:       "웃음으로 잇는 문화, 찾아가는 무대",
+      thumbnail_url: "/pium-app/utjakorea/card.jpg",
+      category:      "community",
+      price_model:   "free",
+      users:         { nickname: "정세연" },
+    },
   ];
   // 갓 피어난 앱: 하드코딩 선두 + DB 최근 순
   const recentFeatured = [

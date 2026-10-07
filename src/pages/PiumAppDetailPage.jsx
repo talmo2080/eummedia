@@ -98,6 +98,56 @@ const APPS = {
     appUrl:        "https://litt.ly/bongdang",
     layoutStyle:   "tile-dashboard",
   },
+
+  utjakorea: {
+    slug:          "utjakorea",
+    title:         "웃자대한민국협회",
+    categoryLabel: "지역·커뮤니티",
+    tagline:       "웃음으로 잇는 문화, 찾아가는 무대",
+    thumbnail:     "/pium-app/utjakorea/card.jpg",
+    appUrl:        "https://www.utjakorea.or.kr",
+    makerArticleUrl: "https://www.eummedia.kr/article/article-ofkvp4bo",
+    makerArticle: {
+      thumbnail: "https://avbsniuthpcejjcdeiyw.supabase.co/storage/v1/object/public/article-images/39b41153-941a-4f29-a970-d4695478fd56/1783041226984.png",
+      title: "비개발자가 만든 웹앱, '피움'에서 꽃핀다 — 바이브코딩으로 두피전문가가 3주 만에 신문을 지은 이유",
+    },
+    priceModel:    "free",
+    tags:          ["비영리단체", "웃음", "문화공연", "지역축제"],
+    maker: {
+      name: "정세연",
+      bio:  "닥터리부트 두피관리센터 대표 · 두피전문가 27년 · 이음미디어 편집국장 · AI에이전트전문가 1급",
+    },
+    whatItDoes: [
+      {
+        icon: "🎪",
+        title: "협회 활동 여섯 갈래",
+        desc: "싱글벙글 나비축제, 힐링문화콘서트, 웃음힐링테라피, 2030 청년웃음, 찾아가는 웃음, 문화공연·강의·행사를 각각의 페이지로 소개.",
+      },
+      {
+        icon: "📬",
+        title: "행사문의 자동 전달",
+        desc: "문의 종류·날짜·인원·장소를 체크해 보내면 담당자 텔레그램 단체방으로 즉시 전달됨.",
+      },
+      {
+        icon: "📄",
+        title: "공시자료 공개",
+        desc: "비영리민간단체 의무사항인 기부금 공시자료를 로그인 없이 누구나 열람.",
+      },
+    ],
+    searchStrong: [
+      "JSON-LD·사이트맵·OG 메타를 넣어 구글·네이버 검색에 잡히도록 설계",
+      "사진을 문서 안에 담아 별도 이미지 서버 없이 어디서든 빠르게 열림",
+      "문의가 들어오면 담당자 세 사람이 동시에 알림을 받아 놓치지 않음",
+    ],
+    howToUse: [
+      "링크를 열어 협회 활동과 지난 무대를 둘러봅니다",
+      "행사·강의가 필요하면 '행사문의'에서 항목을 체크해 보냅니다",
+    ],
+    whoFor: [
+      "지역 행사나 축제에 웃음 공연·강의가 필요한 담당자",
+      "비영리단체 홈페이지를 어떻게 꾸릴지 참고하고 싶은 분",
+    ],
+  },
 };
 
 /* ── CSS ── */
@@ -3886,6 +3936,15 @@ function GilBongJoPage() {
   );
 }
 
+/* 앱 주소에서 표시용 호스트 추출 (www. 제거). 없거나 파싱 실패 시 빈 문자열 */
+function appHost(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+}
+
 /* ── 메인 컴포넌트 ── */
 export default function PiumAppDetailPage() {
   const { slug } = useParams();
@@ -4203,7 +4262,7 @@ export default function PiumAppDetailPage() {
           rel="noopener noreferrer"
           className="pd-btn-primary"
         >
-          <ExternalLink size={17} /> 바로 보기 — eummedia.kr
+          <ExternalLink size={17} /> 바로 보기{appHost(app.appUrl) && ` — ${appHost(app.appUrl)}`}
         </a>
       </div>
     </div>
