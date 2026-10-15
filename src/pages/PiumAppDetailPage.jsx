@@ -4109,19 +4109,18 @@ function IsooPage() {
 .isoo-wrap .bookmeta{font-size:13.5px;color:#8B8178;line-height:1.85}
 
 /* ⑦ 영상 */
-.isoo-wrap .vids{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-.isoo-wrap .vids.one{grid-template-columns:1fr;max-width:820px;margin:0 auto}
-.isoo-wrap .vids.one .tt{font-size:16.5px;padding:19px 22px}
+.isoo-wrap .vids{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:920px;margin:0 auto}
 .isoo-wrap .vid{border-radius:14px;overflow:hidden;background:rgba(245,242,234,.05);border:1px solid var(--line)}
 .isoo-wrap .vid .th{aspect-ratio:16/9;background:#0B0810;position:relative;display:flex;
   align-items:center;justify-content:center}
 .isoo-wrap .vid .th img{width:100%;height:100%;object-fit:cover}
+.isoo-wrap video.th{width:100%;aspect-ratio:16/9;display:block;background:#0B0810;object-fit:cover}
 .isoo-wrap .vid .pl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
 .isoo-wrap .vid .pl i{width:54px;height:54px;border-radius:50%;background:rgba(0,0,0,.55);
   display:flex;align-items:center;justify-content:center;font-style:normal;color:#fff;font-size:19px}
 .isoo-wrap .vid .tt{padding:17px 19px;font-size:15px;font-weight:700;line-height:1.5}
 .isoo-wrap .vid.soon .th{color:var(--mut);font-size:13px}
-.isoo-wrap .shorts{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:30px;max-width:820px;margin-left:auto;margin-right:auto}
+.isoo-wrap .shorts{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:30px;max-width:920px;margin-left:auto;margin-right:auto}
 .isoo-wrap .sh{display:block;border-radius:14px;overflow:hidden;background:#0B0810;border:1px solid var(--line)}
 .isoo-wrap .sh .th{aspect-ratio:9/16;position:relative;overflow:hidden}
 .isoo-wrap .sh .th img{width:100%;height:100%;object-fit:cover}
@@ -4173,6 +4172,7 @@ function IsooPage() {
   background:rgba(245,242,234,.05);color:var(--paper);font-size:14.5px;margin-bottom:11px;
   font-family:inherit}
 .isoo-wrap select.fld{appearance:none}
+.isoo-wrap select.fld option{background:#FFFFFF;color:#141110}
 .isoo-wrap .btn{width:100%;padding:15px;border:none;border-radius:9px;background:var(--red);
   color:#fff;font-size:15.5px;font-weight:800;cursor:pointer;font-family:inherit}
 .isoo-wrap .btn:disabled{opacity:.6;cursor:default}
@@ -4416,14 +4416,21 @@ function IsooPage() {
       <section className="sec"><div className="wrap">
         <div className="sec-h">VIDEO</div>
         <h2 className="sec-t">대표 영상</h2>
-        <div className="vids one">
+        <div className="vids">
           <a className="vid" href="https://youtu.be/J8Ju1xZxTxg" target="_blank" rel="noopener">
             <div className="th">
               <img src="https://i.ytimg.com/vi/J8Ju1xZxTxg/maxresdefault.jpg" alt="" onError={isooYtFallback('J8Ju1xZxTxg')} />
               <span className="pl"><i>▶</i></span>
             </div>
-            <div className="tt">수십 명이 함께 치는 합동 연습</div>
+            <div className="tt">방송 출연 영상</div>
           </a>
+          {/* 이 영상은 유튜브에 없음. 사이트에 직접 올린 mp4 를 페이지 안에서 재생한다. */}
+          <div className="vid">
+            <video className="th" src={ISOO_IMG + 'practice.mp4'}
+                   poster={ISOO_IMG + 'practice.jpg'}
+                   controls playsInline preload="none"></video>
+            <div className="tt">수십 명이 함께 치는 합동 연습</div>
+          </div>
         </div>
         <div className="shorts">
           {shorts.map((id) => (
@@ -4526,8 +4533,8 @@ function IsooPage() {
               <form onSubmit={handleSubmit}>
                 <input className="fld" placeholder="성함" aria-label="성함" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} />
                 <input className="fld" placeholder="연락처" aria-label="연락처" type="tel" inputMode="tel" value={form.phone} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} />
-                <select className="fld" aria-label="문의 종류" value={form.kind} onChange={e=>setForm(f=>({...f,kind:e.target.value}))}>
-                  <option value="">문의 종류를 골라주세요</option>
+                <select className="fld" aria-label="문의 종류" required value={form.kind} onChange={e=>setForm(f=>({...f,kind:e.target.value}))}>
+                  <option value="" disabled>문의 종류를 골라주세요</option>
                   {ISOO_KINDS.map(k => <option key={k} value={k}>{k}</option>)}
                 </select>
                 <textarea className="fld" rows="4" placeholder="문의 내용" aria-label="문의 내용" value={form.message} onChange={e=>setForm(f=>({...f,message:e.target.value}))} />
