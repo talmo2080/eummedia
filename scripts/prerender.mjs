@@ -214,6 +214,11 @@ const PIUM_APP_PROFILES = {
     desc: '사람의 몸이 보내는 신호를 대화로 잇는 사람. 맥파바이오솔루션 대표 길봉조 PIUM 전문가 프로필',
     image: `${SITE_URL}/pium-app/gilbongjo/gilbongjo-og.jpg`,
   },
+  '/pium-app/isoo': {
+    title: '아이수 원장 — 장구의 신 · 아랑고고장구 | PIUM',
+    desc: '연변에서 대한민국까지, 두드림의 여신. 장구는 악보를 몰라도 됩니다.',
+    image: `${SITE_URL}/pium-app/isoo/og.jpg`,
+  },
 };
 
 // 정적 페이지(/about, /advertise 등)의 <title> + description + og/twitter 메타 교체

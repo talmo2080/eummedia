@@ -3936,6 +3936,614 @@ function GilBongJoPage() {
   );
 }
 
+/* ══════════════════════════════════════
+   아이수 원장 프로필 — /pium-app/isoo
+   (설계도: isoo-SPEC-v1 · 이미지: public/pium-app/isoo/)
+══════════════════════════════════════ */
+const ISOO_IMG = '/pium-app/isoo/';
+const ISOO_ST = ['st1', 'st2', 'st3', 'st4', 'st5', 'st6', 'st7', 'st8'];
+const ISOO_KINDS = [
+  '수강 문의 — 서울남부지회(봉천역)',
+  '수강 문의 — 대림지부(대림역)',
+  '공연 · 행사 섭외',
+  '그 밖의 문의',
+];
+
+/* 유튜브 썸네일 — 고해상도가 없으면 hqdefault 로 한 번만 교체 */
+function isooYtFallback(id) {
+  return (e) => {
+    if (e.currentTarget.dataset.fb) return;
+    e.currentTarget.dataset.fb = '1';
+    e.currentTarget.src = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+  };
+}
+
+function IsooPage() {
+  const [idx, setIdx] = useState(0);
+  const [form, setForm] = useState({ name: '', phone: '', kind: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [err, setErr] = useState('');
+  const touch = useRef(null);
+
+  const last = ISOO_ST.length - 1;
+  const go = (d) => setIdx((i) => Math.min(last, Math.max(0, i + d)));
+
+  function onTouchStart(e) {
+    const t = e.touches[0];
+    touch.current = { x: t.clientX, y: t.clientY };
+  }
+  function onTouchEnd(e) {
+    if (!touch.current) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touch.current.x;
+    const dy = t.clientY - touch.current.y;
+    touch.current = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) go(dx < 0 ? 1 : -1);
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!form.name.trim() || !form.phone.trim() || !form.message.trim()) {
+      setErr('성함, 연락처, 문의 내용을 모두 입력해 주세요.');
+      return;
+    }
+    setSubmitting(true); setErr('');
+    try {
+      const res = await fetch('/api/isoo-lecture-inquiry', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          kind: form.kind || '선택 안 함',
+          message: form.message,
+        }),
+      });
+      if (!res.ok) throw new Error('서버 오류');
+      setSubmitted(true);
+    } catch {
+      setErr('전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const shorts = ['sVrBridtOVQ', 'Yxjsj4YP6o8', 'bTzh4lxaXko', 'sAENq_Ygqow'];
+
+  return (
+    <div className="isoo-wrap">
+      <style>{`
+.isoo-wrap{--ink:#141110;--ink2:#1E1A18;--paper:#F5F2EA;--red:#C8102E;--gold:#E0A93B;--mut:#9A9088;--line:rgba(245,242,234,.14);--dline:rgba(20,17,16,.13);
+  background:var(--ink);color:var(--paper);font-family:Pretendard,'Noto Sans KR',system-ui,sans-serif;-webkit-font-smoothing:antialiased;word-break:keep-all}
+.isoo-wrap{line-height:normal}
+.isoo-wrap p{margin:1em 0}
+.isoo-wrap *{box-sizing:border-box}
+.isoo-wrap img{max-width:100%;display:block}
+.isoo-wrap a{color:inherit;text-decoration:none}
+.isoo-wrap .wrap{max-width:1120px;margin:0 auto;padding:0 40px}
+.isoo-wrap .sec{padding:96px 0}
+.isoo-wrap .sec.paper{background:var(--paper);color:var(--ink)}
+.isoo-wrap .sec.ink2{background:var(--ink2)}
+.isoo-wrap .sec-h{font-size:12px;letter-spacing:.3em;color:var(--gold);font-weight:700;margin-bottom:14px}
+.isoo-wrap .sec.paper .sec-h{color:var(--red)}
+.isoo-wrap .sec-t{font-size:34px;font-weight:800;letter-spacing:-.02em;margin:0 0 46px}
+
+/* ① 히어로 */
+.isoo-wrap .hero{position:relative;background:#0B0810}
+.isoo-wrap .hero img{width:100%}
+.isoo-wrap .hero::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(11,8,16,0) 55%,rgba(20,17,16,.93) 100%)}
+.isoo-wrap .hero-b{background:var(--ink);border-bottom:1px solid var(--line)}
+.isoo-wrap .hero-b .wrap{display:flex;align-items:flex-end;gap:28px;padding-top:32px;padding-bottom:32px;flex-wrap:wrap}
+.isoo-wrap .nm small{display:block;font-size:11.5px;letter-spacing:.3em;color:var(--gold);margin-bottom:10px;font-weight:700}
+.isoo-wrap .nm b{font-size:44px;font-weight:800;letter-spacing:-.02em;line-height:1}
+.isoo-wrap .nm .en{font-size:15px;letter-spacing:.34em;color:var(--mut);margin-left:12px;font-weight:600}
+.isoo-wrap .role{margin-left:auto;text-align:right;font-size:14px;line-height:1.75;color:#CFC6BC}
+.isoo-wrap .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;justify-content:flex-end}
+.isoo-wrap .pill{font-size:11.5px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;color:#CFC6BC}
+.isoo-wrap .pill.on{border-color:var(--red);color:#FFD9DF;background:rgba(200,16,46,.18)}
+
+/* ② 한마디 */
+.isoo-wrap .quote{text-align:center}
+.isoo-wrap .qbig{font-size:42px;font-weight:800;line-height:1.45;letter-spacing:-.02em;margin:0}
+.isoo-wrap .qbig em{font-style:normal;color:var(--gold)}
+.isoo-wrap .qsub{margin-top:26px;font-size:15.5px;color:var(--mut);line-height:1.95}
+
+/* ③ 걸어온 길 */
+.isoo-wrap .tl{border-top:1px solid var(--line)}
+.isoo-wrap .tl .it{display:grid;grid-template-columns:118px 1fr;gap:26px;
+  padding:28px 4px;border-bottom:1px solid var(--line);align-items:baseline}
+.isoo-wrap .tl .yr{font-size:12.5px;font-weight:800;color:var(--red);letter-spacing:.05em;padding-top:4px}
+.isoo-wrap .tl .yr.now{color:var(--ink);background:var(--gold);display:inline-block;
+  padding:4px 11px;border-radius:4px;font-size:11.5px}
+.isoo-wrap .tl .h2{font-size:18px;font-weight:700;line-height:1.55}
+.isoo-wrap .tl .h2 span{display:block;font-size:14px;font-weight:500;color:#A9A096;margin-top:8px;line-height:1.85}
+.isoo-wrap .tl .it.seed .h2{font-size:20px}
+.isoo-wrap .tl .it.seed .h2 span{color:var(--gold)}
+
+/* ④ 슬라이드 */
+.isoo-wrap .slider{max-width:640px;margin:0 auto}
+.isoo-wrap .sv{border-radius:16px;overflow:hidden;background:#0B0810;aspect-ratio:3/4;position:relative;touch-action:pan-y;user-select:none}
+.isoo-wrap .sv img{width:100%;height:100%;object-fit:cover}
+.isoo-wrap .sv-track{display:flex;height:100%;transition:transform .35s ease}
+.isoo-wrap .sv-slide{flex:0 0 100%;height:100%}
+.isoo-wrap .sl-nav{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:22px}
+.isoo-wrap .sl-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);
+  background:transparent;color:var(--paper);font-size:17px;cursor:pointer;line-height:1}
+.isoo-wrap .sl-btn:disabled{opacity:.28;cursor:default}
+.isoo-wrap .sl-btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.isoo-wrap .sl-dots{display:flex;gap:9px}
+.isoo-wrap .sl-dots i{width:7px;height:7px;border-radius:50%;background:rgba(245,242,234,.26);display:block}
+.isoo-wrap .sl-dots i.on{background:var(--gold);width:22px;border-radius:999px}
+.isoo-wrap .sl-cap{text-align:center;margin-top:16px;font-size:13.5px;color:var(--mut)}
+@media (prefers-reduced-motion:reduce){.isoo-wrap .sv-track{transition:none}}
+
+/* ⑤ 기록 */
+.isoo-wrap .acc{border-top:1px solid var(--line)}
+.isoo-wrap .acc details{border-bottom:1px solid var(--line)}
+.isoo-wrap .acc summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:18px;padding:28px 4px}
+.isoo-wrap .acc summary::-webkit-details-marker{display:none}
+.isoo-wrap .acc .k{font-size:11.5px;font-weight:800;letter-spacing:.2em;color:var(--gold);width:92px;flex:0 0 92px}
+.isoo-wrap .acc .t{font-size:18px;font-weight:700}
+.isoo-wrap .acc .n{font-size:13px;color:var(--mut);margin-left:10px;font-weight:500}
+.isoo-wrap .acc .arw{margin-left:auto;font-size:13px;color:var(--mut)}
+.isoo-wrap .acc details[open] .arw i{transform:rotate(180deg)}
+.isoo-wrap .acc .arw i{font-style:normal;display:inline-block;transition:transform .2s}
+.isoo-wrap .acc .body{padding:0 4px 30px 110px}
+.isoo-wrap .acc .body ul{margin:0;padding:0}
+.isoo-wrap .acc .body li{font-size:15px;line-height:2.05;color:#D5CCC3;list-style:none;position:relative;padding-left:16px}
+.isoo-wrap .acc .body li::before{content:"";position:absolute;left:0;top:14px;width:5px;height:5px;
+  border-radius:50%;background:var(--red)}
+.isoo-wrap .disc{display:grid;grid-template-columns:150px 1fr;gap:34px;align-items:center;margin-top:10px}
+.isoo-wrap .disc img{border-radius:12px}
+.isoo-wrap .disc .d{font-size:15px;line-height:2.1;color:#D5CCC3}
+.isoo-wrap .disc .d b{color:var(--gold);font-weight:700}
+
+/* ⑥ 책 */
+.isoo-wrap .bookwrap{display:grid;grid-template-columns:260px 1fr;gap:52px;align-items:center}
+.isoo-wrap .bookwrap img{border-radius:12px;box-shadow:0 16px 42px rgba(20,17,16,.28)}
+.isoo-wrap .booktitle{font-size:30px;font-weight:800;letter-spacing:-.025em;margin:0 0 8px;line-height:1.3}
+.isoo-wrap .booksub{font-size:15px;color:#6B6159;margin:0 0 22px}
+.isoo-wrap .bookq{font-size:16.5px;line-height:1.95;color:#3D3630;border-left:3px solid var(--red);
+  padding-left:20px;margin:0 0 22px}
+.isoo-wrap .bookmeta{font-size:13.5px;color:#8B8178;line-height:1.85}
+
+/* ⑦ 영상 */
+.isoo-wrap .vids{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.isoo-wrap .vids.one{grid-template-columns:1fr;max-width:820px;margin:0 auto}
+.isoo-wrap .vids.one .tt{font-size:16.5px;padding:19px 22px}
+.isoo-wrap .vid{border-radius:14px;overflow:hidden;background:rgba(245,242,234,.05);border:1px solid var(--line)}
+.isoo-wrap .vid .th{aspect-ratio:16/9;background:#0B0810;position:relative;display:flex;
+  align-items:center;justify-content:center}
+.isoo-wrap .vid .th img{width:100%;height:100%;object-fit:cover}
+.isoo-wrap .vid .pl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.isoo-wrap .vid .pl i{width:54px;height:54px;border-radius:50%;background:rgba(0,0,0,.55);
+  display:flex;align-items:center;justify-content:center;font-style:normal;color:#fff;font-size:19px}
+.isoo-wrap .vid .tt{padding:17px 19px;font-size:15px;font-weight:700;line-height:1.5}
+.isoo-wrap .vid.soon .th{color:var(--mut);font-size:13px}
+.isoo-wrap .shorts{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:30px;max-width:820px;margin-left:auto;margin-right:auto}
+.isoo-wrap .sh{display:block;border-radius:14px;overflow:hidden;background:#0B0810;border:1px solid var(--line)}
+.isoo-wrap .sh .th{aspect-ratio:9/16;position:relative;overflow:hidden}
+.isoo-wrap .sh .th img{width:100%;height:100%;object-fit:cover}
+.isoo-wrap .sh .pl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.isoo-wrap .sh .pl i{width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;font-style:normal;color:#fff;font-size:15px}
+.isoo-wrap .vnote{margin-top:22px;font-size:13px;color:var(--mut);text-align:center}
+
+/* ⑧ 수강 */
+.isoo-wrap .clsphoto{border-radius:16px;overflow:hidden;box-shadow:0 10px 34px rgba(20,17,16,.14)}
+.isoo-wrap .clscap{margin-top:14px;font-size:13.5px;color:#8B8178;text-align:center;margin-bottom:46px}
+.isoo-wrap .classgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:46px}
+.isoo-wrap .cl{border:1px solid var(--dline);border-radius:14px;padding:26px 24px;background:#fff}
+.isoo-wrap .cl .lv{font-size:11.5px;font-weight:800;letter-spacing:.18em;color:var(--red);margin-bottom:12px}
+.isoo-wrap .cl .ttl{font-size:17px;font-weight:800;margin-bottom:14px;letter-spacing:-.01em}
+.isoo-wrap .cl .chips{display:flex;flex-wrap:wrap;gap:7px}
+.isoo-wrap .cl .chips span{font-size:13px;padding:6px 12px;border-radius:999px;background:#F2EEE6;color:#3D3630;font-weight:600}
+.isoo-wrap .cl .note{font-size:13px;color:#8B8178;margin-top:12px;line-height:1.75}
+.isoo-wrap .places{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.isoo-wrap .pl2{border:2px solid var(--ink);border-radius:14px;padding:26px 24px;background:#fff}
+.isoo-wrap .pl2 .badge{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.1em;
+  background:var(--ink);color:var(--gold);padding:6px 12px;border-radius:5px;margin-bottom:16px}
+.isoo-wrap .pl2 .nm2{font-size:19px;font-weight:800;margin-bottom:10px}
+.isoo-wrap .pl2 .addr{font-size:14.5px;line-height:1.85;color:#3D3630;margin:0}
+.isoo-wrap .pl2 .sub{font-size:13.5px;color:#8B8178;margin:8px 0 0;line-height:1.7}
+.isoo-wrap .ln{display:inline-block;font-size:12px;font-weight:800;color:#fff;padding:3px 9px;border-radius:4px;margin-right:6px}
+.isoo-wrap .ln.g{background:#009D3E} .isoo-wrap .ln.o{background:#747F00}
+
+/* ⑨ 채널 */
+.isoo-wrap .chs{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.isoo-wrap .ch{border:1px solid var(--dline);border-radius:14px;padding:24px;background:#fff;display:block}
+.isoo-wrap .ch .d{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;
+  justify-content:center;margin-bottom:14px;background:#FEECEC}
+.isoo-wrap .ch .d svg{width:22px;height:22px}
+.isoo-wrap .ch .t{font-size:16px;font-weight:700}
+.isoo-wrap .ch .s{font-size:12.5px;color:#8B8178;margin-top:5px;word-break:break-all}
+.isoo-wrap .ch.empty{opacity:.45;border-style:dashed}
+.isoo-wrap .ch.empty .d{background:#EDEDED;color:#9A9088;font-size:18px}
+
+/* ⑩ 문의 */
+.isoo-wrap .ct{display:grid;grid-template-columns:1fr 1fr;gap:34px}
+.isoo-wrap .box{border:1px solid var(--line);border-radius:16px;padding:30px}
+.isoo-wrap .row{display:grid;grid-template-columns:90px 1fr;gap:16px;padding:15px 0;
+  border-bottom:1px solid var(--line);font-size:15px}
+.isoo-wrap .row:last-child{border-bottom:none}
+.isoo-wrap .row .k{color:var(--mut);font-size:13.5px}
+.isoo-wrap .tel{color:var(--gold);font-weight:700}
+.isoo-wrap .fld{width:100%;padding:13px 14px;border-radius:9px;border:1px solid var(--line);
+  background:rgba(245,242,234,.05);color:var(--paper);font-size:14.5px;margin-bottom:11px;
+  font-family:inherit}
+.isoo-wrap select.fld{appearance:none}
+.isoo-wrap .btn{width:100%;padding:15px;border:none;border-radius:9px;background:var(--red);
+  color:#fff;font-size:15.5px;font-weight:800;cursor:pointer;font-family:inherit}
+.isoo-wrap .btn:disabled{opacity:.6;cursor:default}
+.isoo-wrap .note{margin-top:14px;font-size:12.5px;color:var(--mut);line-height:1.7}
+.isoo-wrap .isoo-ok{font-size:15px;line-height:1.8;color:var(--gold);font-weight:700;padding:18px 0}
+.isoo-wrap .isoo-err{font-size:13.5px;color:#FF8A8A;margin:0 0 11px}
+
+.isoo-wrap .ytbig{display:flex;align-items:center;gap:26px;max-width:720px;margin:0 auto;
+  padding:30px 34px;border-radius:18px;background:#fff;color:var(--ink);
+  text-decoration:none;transition:transform .18s,box-shadow .18s}
+.isoo-wrap .ytbig:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.28)}
+.isoo-wrap .ytbig .yd{width:56px;height:56px;border-radius:15px;background:#FEECEC;flex:0 0 56px;
+  display:flex;align-items:center;justify-content:center}
+.isoo-wrap .ytbig .yd svg{width:30px;height:30px}
+.isoo-wrap .ytbig .yt2{min-width:0}
+.isoo-wrap .ytbig .yt2 b{display:block;font-size:19px;font-weight:800;letter-spacing:-.01em}
+.isoo-wrap .ytbig .yt2 em{display:block;font-style:normal;font-size:13.5px;color:#8B8178;margin-top:6px}
+.isoo-wrap .ytbig .ygo{margin-left:auto;flex:0 0 auto;font-size:14px;font-weight:800;color:var(--red);white-space:nowrap}
+@media(max-width:640px){
+  .isoo-wrap .ytbig{flex-direction:column;align-items:flex-start;gap:16px;padding:24px}
+  .isoo-wrap .ytbig .ygo{margin-left:0}
+}
+
+/* PRESS */
+.isoo-wrap .prwrap{display:grid;grid-template-columns:1fr 250px;gap:52px;align-items:center}
+.isoo-wrap .press{display:flex;align-items:center;gap:26px;padding:30px 32px;border-radius:16px;
+  background:#fff;border:1px solid var(--dline);text-decoration:none;color:inherit;
+  transition:box-shadow .18s}
+.isoo-wrap .press:hover{box-shadow:0 10px 28px rgba(20,17,16,.10)}
+.isoo-wrap .press .tx{min-width:0}
+.isoo-wrap .press .em{font-size:11.5px;font-weight:800;letter-spacing:.16em;color:var(--red);margin-bottom:10px}
+.isoo-wrap .press .ti{font-size:20px;font-weight:800;line-height:1.45;letter-spacing:-.015em;margin-bottom:9px}
+.isoo-wrap .press .dt{font-size:13px;color:#8B8178}
+.isoo-wrap .press .go{margin-left:auto;flex:0 0 auto;font-size:13.5px;font-weight:700;color:var(--red);white-space:nowrap}
+.isoo-wrap .press.soon{border-style:dashed;opacity:.62}
+.isoo-wrap .press.soon .go{color:#9A9088}
+.isoo-wrap .prside img{width:100%;border-radius:14px}
+@media(max-width:1024px){ .isoo-wrap .prwrap{grid-template-columns:1fr 190px;gap:30px} }
+@media(max-width:640px){
+  .isoo-wrap .prwrap{grid-template-columns:1fr;gap:22px}
+  .isoo-wrap .prside{order:-1;text-align:center} .isoo-wrap .prside img{max-width:190px;margin:0 auto}
+  .isoo-wrap .press{flex-direction:column;align-items:flex-start;gap:14px;padding:24px}
+  .isoo-wrap .press .go{margin-left:0}
+}
+
+@media(max-width:1024px){
+  .isoo-wrap .wrap{padding:0 28px} .isoo-wrap .sec{padding:72px 0}
+  .isoo-wrap .sec-t{font-size:28px} .isoo-wrap .qbig{font-size:31px}
+  .isoo-wrap .shorts{grid-template-columns:1fr 1fr} .isoo-wrap .chs{grid-template-columns:1fr 1fr}
+  .isoo-wrap .ct{grid-template-columns:1fr;gap:26px} .isoo-wrap .places{grid-template-columns:1fr}
+  .isoo-wrap .bookwrap{grid-template-columns:200px 1fr;gap:34px}
+}
+@media(max-width:640px){
+  .isoo-wrap .wrap{padding:0 20px} .isoo-wrap .sec{padding:56px 0}
+  .isoo-wrap .sec-t{font-size:23px}
+  .isoo-wrap .hero-b .wrap{flex-direction:column;align-items:flex-start;gap:16px}
+  .isoo-wrap .nm b{font-size:33px} .isoo-wrap .role{margin-left:0;text-align:left}
+  .isoo-wrap .pills{justify-content:flex-start}
+  .isoo-wrap .qbig{font-size:25px;line-height:1.5}
+  .isoo-wrap .tl .it{grid-template-columns:1fr;gap:9px}
+  .isoo-wrap .acc summary{gap:12px;flex-wrap:wrap} .isoo-wrap .acc .k{width:auto;flex:none}
+  .isoo-wrap .acc .body{padding-left:4px}
+  .isoo-wrap .disc{grid-template-columns:1fr;gap:22px} .isoo-wrap .disc img{max-width:150px}
+  .isoo-wrap .vids{grid-template-columns:1fr} .isoo-wrap .shorts{grid-template-columns:1fr 1fr}
+  .isoo-wrap .bookwrap{grid-template-columns:1fr;gap:28px} .isoo-wrap .bookwrap img{max-width:210px;margin:0 auto}
+  .isoo-wrap .classgrid{grid-template-columns:1fr} .isoo-wrap .chs{grid-template-columns:1fr}
+}
+      `}</style>
+
+      {/* ① 히어로 */}
+      <div className="hero"><img src={ISOO_IMG + 'hero.jpg'} alt="장구의 신 아이수" /></div>
+      <div className="hero-b"><div className="wrap">
+        <div className="nm">
+          <small>JANGGU QUEEN</small>
+          <b>아이수</b><span className="en">i S O O</span>
+        </div>
+        <div className="role">
+          가수 겸 장구 연주가 · 아랑고고장구 25년<br />
+          (사)한국고고장구진흥원 서울남부지회 회장 · 원장<br />
+          K-팝 월드 문화예술인 총연합회 회장
+          <div className="pills">
+            <span className="pill on">장구의 신</span>
+            <span className="pill">두드림의 여신</span>
+            <span className="pill">소통공감박사</span>
+          </div>
+        </div>
+      </div></div>
+
+      {/* ② 한마디 */}
+      <section className="sec"><div className="wrap quote">
+        <div className="sec-h">MESSAGE</div>
+        <p className="qbig">장구는 <em>악보를 몰라도</em> 됩니다.</p>
+        <p className="qsub">
+          제일 뒤에서 최선을 다하는 제자가 빛난다고 봅니다.<br />
+          남은 인생을 건강과 웃음을 전하는 행복 전도사로 살고 싶습니다.
+        </p>
+      </div></section>
+
+      {/* ③ PRESS */}
+      <section className="sec paper"><div className="wrap">
+        <div className="prwrap">
+          <div>
+            <div className="sec-h">PRESS</div>
+            <h2 className="sec-t" style={{marginBottom:'30px'}}>이음미디어가 만난 사람</h2>
+            <a className="press" href="https://www.eummedia.kr/article/아이수-장구의신-두드림의여신" target="_blank" rel="noopener">
+              <div className="tx">
+                <div className="em">이음피플</div>
+                <div className="ti">장구의 신 아이수,<br />세 살 때 주운 나뭇가지에서 시작됐다</div>
+                <div className="dt">이음미디어 · 이음피플</div>
+              </div>
+              <div className="go">이음미디어 인물기사 보기 →</div>
+            </a>
+          </div>
+          <div className="prside"><img src={ISOO_IMG + 'press.jpg'} alt="아이수 원장" /></div>
+        </div>
+      </div></section>
+
+      {/* ④ 걸어온 길 */}
+      <section className="sec ink2"><div className="wrap">
+        <div className="sec-h">CAREER</div>
+        <h2 className="sec-t">걸어온 길</h2>
+        <div className="tl">
+          <div className="it"><div className="yr now">현재</div><div className="h2">(사)한국고고장구진흥원 서울남부지회 회장 · 원장
+            <span>전국 아랑고고장구 예술인협회 대림지부 원장 · K-팝 월드 문화예술인 총연합회 회장(예술 총감독) · 서울시 관악구 자율방범대장</span></div></div>
+          <div className="it"><div className="yr">2022</div><div className="h2">신곡 「눈 깜짝할 새」 · 「고고장구」 발표</div></div>
+          <div className="it"><div className="yr">2010</div><div className="h2">가수 데뷔 — 1집 「사랑의 북」</div></div>
+          <div className="it"><div className="yr">교육으로</div><div className="h2">무대에서 교실로 방향을 바꾸다
+            <span>전국 200여 지회·지부 중 열다섯 번째로 문을 열어 두 곳을 운영하고 있습니다.</span></div></div>
+          <div className="it"><div className="yr">품바 10년</div><div className="h2">아랑극단에서 가장 많이 불려 다니던 시절
+            <span>쇠젓가락을 입에 물고 발음부터 멘트까지 연습했습니다.</span></div></div>
+          <div className="it"><div className="yr">입문</div><div className="h2">“배움에는 국경이 없다고 들었습니다”
+            <span>길거리 품바 공연을 보고 찾아간 조승현 대표에게서 제자로 받아들여졌습니다.</span></div></div>
+          <div className="it"><div className="yr">한국</div><div className="h2">돈을 벌러 왔다가, 어릴 적 꿈을 이루다</div></div>
+          <div className="it"><div className="yr">사이판</div><div className="h2">봉제공장에서 3,800명을 이끄는 리더로 7년 반
+            <span>돈보다 더 소중한 관계와 리더십을 배운 시간이었습니다.</span></div></div>
+          <div className="it"><div className="yr">러시아</div><div className="h2">노상에서 장사하며 버틴 시간</div></div>
+          <div className="it seed"><div className="yr">중국 연변</div><div className="h2">세 살, 바가지를 두드리다 손이 아파 나뭇가지를 주웠다
+            <span>그 나뭇가지가 지금의 장구채가 되었습니다.</span></div></div>
+        </div>
+      </div></section>
+
+      {/* ⑤ 무대 — 4장 슬라이드 */}
+      <section className="sec"><div className="wrap">
+        <div className="sec-h">ON STAGE</div>
+        <h2 className="sec-t">무대 위에서</h2>
+        <div className="slider">
+          <div className="sv" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+            <div className="sv-track" style={{transform:`translateX(-${idx * 100}%)`}}>
+              {ISOO_ST.map((n, i) => (
+                <div className="sv-slide" key={n} aria-hidden={i !== idx}>
+                  <img
+                    src={ISOO_IMG + n + '.jpg'}
+                    alt={i === 0 ? '무대 사진' : `무대 사진 ${i + 1}`}
+                    loading={i === 0 ? undefined : 'lazy'}
+                    draggable={false}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="sl-nav">
+            <button type="button" className="sl-btn" onClick={() => go(-1)} disabled={idx === 0} aria-label="이전 사진">‹</button>
+            <div className="sl-dots">
+              {ISOO_ST.map((n, i) => <i key={n} className={i === idx ? 'on' : undefined}></i>)}
+            </div>
+            <button type="button" className="sl-btn" onClick={() => go(1)} disabled={idx === last} aria-label="다음 사진">›</button>
+          </div>
+          <p className="sl-cap" aria-live="polite">사진 {idx + 1} / {ISOO_ST.length} · 좌우로 넘겨 보실 수 있습니다</p>
+        </div>
+      </div></section>
+
+      {/* ⑥ 기록 */}
+      <section className="sec ink2"><div className="wrap">
+        <div className="sec-h">RECORD</div>
+        <h2 className="sec-t">무대 위의 기록</h2>
+        <div className="acc">
+          <details open><summary>
+            <span className="k">AWARD</span><span className="t">수상</span><span className="n">10건</span>
+            <span className="arw">펼쳐보기 <i>▾</i></span></summary>
+            <div className="body"><ul>
+              <li>대한민국 국민행복대상</li>
+              <li>자랑스런 한국인대상</li>
+              <li>독도수호 문화예술대상</li>
+              <li>한국 다문화예술대상</li>
+              <li>한국문화예술인 가수대상</li>
+              <li>관악구 구청장상</li>
+              <li>관악구 경찰서장상</li>
+              <li>관악구 구의회 의장장</li>
+              <li>(사)한국고고장구 전국경연대회</li>
+              <li>변산해넘이축제 대상</li>
+            </ul></div>
+          </details>
+          <details><summary>
+            <span className="k">ON AIR</span><span className="t">방송 출연</span><span className="n">9개 프로그램</span>
+            <span className="arw">펼쳐보기 <i>▾</i></span></summary>
+            <div className="body"><ul>
+              <li>KBS 아침마당</li>
+              <li>KBS 전국노래자랑</li>
+              <li>KBS 열린음악회</li>
+              <li>KBS 6시 내고향</li>
+              <li>KBS VJ특공대</li>
+              <li>KBS 뮤직뱅크</li>
+              <li>MBC 트로트의 민족</li>
+              <li>SBS 트롯신이 떴다</li>
+              <li>전국 TOP10 가요쇼</li>
+            </ul></div>
+          </details>
+          <details><summary>
+            <span className="k">DISC</span><span className="t">음반</span><span className="n">3집</span>
+            <span className="arw">펼쳐보기 <i>▾</i></span></summary>
+            <div className="body"><div className="disc">
+              <img src={ISOO_IMG + 'album.jpg'} alt="아이수 1집 사랑의 북" />
+              <div className="d">
+                <b>2010</b>　1집 「사랑의 북」<br />
+                <b>2022</b>　「눈 깜짝할 새」 · 「고고장구」<br />
+                <span style={{color:'#9A9088'}}>앨범 발매 3집</span>
+              </div>
+            </div></div>
+          </details>
+        </div>
+      </div></section>
+
+      {/* ⑦ 책 */}
+      <section className="sec paper"><div className="wrap">
+        <div className="sec-h">BOOK</div>
+        <h2 className="sec-t">펴낸 책</h2>
+        <div className="bookwrap">
+          <img src={ISOO_IMG + 'book.jpg'} alt="돈 벌러 왔다가, 꿈을 이뤘다 표지" />
+          <div>
+            <h3 className="booktitle">돈 벌러 왔다가,<br />꿈을 이뤘다</h3>
+            <p className="booksub">연변에서 대한민국까지, 장구의 신 아이수</p>
+            <p className="bookq">“세 살 때였습니다. 바가지를 두드리다 손이 아팠습니다.<br />
+              밖에 나가 나뭇가지 두 개를 주워 왔습니다.”</p>
+            <p className="bookmeta">연변에서 태어나 러시아와 사이판을 돌아 대한민국에 뿌리내린 이야기.<br />
+              아이수 지음 · 전자책</p>
+          </div>
+        </div>
+      </div></section>
+
+      {/* ⑧ 영상 */}
+      <section className="sec"><div className="wrap">
+        <div className="sec-h">VIDEO</div>
+        <h2 className="sec-t">대표 영상</h2>
+        <div className="vids one">
+          <a className="vid" href="https://youtu.be/J8Ju1xZxTxg" target="_blank" rel="noopener">
+            <div className="th">
+              <img src="https://i.ytimg.com/vi/J8Ju1xZxTxg/maxresdefault.jpg" alt="" onError={isooYtFallback('J8Ju1xZxTxg')} />
+              <span className="pl"><i>▶</i></span>
+            </div>
+            <div className="tt">수십 명이 함께 치는 합동 연습</div>
+          </a>
+        </div>
+        <div className="shorts">
+          {shorts.map((id) => (
+            <a key={id} className="sh" href={`https://www.youtube.com/shorts/${id}`} target="_blank" rel="noopener">
+              <div className="th">
+                <img src={`https://i.ytimg.com/vi/${id}/oardefault.jpg`} alt="숏츠" onError={isooYtFallback(id)} />
+                <span className="pl"><i>▶</i></span>
+              </div>
+            </a>
+          ))}
+        </div>
+        <p className="vnote">숏츠는 눌러서 보실 수 있습니다</p>
+      </div></section>
+
+      {/* ⑨ 수강 */}
+      <section className="sec paper"><div className="wrap">
+        <div className="sec-h">CLASS</div>
+        <h2 className="sec-t">장구, 배우실 수 있습니다</h2>
+        <div className="clsphoto"><img src={ISOO_IMG + 'class.jpg'} alt="아랑고고장구 수강생들" /></div>
+        <p className="clscap">같은 교실에서 함께 치는 분들입니다</p>
+
+        <div className="classgrid">
+          <div className="cl">
+            <div className="lv">처음이라면</div>
+            <div className="ttl">악보 몰라도 됩니다</div>
+            <div className="chips"><span>취미반</span><span>주말반</span><span>직장인반</span><span>개인레슨</span></div>
+            <p className="note">장구를 한 번도 잡아보지 않으셨어도 됩니다. 첫 장단부터 하나씩 배웁니다.<br />
+              1980년대생부터 여든 넘으신 분까지 같은 교실에서 치고 계십니다.</p>
+          </div>
+          <div className="cl">
+            <div className="lv">더 깊이</div>
+            <div className="ttl">제대로 배우고 싶다면</div>
+            <div className="chips"><span>단체반</span><span>특강반</span><span>작품반</span></div>
+            <p className="note">장단을 익히고 한 작품을 끝까지 만들어 봅니다.</p>
+          </div>
+          <div className="cl">
+            <div className="lv">무대에 서려면</div>
+            <div className="ttl">함께 공연합니다</div>
+            <div className="chips"><span>공연반</span><span>방송반</span></div>
+            <p className="note">아랑고고장구 팀으로 행사·축제 무대에 함께 오릅니다.</p>
+          </div>
+          <div className="cl">
+            <div className="lv">가르치려면</div>
+            <div className="ttl">자격을 갖추는 길</div>
+            <div className="chips"><span>장구지도자 자격증반</span><span>난타반</span></div>
+            <p className="note">(사)한국고고장구진흥원 과정으로 지도자 자격을 준비합니다.</p>
+          </div>
+        </div>
+
+        <h3 style={{fontSize:'19px',fontWeight:'800',margin:'0 0 20px'}}>어디로 오시면 되나요</h3>
+        <div className="places">
+          <div className="pl2">
+            <span className="badge">수업 ①</span>
+            <div className="nm2">아랑고고장구 서울남부지회</div>
+            <p className="addr">서울시 관악구 남부순환로 1693</p>
+            <p className="sub"><span className="ln g">2호선</span>봉천역 4번 출구 도보 1분</p>
+          </div>
+          <div className="pl2">
+            <span className="badge">수업 ②</span>
+            <div className="nm2">전국아랑고고장구 예술인협회 대림지부</div>
+            <p className="addr">서울시 영등포구 대림로 148<br />대명빌딩 지하 1층</p>
+            <p className="sub"><span className="ln o">7호선</span>대림역 11번 출구 직진, 우성아파트 사거리</p>
+          </div>
+        </div>
+      </div></section>
+
+      {/* ⑩ 채널 */}
+      <section className="sec ink2"><div className="wrap">
+        <div className="sec-h">CHANNEL</div>
+        <h2 className="sec-t">채널 바로가기</h2>
+        <a className="ytbig" href="https://www.youtube.com/@%EC%95%84%EB%9E%91%EA%B3%A0%EA%B3%A0%EC%9E%A5%EA%B5%AC%EC%95%84%EC%9D%B4%EC%88%98TV" target="_blank" rel="noopener">
+          <span className="yd">
+            <svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8z"/><path d="M9.6 15.6V8.4l6.3 3.6-6.3 3.6z" fill="#fff"/></svg>
+          </span>
+          <span className="yt2">
+            <b>아랑고고장구 아이수TV</b>
+            <em>장구 배우는 영상과 무대 기록이 올라옵니다</em>
+          </span>
+          <span className="ygo">채널 가기 →</span>
+        </a>
+      </div></section>
+
+      {/* ⑪ 문의 */}
+      <section className="sec"><div className="wrap">
+        <div className="sec-h">CONTACT</div>
+        <h2 className="sec-t">문의하기</h2>
+        <div className="ct">
+          <div className="box">
+            <div className="row"><div className="k">수강 문의</div><div><a className="tel" href="tel:01062234222">010-6223-4222</a>
+              <div style={{fontSize:'12.5px',color:'var(--mut)',marginTop:'5px'}}>서울남부지회 · 대림지부 공통</div></div></div>
+            <div className="row"><div className="k">공연 문의</div><div><a className="tel" href="tel:01062234222">010-6223-4222</a>
+              <div style={{fontSize:'12.5px',color:'var(--mut)',marginTop:'5px'}}>행사 · 축제 · 방송 섭외</div></div></div>
+            <div className="row"><div className="k">배우는 것</div><div>취미 · 자격증 · 공연 · 난타</div></div>
+          </div>
+          <div className="box">
+            <div style={{fontSize:'15px',fontWeight:'700',marginBottom:'16px'}}>남겨두시면 연락드립니다</div>
+            {submitted ? (
+              <p className="isoo-ok">문의가 전달되었습니다. 아이수 원장님께서 연락 드립니다.</p>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <input className="fld" placeholder="성함" aria-label="성함" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} />
+                <input className="fld" placeholder="연락처" aria-label="연락처" type="tel" inputMode="tel" value={form.phone} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} />
+                <select className="fld" aria-label="문의 종류" value={form.kind} onChange={e=>setForm(f=>({...f,kind:e.target.value}))}>
+                  <option value="">문의 종류를 골라주세요</option>
+                  {ISOO_KINDS.map(k => <option key={k} value={k}>{k}</option>)}
+                </select>
+                <textarea className="fld" rows="4" placeholder="문의 내용" aria-label="문의 내용" value={form.message} onChange={e=>setForm(f=>({...f,message:e.target.value}))} />
+                {err && <p className="isoo-err">{err}</p>}
+                <button className="btn" type="submit" disabled={submitting}>{submitting ? '전송 중…' : '문의 보내기'}</button>
+              </form>
+            )}
+            <p className="note">남겨주신 내용은 아이수 원장에게 직접 전달되며,<br />문의 응대 목적으로만 사용됩니다.</p>
+          </div>
+        </div>
+      </div></section>
+
+    </div>
+  );
+}
+
 /* 앱 주소에서 표시용 호스트 추출 (www. 제거). 없거나 파싱 실패 시 빈 문자열 */
 function appHost(url) {
   try {
@@ -3955,6 +4563,7 @@ export default function PiumAppDetailPage() {
   if (slug === "choiilrye")    return <ChoiilryePage />;
   if (slug === "leemoontae")   return <LeeMoontaePage />;
   if (slug === "gilbongjo")    return <GilBongJoPage />;
+  if (slug === "isoo")         return <IsooPage />;
 
   const app = APPS[slug];
 
