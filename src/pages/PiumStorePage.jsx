@@ -931,6 +931,15 @@ export default function PiumStorePage() {
       price_model:   "free",
       users:         { nickname: "정세연" },
     },
+    {
+      slug:          "isoo",
+      title:         "아이수 원장",
+      summary:       "연변에서 대한민국까지, 두드림의 여신. 장구는 악보를 몰라도 됩니다.",
+      thumbnail_url: "/pium-app/isoo/isoo-card.jpg",
+      category:      "expert_tool",
+      price_model:   "free",
+      users:         { nickname: "아이수" },
+    },
   ];
   // 갓 피어난 앱: 하드코딩 선두 + DB 최근 순
   const recentFeatured = [
