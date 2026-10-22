@@ -4551,6 +4551,551 @@ function IsooPage() {
   );
 }
 
+/* ══════════════════════════════════════
+   임해숙 프로필 — /pium-app/limhaesook
+   (시안: limhaesook-mockup-v14 · 이미지: public/pium-app/limhaesook/)
+══════════════════════════════════════ */
+const LHS_IMG = '/pium-app/limhaesook/';
+
+/* 서재 — 01~09 혼자 쓴 책, 10~14 함께 쓴 책 (시안 data-t / data-p / data-d 그대로) */
+const LHS_BOOKS = [
+  { t: '다이어트 종업식', p: '유페이퍼', d: "'음식의 주인'으로 거듭나는 법" },
+  { t: '체질별 건강 다이어트 비법', p: '유페이퍼 · 선학 공저', d: '전 국민을 위한 건강식 밥상' },
+  { t: '미네랄, 내 몸을 깨우는 자연의 선물', p: 'BOOKK', d: '50세 이후를 위한 미네랄 안내서' },
+  { t: '이제는 나를 잃으면서까지 사랑받지 않기로 했다', p: 'BOOKK', d: '관계에 지친 당신을 위한 따뜻한 마음 처방전' },
+  { t: '오늘부터 평생 다이어트에서 졸업합니다', p: 'BOOKK', d: '몸과 마음의 습관' },
+  { t: '50세부터 다시 차리는 건강 밥상', p: 'BOOKK', d: '아프기 전에 시작하는 건강 먹거리와 생활습관' },
+  { t: '치매는 장에서 시작된다', p: 'BOOKK', d: '장과 뇌의 연결' },
+  { t: '치매는 어느 날 갑자기 오지 않는다', p: 'BOOKK', d: '기억은 오늘의 습관이 만듭니다' },
+  { t: '50세부터 시작하는 AI 부업 혁명', p: 'BOOKK', d: '인생 2막, AI가 당신의 새로운 기회가 됩니다' },
+  { t: '관계의 온도', p: '북랩', d: '사람 사이가 힘들 때, 다시 손 내밀 수 있도록' },
+  { t: '밑줄을 긋다 마음을 잇다', p: '작가의 집', d: '한 줄의 공감이, 우리의 마음을 연결합니다' },
+  { t: '죽음을 경험한 사람들', p: '도서출판 등', d: '죽음 가까이에서 우리가 느낀 것들' },
+  // TODO(임해숙님 확인 후 입력): 출판사(p)와 한 줄 소개(d) — 비워 두면 소개 카드에 그 줄을 그리지 않음
+  { t: '글로벌 인성 인성 리더십', p: '', d: '' },
+  // TODO(임해숙님 확인 후 입력): 출판사(p)
+  { t: '휴먼브랜드', p: '', d: '미래경제를 여는 NEW 패러다임' },
+];
+const LHS_SOLO = 9;
+
+/* PHOTO ZONE — dress-01 ~ 09 (가로·세로 크기는 레이아웃이 흔들리지 않게 미리 적어 둠) */
+const LHS_DRESS = [
+  { f: 'dress-01.jpg', w: 603, h: 1200 }, { f: 'dress-02.jpg', w: 900, h: 1200 },
+  { f: 'dress-03.jpg', w: 1280, h: 853 }, { f: 'dress-04.jpg', w: 615, h: 960 },
+  { f: 'dress-05.jpg', w: 960, h: 960 }, { f: 'dress-06.jpg', w: 544, h: 651 },
+  { f: 'dress-07.jpg', w: 800, h: 1200 }, { f: 'dress-08.jpg', w: 800, h: 1200 },
+  { f: 'dress-09.jpg', w: 960, h: 1050 },
+];
+
+/* TWO STOPS — r 멈춤 · y 다시 준비 · g 출발 (yr 가 비어 있으면 연도 줄을 그리지 않음) */
+const LHS_STOPS = [
+  // TODO(임해숙님 확인 후 입력): 연도(yr)
+  { c: 'r stop', yr: '', b: '첫 번째 멈춤', p: '하반신 마비. 숟가락도 들 수 없던 시간' },
+  // TODO(임해숙님 확인 후 입력): 연도(yr)
+  { c: 'y', yr: '', b: "'뜨다'라는 이름", p: '멘토가 지어준 브랜드 이름으로 다시 시작' },
+  { c: 'g', yr: '2014. 3', b: '첫 수출', p: '중국 광저우 뷰티 박람회에 제 브랜드를 걸고 서다' },
+  // TODO(임해숙님 확인 후 입력): 연도(yr)
+  { c: 'g', yr: '', b: '봉사 강의', p: '소방서, 법무부, 인천의 섬까지 부르는 곳이면 어디든' },
+  { c: 'g', yr: '2016', b: '영업을 시작하다', p: '"못 한다"던 사람의 첫 석 달' },
+  { c: 'g', yr: '1~4년 차', b: '판매왕', p: '1년 차 최우수부터 그랑프리 3관왕까지, 네 번의 왕관' },
+  { c: 'r stop', yr: '2021. 4', b: '두 번째 멈춤', p: '뇌출혈. 여수에서 돌아온 다음 날 아침' },
+  { c: 'y', yr: '3개월', b: '두 발로 퇴원', p: '재활병원에서 스스로 한 약속을 지키다' },
+  { c: 'g', yr: '지금', b: '다시 무대에', p: '강의와 집필, 어르신 건강 밥상 봉사 7년째' },
+];
+
+/* MORNING — 동그라미 6개 (x,y = PC 위치 · mx,my = 휴대폰 위치) */
+const LHS_MORNING = [
+  { x: '8%', y: '22%', mx: '30%', my: '2%', n: '01', b: ['감사 기도'], p: '오늘 아침을 허락해 주셔서 감사하다고' },
+  { x: '24%', y: '58%', mx: '72%', my: '17%', n: '02', b: ['따뜻한 물', '한 컵'], p: '온몸을 깨우기 전에' },
+  { x: '42%', y: '14%', mx: '28%', my: '33%', n: '03', b: ['스트레칭', '30~40분'], p: '누운 채로 머리부터 다리까지' },
+  { x: '59%', y: '60%', mx: '70%', my: '49%', n: '04', b: ['명상', '20분'], p: '일어나 앉아서' },
+  { x: '76%', y: '20%', mx: '30%', my: '64%', n: '05', b: ['맨발 걷기', '20분'], p: '아파트 뒤 풀밭에서' },
+  { x: '91%', y: '56%', mx: '70%', my: '80%', n: '06', b: ['신호등', '샐러드'], tri: true, p: '빨강·초록·노랑 채소로 여는 하루. 방송 작가님이 붙여 준 이름' },
+];
+
+const LHS_PLACES = [
+  ['부산', 'red'], ['제주', 'yellow'], ['군포', 'green'], ['안면도', 'red'],
+  ['공주', 'yellow'], ['조치원', 'green'], ['광주', 'red'],
+];
+const LHS_TOPICS = [
+  { c: 'g', s: 'DIET MIND', b: '다이어트 심리', p: '체중이 아니라 식욕과 마음의 허기를 들여다보는 시간. 『오늘부터 평생 다이어트에서 졸업합니다』의 저자' },
+  { c: 'y', s: 'TABLE', b: '건강한 밥상', p: '중장년의 식습관과 생활습관 이야기. 『50세부터 다시 차리는 건강 밥상』의 저자' },
+  { c: 'r', s: 'HUMAN BRAND', b: '휴먼브랜드', p: "'뜨다'라는 이름으로 다시 선 사람이 전하는, 나를 브랜드로 세우는 법" },
+  { c: 'g', s: 'MENTAL COACHING', b: '영업 멘탈 코칭', p: '"못 한다"던 사람이 판매왕이 되고, 판매왕을 길러낸 이야기' },
+];
+const LHS_FORM_TOPICS = ['다이어트 심리', '건강한 밥상', '휴먼브랜드', '영업 멘탈 코칭', '기타'];
+
+function LimHaesookPage() {
+  /* MESSAGE — 화면에 들어오면 한 번 떠오름 */
+  const msgRef = useRef(null);
+  const [msgIn, setMsgIn] = useState(false);
+  useEffect(() => {
+    const el = msgRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') { setMsgIn(true); return undefined; }
+    const io = new IntersectionObserver((es, o) => es.forEach((x) => {
+      if (x.isIntersecting) { setMsgIn(true); o.disconnect(); }
+    }), { threshold: 0.3 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  /* LIBRARY — 첫 책이 이미 앞으로 나와 있음 */
+  const [pick, setPick] = useState(0);
+  const bk = LHS_BOOKS[pick];
+
+  /* MORNING — 동그라미 중심을 잇는 곡선 (화면 크기가 바뀌면 다시 그림) */
+  const flowRef = useRef(null);
+  const vineRef = useRef(null);
+  useEffect(() => {
+    const f = flowRef.current; const p = vineRef.current;
+    if (!f || !p) return undefined;
+    const draw = () => {
+      const r = f.getBoundingClientRect();
+      const c = [...f.querySelectorAll('.circ')].map((e) => {
+        const b = e.getBoundingClientRect();
+        return [b.left - r.left + b.width / 2, b.top - r.top + b.height / 2];
+      });
+      if (!c.length) return;
+      let d = `M${c[0][0]},${c[0][1]}`;
+      const w = [0.55, -0.42, 0.62, -0.5, 0.48];
+      for (let i = 1; i < c.length; i++) {
+        const [a, b] = c[i - 1]; const [x, y] = c[i];
+        const dx = x - a; const dy = y - b; const L = Math.hypot(dx, dy) || 1;
+        const nx = -dy / L; const ny = dx / L; const k = w[(i - 1) % w.length] * L;
+        d += ` C${a + dx * 0.15 + nx * k},${b + dy * 0.15 + ny * k} ${a + dx * 0.95 - nx * k * 0.6},${b + dy * 0.95 - ny * k * 0.6} ${x},${y}`;
+      }
+      p.setAttribute('d', d);
+    };
+    draw();
+    window.addEventListener('resize', draw);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+    return () => window.removeEventListener('resize', draw);
+  }, []);
+
+  /* PHOTO ZONE — 가로 스냅 슬라이드, 끝에서 멈춤(순환 안 함) */
+  const reelRef = useRef(null);
+  const [pz, setPz] = useState({ i: 0, prevDis: true, nextDis: false });
+  const padL = (r) => parseFloat(getComputedStyle(r).paddingLeft);
+  const curIdx = (r, ims) => {
+    const x = r.scrollLeft; let i = 0;
+    ims.forEach((m, k) => { if (m.offsetLeft - r.offsetLeft - padL(r) - 20 <= x) i = k; });
+    return i;
+  };
+  useEffect(() => {
+    const r = reelRef.current;
+    if (!r) return undefined;
+    const upd = () => {
+      const ims = [...r.querySelectorAll('img')];
+      // 스크롤이 끝에 닿았으면 마지막 번호를 보여 준다 (한 화면에 여러 장이 보이면 마지막 장이 맨 앞에 올 수 없어서)
+      const atEnd = r.scrollLeft + r.clientWidth >= r.scrollWidth - 5;
+      setPz({
+        i: atEnd ? ims.length - 1 : curIdx(r, ims),
+        prevDis: r.scrollLeft < 5,
+        nextDis: atEnd,
+      });
+    };
+    upd();
+    r.addEventListener('scroll', upd, { passive: true });
+    window.addEventListener('resize', upd);
+    return () => { r.removeEventListener('scroll', upd); window.removeEventListener('resize', upd); };
+  }, []);
+  const reelGo = (d) => {
+    const r = reelRef.current;
+    if (!r) return;
+    const ims = [...r.querySelectorAll('img')];
+    const i = Math.max(0, Math.min(ims.length - 1, curIdx(r, ims) + d));
+    r.scrollTo({ left: ims[i].offsetLeft - r.offsetLeft - padL(r) });
+  };
+
+  /* 강의 문의 */
+  const [form, setForm] = useState({ name: '', phone: '', org: '', topic: LHS_FORM_TOPICS[0], message: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [err, setErr] = useState('');
+  const setF = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!form.name.trim() || !form.phone.trim() || !form.message.trim()) {
+      setErr('이름, 연락처, 문의 내용을 모두 입력해 주세요.');
+      return;
+    }
+    setSubmitting(true); setErr('');
+    try {
+      const res = await fetch('/api/limhaesook-lecture-inquiry', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name, phone: form.phone, org: form.org,
+          topic: form.topic, message: form.message,
+        }),
+      });
+      if (!res.ok) throw new Error('서버 오류');
+      setSubmitted(true);
+    } catch {
+      setErr('전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const Dots = () => <span className="dots"><i></i><i></i><i></i></span>;
+
+  return (
+    <div className="lhs-wrap">
+      <style>{`
+.lhs-wrap{--ivory:#FBF7EE;--sun:#FFF1CC;--ink:#24211D;--soft:#6B645A;--wood:#D9B98C;--wood2:#C49A66;--red:#E5533D;--green:#3E9E5B;--yellow:#F2B83A;
+  word-break:keep-all;font-family:Pretendard,sans-serif;background:var(--ivory);color:var(--ink);overflow-x:hidden;overflow-x:clip;line-height:normal}
+.lhs-wrap *{box-sizing:border-box;margin:0}
+.lhs-wrap .tag{font-size:13px;letter-spacing:.2em;color:var(--soft);font-weight:600}
+.lhs-wrap .dots{display:inline-flex;gap:6px;margin-right:10px;vertical-align:middle}.lhs-wrap .dots i{width:8px;height:8px;border-radius:50%;display:block}
+.lhs-wrap .dots i:nth-child(1){background:var(--red)}.lhs-wrap .dots i:nth-child(2){background:var(--yellow)}.lhs-wrap .dots i:nth-child(3){background:var(--green)}
+/* HERO */
+.lhs-wrap .hero{position:relative;min-height:100vh;display:flex;align-items:center;background:var(--ivory);padding:40px 6vw;overflow:hidden}
+.lhs-wrap .hero .txt{position:relative;z-index:2;max-width:520px}
+.lhs-wrap .hero h1{font-size:clamp(44px,6vw,84px);font-weight:800;letter-spacing:-.02em;margin:18px 0 10px}
+.lhs-wrap .hero .role{font-size:clamp(16px,1.6vw,20px);color:var(--soft);font-weight:400;line-height:1.6}
+.lhs-wrap .hero blockquote{margin-top:40px;font-size:clamp(22px,2.6vw,34px);font-weight:700;line-height:1.4;border-left:4px solid var(--yellow);padding-left:20px}
+.lhs-wrap .hero .names{margin-top:28px;display:flex;gap:8px;flex-wrap:wrap}
+.lhs-wrap .hero .names span{font-size:13px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.85);border:1px solid #EADFCB;color:var(--soft)}
+.lhs-wrap .hero .ph{position:absolute;top:0;right:0;bottom:0;width:64%;z-index:1}
+.lhs-wrap .hero .ph img{width:100%;height:100%;object-fit:cover;object-position:60% 30%;display:block;max-width:none}
+.lhs-wrap .hero .ph:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--ivory) 0%,rgba(251,247,238,.85) 12%,rgba(251,247,238,0) 34%);z-index:1}
+.lhs-wrap .rise{opacity:0;transform:translateY(28px);animation:lhsrise 1.1s cubic-bezier(.2,.7,.2,1) forwards}
+.lhs-wrap .d1{animation-delay:.15s}.lhs-wrap .d2{animation-delay:.45s}.lhs-wrap .d3{animation-delay:.8s}.lhs-wrap .d4{animation-delay:1.1s}
+@keyframes lhsrise{to{opacity:1;transform:none}}
+/* MESSAGE */
+.lhs-wrap .msg{padding:130px 6vw;background:#fff;text-align:center}
+.lhs-wrap .msg .tag{margin-bottom:28px}.lhs-wrap .msg .big{font-size:clamp(84px,13vw,170px);font-weight:800;letter-spacing:-.03em;line-height:1;background:linear-gradient(180deg,var(--yellow),#E58A3A);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:0;transform:translateY(60px);transition:all 1.4s cubic-bezier(.2,.7,.2,1)}
+.lhs-wrap .msg.in .big{opacity:1;transform:none}
+.lhs-wrap .msg .q{margin:40px auto 0;max-width:760px;font-size:clamp(22px,2.6vw,32px);font-weight:700;line-height:1.5}
+.lhs-wrap .msg .story{margin:28px auto 0;max-width:620px;color:var(--soft);font-size:17px;line-height:1.8}
+/* SHARE */
+.lhs-wrap .share{padding:110px 6vw 120px;background:linear-gradient(180deg,#FBF7EE,#F3F7EE)}
+.lhs-wrap .share h2{font-size:clamp(30px,3.6vw,46px);font-weight:800;margin:14px 0 8px}
+.lhs-wrap .share .sub{color:var(--soft);font-size:17px}
+.lhs-wrap .nums{display:flex;gap:40px;margin-top:44px;flex-wrap:wrap}
+.lhs-wrap .nums div b{display:block;font-size:clamp(46px,6vw,72px);font-weight:800;line-height:1;color:var(--green)}
+.lhs-wrap .nums div span{display:block;margin-top:10px;font-size:15px;color:var(--soft)}
+.lhs-wrap .places{margin-top:36px;display:flex;flex-wrap:wrap;gap:10px;max-width:760px}
+.lhs-wrap .places span{padding:10px 18px;border-radius:999px;background:#fff;border:1px solid #DCE6D2;font-size:15px;font-weight:600}
+.lhs-wrap .places span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c,var(--green));margin-right:8px;vertical-align:1px}
+.lhs-wrap .sq{margin-top:48px;max-width:760px;font-size:clamp(19px,2vw,24px);font-weight:700;line-height:1.6}
+.lhs-wrap .sq small{display:block;margin-top:8px;font-size:14px;font-weight:400;color:var(--soft)}
+/* PRESS */
+.lhs-wrap .press{padding:100px 6vw;background:var(--ivory)}
+.lhs-wrap .press h2{font-size:clamp(30px,3.6vw,46px);font-weight:800;margin:14px 0 36px}
+.lhs-wrap .pcard{display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;max-width:1000px;background:#fff;border:1px solid #EADFCB;border-radius:20px;padding:30px 34px;text-decoration:none;color:inherit;transition:transform .25s,box-shadow .25s}
+.lhs-wrap .pcard:hover{transform:translateY(-4px);box-shadow:0 18px 36px -20px rgba(80,60,20,.35)}
+.lhs-wrap .pcard .src{font-size:13px;font-weight:800;color:var(--green);letter-spacing:.05em;line-height:1.5}
+.lhs-wrap .pcard .src span{display:block;color:var(--soft);font-weight:500}
+.lhs-wrap .pcard b{font-size:clamp(19px,2vw,24px);line-height:1.4;display:block}
+.lhs-wrap .pcard p{color:var(--soft);margin-top:6px;font-size:15px}
+.lhs-wrap .pcard .go{font-weight:700;color:var(--ink);white-space:nowrap}
+/* TWO STOPS */
+.lhs-wrap .stops{padding:110px 0 120px;background:#fff}
+.lhs-wrap .stops .head{padding:0 6vw}
+.lhs-wrap .stops h2{font-size:clamp(30px,3.6vw,46px);font-weight:800;margin:14px 0 8px}
+.lhs-wrap .stops .sub{color:var(--soft);font-size:17px;line-height:1.6}
+.lhs-wrap .legend{display:flex;gap:18px;margin-top:22px;font-size:14px;color:var(--soft);flex-wrap:wrap}
+.lhs-wrap .legend span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.lhs-wrap .track{position:relative;margin-top:48px;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-left:6vw;padding:10px 6vw 24px;scrollbar-width:thin}
+.lhs-wrap .node{flex:0 0 230px;margin-left:6px;scroll-snap-align:start;position:relative;padding:44px 22px 0 0}
+.lhs-wrap .node:before{content:"";position:absolute;top:13px;left:0;right:0;height:2px;background:#E9DFCC}
+.lhs-wrap .node .dot{position:absolute;top:4px;left:0;width:20px;height:20px;border-radius:50%;background:var(--c);box-shadow:0 0 0 6px #fff,0 0 0 7px #E9DFCC}
+.lhs-wrap .node.stop .dot{width:28px;height:28px;top:0;left:-4px;box-shadow:0 0 0 6px #fff,0 0 0 8px var(--c)}
+.lhs-wrap .node .yr{font-size:14px;font-weight:800;color:var(--c)}
+.lhs-wrap .node b{display:block;font-size:19px;margin:6px 0 6px;line-height:1.35}
+.lhs-wrap .node p{font-size:15px;color:var(--soft);line-height:1.55}
+.lhs-wrap .node.stop b{color:var(--red)}
+.lhs-wrap .r{--c:var(--red)}.lhs-wrap .y{--c:var(--yellow)}.lhs-wrap .g{--c:var(--green)}
+.lhs-wrap .quote{margin:56px 6vw 0;max-width:760px;font-size:clamp(20px,2.2vw,28px);font-weight:700;line-height:1.5}
+.lhs-wrap .quote small{display:block;margin-top:10px;font-size:15px;font-weight:400;color:var(--soft)}
+.lhs-wrap .hint{padding:0 6vw;font-size:13px;color:#B9AE9C;margin-top:6px}
+/* MORNING */
+.lhs-wrap .morning{padding:110px 6vw 120px;background:linear-gradient(180deg,#FFF6DD 0%,#FBF7EE 70%)}
+.lhs-wrap .morning h2{font-size:clamp(30px,3.6vw,46px);font-weight:800;margin:14px 0 8px}
+.lhs-wrap .morning .sub{color:var(--soft);font-size:17px}
+.lhs-wrap .mq{margin-top:44px;max-width:760px;font-size:clamp(19px,2vw,24px);font-weight:700;line-height:1.55}
+.lhs-wrap .mq small{display:block;margin-top:8px;font-size:14px;font-weight:400;color:var(--soft)}
+/* CLASS */
+.lhs-wrap .class{padding:110px 6vw 120px;background:var(--ivory)}
+.lhs-wrap .class h2{font-size:clamp(30px,3.6vw,46px);font-weight:800;margin:14px 0 8px}
+.lhs-wrap .class .sub{color:var(--soft);font-size:17px}
+.lhs-wrap .chead{display:flex;align-items:center;justify-content:space-between;gap:40px;max-width:1180px}
+.lhs-wrap .ctext{padding-bottom:0}
+.lhs-wrap .cphoto{width:min(520px,44%);height:auto;max-width:none;display:block;border-radius:22px;box-shadow:0 20px 40px -24px rgba(80,60,20,.45)}
+.lhs-wrap .topics{margin-top:44px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;max-width:1180px}
+.lhs-wrap .topic{background:#fff;border-radius:20px;padding:28px 24px 30px;border-top:5px solid var(--c);box-shadow:0 10px 30px -22px rgba(80,60,20,.4)}
+.lhs-wrap .topic small{font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--c)}
+.lhs-wrap .topic b{display:block;font-size:21px;margin:10px 0 10px;line-height:1.35}
+.lhs-wrap .topic p{font-size:15px;color:var(--soft);line-height:1.6}
+.lhs-wrap .where{margin-top:40px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:15px;color:var(--soft)}
+.lhs-wrap .where em{font-style:normal;padding:7px 14px;border-radius:999px;background:#fff;border:1px solid #EADFCB;color:var(--ink);font-size:14px}
+.lhs-wrap .ch{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;text-decoration:none;color:inherit;border:1px solid #EADFCB;border-radius:18px;padding:26px 16px;background:var(--ivory);transition:transform .25s}
+.lhs-wrap .ch i{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;margin-bottom:6px;font-style:normal}
+.lhs-wrap .ch i.yt{background:#FEECEC}.lhs-wrap .ch i.ig{background:#FDEDF4}.lhs-wrap .ch i.nv{background:#E8F8EE}.lhs-wrap .ch i.tk{background:#EEEEEE}
+.lhs-wrap .ch i svg{width:30px;height:30px}
+.lhs-wrap .ch b{font-size:17px}.lhs-wrap .ch span{font-size:14px;color:var(--soft)}
+.lhs-wrap .form{margin-top:56px;max-width:860px;background:#fff;border:1px solid #EADFCB;border-radius:22px;padding:34px}
+.lhs-wrap .form h3{font-size:24px;font-weight:800}.lhs-wrap .fsub{color:var(--soft);margin:6px 0 0;font-size:15px}
+.lhs-wrap .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.lhs-wrap .grid label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--soft)}
+.lhs-wrap .grid .full{grid-column:1/-1}
+.lhs-wrap .grid input,.lhs-wrap .grid select,.lhs-wrap .grid textarea{font:inherit;font-weight:400;font-size:16px;color:var(--ink);background:var(--ivory);border:1px solid #E3D6BE;border-radius:12px;padding:12px 14px}
+.lhs-wrap .grid option{color:#24211D;background:#fff}
+.lhs-wrap .send{margin-top:20px;padding:16px 30px;border:0;border-radius:999px;background:var(--ink);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.lhs-wrap .send:disabled{opacity:.6;cursor:default}
+.lhs-wrap .fhead{margin-bottom:22px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.lhs-wrap .call{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;background:var(--green);color:#fff;text-decoration:none;font-weight:700;font-size:15px;white-space:nowrap}
+.lhs-wrap .call svg{width:20px;height:20px}
+.lhs-wrap .lhs-ok{margin-top:20px;font-size:16px;line-height:1.7;font-weight:700;color:var(--green)}
+.lhs-wrap .lhs-err{margin-top:14px;font-size:14px;color:var(--red)}
+/* PHOTO ZONE */
+.lhs-wrap .photo{padding:110px 0 110px;background:#1F1B17;color:#F6EEDD}
+.lhs-wrap .photo .head{padding:0 6vw}
+.lhs-wrap .photo .tag{color:#C9BBA3}
+.lhs-wrap .photo h2{font-size:clamp(30px,3.6vw,46px);font-weight:800;margin:14px 0 8px}
+.lhs-wrap .photo .sub{color:#C9BBA3;font-size:17px}
+.lhs-wrap .reel{margin-top:44px;display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-left:6vw;padding:0 6vw 18px;scrollbar-width:none;scroll-behavior:smooth}
+.lhs-wrap .reel::-webkit-scrollbar{display:none}
+.lhs-wrap .reel img{height:min(520px,62vh);width:auto;max-width:none;flex:0 0 auto;border-radius:14px;scroll-snap-align:start;display:block}
+.lhs-wrap .pnav{display:flex;align-items:center;gap:14px;padding:12px 6vw 0}
+.lhs-wrap .pnav button{width:46px;height:46px;border-radius:50%;border:1px solid #5a5047;background:transparent;color:#F6EEDD;font-size:20px;cursor:pointer}
+.lhs-wrap .pnav button:disabled{opacity:.3;cursor:default}
+.lhs-wrap .pnav span{font-size:14px;color:#C9BBA3;font-variant-numeric:tabular-nums}
+.lhs-wrap .flow{position:relative;height:440px;margin-top:40px;max-width:1180px}
+.lhs-wrap .vine{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.lhs-wrap .vine path{fill:none;stroke:#DDBF86;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.lhs-wrap .mstep{position:absolute;left:var(--x);top:var(--y);transform:translateX(-50%);width:170px;text-align:center}
+.lhs-wrap .circ{width:96px;height:96px;margin:0 auto;border-radius:50%;background:#fff;border:2px solid #F0E3C6;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 12px 26px -16px rgba(120,90,30,.45);position:relative;z-index:1}
+.lhs-wrap .circ small{font-size:11px;font-weight:800;color:var(--yellow);letter-spacing:.1em}
+.lhs-wrap .circ b{font-size:14px;line-height:1.3;margin-top:2px}
+.lhs-wrap .tri{display:flex;gap:4px;margin-top:5px}.lhs-wrap .tri i{width:9px;height:9px;border-radius:50%;display:block}
+.lhs-wrap .mstep p{position:relative;z-index:1;display:inline-block;font-size:13.5px;color:var(--soft);line-height:1.5;margin-top:10px;padding:3px 8px;border-radius:8px;background:rgba(253,248,236,.92)}
+/* CHANNEL */
+.lhs-wrap .channel{padding:100px 6vw 110px;background:#fff}
+.lhs-wrap .channel h2{font-size:clamp(30px,3.6vw,46px);font-weight:800;margin:14px 0 32px}
+.lhs-wrap .chs{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1100px}
+.lhs-wrap .ch:hover{transform:translateY(-4px)}
+/* LIBRARY */
+.lhs-wrap .lib{padding:110px 6vw 120px;background:linear-gradient(#F6EEDD,#FBF7EE)}
+.lhs-wrap .lib h2{font-size:clamp(30px,3.6vw,46px);font-weight:800;margin:14px 0 8px}
+.lhs-wrap .lib .sub{color:var(--soft);font-size:17px}
+.lhs-wrap .shelf{margin-top:48px;max-width:1240px}
+.lhs-wrap .shelf .plate{display:inline-block;background:#fff;border:1px solid #E6D3B3;color:var(--wood2);font-size:13px;font-weight:700;padding:6px 14px;border-radius:6px;margin-bottom:14px;letter-spacing:.05em}
+.lhs-wrap .row{display:flex;align-items:flex-end;gap:14px;padding:30px 22px 0;flex-wrap:nowrap}
+.lhs-wrap .board{height:20px;background:linear-gradient(var(--wood),var(--wood2));border-radius:4px;box-shadow:0 14px 22px -12px rgba(90,60,20,.5)}
+.lhs-wrap .book{border:0;background:none;padding:0;cursor:pointer;transition:transform .35s cubic-bezier(.2,.7,.2,1);margin-bottom:-2px}
+.lhs-wrap .book img{height:155px;width:auto;max-width:none;display:block;border-radius:2px 5px 5px 2px;box-shadow:-3px 0 0 rgba(0,0,0,.08) inset,4px 6px 12px -4px rgba(0,0,0,.35)}
+.lhs-wrap .co .book img{height:135px}
+.lhs-wrap .book:hover,.lhs-wrap .book.on{transform:translateY(-18px)}
+.lhs-wrap .card{margin-top:34px;max-width:620px;min-height:96px;background:#fff;border-radius:16px;padding:22px 26px;border:1px solid #EADFCB;transition:opacity .3s}
+.lhs-wrap .card b{font-size:20px;display:block}.lhs-wrap .card small{color:var(--wood2);font-weight:700;font-size:13px}.lhs-wrap .card p{color:var(--soft);margin-top:8px}
+@media(max-width:760px){
+ .lhs-wrap .hero{flex-direction:column;align-items:stretch;padding:0 0 56px;min-height:0}
+ .lhs-wrap .hero .ph{position:relative;order:-1;width:100%;height:auto}.lhs-wrap .hero .ph img{height:auto;aspect-ratio:4/3.4}
+ .lhs-wrap .hero .ph:before{background:linear-gradient(0deg,var(--ivory) 0%,rgba(251,247,238,0) 28%)}
+ .lhs-wrap .hero .txt{padding:8px 16px 0}
+ .lhs-wrap .lib{padding:80px 16px}
+ .lhs-wrap .press{padding:80px 16px}.lhs-wrap .msg{padding:90px 16px}.lhs-wrap .share{padding:80px 16px}.lhs-wrap .nums{gap:28px}.lhs-wrap .morning,.lhs-wrap .channel,.lhs-wrap .class{padding:80px 16px}.lhs-wrap .topics{grid-template-columns:1fr;gap:12px}.lhs-wrap .photo{padding:80px 0}.lhs-wrap .photo .head,.lhs-wrap .pnav{padding-left:16px;padding-right:16px}.lhs-wrap .reel{padding:0 16px 14px;scroll-padding-left:16px}.lhs-wrap .reel img{height:380px}.lhs-wrap .flow{height:880px}.lhs-wrap .mstep{left:var(--mx);top:var(--my);width:150px}.lhs-wrap .chs{grid-template-columns:1fr 1fr;gap:12px}.lhs-wrap .ch{padding:20px 10px}.lhs-wrap .form{padding:24px 18px}.lhs-wrap .fhead{flex-direction:column}.lhs-wrap .grid{grid-template-columns:1fr}.lhs-wrap .pcard{grid-template-columns:1fr;gap:12px;padding:24px 22px}
+ .lhs-wrap .stops{padding:80px 0}.lhs-wrap .stops .head,.lhs-wrap .hint{padding:0 16px}.lhs-wrap .track{padding:10px 16px 20px;scroll-padding-left:16px}.lhs-wrap .quote{margin:44px 16px 0}.lhs-wrap .node{flex-basis:210px}
+ .lhs-wrap .chead{flex-direction:column-reverse;align-items:stretch;gap:0}
+ .lhs-wrap .cphoto{width:100%;margin:0}
+ .lhs-wrap .ctext{padding:18px 0 24px}
+ .lhs-wrap .row{flex-wrap:nowrap;overflow-x:auto;padding:24px 6px 6px;scroll-snap-type:x mandatory}
+ .lhs-wrap .book{flex:0 0 auto;scroll-snap-align:start}.lhs-wrap .book img{height:160px}.lhs-wrap .co .book img{height:130px}
+}
+@media (prefers-reduced-motion:reduce){.lhs-wrap .msg .tag{margin-bottom:28px}.lhs-wrap .msg .big{opacity:1;transform:none;transition:none}.lhs-wrap .rise{animation:none;opacity:1;transform:none}.lhs-wrap .book{transition:none}}
+      `}</style>
+
+      {/* ① 히어로 */}
+      <section className="hero">
+        <div className="txt">
+          <div className="tag rise d1"><Dots />PIUM · 이음피플</div>
+          <h1 className="rise d2">임해숙</h1>
+          <p className="role rise d2">건강·다이어트 심리 전문가 · 작가<br />웰니스 라이프 코치 · 휴먼브랜드 강사</p>
+          <blockquote className="rise d3">살아 있으니,<br />감사합니다.</blockquote>
+          <div className="names rise d4"><span>뜨다</span><span>불사조 여사</span><span>건강 다이어트 25년차</span><span>저서 14권</span></div>
+        </div>
+        <div className="ph rise d2"><img src={LHS_IMG + 'hero.jpg'} alt="임해숙" /></div>
+      </section>
+
+      {/* ② MESSAGE */}
+      <section className={'msg' + (msgIn ? ' in' : '')} id="msg" ref={msgRef}>
+        <div className="tag"><Dots />MESSAGE</div>
+        <div className="big">뜨다</div>
+        <p className="q">"나를 만나는 모든 사람과<br />함께 뜨는 세상을 만들어 가자."</p>
+        <p className="story">가장 힘들던 때, 멘토가 '임해숙으로 살라'며 지어 준 이름입니다.<br />"이름 하나가 사람을 살릴 수 있다는 걸, 그때 처음 알았습니다."</p>
+      </section>
+
+      {/* ③ PRESS */}
+      <section className="press">
+        <div className="tag"><Dots />PRESS</div>
+        <h2>기사로 만난 임해숙</h2>
+        <a className="pcard" href="https://www.eummedia.kr/article/%EC%9E%84%ED%95%B4%EC%88%99-%EC%9D%B8%EC%83%9D2%EB%A7%89-%EA%B1%B4%EA%B0%95%EC%A0%84%EB%AC%B8%EA%B0%80" target="_blank" rel="noopener">
+          <div className="src">이음미디어<span>이음피플 · 2026.09.05</span></div>
+          <div><b>숟가락도 못 들던 사람이 건강을 가르친다 — 임해숙의 인생 2막</b><p>정세연 편집국장</p></div>
+          <div className="go">기사 읽기 →</div>
+        </a>
+      </section>
+
+      {/* ④ TWO STOPS */}
+      <section className="stops">
+        <div className="head"><div className="tag"><Dots />TWO STOPS</div>
+          <h2>두 번 멈추고, 다시 뜬 사람</h2>
+          <p className="sub">빨간불에 두 번 멈췄고, 두 번 다시 출발했습니다.</p>
+          <div className="legend"><span className="r">멈춤</span><span className="y">다시 준비</span><span className="g">출발</span></div></div>
+        <div className="track">
+          {LHS_STOPS.map((n) => (
+            <div className={'node ' + n.c} key={n.b}>
+              <i className="dot"></i>
+              {n.yr && <div className="yr">{n.yr}</div>}
+              <b>{n.b}</b>
+              <p>{n.p}</p>
+            </div>
+          ))}
+        </div>
+        <p className="hint">옆으로 밀어서 보세요 →</p>
+        <p className="quote">"다 나은 것은 아닙니다. 저는 통증과 불편함을 안고, 포기하지 않고 다시 날아오른 사람입니다."<small>— 임해숙</small></p>
+      </section>
+
+      {/* ⑤ LIBRARY */}
+      <section className="lib">
+        <div className="tag"><Dots />LIBRARY</div>
+        <h2>임해숙의 서재</h2>
+        <p className="sub">책을 누르면 앞으로 꺼내 볼 수 있어요.</p>
+        <div className="shelf"><div className="plate">혼자 쓴 책 · {LHS_SOLO}</div>
+          <div className="row">
+            {LHS_BOOKS.slice(0, LHS_SOLO).map((b, i) => (
+              <button type="button" key={b.t} className={'book' + (pick === i ? ' on' : '')} aria-pressed={pick === i} onClick={() => setPick(i)}>
+                <img src={LHS_IMG + 'book-' + String(i + 1).padStart(2, '0') + '.jpg'} alt={b.t} />
+              </button>
+            ))}
+          </div><div className="board"></div></div>
+        <div className="shelf co"><div className="plate">함께 쓴 책 · {LHS_BOOKS.length - LHS_SOLO}</div>
+          <div className="row">
+            {LHS_BOOKS.slice(LHS_SOLO).map((b, j) => {
+              const i = LHS_SOLO + j;
+              return (
+                <button type="button" key={b.t} className={'book' + (pick === i ? ' on' : '')} aria-pressed={pick === i} onClick={() => setPick(i)}>
+                  <img src={LHS_IMG + 'book-' + String(i + 1).padStart(2, '0') + '.jpg'} alt={b.t} />
+                </button>
+              );
+            })}
+          </div><div className="board"></div></div>
+        <div className="card" id="card" aria-live="polite">{bk.p && <small>{bk.p}</small>}<b>{bk.t}</b>{bk.d && <p>{bk.d}</p>}</div>
+      </section>
+
+      {/* ⑥ MORNING */}
+      <section className="morning">
+        <div className="tag"><Dots />MORNING</div>
+        <h2>임해숙의 아침</h2>
+        <p className="sub">"제 하루는 이렇게 시작됩니다."</p>
+        <div className="flow" id="flow" ref={flowRef}>
+          <svg className="vine" aria-hidden="true"><path ref={vineRef} /></svg>
+          {LHS_MORNING.map((m) => (
+            <div className="mstep" key={m.n} style={{ '--x': m.x, '--y': m.y, '--mx': m.mx, '--my': m.my }}>
+              <div className="circ">
+                <small>{m.n}</small>
+                <b>{m.b.map((line, k) => (k ? [<br key={'br' + k} />, line] : line))}</b>
+                {m.tri && <span className="tri"><i style={{ background: 'var(--red)' }}></i><i style={{ background: 'var(--green)' }}></i><i style={{ background: 'var(--yellow)' }}></i></span>}
+              </div>
+              <p>{m.p}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mq">"특별한 비법이 아닙니다. 그저 오늘 할 수 있는 것을 매일 반복하는 것."<small>— 임해숙</small></p>
+      </section>
+
+      {/* ⑦ PHOTO ZONE */}
+      <section className="photo">
+        <div className="head"><div className="tag"><Dots />PHOTO ZONE</div>
+          <h2>드레스 사회 10년</h2>
+          <p className="sub">행사 사회를 볼 때마다 드레스를 입고 무대에 섭니다.</p></div>
+        <div className="reel" id="reel" ref={reelRef}>
+          {LHS_DRESS.map((im, i) => (
+            <img key={im.f} src={LHS_IMG + im.f} width={im.w} height={im.h} loading={i === 0 ? undefined : 'lazy'} decoding="async" alt="드레스를 입고 사회를 보는 임해숙" />
+          ))}
+        </div>
+        <div className="pnav">
+          <button type="button" aria-label="이전" onClick={() => reelGo(-1)} disabled={pz.prevDis}>←</button>
+          <button type="button" aria-label="다음" onClick={() => reelGo(1)} disabled={pz.nextDis}>→</button>
+          <span aria-live="polite">{pz.i + 1} / {LHS_DRESS.length}</span>
+        </div>
+      </section>
+
+      {/* ⑧ SHARE */}
+      <section className="share">
+        <div className="tag"><Dots />SHARE</div>
+        <h2>어르신 건강 밥상</h2>
+        <p className="sub">전국 곳곳에서 어르신들께 건강한 밥상을 차려 드리고 있습니다.</p>
+        <div className="nums"><div><b>7년째</b><span>이어 온 봉사</span></div><div><b>7곳</b><span>함께하는 지역</span></div></div>
+        <div className="places">
+          {LHS_PLACES.map(([name, c]) => <span key={name} style={{ '--c': 'var(--' + c + ')' }}>{name}</span>)}
+        </div>
+        <p className="sq">"작은 실천이지만 봉사할 수 있어 행복하다고 미소 짓는 어르신을 보며, 저는 더 겸손해야겠다고 배웁니다."<small>— 임해숙</small></p>
+      </section>
+
+      {/* ⑨ CHANNEL */}
+      <section className="channel">
+        <div className="tag"><Dots />CHANNEL</div>
+        <h2>임해숙과 만나는 곳</h2>
+        <div className="chs">
+          {/* 아이콘: YouTube · Instagram · 네이버 블로그는 길봉조 프로필(gbj-wrap)의 SVG 그대로. 틱톡은 길봉조에 없어 시안의 path 그대로(색만 검정, 바탕은 연한 회색) */}
+          <a className="ch" href="https://www.youtube.com/channel/UCQkLQJMGV10KQbIZQE_2r8Q" target="_blank" rel="noopener">
+            <i className="yt"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FF0000" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8z"/><path fill="#fff" d="M9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg></i>
+            <b>유튜브</b><span>임해숙TV</span></a>
+          <a className="ch" href="https://m.blog.naver.com/luck7878-" target="_blank" rel="noopener">
+            <i className="nv"><svg viewBox="0 0 24 24" fill="none" stroke="#03C75A" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M16.5 3.3a2.1 2.1 0 0 1 3 3L9.2 16.6l-4 1 1-4L16.5 3.3z"/><path d="M4 20.6h16"/></svg></i>
+            <b>네이버 블로그</b><span>글 읽기</span></a>
+          <a className="ch" href="https://instagram.com/tteuda7575" target="_blank" rel="noopener">
+            <i className="ig"><svg viewBox="0 0 24 24" fill="none" stroke="#E4405F" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.15" fill="#E4405F" stroke="none"/></svg></i>
+            <b>인스타그램</b><span>@tteuda7575</span></a>
+          <a className="ch" href="https://www.tiktok.com/@user8467448147678" target="_blank" rel="noopener">
+            <i className="tk"><svg fill="#000" aria-hidden="true" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></i>
+            <b>틱톡</b><span>짧은 영상</span></a>
+        </div>
+      </section>
+
+      {/* ⑩ CLASS + 강의 문의 */}
+      <section className="class">
+        <div className="chead"><div className="ctext">
+          <div className="tag"><Dots />CLASS</div>
+          <h2>임해숙의 강의</h2>
+          <p className="sub">"마이크를 잡고 사람들 앞에 서 있는 그 시간만큼은, 저는 아프지 않았습니다."</p></div>
+          <img className="cphoto" src={LHS_IMG + 'class.jpg'} width="923" height="657" alt="두 손을 펴고 웃으며 인사하는 임해숙" /></div>
+        <div className="topics">
+          {LHS_TOPICS.map((t) => (
+            <div className={'topic ' + t.c} key={t.s}><small>{t.s}</small><b>{t.b}</b><p>{t.p}</p></div>
+          ))}
+        </div>
+        <div className="where">강의한 곳 <em>소방서</em><em>법무부</em><em>인천의 섬들</em><em>전국 강연</em></div>
+        <div className="form" id="contact">
+          <div className="fhead"><div><h3>강의 문의</h3>
+            <p className="fsub">남겨 주신 내용은 임해숙님께 바로 전달됩니다.</p></div>
+            <a className="call" href="tel:01065067575" aria-label="임해숙님께 전화 걸기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>전화 문의</span></a></div>
+          {submitted ? (
+            <p className="lhs-ok">문의가 전달되었습니다. 임해숙님께서 연락 드립니다.</p>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <div className="grid">
+                <label>이름<input placeholder="홍길동" value={form.name} onChange={setF('name')} /></label>
+                <label>연락처<input placeholder="010-0000-0000" type="tel" inputMode="tel" value={form.phone} onChange={setF('phone')} /></label>
+                <label>기관·단체<input placeholder="예: ○○구청 평생학습관" value={form.org} onChange={setF('org')} /></label>
+                <label>희망 주제<select value={form.topic} onChange={setF('topic')}>
+                  {LHS_FORM_TOPICS.map((t) => <option key={t} value={t}>{t}</option>)}
+                </select></label>
+                <label className="full">문의 내용<textarea rows="4" placeholder="일정, 인원, 장소 등을 적어 주세요" value={form.message} onChange={setF('message')} /></label>
+              </div>
+              {err && <p className="lhs-err">{err}</p>}
+              <button type="submit" className="send" disabled={submitting}>{submitting ? '전송 중…' : '문의 보내기'}</button>
+            </form>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
 /* 앱 주소에서 표시용 호스트 추출 (www. 제거). 없거나 파싱 실패 시 빈 문자열 */
 function appHost(url) {
   try {
@@ -4571,6 +5116,7 @@ export default function PiumAppDetailPage() {
   if (slug === "leemoontae")   return <LeeMoontaePage />;
   if (slug === "gilbongjo")    return <GilBongJoPage />;
   if (slug === "isoo")         return <IsooPage />;
+  if (slug === "limhaesook")   return <LimHaesookPage />;
 
   const app = APPS[slug];
 

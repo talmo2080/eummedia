@@ -940,6 +940,15 @@ export default function PiumStorePage() {
       price_model:   "free",
       users:         { nickname: "아이수" },
     },
+    {
+      slug:          "limhaesook",
+      title:         "임해숙 대표",
+      summary:       "두 번 멈추고, 다시 뜬 사람. 저서 14권, 강의와 어르신 건강 밥상 봉사.",
+      thumbnail_url: "/pium-app/limhaesook/limhaesook-card.jpg",
+      category:      "expert_tool",
+      price_model:   "free",
+      users:         { nickname: "임해숙" },
+    },
   ];
   // 갓 피어난 앱: 하드코딩 선두 + DB 최근 순
   const recentFeatured = [
