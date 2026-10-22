@@ -577,11 +577,14 @@ export default function ArticleDetail() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      // ★ status 필터 제거 — archived(비공개) 기사도 관리자·작성자는 볼 수 있어야 함
+      //   RLS가 알아서 처리: articles_select_published는 published만 anon 공개,
+      //   articles_select_author_or_owner가 작성자·admin에게 archived도 허용.
+      //   비공개 기사에 비로그인 접근 → RLS로 빈 결과 → "불러오지 못했습니다" 표시 (안전)
       const { data, error: err } = await supabase
         .from('articles')
-        .select('id, slug, title, summary, content, thumbnail_url, image_alt, video_url, show_in_article, show_in_gallery, published_at, channel_id, author_id, like_count, view_count, tags, external_url, inline_ad_image, inline_ad_link, inline_ad_title, inline_ad_subtitle, channels(name, slug, english_slug)')
+        .select('id, slug, title, summary, content, status, thumbnail_url, image_alt, video_url, show_in_article, show_in_gallery, published_at, channel_id, author_id, like_count, view_count, tags, external_url, inline_ad_image, inline_ad_link, inline_ad_title, inline_ad_subtitle, channels(name, slug, english_slug)')
         .eq('slug', slug)
-        .eq('status', 'published')
         .single();
       if (cancelled) return;
       if (err) { setError('기사를 불러오지 못했습니다.'); return; }
@@ -877,6 +880,21 @@ export default function ArticleDetail() {
               </>
             )}
           </div>
+
+          {/* 비공개(archived) 기사 안내 — 관리자·작성자가 열었을 때 상단에 눈에 띄게 */}
+          {article?.status === 'archived' && (
+            <div role="note" style={{
+              background: '#fdf6ec', border: '2px solid #c0392b', borderRadius: 6,
+              padding: '14px 16px', margin: '0 0 20px', fontSize: 14, color: '#3a2a10',
+              lineHeight: 1.6,
+            }}>
+              <strong style={{ color: '#c0392b', fontSize: 15 }}>🙈 이 기사는 현재 비공개 상태입니다.</strong>
+              <div style={{ marginTop: 6 }}>
+                라이브·목록·검색엔진에서 숨겨져 있으며, 관리자·작성자만 이 페이지를 볼 수 있습니다.
+                공개로 되돌리려면 편집 화면에서 <strong>&quot;🔓 다시 공개&quot;</strong>를 눌러주세요.
+              </div>
+            </div>
+          )}
 
           {/* 기사 듣기 컨트롤 (1차: 재생·일시정지·정지) — Web Speech API */}
           <ArticleAudioPlayer article={a} />

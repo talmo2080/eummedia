@@ -1034,6 +1034,53 @@ export default function ArticleEditor() {
     }
   }
 
+  // ━━ 비공개(archived) ↔ 공개(published) 토글 ━━
+  // 세연 설계 (2026-10-22): 발행된 기사를 삭제 없이 숨김
+  //   · 데이터·slug·published_at·조회수·댓글 모두 보존
+  //   · RLS: 'published'만 anon 조회 → archived는 자동 숨김 (목록·검색·sitemap에서 제외)
+  //   · 작성자·관리자는 archived도 조회 가능 (articles_select_author_or_owner 정책)
+  //   · 재배포 트리거 → prerender된 HTML이 dist에서 제거 → 라이브 404 → 검색엔진 자연 제거
+  //   · 되돌리기: 다시 'published'로 → 같은 slug 복구 → prerender 재생성
+  const handleToggleArchive = async () => {
+    if (submitting) return
+    if (!user || !editId) return
+    const isCurrentlyPublished = originalStatus === 'published'
+    const nextStatus = isCurrentlyPublished ? 'archived' : 'published'
+    const confirmMsg = isCurrentlyPublished
+      ? '이 기사를 비공개로 전환하시겠습니까?\n\n' +
+        '· 기사 데이터와 주소(slug)는 그대로 유지됩니다.\n' +
+        '· 라이브·목록·채널·sitemap에서 제외됩니다.\n' +
+        '· 발행일·조회수·댓글은 보존됩니다.\n' +
+        '· 관리자·작성자는 계속 접근해 수정·복구할 수 있습니다.\n' +
+        '· 되돌리려면 다시 \'공개로 전환\'을 눌러주세요.'
+      : '이 기사를 다시 공개하시겠습니까?\n\n' +
+        '· 같은 주소(slug)로 라이브에 복구됩니다.\n' +
+        '· 발행일은 원래 값 유지, 조회수·댓글은 그대로 이어집니다.'
+    if (!window.confirm(confirmMsg)) return
+
+    setSubmitting(true)
+    try {
+      let q = supabase.from('articles')
+        .update({ status: nextStatus, updated_at: new Date().toISOString() })
+        .eq('id', editId)
+      if (!isAdminOrPublisher) q = q.eq('author_id', user.id)
+      const { error } = await q
+      if (error) { alert(`상태 변경 실패: ${error.message}`); return }
+      setOriginalStatus(nextStatus)
+      alert(isCurrentlyPublished
+        ? '비공개로 전환되었습니다. 라이브 반영까지 2~4분 걸립니다.'
+        : '다시 공개되었습니다. 라이브 반영까지 2~4분 걸립니다.'
+      )
+      // prerender 재생성 — archived면 dist에서 제거, published면 재생성
+      triggerDeploy(isCurrentlyPublished ? 'archive' : 'unarchive')
+    } catch (err) {
+      console.error('[handleToggleArchive] catch:', err)
+      alert(`상태 변경 중 오류: ${err?.message || err}`)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   // ━━ 발행본 그대로 저장 (편집국장/발행인 전용 — 발행 기사 수정) ━━
   // status='published' 유지, published_at·author_id 보존, updated_at만 갱신.
   // slug는 잠금 해제 상태에서만 변경 가능. 변경 감지 시 사용자 재확인.
@@ -2150,6 +2197,18 @@ export default function ArticleEditor() {
                   }}>
                   📰 발행본으로 저장
                 </button>
+              ) : editId && isAdminOrPublisher && originalStatus === 'archived' ? (
+                <button onClick={handleToggleArchive} disabled={submitting}
+                  style={{
+                    flex: 2, height: 56, fontSize: 18, fontWeight: 700,
+                    background: submitting ? '#ccc' : '#1c8a4f',
+                    color: submitting ? '#888' : '#fff',
+                    border: 'none', borderRadius: 8,
+                    cursor: submitting ? 'not-allowed' : 'pointer',
+                    fontFamily: SANS,
+                  }}>
+                  🔓 다시 공개
+                </button>
               ) : (
                 <button onClick={handleSubmit}
                   style={{
@@ -2164,6 +2223,39 @@ export default function ArticleEditor() {
                 </button>
               )}
             </div>
+
+            {/* 비공개 토글 버튼 — 발행본·archived 상태에서만, 관리자 전용
+                실수 방지: 큰 저장 버튼과 분리된 별도 줄, 작은 크기 */}
+            {editId && isAdminOrPublisher && originalStatus === 'published' && (
+              <div style={{ marginTop: 12, textAlign: 'right' }}>
+                <button
+                  type="button"
+                  onClick={handleToggleArchive}
+                  disabled={submitting}
+                  style={{
+                    background: '#fff', color: '#c0392b',
+                    border: '1.5px solid #c0392b',
+                    padding: '10px 18px', borderRadius: 6,
+                    fontSize: 14, fontWeight: 700,
+                    cursor: submitting ? 'not-allowed' : 'pointer',
+                    fontFamily: SANS,
+                    opacity: submitting ? 0.5 : 1,
+                  }}>
+                  🙈 비공개로 전환
+                </button>
+                <div style={{ fontSize: 12, color: '#595959', marginTop: 6 }}>
+                  데이터·주소는 그대로 두고 라이브에서만 숨깁니다. 되돌릴 수 있어요.
+                </div>
+              </div>
+            )}
+
+            {editId && isAdminOrPublisher && originalStatus === 'archived' && (
+              <div style={{ marginTop: 12, padding: '10px 14px', background: '#fdf6ec', border: '1px solid #e8c98a', borderRadius: 6, fontSize: 13, color: '#3a2a10' }}>
+                <strong>🙈 이 기사는 현재 비공개 상태입니다.</strong><br />
+                라이브·목록·검색엔진에서 숨겨져 있으며, 관리자·작성자만 볼 수 있습니다.
+                위 <strong>&quot;🔓 다시 공개&quot;</strong> 버튼을 누르면 같은 주소로 복구됩니다.
+              </div>
+            )}
           </div>
         )}
 
