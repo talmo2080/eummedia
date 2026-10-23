@@ -68,6 +68,8 @@ const ARTICLE_STATUS_LABELS = {
   published: { label: '발행됨', color: GREEN, bg: '#eef7f2' },
   // 임시저장 — '내 임시저장' 탭에서만 노출 (admin/publisher 본인 author_id만)
   draft: { label: '임시저장', color: '#b45309', bg: '#fff8e1' },
+  // 비공개 — published 였다가 숨긴 기사 (slug·조회수·댓글 보존, 라이브에서만 숨김)
+  archived: { label: '비공개', color: '#6b7280', bg: '#f3f4f6' },
 }
 
 // USER_STATUS_LABELS 제거 — 새 카드는 inline badge로 대체
@@ -939,6 +941,37 @@ export default function AdminDashboard() {
       setIndexNowResults(prev => ({ ...prev, [id]: r }))
     }
   }
+  // ━━ 비공개(archived) ↔ 공개(published) 토글 — Admin 대시보드 ━━
+  // 세연 설계 (2026-10-22): 발행된 기사를 삭제 없이 숨김
+  //   · slug·발행일·조회수·댓글 전부 보존, status만 변경
+  //   · RLS·prerender·sitemap이 모두 status='published' 필터 → archived 자동 제외
+  const toggleArchiveStatus = async (a) => {
+    const isCurrentlyPublished = a.status === 'published'
+    const nextStatus = isCurrentlyPublished ? 'archived' : 'published'
+    const confirmMsg = isCurrentlyPublished
+      ? `"${a.title}"\n이 기사를 비공개로 전환하시겠습니까?\n\n` +
+        '· 데이터와 주소(slug)는 그대로 유지\n' +
+        '· 라이브·목록·채널·sitemap에서 제외\n' +
+        '· 발행일·조회수·댓글 보존\n' +
+        '· 관리자·작성자는 계속 조회 가능\n' +
+        '· 되돌리기: 다시 "공개로 전환" 누르면 복구'
+      : `"${a.title}"\n이 기사를 다시 공개하시겠습니까?\n\n` +
+        '· 같은 주소(slug)로 라이브 복구\n' +
+        '· 발행일은 원래 값 유지'
+    if (!window.confirm(confirmMsg)) return
+    const { error } = await supabase
+      .from('articles')
+      .update({ status: nextStatus, updated_at: new Date().toISOString() })
+      .eq('id', a.id)
+    if (error) { alert(`상태 변경 실패: ${error.message}`); return }
+    setArticles(prev => prev.map(x => x.id === a.id ? { ...x, status: nextStatus } : x))
+    triggerDeploy(isCurrentlyPublished ? 'archive:admin' : 'unarchive:admin')
+    alert(isCurrentlyPublished
+      ? '비공개로 전환되었습니다. 라이브 반영 2~4분.'
+      : '다시 공개되었습니다. 라이브 반영 2~4분.'
+    )
+  }
+
   const startReject = (id) => { setRejectingId(id); setRejectReason('') }
   const confirmReject = async (id) => {
     const reason = rejectReason.trim() || null
@@ -1446,6 +1479,13 @@ export default function AdminDashboard() {
                               ✏️ 편집
                             </Link>
                           )}
+                          {canAct && isAdminOrPublisher && (
+                            <button onClick={() => toggleArchiveStatus(a)}
+                              title="데이터 삭제 없이 라이브에서만 숨김 — 되돌릴 수 있음"
+                              style={btnStyle('#6b7280', true)}>
+                              🙈 비공개
+                            </button>
+                          )}
                           {canAct && (
                             <button onClick={() => deleteArticle(a)} style={btnStyle(RED, true)}>
                               🗑 삭제
@@ -1454,6 +1494,32 @@ export default function AdminDashboard() {
                           <a href={`/article/${a.slug}`} target="_blank" rel="noopener noreferrer"
                              style={{ ...btnStyle('#666', true), textDecoration: 'none', display: 'inline-block' }}>
                             👁 기사 보기
+                          </a>
+                        </>
+                      )}
+                      {a.status === 'archived' && (
+                        <>
+                          {canAct && isAdminOrPublisher && (
+                            <button onClick={() => toggleArchiveStatus(a)}
+                              title="같은 주소로 라이브 복구"
+                              style={btnStyle(GREEN)}>
+                              🔓 다시 공개
+                            </button>
+                          )}
+                          {canAct && (
+                            <Link to={`/write?id=${a.id}`} style={{ ...btnStyle(BLUE), textDecoration: 'none', display: 'inline-block' }}>
+                              ✏️ 편집
+                            </Link>
+                          )}
+                          {canAct && (
+                            <button onClick={() => deleteArticle(a)} style={btnStyle(RED, true)}>
+                              🗑 완전 삭제
+                            </button>
+                          )}
+                          <a href={`/article/${a.slug}`} target="_blank" rel="noopener noreferrer"
+                             style={{ ...btnStyle('#666', true), textDecoration: 'none', display: 'inline-block' }}
+                             title="관리자·작성자만 볼 수 있음 (anon은 404)">
+                            👁 기사 보기 (관리자용)
                           </a>
                         </>
                       )}
