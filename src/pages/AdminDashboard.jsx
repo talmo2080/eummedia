@@ -656,6 +656,8 @@ export default function AdminDashboard() {
   const [myDrafts, setMyDrafts] = useState([])
   const [users, setUsers] = useState([])
   const [articleFilter, setArticleFilter] = useState('all')
+  // 기사 검색 — 제목·저자명·주소(slug) 포함 매칭 (대소문자 무시)
+  const [searchQuery, setSearchQuery] = useState('')
   const [userFilter, setUserFilter] = useState('all')
   const [memberFilter, setMemberFilter] = useState('all')
   const [rejectingId, setRejectingId] = useState(null)
@@ -730,10 +732,24 @@ export default function AdminDashboard() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const filteredArticles =
+  // 1차: 탭(filter) 필터
+  const statusFiltered =
     articleFilter === 'my_draft' ? myDrafts :        // 본인 draft 별도 state
     articleFilter === 'all'      ? articles :        // 기존 4개 status 전체
     articles.filter(a => a.status === articleFilter)
+
+  // 2차: 검색어 필터 — 제목·저자명·slug 중 하나라도 포함되면 매칭
+  const filteredArticles = (() => {
+    const q = searchQuery.trim().toLowerCase()
+    if (!q) return statusFiltered
+    return statusFiltered.filter(a => {
+      const title    = (a.title || '').toLowerCase()
+      const author   = (a.author_name || '').toLowerCase()
+      const slug     = (a.slug || '').toLowerCase()
+      const channel  = (a.channels?.name || '').toLowerCase()
+      return title.includes(q) || author.includes(q) || slug.includes(q) || channel.includes(q)
+    })
+  })()
   // filteredUsers 제거 — 새 시민기자 관리 탭은 entries (writer_applications + legacy) 사용
 
   // 회원 관리 탭 — 필터 + CSV 내보내기
@@ -1257,6 +1273,47 @@ export default function AdminDashboard() {
               </Link>
             </div>
 
+            {/* 기사 검색 — 제목·저자·주소·채널명 (대소문자 무시) */}
+            <div style={{ position: 'relative', marginBottom: 12 }}>
+              <span aria-hidden="true" style={{
+                position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
+                fontSize: 18, color: '#999', pointerEvents: 'none',
+              }}>🔍</span>
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                aria-label="기사 검색"
+                placeholder="기사 검색 — 제목·저자·주소·채널 (예: 산들소리, 정세연, 이음로컬)"
+                style={{
+                  width: '100%', boxSizing: 'border-box',
+                  padding: '12px 44px 12px 40px', fontSize: 15,
+                  border: '1.5px solid #d0d0d0', borderRadius: 8,
+                  fontFamily: SANS, outline: 'none',
+                }}
+                onFocus={e => e.currentTarget.style.borderColor = NAVY}
+                onBlur={e => e.currentTarget.style.borderColor = '#d0d0d0'}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  aria-label="검색어 지우기"
+                  style={{
+                    position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+                    width: 28, height: 28, borderRadius: '50%',
+                    background: '#f0f0f0', color: '#555',
+                    border: 'none', fontSize: 16, fontWeight: 700,
+                    cursor: 'pointer', fontFamily: SANS,
+                  }}>×</button>
+              )}
+            </div>
+            {searchQuery && (
+              <div style={{ fontSize: 13, color: '#595959', marginBottom: 12, fontFamily: SANS }}>
+                <strong style={{ color: NAVY }}>&quot;{searchQuery}&quot;</strong> 검색결과 {filteredArticles.length}건
+              </div>
+            )}
+
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
               {ARTICLE_FILTERS
                 .filter(f => !f.adminOrPublisherOnly || isAdminOrPublisher)
@@ -1283,7 +1340,9 @@ export default function AdminDashboard() {
 
             {filteredArticles.length === 0 && (
               <div style={{ ...card, textAlign: 'center', color: '#595959', fontSize: 18, padding: 40 }}>
-                해당 상태의 기사가 없습니다.
+                {searchQuery
+                  ? <>검색 결과가 없습니다. 다른 단어로 시도해보세요. <button type="button" onClick={() => setSearchQuery('')} style={{ background: 'transparent', border: 'none', color: NAVY, cursor: 'pointer', fontWeight: 700, fontSize: 15, marginLeft: 8, textDecoration: 'underline' }}>검색 초기화</button></>
+                  : '해당 상태의 기사가 없습니다.'}
               </div>
             )}
             {visibleArticles.map(a => {
