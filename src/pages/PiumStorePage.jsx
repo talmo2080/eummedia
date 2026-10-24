@@ -949,6 +949,15 @@ export default function PiumStorePage() {
       price_model:   "free",
       users:         { nickname: "임해숙" },
     },
+    {
+      slug:          "parksangyoung",
+      title:         "박상영 대표",
+      summary:       "교과서가 다 담지 못한 홍범도 장군의 이야기를 전하는 외손자.",
+      thumbnail_url: "/pium-app/parksangyoung/parksangyoung-card.jpg",
+      category:      "expert_tool",
+      price_model:   "free",
+      users:         { nickname: "박상영" },
+    },
   ];
   // 갓 피어난 앱: 하드코딩 선두 + DB 최근 순
   const recentFeatured = [
