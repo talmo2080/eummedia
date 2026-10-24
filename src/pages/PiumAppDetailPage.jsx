@@ -5096,6 +5096,275 @@ function LimHaesookPage() {
   );
 }
 
+/* ══════════════════════════════════════
+   박상영 대표 프로필 — /pium-app/parksangyoung
+   (시안: parksangyoung-mockup-v6 · 이미지: public/pium-app/parksangyoung/)
+══════════════════════════════════════ */
+const PSY_IMG = '/pium-app/parksangyoung/';
+const PSY_GALLERY = [
+  { f: 'gallery-01.jpg', w: 585, h: 786 }, { f: 'gallery-02.jpg', w: 871, h: 600 },
+  { f: 'gallery-03.jpg', w: 501, h: 769 }, { f: 'gallery-04.jpg', w: 467, h: 712 },
+];
+/* 귀갑문(거북 등껍질 육각 무늬) — 배경에 은은하게 깔리는 한국 전통 문양 */
+const PSY_HEX = "M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.34V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.3h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z";
+const psyPat = (color, op) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='56' height='98' viewBox='0 0 28 49'><path fill='${color}' fill-opacity='${op}' fill-rule='evenodd' d='${PSY_HEX}'/></svg>`)}")`;
+const PSY_PAT_LIGHT = psyPat('#9C4A2F', 0.07);
+const PSY_PAT_DARK = psyPat('#C9A45C', 0.09);
+const PSY_VIDEO_ID = 'LhTQSXVv1NI';
+const PSY_VIDEO_TITLE = '아직 끝나지 않은 역사, 홍범도 장군 외손자가 전하는 메시지 | 통일부문대상 외손자 박상영 마침내 입을 열다';
+const PSY_FONT_HREF = 'https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&display=swap';
+
+function ParkSangyoungPage() {
+  /* 제목 서체(Noto Serif KR)는 이 페이지에서만 불러온다 — 시안과 같은 Google Fonts 주소 */
+  useEffect(() => {
+    if (document.querySelector('link[data-psy-font]')) return;
+    const l = document.createElement('link');
+    l.rel = 'stylesheet'; l.href = PSY_FONT_HREF; l.setAttribute('data-psy-font', '1');
+    document.head.appendChild(l);
+  }, []);
+
+  /* GALLERY — 가로 스냅 슬라이드, 끝에서 마지막 번호, 순환 없음 */
+  const reelRef = useRef(null);
+  const [pz, setPz] = useState({ i: 0, prevDis: true, nextDis: false });
+  const padL = (r) => parseFloat(getComputedStyle(r).paddingLeft);
+  const curIdx = (r, ims) => {
+    const x = r.scrollLeft; let i = 0;
+    ims.forEach((m, k) => { if (m.offsetLeft - r.offsetLeft - padL(r) - 20 <= x) i = k; });
+    return i;
+  };
+  useEffect(() => {
+    const r = reelRef.current;
+    if (!r) return undefined;
+    const upd = () => {
+      const ims = [...r.querySelectorAll('img')];
+      const atEnd = r.scrollLeft + r.clientWidth >= r.scrollWidth - 5;
+      setPz({ i: atEnd ? ims.length - 1 : curIdx(r, ims), prevDis: r.scrollLeft < 5, nextDis: atEnd });
+    };
+    upd();
+    r.addEventListener('scroll', upd, { passive: true });
+    window.addEventListener('resize', upd);
+    return () => { r.removeEventListener('scroll', upd); window.removeEventListener('resize', upd); };
+  }, []);
+  const reelGo = (d) => {
+    const r = reelRef.current;
+    if (!r) return;
+    const ims = [...r.querySelectorAll('img')];
+    const i = Math.max(0, Math.min(ims.length - 1, curIdx(r, ims) + d));
+    r.scrollTo({ left: ims[i].offsetLeft - r.offsetLeft - padL(r), behavior: 'smooth' });
+  };
+
+  /* 강연·행사 문의 */
+  const [form, setForm] = useState({ name: '', phone: '', org: '', schedule: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [err, setErr] = useState('');
+  const setF = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!form.name.trim() || !form.phone.trim() || !form.message.trim()) {
+      setErr('이름, 연락처, 문의 내용을 모두 입력해 주세요.');
+      return;
+    }
+    setSubmitting(true); setErr('');
+    try {
+      const res = await fetch('/api/parksangyoung-lecture-inquiry', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name, phone: form.phone, org: form.org,
+          schedule: form.schedule, message: form.message,
+        }),
+      });
+      if (!res.ok) throw new Error('서버 오류');
+      setSubmitted(true);
+    } catch {
+      setErr('전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="psy-wrap">
+      <style>{`
+.psy-wrap{--patl:${PSY_PAT_LIGHT};--patd:${PSY_PAT_DARK};--forest:#17211B;--forest2:#22302A;--paper:#EFE6D2;--paper2:#E4D8BE;--ink:#231E17;--soft:#6B6152;--rust:#9C4A2F;--gold:#C9A45C;--cream:#F6F0E2;
+  font-family:Pretendard,sans-serif;color:var(--ink);background:var(--forest);word-break:keep-all;overflow-x:hidden;overflow-x:clip;line-height:normal}
+.psy-wrap *{box-sizing:border-box;margin:0}
+.psy-wrap .tag{font-size:13px;letter-spacing:.25em;font-weight:700;color:var(--gold)}
+.psy-wrap h2{font-family:"Noto Serif KR",serif;font-weight:900;font-size:clamp(30px,3.8vw,48px);margin:14px 0 10px;line-height:1.3}
+/* HERO */
+.psy-wrap .hero{background:var(--patd),#141D18;color:var(--cream);padding-bottom:70px}
+.psy-wrap .stage{position:relative;max-width:1800px;margin:0 auto}
+.psy-wrap .comp{width:100%;height:auto;display:block;max-width:none}
+.psy-wrap .htxt{text-align:center;margin-top:28px;position:relative;padding:0 7vw}
+.psy-wrap .hero .kin{font-size:clamp(13px,1.2vw,18px);color:var(--gold);font-weight:600;letter-spacing:.05em}
+.psy-wrap .hero h1{font-family:"Noto Serif KR",serif;font-weight:900;font-size:clamp(40px,5vw,84px);margin:10px 0 12px;letter-spacing:.04em}
+.psy-wrap .hero .role{color:#C9C0AE;font-size:clamp(14px,1.3vw,18px);line-height:1.7}
+.psy-wrap .hero blockquote{margin:36px auto 0;max-width:900px;text-align:center;font-family:"Noto Serif KR",serif;font-size:clamp(20px,2.2vw,30px);line-height:1.6;font-weight:500;padding:0 7vw}
+/* MESSAGE */
+.psy-wrap .msg{background:var(--patl),var(--paper);padding:120px 7vw;text-align:center}
+.psy-wrap .msg p{font-family:"Noto Serif KR",serif;font-size:clamp(22px,2.6vw,34px);font-weight:700;line-height:1.7;max-width:900px;margin:22px auto 0}
+.psy-wrap .msg small{display:block;margin-top:20px;color:var(--soft);font-size:15px}
+.psy-wrap .msg .tag{color:var(--rust)}
+/* PRESS */
+.psy-wrap .press{background:var(--patl),var(--paper);padding:0 7vw 110px}
+.psy-wrap .pcard{display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;max-width:1000px;margin:0 auto;background:var(--cream);border:1px solid var(--paper2);border-radius:14px;padding:28px 32px;text-decoration:none;color:inherit}
+.psy-wrap .pcard .src{font-size:13px;font-weight:800;color:var(--rust);line-height:1.5}.psy-wrap .pcard .src span{display:block;color:var(--soft);font-weight:500}
+.psy-wrap .pcard b{font-size:clamp(18px,1.9vw,22px);line-height:1.45;display:block}.psy-wrap .pcard .go{font-weight:700;white-space:nowrap}
+/* STORY */
+.psy-wrap .story{background:var(--patl),linear-gradient(var(--paper),var(--paper2));padding:110px 7vw 120px}
+.psy-wrap .story .head{max-width:900px}.psy-wrap .story .tag{color:var(--rust)}
+.psy-wrap .story .lead{font-size:18px;color:var(--soft);line-height:1.8;margin-top:6px}
+.psy-wrap .scenes{margin-top:60px;max-width:1000px;position:relative}
+.psy-wrap .scenes:before{content:"";position:absolute;left:118px;top:10px;bottom:10px;width:2px;background:repeating-linear-gradient(var(--rust) 0 8px,transparent 8px 14px);opacity:.5}
+.psy-wrap .scene{display:grid;grid-template-columns:100px 1fr;gap:40px;padding:0 0 64px;position:relative}
+.psy-wrap .scene:before{content:"";position:absolute;left:112px;top:12px;width:14px;height:14px;border-radius:50%;background:var(--rust);box-shadow:0 0 0 5px var(--paper)}
+.psy-wrap .scene .yr{font-family:"Noto Serif KR",serif;font-weight:900;font-size:30px;color:var(--rust);text-align:right;padding-top:2px}
+.psy-wrap .scene .body{padding-left:20px}
+.psy-wrap .scene h3{font-family:"Noto Serif KR",serif;font-size:26px;font-weight:900}
+.psy-wrap .scene .q{font-family:"Noto Serif KR",serif;font-size:19px;line-height:1.8;margin-top:12px;font-weight:500}
+.psy-wrap .scene .d{color:var(--soft);font-size:16px;line-height:1.8;margin-top:10px;max-width:680px}
+.psy-wrap .scene .q2{margin-top:14px;display:inline-block;background:var(--forest);color:var(--cream);font-family:"Noto Serif KR",serif;font-weight:700;padding:10px 16px;border-radius:6px;font-size:17px}
+.psy-wrap .hong{margin-top:22px;display:inline-block}
+.psy-wrap .hong img{width:200px;height:auto;max-width:none;display:block;filter:sepia(.25);border:6px solid var(--cream);box-shadow:0 14px 30px -14px rgba(0,0,0,.5)}
+.psy-wrap .hong figcaption{font-size:12px;color:var(--soft);margin-top:8px}
+.psy-wrap .end{margin-top:20px;max-width:900px;font-family:"Noto Serif KR",serif;font-size:clamp(21px,2.4vw,30px);font-weight:700;line-height:1.7}
+.psy-wrap .end small{display:block;margin-top:12px;font-family:Pretendard,sans-serif;font-size:14px;font-weight:400;color:var(--soft)}
+/* AWARD */
+.psy-wrap .award{background:var(--patd),var(--forest2);color:var(--cream);padding:110px 7vw}
+.psy-wrap .aphoto{max-width:1000px;margin:0 0 56px}.psy-wrap .aphoto img{width:100%;height:auto;max-width:none;display:block;border-radius:10px;box-shadow:0 30px 60px -30px rgba(0,0,0,.7)}.psy-wrap .aphoto figcaption{margin-top:12px;font-size:14px;line-height:1.6;color:#A9B3A9}
+.psy-wrap .acard{margin-top:36px;max-width:900px;border:1px solid rgba(201,164,92,.5);border-radius:14px;padding:36px 40px;background:linear-gradient(135deg,rgba(201,164,92,.10),transparent)}
+.psy-wrap .acard .date{color:var(--gold);font-weight:700;letter-spacing:.05em}
+.psy-wrap .acard b{display:block;font-family:"Noto Serif KR",serif;font-size:clamp(24px,2.8vw,34px);margin:10px 0 12px}
+.psy-wrap .acard p{color:#C9C0AE;line-height:1.8}
+.psy-wrap .acard blockquote{margin-top:22px;font-family:"Noto Serif KR",serif;font-size:19px;line-height:1.8;border-left:3px solid var(--gold);padding-left:18px}
+/* VIDEO */
+.psy-wrap .vid{background:var(--patl),var(--paper2);padding:110px 7vw}.psy-wrap .vid .tag{color:var(--rust)}
+.psy-wrap .vframe{margin-top:30px;max-width:900px;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 18px 40px -20px rgba(0,0,0,.5)}
+.psy-wrap .vtitle{margin-top:16px;max-width:900px;font-family:"Noto Serif KR",serif;font-weight:700;font-size:clamp(17px,1.8vw,21px);line-height:1.6}
+.psy-wrap .vframe iframe{width:100%;height:100%;border:0;display:block}
+/* GALLERY */
+.psy-wrap .gal{background:var(--patd),var(--forest);color:var(--cream);padding:100px 0 110px}
+.psy-wrap .gal .head{padding:0 7vw}
+.psy-wrap .reel{margin-top:40px;display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-left:7vw;padding:0 7vw 16px;scrollbar-width:none}
+.psy-wrap .reel::-webkit-scrollbar{display:none}
+.psy-wrap .reel img{height:min(520px,62vh);width:auto;max-width:none;flex:0 0 auto;border-radius:10px;scroll-snap-align:start;display:block}
+.psy-wrap .pnav{display:flex;gap:14px;align-items:center;padding:12px 7vw 0}
+.psy-wrap .pnav button{width:46px;height:46px;border-radius:50%;border:1px solid #4a5a50;background:transparent;color:var(--cream);font-size:20px;cursor:pointer}
+.psy-wrap .pnav button:disabled{opacity:.3;cursor:default}.psy-wrap .pnav span{font-size:14px;color:#A9B3A9}
+/* ACTIVITY */
+.psy-wrap .act{background:var(--patl),var(--paper);padding:110px 7vw}.psy-wrap .act .tag{color:var(--rust)}
+.psy-wrap .roles{margin-top:36px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1180px}
+.psy-wrap .rc{background:var(--cream);border:1px solid var(--paper2);border-top:4px solid var(--rust);border-radius:12px;padding:26px 24px}
+.psy-wrap .rc small{font-size:13px;font-weight:800;color:var(--rust);letter-spacing:.05em}
+.psy-wrap .rc b{display:block;font-family:"Noto Serif KR",serif;font-size:21px;line-height:1.45;margin:10px 0 10px}
+.psy-wrap .rc p{color:var(--soft);line-height:1.7;font-size:15px}
+/* CONTACT */
+.psy-wrap .contact{background:var(--patd),var(--forest);color:var(--cream);padding:110px 7vw 120px}
+.psy-wrap .form{margin-top:30px;max-width:860px;background:var(--cream);color:var(--ink);border-radius:18px;padding:32px}
+.psy-wrap .fhead{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}
+.psy-wrap .fsub{color:var(--soft);font-size:15px}
+.psy-wrap .call{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;background:var(--rust);color:#fff;text-decoration:none;font-weight:700;font-size:15px;white-space:nowrap}
+.psy-wrap .call svg{width:20px;height:20px}
+.psy-wrap .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.psy-wrap .grid label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--soft)}
+.psy-wrap .grid .full{grid-column:1/-1}
+.psy-wrap .grid input,.psy-wrap .grid textarea{font:inherit;font-weight:400;font-size:16px;color:var(--ink);background:#fff;border:1px solid var(--paper2);border-radius:10px;padding:12px 14px}
+.psy-wrap .send{margin-top:20px;padding:16px 30px;border:0;border-radius:999px;background:var(--forest);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.psy-wrap .send:disabled{opacity:.6;cursor:default}
+.psy-wrap .psy-ok{margin-top:6px;font-size:16px;line-height:1.7;font-weight:700;color:var(--rust)}
+.psy-wrap .psy-err{margin-top:14px;font-size:14px;color:var(--rust)}
+@media(max-width:760px){
+ .psy-wrap .vid{padding:84px 16px}
+ .psy-wrap .htxt{margin-top:20px;padding:0 16px}.psy-wrap .hero{padding-bottom:56px}.psy-wrap .hero blockquote{padding:0 16px;margin-top:22px}
+ .psy-wrap .msg{padding:84px 16px}.psy-wrap .press{padding:0 16px 80px}.psy-wrap .pcard{grid-template-columns:1fr;gap:10px;padding:22px}
+ .psy-wrap .story{padding:84px 16px}.psy-wrap .scenes:before{left:7px}.psy-wrap .scene{grid-template-columns:1fr;gap:6px;padding:0 0 48px 30px}.psy-wrap .scene:before{left:0;top:8px}.psy-wrap .scene .yr{text-align:left;font-size:26px}.psy-wrap .scene .body{padding-left:0}
+ .psy-wrap .award{padding:84px 16px}.psy-wrap .acard{padding:26px 22px}
+ .psy-wrap .act,.psy-wrap .contact{padding:84px 16px}.psy-wrap .roles{grid-template-columns:1fr;gap:12px}.psy-wrap .form{padding:24px 18px}.psy-wrap .fhead{flex-direction:column;align-items:flex-start}.psy-wrap .grid{grid-template-columns:1fr}
+ .psy-wrap .gal{padding:80px 0}.psy-wrap .gal .head,.psy-wrap .pnav{padding-left:16px;padding-right:16px}.psy-wrap .reel{padding:0 16px 14px;scroll-padding-left:16px}.psy-wrap .reel img{height:380px}
+}
+      `}</style>
+
+      {/* ① 히어로 — 대표 이미지(hero.jpg) 속 띠 이름은 원본 사진으로 고친 뒤 교체 예정 */}
+      <section className="hero">
+        <div className="stage"><img className="comp" src={PSY_IMG + 'hero.jpg'} width="1800" height="1100" alt="홍범도 장군에게 경례하는 외손자 박상영 대표" />
+          <div className="htxt"><div className="kin">홍범도 장군의 외손자</div><h1>박상영</h1><p className="role">홍범도 유족대표 · 월남참전 군인 전투수당 진상규명위원회 위원장</p></div></div>
+        <blockquote>"오직 내 나라 땅에서 내 아이들이 총칼의 공포 없이 평화롭게 웃을 수 있는 세상."</blockquote>
+      </section>
+
+      {/* ② MESSAGE */}
+      <section className="msg"><div className="tag">MESSAGE</div>
+        <p>"독립운동가 가문의 후손으로서<br />조국의 평화로운 미래와 통일을 이루는 길에<br />저 역시 작은 힘을 지속해서 보태겠습니다."</p>
+        <small>— 2026년 8월 14일, 한반도평화통일대상 수상 소감에서</small></section>
+
+      {/* ③ PRESS */}
+      <section className="press"><a className="pcard" href="https://www.eummedia.kr/article/%ED%99%8D%EB%B2%94%EB%8F%84%EC%9E%A5%EA%B5%B0-%EC%99%B8%EC%86%90%EC%9E%90%EB%B0%95%EC%83%81%EC%98%81%EB%8C%80%ED%91%9C-%ED%95%9C%EB%B0%98%EB%8F%84%ED%8F%89%ED%99%94%ED%86%B5%EC%9D%BC%EB%8C%80%EC%83%81" target="_blank" rel="noopener"><div className="src">이음미디어<span>이음피플 · 2026.08.19</span></div><div><b>홍범도 장군 유일 생존 외손자 박상영 대표, 광복절 81주년 맞아 '한반도평화통일대상' 수상</b></div><div className="go">기사 읽기 →</div></a></section>
+
+      {/* ④ STORY */}
+      <section className="story"><div className="head"><div className="tag">STORY</div><h2>교과서가 다 담지 못한 이야기</h2>
+        <p className="lead">"교과서는 제 외할아버지를 '백두산 호랑이', '불패의 독립군 대장'으로 단 몇 줄 요약합니다. 역사책이 차마 다 담지 못한 할아버지의 진짜 이야기를 들려드리고자 합니다."</p></div>
+        <div className="scenes">
+          <article className="scene"><div className="yr">1907</div><div className="body"><h3>의병을 일으키다</h3><p className="q">"1907년 일제가 총기를 빼앗자, 할아버지는 포수들을 모아 의병을 일으켰습니다."</p><p className="d">외할머니 이옥구 여사는 남편에게 귀순을 권하는 편지를 쓰라는 협박에 끝내 붓을 들지 않고 함흥 감옥에서 옥사했습니다.</p><p className="q2">"날 찢어 죽여도 그런 글은 쓰지 않겠소."</p></div></article>
+          <article className="scene"><div className="yr">1908</div><div className="body"><h3>맏아들을 묻다</h3><p className="q">"아내를 잃고, 맏아들을 제 손으로 흙에 묻은 사내는 그 산골짜기에서 남은 생을 나라에 완전히 바치기로 맹세했습니다."</p><p className="d">스무 살 큰아들 양순은 아버지를 따라 의병이 되었고, 1908년 5월 함남 정평 전투에서 숨을 거두었습니다.</p><p className="q2">"네가 내 자식이냐, 왜놈의 앞잡이냐!"</p></div></article>
+          <article className="scene"><div className="yr">1920</div><div className="body"><h3>봉오동</h3><p className="q">"병사들과 똑같이 해진 짚신을 신고, 보리밥 한 덩이를 나눠 먹으며 벼랑 끝에 엎드려 있었습니다."</p><p className="d">1920년 6월 7일 만주 봉오동. 독립군이 일본 정규군을 상대로 거둔 첫 대규모 승리였고, 이어 청산리에서도 김좌진 장군과 함께 싸웠습니다.</p>
+            {/* TODO(출처 확인 후 입력): 사진 출처 — 확인되면 캡션 뒤에 출처를 덧붙인다. 지금은 "홍범도 장군"만 표시 */}
+            <figure className="hong"><img src={PSY_IMG + 'hong-photo.jpg'} width="224" height="357" alt="홍범도 장군" /><figcaption>홍범도 장군</figcaption></figure></div></article>
+          <article className="scene"><div className="yr">1937</div><div className="body"><h3>고려극장의 수위</h3><p className="q">"한때 수천 명의 군사를 호령하던 분이 낡은 빗자루를 들고 극장 마당을 쓸고, 밤이면 램프를 든 채 순찰을 돌았습니다."</p><p className="d">강제이주로 카자흐스탄 크질오르다에 닿은 노장군은 고려극장에서 일했고, 1942년 연극 《홍범도》를 객석 맨 뒷자리에서 지켜보았습니다. 1943년 10월 25일, 해방을 2년 앞두고 눈을 감았습니다.</p></div></article>
+          <article className="scene"><div className="yr">2021</div><div className="body"><h3>고국의 하늘로</h3><p className="q">"할아버지, 이제 더는 추운 눈밭을 헤매지 않으셔도 됩니다."</p><p className="d">서거 78년 만인 2021년 8월, 유해가 고국으로 돌아와 대전현충원에 모셔졌습니다.</p></div></article>
+        </div>
+        <p className="end">"홍범도 장군이 목숨과 가족을 다 바쳐 지켜내려 했던 것은 어떤 이념도, 영웅의 칭호도 아니었습니다."<small>— 박상영 대표의 이야기 원고에서</small></p>
+      </section>
+
+      {/* ⑤ AWARD */}
+      <section className="award"><figure className="aphoto"><img src={PSY_IMG + 'award.jpg'} width="960" height="626" alt="한반도평화통일대상 시상식 기념촬영" /><figcaption>2026년 8월 14일 서울 국회박물관 대강당에서 박상영 대표(왼쪽 세 번째)가 한반도평화통일대상 통일부문대상 표창패를 들고 수상자들과 기념촬영을 하고 있다. (사진: 한반도평화통일협회 제공)</figcaption></figure><div className="tag">AWARD</div><h2>한반도평화통일대상</h2>
+        <div className="acard"><div className="date">2026. 8. 14 · 국회박물관 대강당</div><b>통일부문대상</b>
+          <p>민족통일국민연합 창립 35주년·한반도평화통일협회 창립 20주년 기념 한반도평화통일포럼 시상식</p>
+          <blockquote>"귀한 날 귀한 상을 받게 되어 깊은 영광이자 무거운 책임감을 느낍니다."</blockquote></div></section>
+
+      {/* VIDEO */}
+      <section className="vid"><div className="tag">VIDEO</div><h2>영상으로 만나기</h2>
+        <div className="vframe"><iframe src={`https://www.youtube-nocookie.com/embed/${PSY_VIDEO_ID}`} title={PSY_VIDEO_TITLE} loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" /></div>
+        <p className="vtitle">{PSY_VIDEO_TITLE}</p></section>
+
+      {/* ⑥ GALLERY */}
+      <section className="gal"><div className="head"><div className="tag">GALLERY</div><h2>박상영</h2></div>
+        <div className="reel" id="reel" ref={reelRef}>
+          {PSY_GALLERY.map((im) => <img key={im.f} src={PSY_IMG + im.f} width={im.w} height={im.h} alt="박상영 대표" />)}
+        </div>
+        <div className="pnav">
+          <button type="button" aria-label="이전" onClick={() => reelGo(-1)} disabled={pz.prevDis}>←</button>
+          <button type="button" aria-label="다음" onClick={() => reelGo(1)} disabled={pz.nextDis}>→</button>
+          <span aria-live="polite">{pz.i + 1} / {PSY_GALLERY.length}</span>
+        </div></section>
+
+      {/* ⑦ ACTIVITY */}
+      <section className="act"><div className="tag">ACTIVITY</div><h2>박상영 대표가 하는 일</h2>
+        <div className="roles">
+          <div className="rc"><small>홍범도 유족대표</small><b>장군의 이야기를 전합니다</b><p>교과서가 다 담지 못한 홍범도 장군과 가족의 이야기를 강연과 행사에서 들려줍니다.</p></div>
+          <div className="rc"><small>국가유공자</small><b>월남전 참전</b><p>월남전에 참전한 국가유공자입니다.</p></div>
+          <div className="rc"><small>위원장</small><b>월남참전 군인 전투수당 진상규명위원회</b><p>월남참전 군인들의 전투수당 문제를 밝히는 일을 이끌고 있습니다.</p></div>
+        </div>
+        {/* TODO(대표님께 받아 입력): 강연 주제와 이력 — 시안의 회색 안내문("강연 주제와 이력은 대표님께 받아 채울 자리입니다.")은 공개 화면에 내지 않음 */}
+      </section>
+
+      {/* ⑧ CONTACT */}
+      <section className="contact"><div className="tag">CONTACT</div><h2>강연·행사 문의</h2>
+        <div className="form"><div className="fhead"><p className="fsub">남겨 주신 내용은 박상영 대표님께 바로 전달됩니다.</p><a className="call" href="tel:01079997600" aria-label="박상영 대표에게 전화 걸기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>전화 문의</span></a></div>
+          {submitted ? (
+            <p className="psy-ok">문의가 전달되었습니다. 박상영 대표님께서 연락 드립니다.</p>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <div className="grid"><label>이름<input placeholder="홍길동" value={form.name} onChange={setF('name')} /></label><label>연락처<input placeholder="010-0000-0000" type="tel" inputMode="tel" value={form.phone} onChange={setF('phone')} /></label>
+                <label>기관·단체<input placeholder="예: ○○구청, ○○학교" value={form.org} onChange={setF('org')} /></label><label>희망 일정<input placeholder="예: 2026년 11월 중" value={form.schedule} onChange={setF('schedule')} /></label>
+                <label className="full">문의 내용<textarea rows="4" placeholder="행사 성격, 인원, 장소 등을 적어 주세요" value={form.message} onChange={setF('message')} /></label></div>
+              {err && <p className="psy-err">{err}</p>}
+              <button type="submit" className="send" disabled={submitting}>{submitting ? '전송 중…' : '문의 보내기'}</button>
+            </form>
+          )}
+        </div></section>
+    </div>
+  );
+}
+
 /* 앱 주소에서 표시용 호스트 추출 (www. 제거). 없거나 파싱 실패 시 빈 문자열 */
 function appHost(url) {
   try {
@@ -5117,6 +5386,7 @@ export default function PiumAppDetailPage() {
   if (slug === "gilbongjo")    return <GilBongJoPage />;
   if (slug === "isoo")         return <IsooPage />;
   if (slug === "limhaesook")   return <LimHaesookPage />;
+  if (slug === "parksangyoung") return <ParkSangyoungPage />;
 
   const app = APPS[slug];
 

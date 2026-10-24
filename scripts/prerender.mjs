@@ -224,6 +224,11 @@ const PIUM_APP_PROFILES = {
     desc: '두 번 멈추고, 다시 뜬 사람. 저서 14권, 강의와 어르신 건강 밥상 봉사.',
     image: `${SITE_URL}/pium-app/limhaesook/og.jpg`,
   },
+  '/pium-app/parksangyoung': {
+    title: '박상영 — 홍범도 장군의 외손자 · 홍범도 유족대표 | PIUM',
+    desc: '교과서가 다 담지 못한 홍범도 장군의 이야기를 전하는 외손자, 박상영 대표.',
+    image: `${SITE_URL}/pium-app/parksangyoung/og.jpg`,
+  },
 };
 
 // 정적 페이지(/about, /advertise 등)의 <title> + description + og/twitter 메타 교체
