@@ -229,6 +229,11 @@ const PIUM_APP_PROFILES = {
     desc: '교과서가 다 담지 못한 홍범도 장군의 이야기를 전하는 외손자, 박상영 대표.',
     image: `${SITE_URL}/pium-app/parksangyoung/og.jpg`,
   },
+  '/pium-app/leeyunwoo': {
+    title: '이윤우 — 명품강사 · 웃자대한민국협회 자문위원 | PIUM',
+    desc: '군인 23년, 공직 15년, 교수와 강사로 네 번 길을 바꾼 사람. 『나는 아직 은퇴하지 않았다』의 저자 이윤우.',
+    image: `${SITE_URL}/pium-app/leeyunwoo/og.jpg`,
+  },
 };
 
 // 정적 페이지(/about, /advertise 등)의 <title> + description + og/twitter 메타 교체

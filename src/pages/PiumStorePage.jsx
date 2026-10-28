@@ -958,6 +958,15 @@ export default function PiumStorePage() {
       price_model:   "free",
       users:         { nickname: "박상영" },
     },
+    {
+      slug:          "leeyunwoo",
+      title:         "이윤우 자문위원",
+      summary:       "군 23년·공직 15년, 인생 3막을 여는 명품인생 강사",
+      thumbnail_url: "/pium-app/leeyunwoo/card.jpg",
+      category:      "expert_tool",
+      price_model:   "free",
+      users:         { nickname: "이윤우" },
+    },
   ];
   // 갓 피어난 앱: 하드코딩 선두 + DB 최근 순
   const recentFeatured = [

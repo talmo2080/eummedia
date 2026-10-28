@@ -5365,6 +5365,279 @@ function ParkSangyoungPage() {
   );
 }
 
+/* ══════════════════════════════════════
+   이윤우 교수 프로필 — /pium-app/leeyunwoo
+   (시안: leeyunwoo-mockup-v7 · 이미지: public/pium-app/leeyunwoo/)
+══════════════════════════════════════ */
+const LYW_IMG = '/pium-app/leeyunwoo/';
+const LYW_GALLERY = [
+  { f: 'gallery-01.jpg', w: 533, h: 721 }, { f: 'gallery-02.jpg', w: 476, h: 648 },
+  { f: 'gallery-03.jpg', w: 552, h: 732 }, { f: 'gallery-04.jpg', w: 531, h: 731 },
+  { f: 'gallery-05.jpg', w: 462, h: 546 },
+];
+const LYW_VIDEO_ID = 'JK29L5gohd4';
+const LYW_VIDEO_TITLE = '인생 2막, 3막을 준비하는 분들에게 들려주는 명품인생 이야기 | 강사 이윤우';
+const LYW_COURSES = ['명품인생 어떻게 만들 것인가?', '보약 중에 진짜 보약은 웃음이여요', '공감과 소통', '기타'];
+
+function LeeYunwooPage() {
+  /* GALLERY — 가로 스냅 슬라이드, 끝에서 마지막 번호, 순환 없음 */
+  const reelRef = useRef(null);
+  const [pz, setPz] = useState({ i: 0, prevDis: true, nextDis: false });
+  const padL = (r) => parseFloat(getComputedStyle(r).paddingLeft);
+  const curIdx = (r, ims) => {
+    const x = r.scrollLeft; let i = 0;
+    ims.forEach((m, k) => { if (m.offsetLeft - r.offsetLeft - padL(r) - 20 <= x) i = k; });
+    return i;
+  };
+  useEffect(() => {
+    const r = reelRef.current;
+    if (!r) return undefined;
+    const upd = () => {
+      const ims = [...r.querySelectorAll('img')];
+      const atEnd = r.scrollLeft + r.clientWidth >= r.scrollWidth - 5;
+      setPz({ i: atEnd ? ims.length - 1 : curIdx(r, ims), prevDis: r.scrollLeft < 5, nextDis: atEnd });
+    };
+    upd();
+    r.addEventListener('scroll', upd, { passive: true });
+    window.addEventListener('resize', upd);
+    return () => { r.removeEventListener('scroll', upd); window.removeEventListener('resize', upd); };
+  }, []);
+  const reelGo = (d) => {
+    const r = reelRef.current;
+    if (!r) return;
+    const ims = [...r.querySelectorAll('img')];
+    const i = Math.max(0, Math.min(ims.length - 1, curIdx(r, ims) + d));
+    r.scrollTo({ left: ims[i].offsetLeft - r.offsetLeft - padL(r), behavior: 'smooth' });
+  };
+
+  /* 강의 문의 */
+  const [form, setForm] = useState({ name: '', phone: '', org: '', topic: LYW_COURSES[0], message: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [err, setErr] = useState('');
+  const setF = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!form.name.trim() || !form.phone.trim() || !form.message.trim()) {
+      setErr('이름, 연락처, 문의 내용을 모두 입력해 주세요.');
+      return;
+    }
+    setSubmitting(true); setErr('');
+    try {
+      const res = await fetch('/api/leeyunwoo-lecture-inquiry', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name, phone: form.phone, org: form.org,
+          topic: form.topic, message: form.message,
+        }),
+      });
+      if (!res.ok) throw new Error('서버 오류');
+      setSubmitted(true);
+    } catch {
+      setErr('전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="lyw-wrap">
+      <style>{`
+.lyw-wrap{--sky:#E8F3FD;--sky2:#CFE6FA;--blue:#1E6FC2;--navy:#0D2E5C;--orange:#EF8A1F;--ink:#16243A;--soft:#5A6A80;
+  font-family:Pretendard,sans-serif;color:var(--ink);background:#fff;word-break:keep-all;overflow-x:hidden;overflow-x:clip;line-height:normal}
+.lyw-wrap *{box-sizing:border-box;margin:0}
+.lyw-wrap .tag{font-size:13px;letter-spacing:.22em;font-weight:800;color:var(--orange)}
+.lyw-wrap h2{font-size:clamp(30px,3.6vw,46px);font-weight:800;margin:12px 0 10px;line-height:1.3;letter-spacing:-.01em}
+.lyw-wrap .sub{color:var(--soft);font-size:17px;line-height:1.7}
+/* HERO */
+.lyw-wrap .hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:60px 7vw;background:linear-gradient(180deg,#9FD0F7 0%,#CFE8FB 45%,#F3F9FE 100%);overflow:hidden}
+.lyw-wrap .htxt{position:relative;z-index:2;max-width:560px}
+.lyw-wrap .hero .kick{display:inline-block;background:var(--orange);color:#fff;font-weight:800;font-size:14px;padding:7px 14px;border-radius:999px}
+.lyw-wrap .hero h1{font-size:clamp(54px,7.4vw,104px);font-weight:900;color:var(--navy);margin:18px 0 6px;letter-spacing:.02em;line-height:normal}
+.lyw-wrap .hero .role{font-size:clamp(15px,1.4vw,19px);color:var(--navy);line-height:1.8;font-weight:600}
+.lyw-wrap .hero .big{margin-top:34px;font-size:clamp(28px,3.4vw,46px);font-weight:900;line-height:1.3;color:var(--navy)}
+.lyw-wrap .hero .big em{font-style:normal;color:var(--orange)}
+.lyw-wrap .hero .nums{display:flex;gap:28px;margin-top:30px;flex-wrap:wrap}
+.lyw-wrap .hero .nums div b{display:block;font-size:30px;font-weight:900;color:var(--blue)}.lyw-wrap .hero .nums div span{font-size:14px;color:var(--soft)}
+.lyw-wrap .hph{position:absolute;top:0;right:0;bottom:0;width:58%;z-index:1}
+.lyw-wrap .hph img{width:100%;height:100%;max-width:none;object-fit:cover;object-position:55% 20%;display:block;-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 30%);mask-image:linear-gradient(90deg,transparent 0%,#000 30%)}
+/* MESSAGE */
+.lyw-wrap .msg{background:var(--navy);color:#fff;padding:110px 7vw;text-align:center}
+.lyw-wrap .msg p{font-size:clamp(24px,3vw,40px);font-weight:800;line-height:1.55;max-width:960px;margin:20px auto 0}
+.lyw-wrap .msg p em{font-style:normal;color:var(--orange)}
+.lyw-wrap .msg small{display:block;margin-top:20px;color:#A9BFDD;font-size:15px}
+/* ROADS */
+.lyw-wrap .roads{background:var(--sky);padding:110px 7vw 120px}
+.lyw-wrap .rgrid{margin-top:44px;display:grid;grid-template-columns:repeat(4,1fr);gap:20px;position:relative}
+.lyw-wrap .road{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 16px 40px -26px rgba(13,46,92,.45);display:flex;flex-direction:column}
+.lyw-wrap .rimg{position:relative;aspect-ratio:3/4;overflow:hidden}.lyw-wrap .rimg img{width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 70%;display:block}
+.lyw-wrap .rimg .no{position:absolute;left:14px;top:12px;font-size:34px;font-weight:900;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.4)}
+.lyw-wrap .rbody{padding:20px 20px 24px}
+.lyw-wrap .rbody small{font-size:13px;font-weight:800;color:var(--blue)}
+.lyw-wrap .rbody h3{font-size:21px;font-weight:800;margin:6px 0 4px}
+.lyw-wrap .rbody .sub2{font-size:14px;font-weight:700;color:var(--orange);margin-bottom:10px}
+.lyw-wrap .rbody p{font-size:14.5px;line-height:1.7;color:var(--soft)}
+.lyw-wrap .rnote{margin-top:16px;font-size:12px;color:#8FA0B6}
+/* BOOK */
+.lyw-wrap .book{background:#fff;padding:110px 7vw}
+.lyw-wrap .bwrap{display:grid;grid-template-columns:auto 1fr;gap:56px;align-items:center;max-width:1100px}
+.lyw-wrap .bwrap img{width:min(320px,70vw);height:auto;max-width:none;display:block;border-radius:6px;box-shadow:0 30px 50px -24px rgba(13,46,92,.55)}
+.lyw-wrap .bq{font-size:clamp(22px,2.4vw,30px);font-weight:800;line-height:1.55;margin-top:22px;color:var(--navy);border-left:5px solid var(--orange);padding-left:20px}
+.lyw-wrap .binfo{margin-top:22px;color:var(--soft);font-size:15px;line-height:1.8}
+.lyw-wrap .rec{margin-top:22px;background:var(--sky);border-radius:14px;padding:18px 22px;font-size:15.5px;line-height:1.75}
+.lyw-wrap .rec b{display:block;font-size:13px;color:var(--blue);margin-bottom:4px}
+/* CLASS */
+.lyw-wrap .class{background:linear-gradient(180deg,var(--sky),#fff);padding:110px 7vw}
+.lyw-wrap .cbig{margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:1180px}
+.lyw-wrap .cb{background:var(--navy);color:#fff;border-radius:22px;padding:32px 30px}
+.lyw-wrap .cb small{color:var(--orange);font-weight:800;font-size:13px;letter-spacing:.08em}
+.lyw-wrap .cb h3{font-size:clamp(22px,2.2vw,28px);font-weight:800;margin:10px 0 14px;line-height:1.4}
+.lyw-wrap .cb ul{padding-left:18px;list-style:disc;color:#C8D6EA;line-height:1.85;font-size:15px}
+.lyw-wrap .chips{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px}
+.lyw-wrap .chips span{background:#fff;border:1px solid var(--sky2);border-radius:999px;padding:9px 16px;font-size:15px;font-weight:600;color:var(--navy)}
+.lyw-wrap .cred{margin-top:34px;display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end}
+.lyw-wrap .cred div b{display:block;font-size:40px;font-weight:900;color:var(--orange);line-height:1}.lyw-wrap .cred div span{font-size:14px;color:var(--soft)}
+/* WITH */
+.lyw-wrap .with{background:#fff;padding:100px 7vw}
+.lyw-wrap .wgrid{margin-top:36px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1180px}
+.lyw-wrap .wc{border:1px solid var(--sky2);border-radius:18px;padding:26px 24px;background:#FAFCFF}
+.lyw-wrap .wc small{font-size:13px;color:var(--blue);font-weight:800}.lyw-wrap .wc b{display:block;font-size:20px;margin:8px 0 6px}.lyw-wrap .wc p{font-size:14.5px;color:var(--soft);line-height:1.6}
+.lyw-wrap .wc.hi{background:var(--orange);border-color:var(--orange);color:#fff}.lyw-wrap .wc.hi small,.lyw-wrap .wc.hi p{color:#FFF1E2}
+/* PRESS */
+.lyw-wrap .ph{background:var(--sky);padding:90px 7vw}
+.lyw-wrap .pcard{margin-top:26px;display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;max-width:1000px;background:#fff;border:1px solid var(--sky2);border-radius:20px;padding:24px 28px;text-decoration:none;color:inherit;transition:transform .25s}
+.lyw-wrap .pcard:hover{transform:translateY(-3px)}
+.lyw-wrap .pcard .src{font-size:13px;font-weight:800;color:var(--blue);line-height:1.5}.lyw-wrap .pcard .src span{display:block;color:var(--soft);font-weight:500}
+.lyw-wrap .pcard b{font-size:clamp(18px,1.9vw,22px);line-height:1.45;font-weight:800;color:var(--navy)}
+.lyw-wrap .pcard em{font-style:normal;font-weight:700;color:var(--navy);white-space:nowrap}
+/* GALLERY */
+.lyw-wrap .gal{background:#fff;padding:100px 0 110px}.lyw-wrap .gal .head{padding:0 7vw}
+.lyw-wrap .reel{margin-top:36px;display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-left:7vw;padding:0 7vw 16px;scrollbar-width:none}.lyw-wrap .reel::-webkit-scrollbar{display:none}
+.lyw-wrap .reel img{height:min(520px,62vh);width:auto;max-width:none;flex:0 0 auto;border-radius:18px;scroll-snap-align:start;display:block}
+.lyw-wrap .pnav{display:flex;gap:14px;align-items:center;padding:12px 7vw 0}.lyw-wrap .pnav button{width:46px;height:46px;border-radius:50%;border:1px solid var(--sky2);background:#fff;color:var(--navy);font-size:20px;cursor:pointer}.lyw-wrap .pnav button:disabled{opacity:.3;cursor:default}.lyw-wrap .pnav span{font-size:14px;color:var(--soft)}
+.lyw-wrap .more{margin-top:22px;max-width:760px}
+.lyw-wrap .more summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:999px;background:#fff;border:1px solid var(--sky2);font-weight:700;color:var(--navy);font-size:15px}
+.lyw-wrap .more summary::-webkit-details-marker{display:none}.lyw-wrap .more summary:after{content:"＋";color:var(--orange);font-weight:900}.lyw-wrap .more[open] summary:after{content:"－"}
+.lyw-wrap .clist{margin-top:14px;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lyw-wrap .clist li{background:#fff;border:1px solid var(--sky2);border-radius:12px;padding:12px 14px;font-weight:600;font-size:15px}
+/* CHANNEL */
+.lyw-wrap .chan{background:var(--sky);padding:100px 7vw}
+.lyw-wrap .yt{margin-top:30px;display:flex;align-items:center;gap:18px;max-width:560px;background:#fff;border:1px solid var(--sky2);border-radius:20px;padding:22px 26px;text-decoration:none;color:inherit;transition:transform .25s}
+.lyw-wrap .yt:hover{transform:translateY(-3px)}.lyw-wrap .yt i{width:58px;height:58px;border-radius:16px;background:#FF0000;display:grid;place-items:center;flex:0 0 auto}.lyw-wrap .yt i svg{width:30px;height:30px}
+.lyw-wrap .yt b{display:block;font-size:19px}.lyw-wrap .yt span{color:var(--soft);font-size:15px}.lyw-wrap .yt em{margin-left:auto;font-style:normal;font-weight:700;color:var(--navy);white-space:nowrap}
+/* VIDEO */
+.lyw-wrap .vid{background:#fff;padding:100px 7vw}
+.lyw-wrap .vbox{margin-top:30px;max-width:960px;aspect-ratio:16/9;border-radius:20px;overflow:hidden;background:var(--navy);box-shadow:0 30px 60px -30px rgba(13,46,92,.5)}
+.lyw-wrap .vbox iframe{width:100%;height:100%;border:0;display:block}
+.lyw-wrap .vt{margin-top:16px;font-size:18px;font-weight:700;color:var(--navy);max-width:960px}
+/* CONTACT */
+.lyw-wrap .contact{background:var(--navy);color:#fff;padding:110px 7vw 120px}
+.lyw-wrap .form{margin-top:30px;max-width:860px;background:#fff;color:var(--ink);border-radius:20px;padding:32px}
+.lyw-wrap .fhead{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}.lyw-wrap .fsub{color:var(--soft);font-size:15px}
+.lyw-wrap .call{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;background:var(--orange);color:#fff;text-decoration:none;font-weight:800;font-size:15px;white-space:nowrap}.lyw-wrap .call svg{width:20px;height:20px}
+.lyw-wrap .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.lyw-wrap .grid label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--soft)}.lyw-wrap .grid .full{grid-column:1/-1}
+.lyw-wrap .grid input,.lyw-wrap .grid select,.lyw-wrap .grid textarea{font:inherit;font-weight:400;font-size:16px;color:var(--ink);background:#F6FAFF;border:1px solid var(--sky2);border-radius:10px;padding:12px 14px}
+.lyw-wrap .grid option{color:#16243A;background:#fff}
+.lyw-wrap .send{margin-top:20px;padding:16px 30px;border:0;border-radius:999px;background:var(--navy);color:#fff;font:inherit;font-weight:800;cursor:pointer}
+.lyw-wrap .send:disabled{opacity:.6;cursor:default}
+.lyw-wrap .lyw-ok{margin-top:6px;font-size:16px;line-height:1.7;font-weight:700;color:var(--blue)}
+.lyw-wrap .lyw-err{margin-top:14px;font-size:14px;color:#C0392B}
+@media(max-width:820px){
+ .lyw-wrap .hero{flex-direction:column;align-items:stretch;padding:0 0 56px;min-height:0}.lyw-wrap .hph{position:relative;width:100%;order:-1}.lyw-wrap .hph img{height:auto;aspect-ratio:4/4.4;-webkit-mask-image:linear-gradient(0deg,transparent 0%,#000 30%);mask-image:linear-gradient(0deg,transparent 0%,#000 30%)}.lyw-wrap .htxt{padding:6px 16px 0}
+ .lyw-wrap .pcard{grid-template-columns:1fr;gap:10px;padding:20px}
+ .lyw-wrap .msg,.lyw-wrap .ph,.lyw-wrap .roads,.lyw-wrap .book,.lyw-wrap .class,.lyw-wrap .with,.lyw-wrap .contact{padding-left:16px;padding-right:16px;padding-top:80px;padding-bottom:84px}
+ .lyw-wrap .rgrid{grid-template-columns:1fr 1fr;gap:12px}.lyw-wrap .rbody{padding:14px}.lyw-wrap .rbody h3{font-size:17px}.lyw-wrap .rbody p{font-size:13.5px}
+ .lyw-wrap .bwrap{grid-template-columns:1fr;gap:28px}.lyw-wrap .cbig,.lyw-wrap .wgrid{grid-template-columns:1fr}
+ .lyw-wrap .gal{padding:80px 0}.lyw-wrap .gal .head,.lyw-wrap .pnav{padding-left:16px;padding-right:16px}.lyw-wrap .reel{padding:0 16px 14px;scroll-padding-left:16px}.lyw-wrap .reel img{height:380px}
+ .lyw-wrap .chan,.lyw-wrap .vid{padding:80px 16px}.lyw-wrap .clist{grid-template-columns:1fr 1fr}.lyw-wrap .yt{flex-wrap:wrap}.lyw-wrap .yt em{margin-left:0}
+ .lyw-wrap .form{padding:24px 18px}.lyw-wrap .fhead{flex-direction:column;align-items:flex-start}.lyw-wrap .grid{grid-template-columns:1fr}
+}
+      `}</style>
+
+      <section className="hero"><div className="htxt">
+        <span className="kick">명품강사</span><h1>이윤우</h1>
+        <p className="role">웃자대한민국협회 자문위원<br />한국시니어교육협회 부회장 · 교수</p>
+        <p className="big">나는 아직<br /><em>은퇴하지 않았다</em></p>
+        <div className="nums"><div><b>23년</b><span>군 복무</span></div><div><b>15년</b><span>공직</span></div><div><b>15개</b><span>자격증</span></div></div>
+      </div><div className="hph"><img src={LYW_IMG + 'hero.jpg'} width="522" height="644" alt="팔짱을 끼고 웃는 이윤우 교수" /></div></section>
+
+      <section className="msg"><div className="tag">MESSAGE</div>
+        <p>"사람은 나이가 들어 늙는 것이 아니라,<br /><em>꿈을 포기할 때</em> 늙는다."</p><small>— 저서 『나는 아직 은퇴하지 않았다』 프롤로그에서</small></section>
+
+      <section className="ph"><div className="tag">PRESS</div><h2>기사로 만난 이윤우</h2>
+        <a className="pcard" href="https://www.eummedia.kr/article/article-svxq68v0" target="_blank" rel="noopener"><div className="src">이음미디어<span>위촉 기사</span></div><b>"은퇴는 출발선" 이윤우 교수, 웃자대한민국협회 자문위원</b><em>기사 읽기 →</em></a></section>
+
+      <section className="vid"><div className="tag">VIDEO</div><h2>영상으로 만나는 이윤우</h2>
+        <div className="vbox"><iframe src={`https://www.youtube-nocookie.com/embed/${LYW_VIDEO_ID}`} title={LYW_VIDEO_TITLE} loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /></div>
+        <p className="vt">{LYW_VIDEO_TITLE}</p></section>
+
+      <section className="roads"><div className="tag">FOUR ROADS</div><h2>네 번의 출발</h2>
+        <p className="sub">"나는 살아오면서 여러 번 인생을 다시 시작했습니다."</p>
+        <div className="rgrid">
+          <article className="road"><div className="rimg"><img src={LYW_IMG + 'road-01.jpg'} width="800" height="1200" alt="책 『나는 아직 은퇴하지 않았다』 1장 삽화" /><span className="no">01</span></div><div className="rbody"><small>1978 – 2001 · 23년</small><h3>군인의 길</h3><p className="sub2">인생의 기초를 배우다</p><p>사단·군단사령부, 육군본부, 합동참모본부, 국방부에서 지휘관·참모·교관으로 복무</p></div></article>
+          <article className="road"><div className="rimg"><img src={LYW_IMG + 'road-02.jpg'} width="800" height="1200" alt="책 『나는 아직 은퇴하지 않았다』 2장 삽화" /><span className="no">02</span></div><div className="rbody"><small>2002 – 2016 · 15년</small><h3>공직자의 길</h3><p className="sub2">행정을 배우다</p><p>관악문화재단(관악구청) 총무·문화과장. 인사행정, 문화관·공연장 운영, 평생교육 프로그램 운영</p></div></article>
+          <article className="road"><div className="rimg"><img src={LYW_IMG + 'road-03.jpg'} width="800" height="1200" alt="책 『나는 아직 은퇴하지 않았다』 3장 삽화" /><span className="no">03</span></div><div className="rbody"><small>2009 – 2022</small><h3>교수와 복지기관장</h3><p className="sub2">새로운 도전의 삶</p><p>청운대·서울기독대학 겸임·외래교수, 대한행정사협회 사무총장·평생교육원장, 함께하는사랑밭 업무총괄, 상록복지센터 대표</p></div></article>
+          <article className="road"><div className="rimg"><img src={LYW_IMG + 'road-04.jpg'} width="841" height="1200" alt="책 『나는 아직 은퇴하지 않았다』 5장 삽화" /><span className="no">04</span></div><div className="rbody"><small>2022 – 지금</small><h3>강사와 작가의 길</h3><p className="sub2">나는 아직 은퇴하지 않았다</p><p>한국시니어교육협회 부회장 겸 강사, 대한노인회 소속 노인대학 대표강사, 저서 『나는 아직 은퇴하지 않았다』</p></div></article>
+        </div><p className="rnote">그림: 저서 『나는 아직 은퇴하지 않았다』 장별 삽화</p></section>
+
+      <section className="book"><div className="bwrap"><img src={LYW_IMG + 'book.jpg'} width="760" height="1200" alt="책 『나는 아직 은퇴하지 않았다』 표지" />
+        <div><div className="tag">BOOK</div><h2>나는 아직 은퇴하지 않았다</h2><p className="sub">군인, 공직자, 교수 그리고 강사로 살아온 인생 이야기</p>
+          <p className="bq">"일이 끝난 것이지, 인생이 끝난 것은 아닙니다."</p>
+          <p className="binfo">이윤우 지음 · 부크크 · 2026년 3월 26일 발행</p>
+          <div className="rec"><b>추천의 글 — 성창운 총장</b>"저자는 자신의 삶을 통해 말합니다. 인생은 나이가 아니라, 도전으로 완성된다는 것입니다."</div></div></div></section>
+
+      <section className="class"><div className="tag">CLASS</div><h2>명품강사 이윤우의 강의</h2><p className="sub">전문분야 인문학 · 노인대학과 기관·단체에서 강의합니다.</p>
+        <div className="cbig">
+          <div className="cb"><small>대표 강의 1</small><h3>명품인생 어떻게 만들 것인가?</h3><ul><li>명품 인생의 이해와 기본 구비조건</li><li>명품인생을 만들기 위한 7가지 지혜와 실천방법</li><li>명품인생을 살아온 분들의 특징 — 섬김과 의미, 균형 있는 삶</li><li>나 자신을 돌아보기 — 상호 칭찬하기, "나 아직 살아있네"</li></ul></div>
+          <div className="cb"><small>대표 강의 2</small><h3>보약 중에 진짜 보약은 웃음이여요</h3><ul><li>멋지게 살고 아름답게 늙어가자</li><li>웃음의 종류 소개와 실제 웃음 체험</li><li>겸손과 배려, 감사하는 마음 텃밭 가꾸기</li><li>행복한 노후 설계 — 행복은 내가 만들어 가는 인생</li></ul></div>
+        </div>
+        <div className="chips"><span>공감과 소통</span><span>웃음과 건강</span><span>인생 별거 있나, 노후의 행복살이</span><span>당신이 더 행복했으면 좋겠습니다</span><span>웃음이 보약이다</span></div>
+        <div className="cred"><div><b>15</b><span>국가·민간 자격증</span></div><p className="sub">경남대 행정대학원 석사<br />숭실대 일반대학원 평생교육학 박사과정 논문 심사 중</p></div>
+        <details className="more"><summary>자격증 보기</summary><ul className="clist"><li>사회복지사</li><li>평생교육사</li><li>웃음치료사</li>
+          {/* TODO(자격증 이름 받아 입력): 나머지 12개 — 시안의 "나머지 12개 — 이윤우 교수님께 받아 채울 자리" 줄은 공개 화면에 내지 않음 */}
+        </ul></details></section>
+
+      <section className="with"><div className="tag">WITH</div><h2>함께하는 곳</h2><div className="wgrid">
+        <div className="wc hi"><small>2026. 10 위촉</small><b>웃자대한민국협회</b><p>자문위원</p></div>
+        <div className="wc"><small>2022 –</small><b>한국시니어교육협회</b><p>부회장 겸 강사 · 대한노인회 지정 교육기관</p></div>
+        <div className="wc"><small>2022 –</small><b>대한노인회</b><p>소속 대표강사(노인대학)</p></div>
+        <div className="wc"><small>2026. 5 –</small><b>대한모금가협회</b><p>가치공유 인재개발원장 · 평생교육원 운영 총괄</p></div>
+        <div className="wc"><small>2026. 5 –</small><b>한국소기업소상공인연합회</b><p>관악구 정책자문위원장</p></div>
+        <div className="wc"><small>현재</small><b>한국글로벌강사협회</b><p>교수</p></div>
+      </div></section>
+
+      <section className="gal"><div className="head"><div className="tag">GALLERY</div><h2>이윤우</h2></div>
+        <div className="reel" ref={reelRef}>
+          {LYW_GALLERY.map((im) => <img key={im.f} src={LYW_IMG + im.f} width={im.w} height={im.h} alt="이윤우 교수" />)}
+        </div>
+        <div className="pnav">
+          <button type="button" aria-label="이전" onClick={() => reelGo(-1)} disabled={pz.prevDis}>←</button>
+          <button type="button" aria-label="다음" onClick={() => reelGo(1)} disabled={pz.nextDis}>→</button>
+          <span aria-live="polite">{pz.i + 1} / {LYW_GALLERY.length}</span>
+        </div></section>
+
+      <section className="chan"><div className="tag">CHANNEL</div><h2>이윤우와 만나는 곳</h2>
+        <a className="yt" href="https://www.youtube.com/@이윤우_tv" target="_blank" rel="noopener noreferrer"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8z" /><path fill="#FF0000" d="M9.6 15.6V8.4l6.2 3.6-6.2 3.6z" /></svg></i><div><b>유튜브</b><span>@이윤우_tv</span></div><em>영상 보러 가기 →</em></a></section>
+
+      <section className="contact"><div className="tag">CONTACT</div><h2>강의 문의</h2>
+        <div className="form"><div className="fhead"><p className="fsub">남겨 주신 내용은 이윤우 교수님께 바로 전달됩니다.</p><a className="call" href="tel:01074462687" aria-label="이윤우 교수에게 전화 걸기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg><span>전화 문의</span></a></div>
+          {submitted ? (
+            <p className="lyw-ok">문의가 전달되었습니다. 이윤우 교수님께 전해 드립니다.</p>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <div className="grid"><label>이름<input placeholder="홍길동" value={form.name} onChange={setF('name')} /></label><label>연락처<input placeholder="010-0000-0000" type="tel" inputMode="tel" value={form.phone} onChange={setF('phone')} /></label>
+                <label>기관·단체<input placeholder="예: ○○노인대학, ○○복지관" value={form.org} onChange={setF('org')} /></label>
+                <label>희망 강의<select value={form.topic} onChange={setF('topic')}>{LYW_COURSES.map((c) => <option key={c} value={c}>{c}</option>)}</select></label>
+                <label className="full">문의 내용<textarea rows="4" placeholder="일정, 인원, 장소 등을 적어 주세요" value={form.message} onChange={setF('message')} /></label></div>
+              {err && <p className="lyw-err">{err}</p>}
+              <button type="submit" className="send" disabled={submitting}>{submitting ? '전송 중…' : '문의 보내기'}</button>
+            </form>
+          )}
+        </div></section>
+    </div>
+  );
+}
+
 /* 앱 주소에서 표시용 호스트 추출 (www. 제거). 없거나 파싱 실패 시 빈 문자열 */
 function appHost(url) {
   try {
@@ -5387,6 +5660,7 @@ export default function PiumAppDetailPage() {
   if (slug === "isoo")         return <IsooPage />;
   if (slug === "limhaesook")   return <LimHaesookPage />;
   if (slug === "parksangyoung") return <ParkSangyoungPage />;
+  if (slug === "leeyunwoo")     return <LeeYunwooPage />;
 
   const app = APPS[slug];
 
