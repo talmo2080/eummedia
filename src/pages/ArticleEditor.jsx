@@ -835,7 +835,9 @@ export default function ArticleEditor() {
   //   · 라인 전체가 정확히 ^---{항목}---$ (앞뒤 공백 허용)
   //   · 본문의 '---' 가로줄과 혼동 안 됨 (가로줄은 대시만, 항목명 없음)
 
-  const BULK_SECTIONS = ['채널', '제목', '부제', '요약', '태그', '슬러그', '본문']
+  // ※ '부제'는 【3】 subtitle 컬럼 추가 전까지 임시 제외 (세연 요청 2026-11-02).
+  //    요약과 섞여 저장되던 문제 방지. 복원 시 '요약' 앞에 '부제' 다시 추가.
+  const BULK_SECTIONS = ['채널', '제목', '요약', '태그', '슬러그', '본문']
   const BULK_SEP_RE = new RegExp(`^\\s*---\\s*(${BULK_SECTIONS.join('|')})\\s*---\\s*$`, 'gm')
 
   function parseBulkText(text) {
@@ -867,7 +869,10 @@ export default function ArticleEditor() {
     const anyMatches = [...text.matchAll(anyRe)]
     for (const am of anyMatches) {
       const n = am[1].trim()
-      if (!BULK_SECTIONS.includes(n)) {
+      if (n === '부제') {
+        // 【3】 subtitle 컬럼이 생기면 BULK_SECTIONS 에 '부제'를 다시 추가하면 이 경고가 사라짐.
+        warnings.push(`'---부제---'는 현재 지원하지 않습니다. 부제 칸은 준비 중이며, 지금 쓰면 반영되지 않습니다. 요약 칸에 함께 적어주세요.`)
+      } else if (!BULK_SECTIONS.includes(n)) {
         warnings.push(`알 수 없는 구분자: '---${n}---' (지원 목록: ${BULK_SECTIONS.join(', ')})`)
       }
     }
@@ -881,11 +886,10 @@ export default function ArticleEditor() {
       if (CHANNELS.includes(trimmed)) setChannel(trimmed)
     }
     if (parsed.제목) setTitle(parsed.제목.trim())
-    // 부제·요약 합치기 (DB엔 summary 컬럼 하나뿐이라 두 줄 공백으로 결합)
-    const sub = (parsed.부제 || '').trim()
-    const sum = (parsed.요약 || '').trim()
-    const combined = [sub, sum].filter(Boolean).join('\n\n')
-    if (combined) setSummary(combined)
+    // 요약만 summary 로 반영. 부제는 【3】 subtitle 컬럼 추가 전까지 미지원.
+    //   (이전엔 부제+요약을 \n\n 로 결합해 summary 에 넣었으나,
+    //    세연이 쓴 요약이 뒤섞이는 문제로 2026-11-02 분리)
+    if (parsed.요약) setSummary(parsed.요약.trim())
     if (parsed.태그) {
       const tagList = parsed.태그.split(/[,\n]/).map(t => t.trim().replace(/^#/, '')).filter(Boolean)
       setTags(tagList)
@@ -903,7 +907,7 @@ export default function ArticleEditor() {
     const occupied = []
     if (parsed.채널 && channel) occupied.push(`채널 ("${channel}")`)
     if (parsed.제목 && title.trim()) occupied.push(`제목`)
-    if ((parsed.부제 || parsed.요약) && summary.trim()) occupied.push(`요약`)
+    if (parsed.요약 && summary.trim()) occupied.push(`요약`)
     if (parsed.태그 && Array.isArray(tags) && tags.length > 0) occupied.push(`태그 (${tags.length}개)`)
     if (parsed.슬러그 && (slugInputRef.current?.value || slug).trim()) occupied.push(`주소(slug)`)
     if (parsed.본문 && content.trim()) occupied.push(`본문`)
@@ -1613,7 +1617,7 @@ export default function ArticleEditor() {
                     value={bulkText}
                     onChange={e => setBulkText(e.target.value)}
                     rows={10}
-                    placeholder={'---채널---\n이음피플\n---제목---\n(제목)\n---부제---\n(부제)\n---요약---\n(요약)\n---태그---\n키워드1, 키워드2\n---슬러그---\n한글-슬러그\n---본문---\n(본문 전체)'}
+                    placeholder={'---채널---\n이음피플\n---제목---\n(제목)\n---요약---\n(요약)\n---태그---\n키워드1, 키워드2\n---슬러그---\n한글-슬러그\n---본문---\n(본문 전체)'}
                     style={{
                       width: '100%', boxSizing: 'border-box',
                       padding: '12px 14px', fontSize: 14,
