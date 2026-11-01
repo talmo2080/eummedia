@@ -26,6 +26,7 @@ import MyPage from './pages/MyPage'
 import Videos from './pages/Videos'
 import Accessibility from './pages/Accessibility'
 import Pium from './pages/Pium'
+import SearchResults from './pages/SearchResults'
 import PiumRequest from './pages/PiumRequest'
 import PiumSubmitPage from './pages/PiumSubmitPage'
 import PiumAdminPage from './pages/PiumAdminPage'
@@ -67,6 +68,7 @@ function AppShell() {
         <Route path="/youth" element={<YouthPolicy />} />
         <Route path="/videos" element={<Videos />} />
         <Route path="/accessibility" element={<Accessibility />} />
+        <Route path="/search" element={<SearchResults />} />
         <Route path="/write" element={
           <ProtectedRoute requiredRole="writer"><ArticleEditor /></ProtectedRoute>
         } />

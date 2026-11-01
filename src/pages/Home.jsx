@@ -1,7 +1,58 @@
 ﻿import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import VideoGallery from "../components/VideoGallery";
+
+// 홈 상단 검색박스 — 세연 요청 (2026-11-02)
+// Home 함수 안에서 useNavigate 중복 호출 피하려 분리 컴포넌트.
+// 되돌리기: 이 컴포넌트와 <HomeSearchBox/> 호출 1줄 삭제.
+function HomeSearchBox() {
+  const navigate = useNavigate();
+  const [q, setQ] = useState("");
+  const onSubmit = (e) => {
+    e.preventDefault();
+    const v = q.trim().replace(/[,()%]/g, " ").replace(/\s+/g, " ").slice(0, 100);
+    if (!v) return;
+    navigate(`/search?q=${encodeURIComponent(v)}`);
+  };
+  return (
+    <section aria-label="기사 검색" style={{
+      maxWidth: 1200, margin: "16px auto 0", padding: "0 16px",
+    }}>
+      <form onSubmit={onSubmit} role="search" style={{
+        display: "flex", gap: 8,
+        background: "#fff", padding: 10, borderRadius: 8,
+        border: "1.5px solid #0d2d52",
+      }}>
+        <label htmlFor="home-search-input" style={{
+          position: "absolute", width: 1, height: 1, padding: 0, margin: -1,
+          overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0,
+        }}>기사 검색</label>
+        <input
+          id="home-search-input"
+          type="search"
+          value={q}
+          onChange={e => setQ(e.target.value)}
+          placeholder="기사 검색 — 제목·요약·기자·본문"
+          style={{
+            flex: 1, minHeight: 44, padding: "8px 12px",
+            fontSize: 16, borderRadius: 6,
+            border: "1px solid #d0d0d0", background: "#fff",
+            fontFamily: "inherit", boxSizing: "border-box",
+            minWidth: 0,
+          }}
+        />
+        <button type="submit" style={{
+          minHeight: 44, padding: "8px 18px",
+          background: "#0d2d52", color: "#fff",
+          fontSize: 15, fontWeight: 800,
+          border: "none", borderRadius: 6, cursor: "pointer",
+          fontFamily: "inherit", whiteSpace: "nowrap",
+        }}>🔍 검색</button>
+      </form>
+    </section>
+  );
+}
 
 const CC = {
   "이음매거진":"#0d2d52","이음뉴스":"#c0392b","이음에듀":"#1a6b3c",
@@ -410,6 +461,9 @@ export default function Home() {
           ⚠️ {error}
         </div>
       )}
+
+      {/* 기사 검색 — 세연 요청 (2026-11-02). 모바일·데스크탑 공통 상단 */}
+      <HomeSearchBox />
 
       {/* ━━━━━━━━━━━ 모바일·태블릿 신문형 (lg 미만) ━━━━━━━━━━━ */}
       {/* 순서: HERO → 최신 → 카드뉴스 → 인기 → 광고 → 7채널 → 주식 */}
