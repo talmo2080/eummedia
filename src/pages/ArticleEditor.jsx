@@ -2164,12 +2164,40 @@ export default function ArticleEditor() {
               </div>
             </div>
 
-            {/* 8.5 본문 이미지 캡션·alt 편집 — 본문에 삽입된 [이미지:...] 태그를 자동 파싱 */}
-            {inlineImages.length > 0 && (
-              <div style={card}>
-                <label style={lbl}>
-                  본문 이미지 캡션·대체 텍스트 <span style={{ color: '#888', fontWeight: 500, fontSize: 15 }}>({inlineImages.length}장)</span>
-                </label>
+            {/* 8.5 본문 이미지 — 올리기 버튼 + 캡션·alt 편집
+                세연 요청 (2026-11-02): 섹션을 항상 노출하도록 복구.
+                기존은 {inlineImages.length > 0 && (...)}로 조건부라
+                본문에 [이미지:URL] 태그가 없으면 섹션 자체가 안 보여 "사라졌다"로 보임.
+                이제 0장이어도 안내 + 큰 '본문에 사진 올리기' 버튼을 노출. */}
+            <div style={card}>
+              <label style={lbl}>
+                본문 이미지
+                {inlineImages.length > 0 && (
+                  <span style={{ color: '#888', fontWeight: 500, fontSize: 15, marginLeft: 6 }}>
+                    · 캡션·대체 텍스트 ({inlineImages.length}장)
+                  </span>
+                )}
+              </label>
+              {inlineImages.length === 0 ? (
+                <>
+                  <div style={{ fontSize: 15, color: '#555', marginBottom: 14, lineHeight: 1.7 }}>
+                    본문 안에 넣을 사진을 올리면 여기 캡션·대체 텍스트 편집 칸이 나타납니다.<br />
+                    아래 버튼으로 바로 올리거나, 본문 툴바의 '📷 이미지 넣기'로도 추가할 수 있어요.
+                  </div>
+                  <button type="button" onClick={openInlineImageFilePicker} disabled={inlineImageUploading}
+                    style={{
+                      width: '100%', minHeight: 60, fontSize: 19, fontWeight: 700,
+                      background: inlineImageUploading ? '#f0f0f0' : '#fff',
+                      color: inlineImageUploading ? '#888' : NAVY,
+                      border: `2px solid ${inlineImageUploading ? '#ccc' : NAVY}`, borderRadius: 8,
+                      cursor: inlineImageUploading ? 'wait' : 'pointer',
+                      fontFamily: SANS,
+                    }}>
+                    {inlineImageUploading ? '⏳ 업로드 중...' : '📁 본문에 사진 올리기'}
+                  </button>
+                </>
+              ) : (
+                <>
                 <div style={{ fontSize: 13, color: '#666', marginBottom: 16, lineHeight: 1.7 }}>
                   본문에 삽입된 이미지의 캡션·대체 텍스트를 편집합니다.
                   캡션은 사진 아래 표시(출처·날짜 가능), 대체 텍스트는 검색·시각장애인용입니다.
@@ -2247,8 +2275,21 @@ export default function ArticleEditor() {
                     )
                   })}
                 </div>
-              </div>
-            )}
+                <button type="button" onClick={openInlineImageFilePicker} disabled={inlineImageUploading}
+                  style={{
+                    width: '100%', minHeight: 50, marginTop: 14,
+                    fontSize: 16, fontWeight: 700,
+                    background: inlineImageUploading ? '#f0f0f0' : '#fff',
+                    color: inlineImageUploading ? '#888' : NAVY,
+                    border: `1.5px solid ${inlineImageUploading ? '#ccc' : NAVY}`, borderRadius: 6,
+                    cursor: inlineImageUploading ? 'wait' : 'pointer',
+                    fontFamily: SANS,
+                  }}>
+                  {inlineImageUploading ? '⏳ 업로드 중...' : '📁 본문에 사진 더 올리기'}
+                </button>
+                </>
+              )}
+            </div>
 
             {/* 9. 본문 중간 배너 (선택) — 광고/협찬. 제목 있으면 배너 표시, 이미지 있으면 이미지형 자동 분기 */}
             <div style={card}>
