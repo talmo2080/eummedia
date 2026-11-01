@@ -279,6 +279,11 @@ export default function ArticleEditor() {
   // IndexNow 결과: null(요청 전) | {pending:true} | {ok, status, error?, engineResponse?}
   const [indexNowResult, setIndexNowResult] = useState(null)
   const [activeTab, setActiveTab] = useState(1)
+  // 한 번에 붙여넣기 — 세연 요청 (2026-11-02): 템플릿 구분자로 모든 칸 자동 채우기
+  const [bulkOpen, setBulkOpen] = useState(false)      // 섹션 접기/펼치기
+  const [bulkText, setBulkText] = useState('')         // 사용자가 붙여넣은 원문
+  const [bulkPreview, setBulkPreview] = useState(null) // {parsed, warnings}
+  const [bulkError, setBulkError] = useState('')
   const [channel, setChannel] = useState('')
   const [title, setTitle] = useState('')
   // 기사 주소 (slug) — 사용자가 한글로 입력 가능. 비우면 기존/자동 생성값 사용.
@@ -818,6 +823,118 @@ export default function ArticleEditor() {
   // Math.random 기반 fallback (안전)
   const generateSlug = () => `article-${Math.random().toString(36).slice(2, 10)}`
 
+  // ━━ 한 번에 붙여넣기 — 파서·미리보기·채우기 ━━
+  // 세연 요청 (2026-11-02):
+  //   · 템플릿 구분자 '---항목---' 로 모든 칸 자동 채우기
+  //   · 미리보기로 어느 칸에 뭐가 들어가는지 확인 후 확정
+  //   · 기존 입력이 있으면 덮어쓸지 물어봄
+  //   · 오류는 조용히 넘기지 말고 어디가 잘못됐는지 알려줌
+  //   · 발행 버튼은 건드리지 않음 (채우기만)
+  //
+  // 안전한 매칭 패턴:
+  //   · 라인 전체가 정확히 ^---{항목}---$ (앞뒤 공백 허용)
+  //   · 본문의 '---' 가로줄과 혼동 안 됨 (가로줄은 대시만, 항목명 없음)
+
+  const BULK_SECTIONS = ['채널', '제목', '부제', '요약', '태그', '슬러그', '본문']
+  const BULK_SEP_RE = new RegExp(`^\\s*---\\s*(${BULK_SECTIONS.join('|')})\\s*---\\s*$`, 'gm')
+
+  function parseBulkText(text) {
+    if (!text || !text.trim()) return { error: '붙여넣은 내용이 없습니다.' }
+    const matches = [...text.matchAll(BULK_SEP_RE)]
+    if (matches.length === 0) {
+      return { error: '구분자(---채널---, ---제목--- …)가 하나도 없습니다. 템플릿 형식인지 확인해주세요.' }
+    }
+    const parsed = {}
+    const warnings = []
+    const seen = new Set()
+    for (let i = 0; i < matches.length; i++) {
+      const m = matches[i]
+      const name = m[1]
+      if (seen.has(name)) {
+        return { error: `구분자 '---${name}---'가 2번 이상 나왔습니다. 섹션은 한 번씩만 쓰세요.` }
+      }
+      seen.add(name)
+      const start = m.index + m[0].length
+      const end = i + 1 < matches.length ? matches[i + 1].index : text.length
+      const value = text.slice(start, end).replace(/^\s*\n|\n\s*$/g, '').trim()
+      if (!value) {
+        warnings.push(`'---${name}---' 아래 내용이 비어있습니다.`)
+      }
+      parsed[name] = value
+    }
+    // 알 수 없는 구분자(오타 등) 체크: BULK_SEP_RE 밖의 `---xxx---` 패턴
+    const anyRe = /^\s*---\s*([^-\s][^-\n]*?)\s*---\s*$/gm
+    const anyMatches = [...text.matchAll(anyRe)]
+    for (const am of anyMatches) {
+      const n = am[1].trim()
+      if (!BULK_SECTIONS.includes(n)) {
+        warnings.push(`알 수 없는 구분자: '---${n}---' (지원 목록: ${BULK_SECTIONS.join(', ')})`)
+      }
+    }
+    return { parsed, warnings }
+  }
+
+  // 파싱된 데이터로 상태 채우기. 호출 전 confirm 처리는 상위에서.
+  function applyBulkParsed(parsed) {
+    if (parsed.채널) {
+      const trimmed = parsed.채널.trim()
+      if (CHANNELS.includes(trimmed)) setChannel(trimmed)
+    }
+    if (parsed.제목) setTitle(parsed.제목.trim())
+    // 부제·요약 합치기 (DB엔 summary 컬럼 하나뿐이라 두 줄 공백으로 결합)
+    const sub = (parsed.부제 || '').trim()
+    const sum = (parsed.요약 || '').trim()
+    const combined = [sub, sum].filter(Boolean).join('\n\n')
+    if (combined) setSummary(combined)
+    if (parsed.태그) {
+      const tagList = parsed.태그.split(/[,\n]/).map(t => t.trim().replace(/^#/, '')).filter(Boolean)
+      setTags(tagList)
+    }
+    if (parsed.슬러그) {
+      const cleaned = cleanSlug(parsed.슬러그.trim())
+      setSlug(cleaned)
+      if (slugInputRef.current) slugInputRef.current.value = cleaned
+    }
+    if (parsed.본문) setContent(parsed.본문)
+  }
+
+  // 현재 어느 칸에 이미 값이 있는지 — 덮어쓰기 경고용
+  function detectOccupiedFields(parsed) {
+    const occupied = []
+    if (parsed.채널 && channel) occupied.push(`채널 ("${channel}")`)
+    if (parsed.제목 && title.trim()) occupied.push(`제목`)
+    if ((parsed.부제 || parsed.요약) && summary.trim()) occupied.push(`요약`)
+    if (parsed.태그 && Array.isArray(tags) && tags.length > 0) occupied.push(`태그 (${tags.length}개)`)
+    if (parsed.슬러그 && (slugInputRef.current?.value || slug).trim()) occupied.push(`주소(slug)`)
+    if (parsed.본문 && content.trim()) occupied.push(`본문`)
+    return occupied
+  }
+
+  // 미리보기 생성 — 세연이 확정 전에 어느 칸에 뭐가 들어가는지 확인
+  const handleBulkPreview = () => {
+    setBulkError('')
+    const r = parseBulkText(bulkText)
+    if (r.error) { setBulkError(r.error); setBulkPreview(null); return }
+    setBulkPreview(r)
+  }
+
+  // 채우기 확정 — 덮어쓰기 확인 후 applyBulkParsed
+  const handleBulkApply = () => {
+    if (!bulkPreview) return
+    const occupied = detectOccupiedFields(bulkPreview.parsed)
+    if (occupied.length > 0) {
+      const ok = window.confirm(
+        `아래 칸에 이미 입력된 내용이 있습니다. 덮어쓰시겠습니까?\n\n· ${occupied.join('\n· ')}`
+      )
+      if (!ok) return
+    }
+    applyBulkParsed(bulkPreview.parsed)
+    // 사용 후 입력창은 비우지 않음 (사용자가 다시 확인할 수 있게)
+    setBulkPreview(null)
+    setBulkError('')
+    alert('입력창에 자동으로 채워졌습니다. 사진·캡션은 따로 넣어주세요.\n저장은 평소처럼 직접 눌러주세요.')
+  }
+
   // 사용자 입력 slug 정리:
   //   · 소문자화 (한글 영향 없음, 영문만 lowercase)
   //   · 공백 → 하이픈
@@ -949,10 +1066,29 @@ export default function ArticleEditor() {
     return null
   }
 
+  // ━━ 저장 전 slug 비어있음 사전 경고 (세연 요청 2026-11-02)
+  //    자동 생성 주소(article-xxxxxxxx)로 발행된 사고 재발 방지.
+  //    완전히 잠그진 않음 — "꼭 필요할 때는 넘어갈 수 있게."
+  //    편집 중인 기존 기사(editId)에서 이미 slug 가 있으면 통과.
+  const confirmEmptySlugOrAbort = () => {
+    if (isSlugLocked) return true // published 편집은 기존 slug 유지, 체크 불필요
+    const raw = slugInputRef.current?.value ?? slug
+    const cleaned = cleanSlug(raw)
+    if (cleaned) return true // 입력됨
+    return window.confirm(
+      '주소(slug)가 비어 있습니다.\n\n' +
+      '· 이대로 저장하면 자동 생성 주소(article-xxxxxxxx)로 들어갑니다.\n' +
+      '· 이음미디어는 한글 주소를 원칙으로 합니다.\n' +
+      '· 인물 기사라면 이름을 넣어주세요 (예: 성창운-홍채분석-5천명).\n\n' +
+      '그래도 비운 채로 계속하시겠습니까?'
+    )
+  }
+
   const handleDraft = async () => {
     if (submitting) return
     if (!title.trim()) { alert('제목을 입력해주세요.'); return }
     if (!user) { alert('로그인이 필요합니다.'); return }
+    if (!confirmEmptySlugOrAbort()) return
     const slugErr = await preSaveSlugCheck()
     if (slugErr) { alert(slugErr.alert); return }
     setSubmitting(true)
@@ -984,6 +1120,7 @@ export default function ArticleEditor() {
     if (submitting) return
     if (!user) { alert('로그인이 필요합니다.'); return }
     if (!CHANNEL_ID_MAP[channel]) { alert('채널을 선택해주세요.'); return }
+    if (!confirmEmptySlugOrAbort()) return
     if (!canSubmit) {
       setShowRedHighlight(true)
       setActiveTab(2)
@@ -1443,6 +1580,163 @@ export default function ArticleEditor() {
         {/* ━━ 탭 1: 기사 작성 ━━ */}
         {activeTab === 1 && (
           <div>
+            {/* 0. 한 번에 붙여넣기 (보조 수단) — 세연 요청 (2026-11-02) */}
+            <div style={{ ...card, border: '1.5px dashed #c8d2df', background: '#fafbfd' }}>
+              <button
+                type="button"
+                onClick={() => setBulkOpen(!bulkOpen)}
+                aria-expanded={bulkOpen}
+                style={{
+                  width: '100%', textAlign: 'left',
+                  background: 'transparent', border: 'none', padding: 0,
+                  fontSize: 18, fontWeight: 700, color: NAVY,
+                  cursor: 'pointer', fontFamily: SANS,
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}>
+                <span>📋 한 번에 붙여넣기 (선택)</span>
+                <span style={{ fontSize: 14, color: '#595959' }}>{bulkOpen ? '접기 ▲' : '펼치기 ▼'}</span>
+              </button>
+              {!bulkOpen && (
+                <div style={{ fontSize: 14, color: '#595959', marginTop: 8, lineHeight: 1.6 }}>
+                  템플릿 형식(---채널---, ---제목--- …)으로 작성된 글을 한 번에 각 칸에 채워 넣습니다.
+                </div>
+              )}
+              {bulkOpen && (
+                <div style={{ marginTop: 14 }}>
+                  <div style={{ fontSize: 14, color: '#3a3a3a', lineHeight: 1.7, marginBottom: 10 }}>
+                    <strong>구분자</strong>: <code style={{ background: '#eef3fa', padding: '2px 6px', borderRadius: 3 }}>---채널---</code> <code style={{ background: '#eef3fa', padding: '2px 6px', borderRadius: 3 }}>---제목---</code> <code style={{ background: '#eef3fa', padding: '2px 6px', borderRadius: 3 }}>---부제---</code> <code style={{ background: '#eef3fa', padding: '2px 6px', borderRadius: 3 }}>---요약---</code> <code style={{ background: '#eef3fa', padding: '2px 6px', borderRadius: 3 }}>---태그---</code> <code style={{ background: '#eef3fa', padding: '2px 6px', borderRadius: 3 }}>---슬러그---</code> <code style={{ background: '#eef3fa', padding: '2px 6px', borderRadius: 3 }}>---본문---</code>
+                    <div style={{ marginTop: 6, fontSize: 13, color: '#595959' }}>
+                      각 구분자는 라인 전체여야 합니다. 사진·캡션은 손으로 추가하세요.
+                    </div>
+                  </div>
+                  <textarea
+                    value={bulkText}
+                    onChange={e => setBulkText(e.target.value)}
+                    rows={10}
+                    placeholder={'---채널---\n이음피플\n---제목---\n(제목)\n---부제---\n(부제)\n---요약---\n(요약)\n---태그---\n키워드1, 키워드2\n---슬러그---\n한글-슬러그\n---본문---\n(본문 전체)'}
+                    style={{
+                      width: '100%', boxSizing: 'border-box',
+                      padding: '12px 14px', fontSize: 14,
+                      border: '1.5px solid #d0d0d0', borderRadius: 6,
+                      fontFamily: 'monospace, "Noto Sans KR", sans-serif',
+                      resize: 'vertical', outline: 'none', lineHeight: 1.6,
+                    }}
+                  />
+                  <div style={{ display: 'flex', gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      onClick={handleBulkPreview}
+                      disabled={!bulkText.trim()}
+                      style={{
+                        background: bulkText.trim() ? NAVY : '#ccc',
+                        color: '#fff', border: 'none',
+                        padding: '10px 18px', borderRadius: 6,
+                        fontSize: 15, fontWeight: 700,
+                        cursor: bulkText.trim() ? 'pointer' : 'not-allowed',
+                        fontFamily: SANS,
+                      }}>
+                      👀 미리보기
+                    </button>
+                    {bulkText && (
+                      <button
+                        type="button"
+                        onClick={() => { setBulkText(''); setBulkPreview(null); setBulkError('') }}
+                        style={{
+                          background: '#fff', color: '#595959',
+                          border: '1.5px solid #c8d2df',
+                          padding: '10px 18px', borderRadius: 6,
+                          fontSize: 15, fontWeight: 600, cursor: 'pointer',
+                          fontFamily: SANS,
+                        }}>
+                        지우기
+                      </button>
+                    )}
+                  </div>
+
+                  {bulkError && (
+                    <div role="alert" style={{
+                      marginTop: 12, padding: '12px 14px',
+                      background: '#fef0ef', border: '1px solid #c0392b',
+                      borderRadius: 6, color: '#c0392b', fontSize: 14, lineHeight: 1.6,
+                    }}>
+                      <strong>⚠ 오류</strong>: {bulkError}
+                    </div>
+                  )}
+
+                  {bulkPreview && (
+                    <div style={{
+                      marginTop: 12, padding: '14px 16px',
+                      background: '#fff', border: '1.5px solid #93b4e8', borderRadius: 6,
+                    }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: NAVY, marginBottom: 10 }}>
+                        미리보기 — 아래처럼 채워집니다
+                      </div>
+                      <table style={{ width: '100%', fontSize: 13, borderCollapse: 'collapse' }}>
+                        <tbody>
+                          {BULK_SECTIONS.map(sec => {
+                            const val = bulkPreview.parsed[sec]
+                            if (val === undefined) return null
+                            // 채널 매칭 안 되면 경고
+                            const channelOk = sec !== '채널' || CHANNELS.includes(val.trim())
+                            return (
+                              <tr key={sec}>
+                                <td style={{ padding: '6px 10px', verticalAlign: 'top', color: '#595959', fontWeight: 700, width: 70, whiteSpace: 'nowrap' }}>
+                                  {sec}
+                                </td>
+                                <td style={{ padding: '6px 10px', color: '#1a1a1a', wordBreak: 'break-all', borderBottom: '1px solid #f0f0f0' }}>
+                                  {sec === '본문'
+                                    ? <span style={{ color: '#555' }}>({val.length}자, 전체 본문 그대로 들어감)</span>
+                                    : <span>{val.length > 160 ? val.slice(0, 160) + '…' : val}</span>}
+                                  {!channelOk && (
+                                    <div style={{ color: '#c0392b', fontSize: 12, marginTop: 4 }}>
+                                      ⚠ 알 수 없는 채널명 — 지원: {CHANNELS.join(', ')}
+                                    </div>
+                                  )}
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                      {bulkPreview.warnings?.length > 0 && (
+                        <div style={{ marginTop: 10, padding: '10px 12px', background: '#fff8e1', border: '1px solid #e8c98a', borderRadius: 4, fontSize: 13, color: '#5a4520', lineHeight: 1.6 }}>
+                          <strong>참고</strong>:
+                          <ul style={{ margin: '4px 0 0 20px', padding: 0 }}>
+                            {bulkPreview.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                          </ul>
+                        </div>
+                      )}
+                      <div style={{ display: 'flex', gap: 10, marginTop: 14, flexWrap: 'wrap' }}>
+                        <button
+                          type="button"
+                          onClick={handleBulkApply}
+                          style={{
+                            background: GREEN, color: '#fff', border: 'none',
+                            padding: '10px 20px', borderRadius: 6,
+                            fontSize: 15, fontWeight: 700, cursor: 'pointer',
+                            fontFamily: SANS,
+                          }}>
+                          ✅ 이대로 채우기
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setBulkPreview(null)}
+                          style={{
+                            background: '#fff', color: '#595959',
+                            border: '1.5px solid #c8d2df',
+                            padding: '10px 18px', borderRadius: 6,
+                            fontSize: 15, fontWeight: 600, cursor: 'pointer',
+                            fontFamily: SANS,
+                          }}>
+                          취소
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* 1. 채널 선택 */}
             <div style={card}>
               <label style={lbl}>
